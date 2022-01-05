@@ -24,3 +24,10 @@ phoenix_live_admin-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Compiled assets
+/priv/
+
+# Node artifacts
+/.npm/
+/assets/node_modules/

@@ -1,0 +1,18 @@
+{
+  "name": "phoenix_live_admin_assets",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "node esbuild.js",
+    "release": "node esbuild.js --release",
+    "watch": "node esbuild.js --watch"
+  },
+  "dependencies": {
+    "phoenix": "file:../deps/phoenix",
+    "phoenix_html": "file:../deps/phoenix_html",
+    "phoenix_live_view": "file:../deps/phoenix_live_view"
+  },
+  "devDependencies": {
+    "esbuild": "^0.14.0"
+  }
+}
