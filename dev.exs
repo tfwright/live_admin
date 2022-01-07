@@ -34,7 +34,8 @@ Application.put_env(:phoenix_live_admin, DemoWeb.Endpoint,
     patterns: [
       ~r"dist/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"lib/phoenix/live_admin/components/.*(ex)$",
-      ~r"lib/phoenix/live_admin/templates/.*/.*(ex)$"
+      ~r"lib/phoenix/live_admin/templates/.*/.*(ex)$",
+      ~r"lib/phoenix/live_admin/.*(ex)$"
     ]
   ],
   pubsub_server: Demo.PubSub
@@ -59,6 +60,14 @@ defmodule DemoWeb.PageController do
   end
 end
 
+defmodule Demo.User do
+  use Ecto.Schema
+
+  schema "users" do
+    field :name, :string
+  end
+end
+
 defmodule DemoWeb.Router do
   use Phoenix.Router
   import Phoenix.LiveAdmin.Router
@@ -71,7 +80,7 @@ defmodule DemoWeb.Router do
     pipe_through :browser
     get "/", DemoWeb.PageController, :index
 
-    live_admin "/admin"
+    live_admin "/admin", resources: [Demo.User]
   end
 end
 
