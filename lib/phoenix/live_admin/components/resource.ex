@@ -3,6 +3,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   @impl true
   def mount(params, _session, socket) do
-    {:ok, assign(socket, :resource, params["resource"])}
+    {:ok, assign(socket, :resource, String.to_existing_atom(params["resource"]))}
   end
 end

@@ -41,6 +41,8 @@ Application.put_env(:phoenix_live_admin, DemoWeb.Endpoint,
   pubsub_server: Demo.PubSub
 )
 
+Application.put_env(:phoenix_live_admin, :ecto_repo, Demo.Repo)
+
 defmodule DemoWeb.PageController do
   import Plug.Conn
 
@@ -65,6 +67,23 @@ defmodule Demo.User do
 
   schema "users" do
     field :name, :string
+  end
+end
+
+defmodule Demo.Populator do
+  alias Demo.Repo
+
+  def reset do
+    teardown()
+    run()
+  end
+
+  def run do
+    Enum.each(1..100, &Demo.Repo.insert(%Demo.User{id: &1, name: Faker.Person.name()}))
+  end
+
+  defp teardown do
+    Repo.delete_all(Demo.User)
   end
 end
 
@@ -109,6 +128,8 @@ Task.async(fn ->
   children = [Demo.Repo, DemoWeb.Endpoint, {Phoenix.PubSub, name: Demo.PubSub, adapter: Phoenix.PubSub.PG2}]
 
   {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one)
+
+  Demo.Populator.reset()
 
   Process.sleep(:infinity)
 end)

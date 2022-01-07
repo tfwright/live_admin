@@ -14,12 +14,10 @@ services:
     command: mix dev
   db:
     environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: phx_admin_dev
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_HOST_AUTH_METHOD: trust
-    image: 'postgres:11-alpine'
+    image: 'postgres:13-alpine'
     volumes:
-      - 'pgdata:/var/lib/postgresql/data'
-volumes:
-  pgdata:
+      - './dev/initdb:/docker-entrypoint-initdb.d'
