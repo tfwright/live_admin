@@ -7,7 +7,8 @@ defmodule PhoenixLiveAdmin.MixProject do
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -22,8 +23,17 @@ defmodule PhoenixLiveAdmin.MixProject do
   defp deps do
     [
       {:phoenix_live_view, "~> 0.16"},
+      {:plug_cowboy, "~> 2.0", only: :dev},
+      {:jason, "~> 1.3", only: :dev},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:ecto, "~> 3.6.2 or ~> 3.7", only: [:dev, :test]},
-      {:ecto_psql_extras, "~> 0.7", only: [:dev, :test]},
+      {:ecto_psql_extras, "~> 0.7", only: [:dev, :test]}
+    ]
+  end
+
+  defp aliases do
+    [
+      dev: "run --no-halt dev.exs"
     ]
   end
 end

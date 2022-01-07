@@ -6,13 +6,12 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - /opt/app/assets/node_modules
-      - /opt/app/deps
       - .:/opt/app
     environment:
       PG_URL: postgres:postgres@db
     depends_on:
       - db
+    command: mix dev
   db:
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata

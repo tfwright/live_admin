@@ -36,7 +36,7 @@ defmodule Phoenix.LiveAdminTest.Router do
     plug :fetch_session
   end
 
-  scope "/", ThisWontBeUsed, as: :this_wont_be_used do
+  scope "/" do
     pipe_through :browser
 
     live_admin "/"

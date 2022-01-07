@@ -7,6 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="data:;base64,=">
+    <style><%= raw(render("app.css")) %></style>
     <%= csrf_meta_tag() %>
     <%= if assigns[:page_title] do %>
       <%= live_title_tag @page_title %>
