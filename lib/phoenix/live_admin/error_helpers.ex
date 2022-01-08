@@ -8,7 +8,7 @@ defmodule Phoenix.LiveAdmin.ErrorHelpers do
   @doc """
   Generates tag for inlined form input errors.
   """
-  def error_tag(form, field, opts \\ []) do
+  def error_tag(form, field) do
     Enum.map(Keyword.get_values(form.errors, field), fn {desc, _details} ->
       content_tag(:span, desc,
         class: "text-red-500",

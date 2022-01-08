@@ -12,13 +12,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   @impl true
-  def handle_params(unsigned_params, uri, socket) do
-    IO.inspect(unsigned_params, label: "params changed!")
-    IO.inspect(unsigned_params, label: "socket")
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_event(
         "validate",
         %{"params" => params},
