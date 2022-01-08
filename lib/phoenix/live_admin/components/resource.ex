@@ -81,7 +81,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         <%= for record <- repo().all(@resource) do %>
           <tr>
             <%= for field <- fields(@resource) do %>
-              <td class="border px-8 py-4"><%= Map.fetch!(record, field) %></td>
+              <td class="border px-8 py-4">
+                <%= record |> Map.fetch!(field) |> inspect() %>
+              </td>
             <% end %>
           </tr>
         <% end %>
