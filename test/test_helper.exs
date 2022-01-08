@@ -10,7 +10,6 @@ end
 
 _ = Ecto.Adapters.Postgres.storage_up(Phoenix.LiveAdminTest.Repo.config())
 
-
 Application.put_env(:phoenix_live_admin, Phoenix.LiveAdminTest.Endpoint,
   url: [host: "localhost", port: 4000],
   secret_key_base: "Hu4qQN3iKzTV4fJxhorPQlA/osH9fAMtbtjVS58PFgfw3ja5Z18Q/WSNR9wP4OfW",
@@ -33,25 +32,26 @@ defmodule Phoenix.LiveAdminTest.Router do
   import Phoenix.LiveAdmin.Router
 
   pipeline :browser do
-    plug :fetch_session
+    plug(:fetch_session)
   end
 
   scope "/" do
-    pipe_through :browser
+    pipe_through(:browser)
 
-    live_admin "/"
+    live_admin("/")
   end
 end
 
 defmodule Phoenix.LiveAdminTest.Endpoint do
   use Phoenix.Endpoint, otp_app: :phoenix_live_admin
 
-  plug Plug.Session,
+  plug(Plug.Session,
     store: :cookie,
     key: "_live_view_key",
     signing_salt: "/VEDsdfsffMnp5"
+  )
 
-  plug Phoenix.LiveAdminTest.Router
+  plug(Phoenix.LiveAdminTest.Router)
 end
 
 Application.ensure_all_started(:os_mon)

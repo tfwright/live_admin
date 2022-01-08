@@ -8,9 +8,13 @@ defmodule Phoenix.LiveAdmin.Router do
       scope unquote(path), alias: false, as: false do
         import Phoenix.LiveView.Router, only: [live: 4, live_session: 3]
 
-        live_session :live_admin, session: %{"resources" => unquote(resources)}, root_layout: {Phoenix.LiveAdmin.LayoutView, "live.html"}, on_mount: {unquote(__MODULE__), :assign_resources} do
-          live "/", Phoenix.LiveAdmin.Components.Home, :home, as: :home
-          live "/:resource", Phoenix.LiveAdmin.Components.Resource, :resource, as: :resource
+        live_session :live_admin,
+          session: %{"resources" => unquote(resources)},
+          root_layout: {Phoenix.LiveAdmin.LayoutView, "live.html"},
+          on_mount: {unquote(__MODULE__), :assign_resources} do
+          live("/", Phoenix.LiveAdmin.Components.Home, :home, as: :home)
+          live("/:resource", Phoenix.LiveAdmin.Components.Resource, :list, as: :resource)
+          live("/:resource/new", Phoenix.LiveAdmin.Components.Resource, :new, as: :resource)
         end
       end
     end

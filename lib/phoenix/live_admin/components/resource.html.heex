@@ -1,21 +1,7 @@
 <h1 class="text-3xl md:text-5xl mb-4 font-extrabold" id="home">
   <%= @resource %>
 </h1>
-<table class="w-full shadow-md rounded table-auto border-collapse border-1">
-  <thead>
-    <tr>
-      <%= for field <- @resource.__schema__(:fields) do %>
-        <th class="bg-blue-100 border text-left px-8 py-4"><%= field %></th>
-      <% end %>
-    </tr>
-  </thead>
-  <tbody>
-    <%= for record <- Phoenix.LiveAdmin.list_resource(@resource) do %>
-      <tr>
-        <%= for field <- @resource.__schema__(:fields) do %>
-          <td class="border px-8 py-4"><%= Map.fetch!(record, field) %></td>
-        <% end %>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+
+<%= live_redirect "New", to: @socket.router.__helpers__().resource_path(@socket, :new, @resource), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
+
+<%= render "#{@live_action}.html", assigns %>

@@ -34,7 +34,7 @@
                       <li class="p-2 hover:bg-indigo-300 rounded">
                         <a class="truncate" href="#">
                           <span class="hidden sm:inline">
-                            <%= live_redirect resource, to: @socket.router.__helpers__().resource_path(@socket, :resource, resource) %>
+                            <%= live_redirect resource, to: @socket.router.__helpers__().resource_path(@socket, :list, resource) %>
                           </span>
                         </a>
                       </li>
