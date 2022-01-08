@@ -22,7 +22,7 @@ defmodule PhoenixLiveAdmin.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:phoenix_live_view, "~> 0.16"},
+      {:phoenix_live_view, "~> 0.17"},
       {:ecto, "~> 3.6.2 or ~> 3.7"},
       {:phoenix_ecto, "~> 4.4"},
       {:plug_cowboy, "~> 2.0", only: :dev},
