@@ -93,6 +93,10 @@ defmodule Demo.User do
     |> validate_number(:stars_count, greater_than_or_equal_to: 0)
     |> Demo.Repo.insert()
   end
+
+  def validate(changeset, _meta) do
+    Ecto.Changeset.validate_required(changeset, [:name])
+  end
 end
 
 defmodule Demo.Populator do
@@ -137,7 +141,7 @@ defmodule DemoWeb.Router do
     get "/", DemoWeb.PageController, :index
 
     live_admin "/admin", resources: [
-      {Demo.User, hidden_fields: [:private_data], create_with: {Demo.User, :create, []}}
+      {Demo.User, hidden_fields: [:private_data], create_with: {Demo.User, :create, []}, validate_with: {Demo.User, :validate, []}}
     ]
   end
 end

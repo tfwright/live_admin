@@ -24,11 +24,12 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   def handle_event(
         "validate",
         %{"params" => params},
-        %{assigns: %{resource: resource, config: config}} = socket
+        %{assigns: %{resource: resource, config: config, metadata: metadata}} = socket
       ) do
     changeset =
       resource
       |> changeset(config, params)
+      |> validate_resource(config, metadata)
       |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, changeset: changeset)}
@@ -146,6 +147,15 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
       {mod, func_name, args} ->
         apply(mod, func_name, [params, metadata] ++ args)
+    end
+  end
+
+  defp validate_resource(changeset, config, metadata) do
+    config
+    |> Map.get(:validate_with)
+    |> case do
+      nil -> changeset
+      {mod, func_name, args} -> apply(mod, func_name, [changeset, metadata] ++ args)
     end
   end
 end
