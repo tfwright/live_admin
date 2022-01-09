@@ -7,7 +7,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
 
   def render(assigns) do
     ~H"""
-    <%= form_for @changeset , "#", [as: "params", phx_change: "validate", phx_submit: "save", class: "w-3/4 shadow-md p-2"], fn f -> %>
+    <%= form_for @changeset , "#", [as: "params", phx_change: "validate", phx_submit: @action, class: "w-3/4 shadow-md p-2"], fn f -> %>
       <%= for {field, type} <- fields(@resource, @config) do %>
         <.field field={field} type={type} form={f} />
       <% end %>

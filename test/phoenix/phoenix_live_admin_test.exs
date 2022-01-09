@@ -9,6 +9,8 @@ defmodule Phoenix.LiveAdminTest do
   @endpoint Phoenix.LiveAdminTest.Endpoint
 
   setup do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Phoenix.LiveAdminTest.Repo)
+
     %{conn: build_conn()}
   end
 
@@ -77,6 +79,21 @@ defmodule Phoenix.LiveAdminTest do
         |> render_submit(%{name: "test", settings: %{some_option: "test"}})
 
       assert [%{}] = Repo.all(User)
+    end
+  end
+
+  describe "edit resource page" do
+    setup %{conn: conn} do
+      user = Repo.insert!(%User{})
+      {:ok, view, html} = live(conn, "/live_admin_test_user/edit/#{user.id}")
+      %{response: html, view: view}
+    end
+
+    test "handles form submit", %{view: view} do
+      {_, {:live_redirect, %{to: "/live_admin_test_user"}}} =
+        view
+        |> element("form")
+        |> render_submit(%{name: "test"})
     end
   end
 end

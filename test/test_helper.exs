@@ -1,7 +1,8 @@
 pg_url = System.get_env("PG_URL") || "postgres:postgres@127.0.0.1"
 
 Application.put_env(:phoenix_live_admin, Phoenix.LiveAdminTest.Repo,
-  url: "ecto://#{pg_url}/phx_admin_dev"
+  url: "ecto://#{pg_url}/phx_admin_dev",
+  pool: Ecto.Adapters.SQL.Sandbox
 )
 
 defmodule Phoenix.LiveAdminTest.Repo do
@@ -87,4 +88,5 @@ Supervisor.start_link(
 
 Phoenix.LiveAdminTest.Repo.delete_all(Phoenix.LiveAdminTest.User)
 
-ExUnit.start(exclude: :integration)
+ExUnit.start()
+Ecto.Adapters.SQL.Sandbox.mode(Phoenix.LiveAdminTest.Repo, :manual)

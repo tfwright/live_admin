@@ -6,15 +6,26 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   alias __MODULE__.{Form}
 
   @impl true
-  def mount(%{"resource_id" => key}, _session, socket) do
+  def mount(params = %{"resource_id" => key}, _session, socket) do
     {resource, config} = Map.fetch!(socket.assigns.resources, key)
     socket = assign(socket, resource: resource, key: key, config: config, metadata: %{})
 
     socket =
-      if socket.assigns.live_action == :new do
-        assign(socket, :changeset, changeset(resource, config))
-      else
-        socket
+      case socket.assigns.live_action do
+        :new ->
+          assign(socket, :changeset, changeset(resource, config))
+
+        :edit ->
+          changeset =
+            params
+            |> Map.fetch!("record_id")
+            |> get_resource!(resource)
+            |> changeset(config)
+
+          assign(socket, changeset: changeset)
+
+        _ ->
+          socket
       end
 
     {:ok, socket}
@@ -24,10 +35,10 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   def handle_event(
         "validate",
         %{"params" => params},
-        %{assigns: %{resource: resource, config: config, metadata: metadata}} = socket
+        %{assigns: %{changeset: changeset, config: config, metadata: metadata}} = socket
       ) do
     changeset =
-      resource
+      changeset.data
       |> changeset(config, params)
       |> validate_resource(config, metadata)
       |> Map.put(:action, :validate)
@@ -37,7 +48,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   @impl true
   def handle_event(
-        "save",
+        "create",
         %{"params" => params},
         %{assigns: %{resource: resource, key: key, config: config, metadata: metadata}} = socket
       ) do
@@ -55,9 +66,43 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_event(
+        "update",
+        %{"params" => params},
+        %{
+          assigns: %{
+            resource: resource,
+            key: key,
+            config: config,
+            metadata: metadata,
+            changeset: changeset
+          }
+        } = socket
+      ) do
+    socket =
+      case update_resource(changeset.data, config, params, metadata) do
+        {:ok, _} ->
+          socket
+          |> put_flash(:info, "Updated #{resource}")
+          |> push_redirect(to: socket.router.__helpers__().resource_path(socket, :list, key))
+
+        {:error, _} ->
+          put_flash(socket, :error, "Could not update #{resource}")
+      end
+
+    {:noreply, socket}
+  end
+
   def render("new.html", assigns) do
     ~H"""
-    <Form.render resource={@resource} config={@config} changeset={@changeset} />
+    <Form.render resource={@resource} config={@config} changeset={@changeset} action="create" />
+    """
+  end
+
+  def render("edit.html", assigns) do
+    ~H"""
+    <Form.render resource={@resource} config={@config} changeset={@changeset} action="update" />
     """
   end
 
@@ -69,6 +114,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
           <%= for {field, _} <- fields(@resource, @config) do %>
             <th class="bg-blue-100 border text-left px-8 py-4"><%= field %></th>
           <% end %>
+          <th class="bg-blue-100 border text-left px-8 py-4">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -79,6 +125,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
                 <%= record |> Map.fetch!(field) |> inspect() %>
               </td>
             <% end %>
+            <td class="border px-8 py-4">
+              <%= live_redirect "Edit", to: @socket.router.__helpers__().resource_path(@socket, :edit, @key, record.id), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
+            </td>
           </tr>
         <% end %>
       </tbody>
@@ -98,7 +147,13 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     end)
   end
 
-  defp changeset(resource, config, params \\ %{}) do
+  defp changeset(record, config, params \\ %{})
+
+  defp changeset(record, config, params) when is_struct(record) do
+    change_resource(record, config, params)
+  end
+
+  defp changeset(resource, config, params) do
     resource
     |> struct(%{})
     |> change_resource(config, params)
@@ -150,6 +205,20 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     end
   end
 
+  defp update_resource(record, config, params, metadata) do
+    config
+    |> Map.get(:update_with)
+    |> case do
+      nil ->
+        record
+        |> changeset(config, params)
+        |> repo().update()
+
+      {mod, func_name, args} ->
+        apply(mod, func_name, [params, metadata] ++ args)
+    end
+  end
+
   defp validate_resource(changeset, config, metadata) do
     config
     |> Map.get(:validate_with)
@@ -158,4 +227,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       {mod, func_name, args} -> apply(mod, func_name, [changeset, metadata] ++ args)
     end
   end
+
+  def get_resource!(id, resource), do: repo().get!(resource, id)
 end

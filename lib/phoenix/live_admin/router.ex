@@ -15,6 +15,10 @@ defmodule Phoenix.LiveAdmin.Router do
           live("/", Phoenix.LiveAdmin.Components.Home, :home, as: :home)
           live("/:resource_id", Phoenix.LiveAdmin.Components.Resource, :list, as: :resource)
           live("/:resource_id/new", Phoenix.LiveAdmin.Components.Resource, :new, as: :resource)
+
+          live("/:resource_id/edit/:record_id", Phoenix.LiveAdmin.Components.Resource, :edit,
+            as: :resource
+          )
         end
       end
     end
