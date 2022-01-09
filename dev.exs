@@ -75,8 +75,13 @@ defmodule Demo.User do
 
   schema "users" do
     field :name, :string
+    field :active, :boolean
+    field :birth_date, :date
+    field :stars_count, :integer
 
     embeds_one :settings, Demo.User.Settings
+
+    timestamps(updated_at: false)
   end
 end
 
@@ -89,7 +94,16 @@ defmodule Demo.Populator do
   end
 
   def run do
-    Enum.each(1..100, &Demo.Repo.insert(%Demo.User{id: &1, name: Faker.Person.name(), settings: %{}}))
+    Enum.each(1..100, fn _ ->
+      %Demo.User{
+        name: Faker.Person.name(),
+        settings: %{},
+        active: true,
+        birth_date: ~D[1999-12-31],
+        stars_count: Enum.random(0..100)
+      }
+      |> Demo.Repo.insert()
+    end)
   end
 
   defp teardown do

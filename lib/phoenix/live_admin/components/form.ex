@@ -21,11 +21,11 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     """
   end
 
-  def field(assigns = %{type: type}) when type in [:string, :integer] do
+  def field(assigns = %{type: type}) when type in [:string, :integer, :boolean, :date, :utc_datetime, :naive_datetime] do
     ~H"""
     <div class="flex flex-col mb-4">
       <%= label @form, @field, class: "mb-2 uppercase font-bold text-lg text-grey-darkest" %>
-      <%= text_input @form, @field, class: "border py-2 px-3 text-grey-darkest"  %>
+      <.input form={@form} type={@type} field={@field} />
       <%= error_tag @form, @field %>
     </div>
     """
@@ -49,4 +49,40 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   end
 
   def field(assigns), do: ~H""
+
+  def input(assigns = %{type: :string}) do
+    ~H"""
+    <%= text_input @form, @field, class: "border py-2 px-3 text-grey-darkest"  %>
+    """
+  end
+
+  def input(assigns = %{type: :boolean}) do
+    ~H"""
+    <div class="flex-none ml-1">
+      <%= checkbox @form, @field, class: "scale-150" %>
+    </div>
+    """
+  end
+
+  def input(assigns = %{type: :date}) do
+    ~H"""
+    <%= date_input @form, @field %>
+    """
+  end
+
+  def input(assigns = %{type: :integer}) do
+    ~H"""
+    <div class="flex-none ml-1">
+      <%= number_input @form, @field %>
+    </div>
+    """
+  end
+
+  def input(assigns = %{type: type}) when type in [:naive_datetime, :utc_datetime] do
+    ~H"""
+    <div class="flex-none ml-1">
+      <%= datetime_select @form, @field %>
+    </div>
+    """
+  end
 end

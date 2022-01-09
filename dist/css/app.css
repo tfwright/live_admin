@@ -424,6 +424,14 @@ Ensure the default browser behavior of the `hidden` attribute.
 }
 
 *, ::before, ::after {
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-rotate: 0;
+  --tw-skew-x: 0;
+  --tw-skew-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  --tw-transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   --tw-border-opacity: 1;
   border-color: rgb(229 231 235 / var(--tw-border-opacity));
   --tw-ring-offset-shadow: 0 0 #0000;
@@ -455,6 +463,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .ml-4 {
   margin-left: 1rem;
+}
+
+.ml-1 {
+  margin-left: 0.25rem;
 }
 
 .flex {
@@ -489,6 +501,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 100%;
 }
 
+.flex-none {
+  flex: none;
+}
+
 .flex-shrink {
   flex-shrink: 1;
 }
@@ -507,6 +523,12 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .border-collapse {
   border-collapse: collapse;
+}
+
+.scale-150 {
+  --tw-scale-x: 1.5;
+  --tw-scale-y: 1.5;
+  transform: var(--tw-transform);
 }
 
 .flex-col {

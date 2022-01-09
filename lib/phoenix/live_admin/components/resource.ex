@@ -5,7 +5,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   alias Ecto.Changeset
   alias __MODULE__.{Form}
 
-  @castable_types [:string, :integer, :boolean, :utc_datetime, :date]
+  @castable_types [:string, :integer, :boolean, :utc_datetime, :naive_datetime, :date]
 
   @impl true
   def mount(%{"resource" => key}, _session, socket) do
