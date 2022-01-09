@@ -1,7 +1,7 @@
 pg_url = System.get_env("PG_URL") || "postgres:postgres@127.0.0.1"
 
 Application.put_env(:phoenix_live_admin, Phoenix.LiveAdminTest.Repo,
-  url: "ecto://#{pg_url}/phx_dashboard_test"
+  url: "ecto://#{pg_url}/phx_admin_dev"
 )
 
 defmodule Phoenix.LiveAdminTest.Repo do
@@ -24,14 +24,6 @@ defmodule Phoenix.LiveAdminTest.ErrorView do
 
   def template_not_found(template, _assigns) do
     Phoenix.Controller.status_message_from_template(template)
-  end
-end
-
-defmodule Demo.User do
-  use Ecto.Schema
-
-  schema "users" do
-    field :name, :string
   end
 end
 
@@ -62,14 +54,37 @@ defmodule Phoenix.LiveAdminTest.Endpoint do
   plug(Phoenix.LiveAdminTest.Router)
 end
 
+defmodule Phoenix.LiveAdminTest.User do
+  use Ecto.Schema
+
+  schema "users" do
+    field :name, :string
+
+    embeds_one :settings, Phoenix.LiveAdminTest.Settings
+  end
+end
+
+defmodule Phoenix.LiveAdminTest.Settings do
+  use Ecto.Schema
+
+  embedded_schema do
+    field :some_option, :string
+  end
+end
+
 Application.ensure_all_started(:os_mon)
+
+Application.put_env(:phoenix_live_admin, :ecto_repo, Phoenix.LiveAdminTest.Repo)
 
 Supervisor.start_link(
   [
+    Phoenix.LiveAdminTest.Repo,
     {Phoenix.PubSub, name: Phoenix.LiveAdminTest.PubSub, adapter: Phoenix.PubSub.PG2},
     Phoenix.LiveAdminTest.Endpoint
   ],
   strategy: :one_for_one
 )
+
+Phoenix.LiveAdminTest.Repo.delete_all(Phoenix.LiveAdminTest.User)
 
 ExUnit.start(exclude: :integration)

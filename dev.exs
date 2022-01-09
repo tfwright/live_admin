@@ -62,11 +62,21 @@ defmodule DemoWeb.PageController do
   end
 end
 
+defmodule Demo.User.Settings do
+  use Ecto.Schema
+
+  embedded_schema do
+    field :some_option, :string
+  end
+end
+
 defmodule Demo.User do
   use Ecto.Schema
 
   schema "users" do
     field :name, :string
+
+    embeds_one :settings, Demo.User.Settings
   end
 end
 
@@ -79,7 +89,7 @@ defmodule Demo.Populator do
   end
 
   def run do
-    Enum.each(1..100, &Demo.Repo.insert(%Demo.User{id: &1, name: Faker.Person.name()}))
+    Enum.each(1..100, &Demo.Repo.insert(%Demo.User{id: &1, name: Faker.Person.name(), settings: %{}}))
   end
 
   defp teardown do
