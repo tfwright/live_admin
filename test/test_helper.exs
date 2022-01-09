@@ -27,6 +27,14 @@ defmodule Phoenix.LiveAdminTest.ErrorView do
   end
 end
 
+defmodule Demo.User do
+  use Ecto.Schema
+
+  schema "users" do
+    field :name, :string
+  end
+end
+
 defmodule Phoenix.LiveAdminTest.Router do
   use Phoenix.Router
   import Phoenix.LiveAdmin.Router
@@ -38,7 +46,7 @@ defmodule Phoenix.LiveAdminTest.Router do
   scope "/" do
     pipe_through(:browser)
 
-    live_admin("/")
+    live_admin("/", resources: [Phoenix.LiveAdminTest.User])
   end
 end
 

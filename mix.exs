@@ -26,7 +26,7 @@ defmodule PhoenixLiveAdmin.MixProject do
       {:ecto, "~> 3.6.2 or ~> 3.7"},
       {:phoenix_ecto, "~> 4.4"},
       {:plug_cowboy, "~> 2.0", only: :dev},
-      {:jason, "~> 1.3", only: :dev},
+      {:jason, "~> 1.3", only: [:dev, :test]},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:ecto_psql_extras, "~> 0.7", only: [:dev, :test]},
       {:faker, "~> 0.17", only: :dev}
