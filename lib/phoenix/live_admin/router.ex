@@ -21,6 +21,16 @@ defmodule Phoenix.LiveAdmin.Router do
   end
 
   def on_mount(:assign_resources, _params, %{"resources" => resources}, socket) do
+    resources = Map.new(resources, fn mod ->
+      key = mod
+      |> to_string()
+      |> String.split(".")
+      |> Enum.slice(-2, 2)
+      |> Enum.map_join("_", &Macro.underscore/1)
+
+      {key, mod}
+    end)
+
     {:cont, assign(socket, resources: resources, socket: socket)}
   end
 end

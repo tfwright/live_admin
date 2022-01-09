@@ -7,8 +7,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   alias Ecto.Changeset
 
   @impl true
-  def mount(params, _session, socket) do
-    {:ok, assign(socket, :resource, String.to_existing_atom(params["resource"]))}
+  def mount(%{"resource" => key}, _session, socket) do
+    resource = Map.fetch!(socket.assigns.resources, key)
+    {:ok, assign(socket, resource: resource, key: key)}
   end
 
   @impl true
@@ -31,14 +32,14 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   def handle_event(
         "save",
         %{"params" => params},
-        %{assigns: %{resource: resource, record: record}} = socket
+        %{assigns: %{resource: resource, record: record, key: key}} = socket
       ) do
       record
       |> change_resource(params)
       |> repo().insert!()
 
     {:noreply,
-     redirect(socket, to: socket.router.__helpers__().resource_path(socket, :list, resource))}
+     redirect(socket, to: socket.router.__helpers__().resource_path(socket, :list, key))}
   end
 
   def render("new.html", assigns = %{resource: resource}) do
