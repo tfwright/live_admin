@@ -13,24 +13,30 @@ defmodule Phoenix.LiveAdmin.Router do
           root_layout: {Phoenix.LiveAdmin.LayoutView, "live.html"},
           on_mount: {unquote(__MODULE__), :assign_resources} do
           live("/", Phoenix.LiveAdmin.Components.Home, :home, as: :home)
-          live("/:resource", Phoenix.LiveAdmin.Components.Resource, :list, as: :resource)
-          live("/:resource/new", Phoenix.LiveAdmin.Components.Resource, :new, as: :resource)
+          live("/:resource_id", Phoenix.LiveAdmin.Components.Resource, :list, as: :resource)
+          live("/:resource_id/new", Phoenix.LiveAdmin.Components.Resource, :new, as: :resource)
         end
       end
     end
   end
 
   def on_mount(:assign_resources, _params, %{"resources" => resources}, socket) do
-    resources = Map.new(resources, fn mod ->
-      key = mod
-      |> to_string()
-      |> String.split(".")
-      |> Enum.slice(-2, 2)
-      |> Enum.map_join("_", &Macro.underscore/1)
-
-      {key, mod}
-    end)
+    resources =
+      resources
+      |> Enum.map(fn
+        {mod, opts} -> {derive_resource_key(mod), {mod, Map.new(opts)}}
+        mod -> {derive_resource_key(mod), {mod, %{}}}
+      end)
+      |> Enum.into(%{})
 
     {:cont, assign(socket, resources: resources, socket: socket)}
+  end
+
+  defp derive_resource_key(mod) do
+    mod
+    |> to_string()
+    |> String.split(".")
+    |> Enum.slice(-2, 2)
+    |> Enum.map_join("_", &Macro.underscore/1)
   end
 end

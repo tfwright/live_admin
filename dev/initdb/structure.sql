@@ -5,5 +5,6 @@ create table users (
   inserted_at timestamp without time zone,
   active boolean,
   stars_count integer,
-  settings jsonb
+  settings jsonb,
+  private_data jsonb
 );

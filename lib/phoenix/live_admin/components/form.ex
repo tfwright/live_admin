@@ -3,15 +3,12 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   use Phoenix.HTML
 
   import Phoenix.LiveAdmin.ErrorHelpers
-  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 1]
+  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2]
 
   def render(assigns) do
-    %resource{} = assigns.changeset.data
-    assigns = assign(assigns, :resource, resource)
-
     ~H"""
-    <%= form_for @changeset, "#", [as: "params", phx_change: "validate", phx_submit: "save", class: "w-3/4 shadow-md p-2"], fn f -> %>
-      <%= for {field, type} <- fields(@resource) do %>
+    <%= form_for @changeset , "#", [as: "params", phx_change: "validate", phx_submit: "save", class: "w-3/4 shadow-md p-2"], fn f -> %>
+      <%= for {field, type} <- fields(@resource, @config) do %>
         <.field field={field} type={type} form={f} />
       <% end %>
       <div class="text-right">
@@ -21,25 +18,13 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     """
   end
 
-  def field(assigns = %{type: type}) when type in [:string, :integer, :boolean, :date, :utc_datetime, :naive_datetime] do
-    ~H"""
-    <div class="flex flex-col mb-4">
-      <%= label @form, @field, class: "mb-2 uppercase font-bold text-lg text-grey-darkest" %>
-      <.input form={@form} type={@type} field={@field} />
-      <%= error_tag @form, @field %>
-    </div>
-    """
-  end
-
-  def field(assigns = %{type: {_, Ecto.Embedded, %{related: schema}}}) do
-    assigns = assign(assigns, :embed_fields, fields(schema))
-
+  def field(assigns = %{type: {_, Ecto.Embedded, _}}) do
     ~H"""
     <div>
       <h2 class="mb-2 uppercase font-bold text-lg text-grey-darkest"><%= @field %></h2>
       <div class="flex flex-col mb-4 ml-4">
         <%= inputs_for @form, @field, fn fp -> %>
-          <%= for {field, type} <- @embed_fields do %>
+          <%= for {field, type} <- fields_for_embed(@type) do %>
             <.field field={field} type={type} form={fp} />
           <% end %>
         <% end %>
@@ -48,7 +33,15 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     """
   end
 
-  def field(assigns), do: ~H""
+  def field(assigns) do
+    ~H"""
+    <div class="flex flex-col mb-4">
+      <%= label @form, @field, class: "mb-2 uppercase font-bold text-lg text-grey-darkest" %>
+      <.input form={@form} type={@type} field={@field} />
+      <%= error_tag @form, @field %>
+    </div>
+    """
+  end
 
   def input(assigns = %{type: :string}) do
     ~H"""
@@ -85,4 +78,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     </div>
     """
   end
+
+  def input(assigns), do: ~H""
+
+  defp fields_for_embed({_, _, %{related: schema}}), do: fields(schema, %{})
 end

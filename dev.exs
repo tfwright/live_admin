@@ -73,15 +73,25 @@ end
 defmodule Demo.User do
   use Ecto.Schema
 
+  import Ecto.Changeset
+
   schema "users" do
     field :name, :string
     field :active, :boolean
     field :birth_date, :date
     field :stars_count, :integer
+    field :private_data, :map
 
     embeds_one :settings, Demo.User.Settings
 
     timestamps(updated_at: false)
+  end
+
+  def create(params, _meta) do
+    %__MODULE__{}
+    |> cast(params, [:name, :stars_count])
+    |> validate_number(:stars_count, greater_than_or_equal_to: 0)
+    |> Demo.Repo.insert()
   end
 end
 
@@ -100,7 +110,8 @@ defmodule Demo.Populator do
         settings: %{},
         active: true,
         birth_date: ~D[1999-12-31],
-        stars_count: Enum.random(0..100)
+        stars_count: Enum.random(0..100),
+        private_data: %{}
       }
       |> Demo.Repo.insert()
     end)
@@ -114,16 +125,20 @@ end
 defmodule DemoWeb.Router do
   use Phoenix.Router
   import Phoenix.LiveAdmin.Router
+  import Phoenix.LiveView.Router
 
   pipeline :browser do
     plug :fetch_session
+    plug :fetch_live_flash
   end
 
   scope "/" do
     pipe_through :browser
     get "/", DemoWeb.PageController, :index
 
-    live_admin "/admin", resources: [Demo.User]
+    live_admin "/admin", resources: [
+      {Demo.User, hidden_fields: [:private_data], create_with: {Demo.User, :create, []}}
+    ]
   end
 end
 

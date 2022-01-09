@@ -34,9 +34,9 @@ defmodule Phoenix.LiveAdminTest do
 
     test "links to new form", %{view: view} do
       assert {_, {:live_redirect, %{to: "/live_admin_test_user/new"}}} =
-        view
-       |> element("a[href='/live_admin_test_user/new'")
-       |> render_click()
+               view
+               |> element("a[href='/live_admin_test_user/new'")
+               |> render_click()
     end
   end
 
@@ -59,16 +59,24 @@ defmodule Phoenix.LiveAdminTest do
     end
 
     test "persists all form changes", %{view: view} do
-      response = view |> element("form") |> render_change(%{"params" => %{"name" => "test name", "settings" => %{"some_option" => "test option"}}})
+      response =
+        view
+        |> element("form")
+        |> render_change(%{
+          "params" => %{"name" => "test name", "settings" => %{"some_option" => "test option"}}
+        })
 
       assert response =~ "test option"
       assert response =~ "test name"
     end
 
     test "creates user on form submit", %{view: view} do
-      {_, {:redirect, %{to: "/live_admin_test_user"}}} = view |> element("form") |> render_submit(%{name: "test", settings: %{some_option: "test"}})
+      {_, {:live_redirect, %{to: "/live_admin_test_user"}}} =
+        view
+        |> element("form")
+        |> render_submit(%{name: "test", settings: %{some_option: "test"}})
 
-      assert [%{}] =  Repo.all(User)
+      assert [%{}] = Repo.all(User)
     end
   end
 end

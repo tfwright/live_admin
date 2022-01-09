@@ -58,9 +58,9 @@ defmodule Phoenix.LiveAdminTest.User do
   use Ecto.Schema
 
   schema "users" do
-    field :name, :string
+    field(:name, :string)
 
-    embeds_one :settings, Phoenix.LiveAdminTest.Settings
+    embeds_one(:settings, Phoenix.LiveAdminTest.Settings)
   end
 end
 
@@ -68,7 +68,7 @@ defmodule Phoenix.LiveAdminTest.Settings do
   use Ecto.Schema
 
   embedded_schema do
-    field :some_option, :string
+    field(:some_option, :string)
   end
 end
 

@@ -30,7 +30,7 @@
                           </span>
                         </a>
                     </li>
-                    <%= for {key, resource} <- @resources do %>
+                    <%= for {key, {resource, _}} <- @resources do %>
                       <li class="p-2 hover:bg-indigo-300 rounded">
                         <a class="truncate" href="#">
                           <span class="hidden sm:inline">
