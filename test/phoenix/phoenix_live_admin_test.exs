@@ -30,6 +30,7 @@ defmodule Phoenix.LiveAdminTest do
 
   describe "resource page" do
     setup %{conn: conn} do
+      Repo.insert!(%User{})
       {:ok, view, _html} = live(conn, "/live_admin_test_user")
       %{view: view}
     end
@@ -38,6 +39,13 @@ defmodule Phoenix.LiveAdminTest do
       assert {_, {:live_redirect, %{to: "/live_admin_test_user/new"}}} =
                view
                |> element("a[href='/live_admin_test_user/new'")
+               |> render_click()
+    end
+
+    test "deletes record", %{view: view} do
+      assert {_, {:live_redirect, %{to: "/live_admin_test_user"}}} =
+               view
+               |> element("a[phx-click='delete']")
                |> render_click()
     end
   end
