@@ -8,9 +8,9 @@
   </div>
 </div>
 
-<div class="clear-both">
+<div class="flash">
   <p class="resource__error"><%= live_flash(@flash, :error) %></p>
-  <p><%= live_flash(@flash, :info) %></p>
+  <p class="resource__info"><%= live_flash(@flash, :info) %></p>
 </div>
 
 <%= render "#{@live_action}.html", assigns %>

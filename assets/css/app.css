@@ -68,6 +68,12 @@
     @apply py-2;
     @apply text-xl;
   }
+
+  .flash {
+    @apply clear-both;
+    @apply m-1;
+  }
+
   .resource__title {
     @apply float-left;
   }
@@ -89,6 +95,21 @@
 
   .resource__error {
     @apply text-red-500;
+    @apply p-2;
+    @apply border;
+    @apply rounded-md;
+    @apply bg-red-100;
+  }
+
+  .flash > p:empty {
+    @apply hidden;
+  }
+
+  .resource__info {
+    @apply p-2;
+    @apply border;
+    @apply rounded-md;
+    @apply bg-blue-100;
   }
 
   .resource__list {
