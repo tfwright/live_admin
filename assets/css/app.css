@@ -11,7 +11,6 @@
   }
 
   input {
-    @apply p-1;
     @apply relative ;
     @apply bg-white ;
     @apply rounded;
@@ -20,6 +19,24 @@
     @apply outline-none;
     @apply focus:outline-none;
     @apply focus:ring ;
+  }
+
+  select {
+    @apply appearance-none;
+    @apply text-gray-700;
+    @apply bg-white ;
+    @apply bg-clip-padding ;
+    @apply bg-no-repeat;
+    @apply border ;
+    @apply border-solid ;
+    @apply border-gray-300;
+    @apply rounded;
+    @apply transition;
+    @apply ease-in-out;
+    @apply focus:text-gray-700 ;
+    @apply focus:bg-white ;
+    @apply focus:border-blue-600 ;
+    @apply focus:outline-none;
   }
 }
 
@@ -51,6 +68,11 @@
     @apply p-2;
     @apply hover:bg-indigo-300;
     @apply rounded;
+    @apply truncate;
+  }
+
+  .nav__item--active {
+    @apply p-2;
     @apply truncate;
   }
 
@@ -109,9 +131,34 @@
     @apply transition-colors;
     @apply duration-150;
     @apply bg-indigo-700;
-    @apply rounded-lg;
     @apply hover:bg-indigo-800;
     @apply relative;
+    @apply rounded-lg;
+    @apply relative;
+  }
+
+  .resource__action--switch {
+    @apply resource__action--btn;
+  }
+
+  .resource__action--switch nav {
+    @apply appearance-none;
+    @apply hidden;
+    @apply absolute;
+    @apply top-full;
+    @apply left-0;
+    @apply text-black;
+    @apply bg-white;
+    @apply border;
+    @apply rounded-md;
+    @apply w-full;
+    @apply pl-2;
+    @apply truncate;
+  }
+
+  .resource__action--switch:focus-within nav {
+    @apply block;
+    @apply translate-y-1;
   }
 
   .resource__error {

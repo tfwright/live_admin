@@ -89,4 +89,5 @@ Supervisor.start_link(
 Phoenix.LiveAdminTest.Repo.delete_all(Phoenix.LiveAdminTest.User)
 
 ExUnit.start()
+
 Ecto.Adapters.SQL.Sandbox.mode(Phoenix.LiveAdminTest.Repo, :manual)

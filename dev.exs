@@ -42,6 +42,7 @@ Application.put_env(:phoenix_live_admin, DemoWeb.Endpoint,
 )
 
 Application.put_env(:phoenix_live_admin, :ecto_repo, Demo.Repo)
+Application.put_env(:phoenix_live_admin, :prefix_options, ["public", "fake", "alt"])
 
 defmodule DemoWeb.PageController do
   import Plug.Conn
@@ -87,11 +88,11 @@ defmodule Demo.User do
     timestamps(updated_at: false)
   end
 
-  def create(params, _meta) do
+  def create(params, meta) do
     %__MODULE__{}
     |> cast(params, [:name, :stars_count])
     |> validate_number(:stars_count, greater_than_or_equal_to: 0)
-    |> Demo.Repo.insert()
+    |> Demo.Repo.insert(prefix: meta[:__prefix__])
   end
 
   def validate(changeset, _meta) do

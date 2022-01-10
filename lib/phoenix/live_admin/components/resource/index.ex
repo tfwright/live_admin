@@ -2,7 +2,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   use Phoenix.Component
   use Phoenix.HTML
 
-  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2, list: 2]
+  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2, list: 3, route_with_params: 3]
 
   def render(assigns) do
     ~H"""
@@ -25,7 +25,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
                 </td>
               <% end %>
               <td class="resource__cell">
-                <%= live_redirect "Edit", to: @socket.router.__helpers__().resource_path(@socket, :edit, @key, record.id), class: "resource__action--btn" %>
+                <%= live_redirect "Edit", to: route_with_params(@socket, [:edit, @key, record.id], assigns[:params]), class: "resource__action--btn" %>
                 <%= link "Delete", to: "#", "data-confirm": "Are you sure?", "phx-click": "delete", "phx-value-id": record.id, class: "resource__action--btn" %>
               </td>
             </tr>

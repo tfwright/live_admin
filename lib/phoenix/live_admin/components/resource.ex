@@ -8,43 +8,57 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   alias __MODULE__.{Form, Index}
 
   @impl true
-  def mount(params = %{"resource_id" => key}, _session, socket) do
+  def mount(%{"resource_id" => key}, _session, socket) do
     {resource, config} = Map.fetch!(socket.assigns.resources, key)
-    socket = assign(socket, resource: resource, key: key, config: config, metadata: %{})
 
     socket =
-      case socket.assigns.live_action do
-        :new ->
-          assign(socket, :changeset, changeset(resource, config))
-
-        :edit ->
-          changeset =
-            params
-            |> Map.fetch!("record_id")
-            |> get_resource!(resource)
-            |> changeset(config)
-
-          assign(socket, changeset: changeset)
-
-        :list ->
-          assign(socket, records: list(resource, 1), page: 1)
-
-        _ ->
-          socket
-      end
+      assign(socket,
+        resource: resource,
+        key: key,
+        config: config,
+        metadata: %{},
+        loading: !connected?(socket)
+      )
 
     {:ok, socket}
   end
 
   @impl true
-  def handle_params(%{"page" => page}, _, socket) do
-    {:noreply, assign(socket, :page, String.to_integer(page))}
+  def handle_params(params, _uri, socket = %{assigns: %{loading: false}}) do
+    socket =
+      socket
+      |> assign_prefix(params)
+      |> assign_params(params)
+      |> case do
+        socket = %{assigns: %{live_action: :new}} ->
+          assign(socket, :changeset, changeset(socket.assigns.resource, socket.assigns.config))
+
+        socket = %{assigns: %{live_action: :edit}} ->
+          changeset =
+            params
+            |> Map.fetch!("record_id")
+            |> get_resource!(socket.assigns.resource, socket.assigns.metadata[:__prefix__])
+            |> changeset(socket.assigns.config)
+
+          assign(socket, changeset: changeset)
+
+        socket = %{assigns: %{live_action: :list}} ->
+          page = String.to_integer(params["page"] || "1")
+
+          assign(socket,
+            records: list(socket.assigns.resource, page, socket.assigns.metadata[:__prefix__]),
+            page: page
+          )
+
+        socket ->
+          socket
+      end
+
+    {:noreply, socket}
   end
 
   @impl true
-  def handle_params(_, _, socket) do
-    {:noreply, socket}
-  end
+  def handle_params(_params, _uri, socket), do: {:noreply, socket}
 
   @impl true
   def handle_event(
@@ -72,7 +86,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         {:ok, _} ->
           socket
           |> put_flash(:info, "Created #{resource}")
-          |> push_redirect(to: socket.router.__helpers__().resource_path(socket, :list, key))
+          |> push_redirect(to: route_with_params(socket, [:list, key], socket.assigns[:params]))
 
         {:error, _} ->
           put_flash(socket, :error, "Could not create #{resource}")
@@ -100,7 +114,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         {:ok, _} ->
           socket
           |> put_flash(:info, "Updated #{resource}")
-          |> push_redirect(to: socket.router.__helpers__().resource_path(socket, :list, key))
+          |> push_redirect(to: route_with_params(socket, [:list, key], socket.assigns[:params]))
 
         {:error, _} ->
           put_flash(socket, :error, "Could not update #{resource}")
@@ -124,13 +138,13 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       ) do
     socket =
       id
-      |> get_resource!(resource)
+      |> get_resource!(resource, socket.assigns.metadata[:__prefix__])
       |> delete_resource(config, metadata)
       |> case do
         {:ok, _} ->
           socket
           |> put_flash(:info, "Deleted #{resource}")
-          |> push_redirect(to: socket.router.__helpers__().resource_path(socket, :list, key))
+          |> push_redirect(to: route_with_params(socket, [:list, key], socket.assigns[:params]))
 
         {:error, _} ->
           put_flash(socket, :error, "Could not delete #{resource}")
@@ -143,14 +157,16 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   def handle_event(
         "search",
         %{"query" => q},
-        %{assigns: %{resource: resource, key: key, page: page}} = socket
+        %{assigns: %{resource: resource, page: page}} = socket
       ) do
-    records = list(resource, page, search: q)
+    records = list(resource, page, socket.assigns.metadata[:__prefix__], search: q)
 
     socket = assign(socket, :records, records)
 
     {:noreply, socket}
   end
+
+  def render(assigns = %{loading: true}), do: ~H""
 
   @impl true
   def render(assigns) do
@@ -177,7 +193,27 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
             </div>
           </div>
 
-          <%= live_redirect "New", to: @socket.router.__helpers__().resource_path(@socket, :new, @key), class: "resource__action--btn" %>
+          <%= live_redirect "List", to: route_with_params(@socket, [:list, @key], assigns[:params]), class: "resource__action--btn" %>
+          <%= live_redirect "New", to: route_with_params(@socket, [:new, @key], assigns[:params]), class: "resource__action--btn" %>
+          <%= if Application.get_env(:phoenix_live_admin, :prefix_options) do %>
+            <div class="resource__action--switch">
+            <button>Prefix: <%= assigns.metadata[:__prefix__] || "none" %></button>
+            <nav>
+              <ul>
+                <%= if assigns.metadata[:__prefix__] do %>
+                  <li>
+                    <%= live_patch("clear", to: @socket.router.__helpers__().resource_path(@socket, :list, @key)) %>
+                  </li>
+                <% end %>
+                <%= for option <- Application.fetch_env!(:phoenix_live_admin, :prefix_options), to_string(option) != assigns.metadata[:__prefix__] do %>
+                  <li>
+                  <%= live_patch(option, to: @socket.router.__helpers__().resource_path(@socket, :list, @key, prefix: option)) %>
+                  </li>
+                <% end %>
+              </ul>
+            </nav>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>
@@ -205,7 +241,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   def render("list.html", assigns) do
     ~H"""
-    <Index.render socket={@socket} resource={@resource} config={@config} key={@key} page={@page} records={@records} />
+    <Index.render socket={@socket} resource={@resource} config={@config} key={@key} page={@page} records={@records} params={assigns[:params]} />
     """
   end
 
@@ -223,7 +259,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     end)
   end
 
-  def list(resource, page, opts \\ []) do
+  def list(resource, page, prefix, opts \\ []) do
     query =
       resource
       |> limit(10)
@@ -235,8 +271,14 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         {:search, q}, query -> apply_search(query, q, fields(resource, %{}))
       end)
 
-    repo().all(query)
+    repo().all(query, prefix: prefix)
   end
+
+  def route_with_params(socket, segments, params) do
+    apply(socket.router.__helpers__(), :resource_path, [socket] ++ segments ++ [params || %{}])
+  end
+
+  def get_resource!(id, resource, prefix), do: repo().get!(resource, id, prefix: prefix)
 
   defp changeset(record, config, params \\ %{})
 
@@ -287,7 +329,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       nil ->
         resource
         |> changeset(config, params)
-        |> repo().insert()
+        |> repo().insert(prefix: metadata[:__prefix__])
 
       {mod, func_name, args} ->
         apply(mod, func_name, [params, metadata] ++ args)
@@ -329,11 +371,16 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     end
   end
 
-  def get_resource!(id, resource), do: repo().get!(resource, id)
-
   defp apply_search(query, q, fields) do
     Enum.reduce(fields, query, fn {field_name, _}, query ->
       or_where(query, [r], ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%"))
     end)
+  end
+
+  defp assign_prefix(socket, %{"prefix" => prefix}), do: assign(socket, :metadata, Map.put(socket.assigns.metadata, :__prefix__, prefix))
+  defp assign_prefix(socket, _), do: assign(socket, :metadata, Map.put(socket.assigns.metadata, :__prefix__, nil))
+
+  defp assign_params(socket, params) do
+    assign(socket, :params, Map.take(params, ["prefix"]))
   end
 end
