@@ -1,12 +1,16 @@
-<h1 class="text-3xl md:text-5xl mb-4 font-extrabold float-left">
-  <%= @resource %>
-</h1>
+<div>
+  <h1 class="resource__title">
+    <%= @resource %>
+  </h1>
 
-<div class="float-right">
-  <%= live_redirect "New", to: @socket.router.__helpers__().resource_path(@socket, :new, @key), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
+  <div class="float-right">
+    <%= live_redirect "New", to: @socket.router.__helpers__().resource_path(@socket, :new, @key), class: "resource__action" %>
+  </div>
 </div>
 
-<p class="text-red-500"><%= live_flash(@flash, :error) %></p>
-<p><%= live_flash(@flash, :info) %></p>
+<div class="clear-both">
+  <p class="resource__error"><%= live_flash(@flash, :error) %></p>
+  <p><%= live_flash(@flash, :info) %></p>
+</div>
 
 <%= render "#{@live_action}.html", assigns %>

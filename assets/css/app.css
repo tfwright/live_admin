@@ -1,5 +1,181 @@
 @tailwind base;
-
 @tailwind components;
-
 @tailwind utilities;
+
+@layer base {
+  h1 {
+    @apply text-3xl;
+    @apply md:text-5xl;
+    @apply mb-4;
+    @apply font-extrabold;
+  }
+}
+
+@layer components {
+  .main__content {
+    @apply flex;
+    @apply flex-col;
+  }
+
+  .main__wrap {
+    @apply flex;
+    @apply overflow-hidden;
+    @apply h-screen;
+  }
+
+  .nav {
+    @apply flex;
+    @apply bg-gray-100;
+    @apply w-1/5;
+    @apply p-4;
+  }
+
+  .nav__list {
+    @apply overflow-hidden;
+    @apply content-center;
+    @apply justify-between;
+  }
+
+  .nav__item {
+    @apply p-2;
+    @apply hover:bg-indigo-300;
+    @apply rounded;
+    @apply truncate;
+  }
+
+  .content {
+    @apply flex;
+    @apply flex-col;
+    @apply w-4/5;
+    @apply p-2;
+    @apply overflow-y-auto;
+    @apply overflow-x-hidden;
+  }
+
+  .home__intro {
+    @apply py-2;
+    @apply text-xl;
+  }
+  .resource__title {
+    @apply float-left;
+  }
+
+  .resource__action {
+    @apply inline-flex;
+    @apply items-center;
+    @apply h-8;
+    @apply px-4;
+    @apply m-2;
+    @apply text-sm;
+    @apply text-indigo-100;
+    @apply transition-colors;
+    @apply duration-150;
+    @apply bg-indigo-700;
+    @apply rounded-lg;
+    @apply hover:bg-indigo-800;
+  }
+
+  .resource__error {
+    @apply text-red-500;
+  }
+
+  .resource__list {
+    @apply overflow-x-auto;
+  }
+
+  .resource__table {
+    @apply p-2;
+    @apply m-1;
+    @apply shadow-md;
+    @apply rounded;
+    @apply border-collapse;
+    @apply border;
+  }
+
+  .resource__header {
+    @apply bg-blue-100;
+    @apply border;
+    @apply text-left;
+    @apply px-8;
+    @apply py-4;
+  }
+
+  .resource__cell {
+    @apply border;
+    @apply px-4;
+    @apply py-2;
+  }
+
+  .resource__form {
+    @apply shadow-md;
+    @apply rounded;
+    @apply border-collapse;
+    @apply border;
+    @apply w-3/4;
+    @apply shadow-md;
+    @apply p-2;
+    @apply m-1;
+    @apply w-full;
+  }
+
+  .form__actions {
+    @apply text-right;
+  }
+
+  .form__save {
+    @apply inline-flex;
+    @apply items-center;
+    @apply h-8;
+    @apply px-4;
+    @apply m-2;
+    @apply text-sm;
+    @apply text-indigo-100;
+    @apply transition-colors;
+    @apply duration-150;
+    @apply bg-indigo-700;
+    @apply rounded-lg;
+    @apply hover:bg-indigo-800;
+  }
+
+  .embed__title {
+    @apply mb-2;
+    @apply uppercase;
+    @apply font-bold;
+    @apply text-lg;
+  }
+
+  .embed__group {
+    @apply flex;
+    @apply flex-col;
+    @apply mb-4;
+    @apply ml-4;
+  }
+
+  .field__group {
+    @apply flex;
+    @apply flex-col;
+    @apply mb-4;
+  }
+
+  .field__label {
+    @apply mb-2 uppercase;
+    @apply font-bold;
+    @apply text-lg;
+  }
+
+  .field__text {
+    @apply mb-2;
+    @apply uppercase;
+    @apply font-bold;
+    @apply text-lg;
+  }
+
+  .field__checkbox {
+    @apply scale-150;
+  }
+
+  .form__checkbox, .form__number, .form__time {
+    @apply flex-none;
+    @apply ml-1;
+  }
+}

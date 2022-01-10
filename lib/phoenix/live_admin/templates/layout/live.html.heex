@@ -18,33 +18,23 @@
     <link rel="manifest" href="/manifest.json ">
   </head>
   <body>
-    <main role="main">
-      <div class="w-full flex flex-col sm:flex-row flex-grow overflow-hidden">
-        <div class="sm:w-1/3 md:1/4 w-full flex-shrink flex-grow-0 p-4">
-            <div class="sticky top-0 p-4 bg-gray-100 rounded-xl w-full">
-                <ul class="flex sm:flex-col overflow-hidden content-center justify-between">
-                    <li class="p-2 hover:bg-indigo-300 rounded">
-                        <a class="truncate" href="#">
-                          <span class="hidden sm:inline">
-                            <%= live_redirect "Home", to: @socket.router.__helpers__().home_path(@socket, :home) %>
-                          </span>
-                        </a>
-                    </li>
-                    <%= for {key, {resource, _}} <- @resources do %>
-                      <li class="p-2 hover:bg-indigo-300 rounded">
-                        <a class="truncate" href="#">
-                          <span class="hidden sm:inline">
-                            <%= live_redirect resource, to: @socket.router.__helpers__().resource_path(@socket, :list, key) %>
-                          </span>
-                        </a>
-                      </li>
-                    <% end %>
-                </ul>
-            </div>
+    <main class="main__content">
+      <div class="main__wrap">
+        <div class="nav">
+          <ul class="nav__list">
+              <li class="nav__item">
+                <%= live_redirect "Home", to: @socket.router.__helpers__().home_path(@socket, :home) %>
+              </li>
+              <%= for {key, {resource, _}} <- @resources do %>
+                <li class="nav__item">
+                  <%= live_redirect resource, to: @socket.router.__helpers__().resource_path(@socket, :list, key) %>
+                </li>
+              <% end %>
+          </ul>
         </div>
-        <main role="main" class="w-full h-full flex-grow p-3 overflow-auto">
+        <div class="content">
           <%= @inner_content %>
-        </main>
+        </div>
       </div>
     </main>
   </body>

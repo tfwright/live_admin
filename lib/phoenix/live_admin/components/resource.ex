@@ -108,30 +108,32 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   def render("list.html", assigns) do
     ~L"""
-    <table class="w-full shadow-md rounded table-auto border-collapse border-1">
-      <thead>
-        <tr>
-          <%= for {field, _} <- fields(@resource, @config) do %>
-            <th class="bg-blue-100 border text-left px-8 py-4"><%= field %></th>
-          <% end %>
-          <th class="bg-blue-100 border text-left px-8 py-4">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <%= for record <- repo().all(@resource) do %>
+    <div class="resource__list">
+      <table class="resource__table">
+        <thead>
           <tr>
             <%= for {field, _} <- fields(@resource, @config) do %>
-              <td class="border px-8 py-4">
-                <%= record |> Map.fetch!(field) |> inspect() %>
-              </td>
+              <th class="resource__header"><%= field %></th>
             <% end %>
-            <td class="border px-8 py-4">
-              <%= live_redirect "Edit", to: @socket.router.__helpers__().resource_path(@socket, :edit, @key, record.id), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
-            </td>
+            <th class="resource__header">Actions</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <%= for record <- repo().all(@resource) do %>
+            <tr>
+              <%= for {field, _} <- fields(@resource, @config) do %>
+                <td class="resource__cell">
+                  <%= record |> Map.fetch!(field) |> inspect() %>
+                </td>
+              <% end %>
+              <td class="resource__cell">
+                <%= live_redirect "Edit", to: @socket.router.__helpers__().resource_path(@socket, :edit, @key, record.id), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
     """
   end
 

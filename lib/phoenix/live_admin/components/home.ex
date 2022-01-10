@@ -9,8 +9,8 @@ defmodule Phoenix.LiveAdmin.Components.Home do
   @impl true
   def render(assigns) do
     ~H"""
-    <h1 class="text-3xl md:text-5xl mb-4 font-extrabold" id="home">Phoenix LiveAdmin</h1>
-    <p class="py-2 text-xl">
+    <h1 class="home__title">Phoenix LiveAdmin</h1>
+    <p class="home__intro">
       This is your admin home page.
       You will be able to customize this text with whatever copy you'd like to help orient admin users.
       Here will be some instructions for doing that customization.
