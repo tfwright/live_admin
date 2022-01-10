@@ -1,9 +1,9 @@
-defmodule Phoenix.LiveAdmin.LayoutView do
+defmodule Phoenix.LiveAdmin.View do
   use Phoenix.HTML
 
   use Phoenix.View,
     namespace: Phoenix.LiveAdmin,
-    root: "lib/phoenix/live_admin/templates"
+    root: __DIR__
 
   import Phoenix.LiveView.Helpers
 

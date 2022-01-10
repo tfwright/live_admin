@@ -10,7 +10,7 @@ defmodule Phoenix.LiveAdmin.Router do
 
         live_session :live_admin,
           session: %{"resources" => unquote(resources)},
-          root_layout: {Phoenix.LiveAdmin.LayoutView, "live.html"},
+          root_layout: {Phoenix.LiveAdmin.View, "layout.html"},
           on_mount: {unquote(__MODULE__), :assign_resources} do
           live("/", Phoenix.LiveAdmin.Components.Home, :home, as: :home)
           live("/:resource_id", Phoenix.LiveAdmin.Components.Resource, :list, as: :resource)
