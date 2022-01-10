@@ -3,7 +3,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   use Phoenix.HTML
 
   alias Ecto.Changeset
-  alias __MODULE__.{Form}
+  alias __MODULE__.{Form, Index}
 
   @impl true
   def mount(params = %{"resource_id" => key}, _session, socket) do
@@ -124,6 +124,28 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     {:noreply, socket}
   end
 
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div>
+      <h1 class="resource__title">
+        <%= @resource %>
+      </h1>
+
+      <div class="float-right">
+        <%= live_redirect "New", to: @socket.router.__helpers__().resource_path(@socket, :new, @key), class: "resource__action" %>
+      </div>
+    </div>
+
+    <div class="flash">
+      <p class="resource__error"><%= live_flash(@flash, :error) %></p>
+      <p class="resource__info"><%= live_flash(@flash, :info) %></p>
+    </div>
+
+    <%= render "#{@live_action}.html", assigns %>
+    """
+  end
+
   def render("new.html", assigns) do
     ~H"""
     <Form.render resource={@resource} config={@config} changeset={@changeset} action="create" />
@@ -137,36 +159,12 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   def render("list.html", assigns) do
-    ~L"""
-    <div class="resource__list">
-      <table class="resource__table">
-        <thead>
-          <tr>
-            <%= for {field, _} <- fields(@resource, @config) do %>
-              <th class="resource__header"><%= humanize(field) %></th>
-            <% end %>
-            <th class="resource__header">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <%= for record <- repo().all(@resource) do %>
-            <tr>
-              <%= for {field, _} <- fields(@resource, @config) do %>
-                <td class="resource__cell">
-                  <%= record |> Map.fetch!(field) |> inspect() %>
-                </td>
-              <% end %>
-              <td class="resource__cell">
-                <%= live_redirect "Edit", to: @socket.router.__helpers__().resource_path(@socket, :edit, @key, record.id), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
-                <%= link "Delete", to: "#", "data-confirm": "Are you sure?", "phx-click": "delete", "phx-value-id": record.id, class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
+    ~H"""
+    <Index.render socket={@socket} resource={@resource} config={@config} key={@key} />
     """
   end
+
+  def repo, do: Application.fetch_env!(:phoenix_live_admin, :ecto_repo)
 
   def fields(resource, config) do
     Enum.flat_map(resource.__schema__(:fields), fn field_name ->
@@ -221,8 +219,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
     Changeset.cast(record, params, field_names)
   end
-
-  defp repo, do: Application.fetch_env!(:phoenix_live_admin, :ecto_repo)
 
   defp create_resource(resource, config, params, metadata) do
     config
