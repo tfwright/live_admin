@@ -9,6 +9,18 @@
     @apply mb-4;
     @apply font-extrabold;
   }
+
+  input {
+    @apply p-1;
+    @apply relative ;
+    @apply bg-white ;
+    @apply rounded;
+    @apply text-sm;
+    @apply border;
+    @apply outline-none;
+    @apply focus:outline-none;
+    @apply focus:ring ;
+  }
 }
 
 @layer components {
@@ -172,6 +184,16 @@
 
   .field__checkbox {
     @apply scale-150;
+  }
+
+  .field__number {
+    @apply border;
+    @apply p-1;
+    @apply w-20;
+  }
+
+  .field__date {
+    @apply w-32;
   }
 
   .form__checkbox, .form__number, .form__time {
