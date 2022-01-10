@@ -494,7 +494,6 @@ input:focus {
 }
 
 .nav {
-  display: flex;
   --tw-bg-opacity: 1;
   background-color: rgb(243 244 246 / var(--tw-bg-opacity));
   width: 20%;
@@ -521,6 +520,10 @@ input:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.nav__item:first-of-type {
+  border-bottom-width: 1px;
 }
 
 .content {

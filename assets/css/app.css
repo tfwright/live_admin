@@ -36,7 +36,6 @@
   }
 
   .nav {
-    @apply flex;
     @apply bg-gray-100;
     @apply w-1/5;
     @apply p-4;
@@ -53,6 +52,10 @@
     @apply hover:bg-indigo-300;
     @apply rounded;
     @apply truncate;
+  }
+
+  .nav__item:first-of-type {
+    @apply border-b;
   }
 
   .content {
