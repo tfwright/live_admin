@@ -143,7 +143,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         <thead>
           <tr>
             <%= for {field, _} <- fields(@resource, @config) do %>
-              <th class="resource__header"><%= field %></th>
+              <th class="resource__header"><%= humanize(field) %></th>
             <% end %>
             <th class="resource__header">Actions</th>
           </tr>
