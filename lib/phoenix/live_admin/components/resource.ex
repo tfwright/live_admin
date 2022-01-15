@@ -26,7 +26,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
           assign(socket, changeset: changeset)
 
-        :list -> assign(socket, page: 1)
+        :list ->
+          assign(socket, records: list(resource, 1), page: 1)
 
         _ ->
           socket
@@ -139,15 +140,45 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   @impl true
+  def handle_event(
+        "search",
+        %{"query" => q},
+        %{assigns: %{resource: resource, key: key, page: page}} = socket
+      ) do
+    records = list(resource, page, search: q)
+
+    socket = assign(socket, :records, records)
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div class="resource__banner">
       <h1 class="resource__title">
         <%= @resource |> Module.split() |> Enum.join(".") %>
       </h1>
 
-      <div class="float-right">
-        <%= live_redirect "New", to: @socket.router.__helpers__().resource_path(@socket, :new, @key), class: "resource__action" %>
+      <div class="resource__actions">
+        <div>
+          <div class="resource__action">
+            <div class="flex items-center justify-center">
+              <div class="flex border-2 rounded-lg">
+                  <form phx-change="search">
+                    <input type="text" class="px-4 py-1 w-60 border-0" placeholder="Search..." name="query">
+                  </form>
+                  <button class="flex items-center justify-center px-4 border-l">
+                    <svg class="w-6 h-6 text-gray-600" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                      <path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" />
+                    </svg>
+                  </button>
+              </div>
+            </div>
+          </div>
+
+          <%= live_redirect "New", to: @socket.router.__helpers__().resource_path(@socket, :new, @key), class: "resource__action--btn" %>
+        </div>
       </div>
     </div>
 
@@ -174,7 +205,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   def render("list.html", assigns) do
     ~H"""
-    <Index.render socket={@socket} resource={@resource} config={@config} key={@key} page={@page} />
+    <Index.render socket={@socket} resource={@resource} config={@config} key={@key} page={@page} records={@records} />
     """
   end
 
@@ -192,8 +223,19 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     end)
   end
 
-  def list(resource, page) do
-     resource |> limit(10) |> offset(^((page - 1) * 10)) |> repo().all()
+  def list(resource, page, opts \\ []) do
+    query =
+      resource
+      |> limit(10)
+      |> offset(^((page - 1) * 10))
+
+    query =
+      opts
+      |> Enum.reduce(query, fn
+        {:search, q}, query -> apply_search(query, q, fields(resource, %{}))
+      end)
+
+    repo().all(query)
   end
 
   defp changeset(record, config, params \\ %{})
@@ -288,4 +330,10 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   def get_resource!(id, resource), do: repo().get!(resource, id)
+
+  defp apply_search(query, q, fields) do
+    Enum.reduce(fields, query, fn {field_name, _}, query ->
+      or_where(query, [r], ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%"))
+    end)
+  end
 end

@@ -17,7 +17,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
           </tr>
         </thead>
         <tbody>
-          <%= for record <- list(@resource, @page) do %>
+          <%= for record <- @records do %>
             <tr>
               <%= for {field, _} <- fields(@resource, @config) do %>
                 <td class="resource__cell">

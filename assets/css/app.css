@@ -77,13 +77,29 @@
     @apply m-1;
   }
 
+  .resource__banner {
+    @apply flex;
+    @apply bg-white;
+  }
+
   .resource__title {
-    @apply float-left;
+    @apply flex-none;
+  }
+
+  .resource__actions {
+    @apply flex-col;
+    @apply flex-1;
+    @apply items-center;
+    @apply grid;
+    @apply justify-items-end;
   }
 
   .resource__action {
     @apply inline-flex;
     @apply items-center;
+  }
+
+  .resource__action--btn {
     @apply h-8;
     @apply px-4;
     @apply m-2;
@@ -94,6 +110,7 @@
     @apply bg-indigo-700;
     @apply rounded-lg;
     @apply hover:bg-indigo-800;
+    @apply relative;
   }
 
   .resource__error {
