@@ -2,7 +2,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   use Phoenix.Component
   use Phoenix.HTML
 
-  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2, repo: 0]
+  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2, list: 2]
 
   def render(assigns) do
     ~H"""
@@ -17,7 +17,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
           </tr>
         </thead>
         <tbody>
-          <%= for record <- repo().all(@resource) do %>
+          <%= for record <- list(@resource, @page) do %>
             <tr>
               <%= for {field, _} <- fields(@resource, @config) do %>
                 <td class="resource__cell">
@@ -31,6 +31,14 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
             </tr>
           <% end %>
         </tbody>
+        <tfoot>
+          <tr>
+            <td class="w-full" colspan={fields(@resource, @config) |> Enum.count()}>
+              <%= if @page > 1, do: live_patch "Prev", to: @socket.router.__helpers__().resource_path(@socket, :list, @key, page: @page - 1), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
+              <%= live_patch "Next", to: @socket.router.__helpers__().resource_path(@socket, :list, @key, page: @page + 1), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
     """

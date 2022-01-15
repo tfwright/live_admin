@@ -2,6 +2,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   use Phoenix.LiveView
   use Phoenix.HTML
 
+  import Ecto.Query
+
   alias Ecto.Changeset
   alias __MODULE__.{Form, Index}
 
@@ -24,11 +26,23 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
           assign(socket, changeset: changeset)
 
+        :list -> assign(socket, page: 1)
+
         _ ->
           socket
       end
 
     {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(%{"page" => page}, _, socket) do
+    {:noreply, assign(socket, :page, String.to_integer(page))}
+  end
+
+  @impl true
+  def handle_params(_, _, socket) do
+    {:noreply, socket}
   end
 
   @impl true
@@ -160,7 +174,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   def render("list.html", assigns) do
     ~H"""
-    <Index.render socket={@socket} resource={@resource} config={@config} key={@key} />
+    <Index.render socket={@socket} resource={@resource} config={@config} key={@key} page={@page} />
     """
   end
 
@@ -176,6 +190,10 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         true -> []
       end
     end)
+  end
+
+  def list(resource, page) do
+     resource |> limit(10) |> offset(^((page - 1) * 10)) |> repo().all()
   end
 
   defp changeset(record, config, params \\ %{})
