@@ -18,6 +18,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     """
   end
 
+  def field(assigns = %{type: :id}), do: ~H""
+
   def field(assigns = %{type: {_, Ecto.Embedded, _}}) do
     ~H"""
     <div>
