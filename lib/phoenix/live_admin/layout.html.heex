@@ -27,7 +27,7 @@
               </li>
               <%= for {key, {resource, _}} <- @resources do %>
                 <li class="nav__item">
-                  <%= live_redirect resource, to: @socket.router.__helpers__().resource_path(@socket, :list, key) %>
+                  <%= live_redirect(resource |> Module.split() |> Enum.join("."), to: @socket.router.__helpers__().resource_path(@socket, :list, key)) %>
                 </li>
               <% end %>
           </ul>

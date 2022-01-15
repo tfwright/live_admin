@@ -129,7 +129,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     ~H"""
     <div>
       <h1 class="resource__title">
-        <%= @resource %>
+        <%= @resource |> Module.split() |> Enum.join(".") %>
       </h1>
 
       <div class="float-right">
