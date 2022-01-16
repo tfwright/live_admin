@@ -147,7 +147,7 @@
   }
 
   .resource__header {
-    @apply bg-blue-100;
+    @apply bg-indigo-100;
     @apply border;
     @apply text-left;
     @apply px-8;

@@ -639,7 +639,7 @@ input:focus {
 
 .resource__header {
   --tw-bg-opacity: 1;
-  background-color: rgb(219 234 254 / var(--tw-bg-opacity));
+  background-color: rgb(224 231 255 / var(--tw-bg-opacity));
   border-width: 1px;
   text-align: left;
   padding-left: 2rem;
