@@ -25,8 +25,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
                 </td>
               <% end %>
               <td class="resource__cell">
-                <%= live_redirect "Edit", to: @socket.router.__helpers__().resource_path(@socket, :edit, @key, record.id), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
-                <%= link "Delete", to: "#", "data-confirm": "Are you sure?", "phx-click": "delete", "phx-value-id": record.id, class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
+                <%= live_redirect "Edit", to: @socket.router.__helpers__().resource_path(@socket, :edit, @key, record.id), class: "resource__action--btn" %>
+                <%= link "Delete", to: "#", "data-confirm": "Are you sure?", "phx-click": "delete", "phx-value-id": record.id, class: "resource__action--btn" %>
               </td>
             </tr>
           <% end %>
@@ -34,8 +34,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
         <tfoot>
           <tr>
             <td class="w-full" colspan={fields(@resource, @config) |> Enum.count()}>
-              <%= if @page > 1, do: live_patch "Prev", to: @socket.router.__helpers__().resource_path(@socket, :list, @key, page: @page - 1), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
-              <%= live_patch "Next", to: @socket.router.__helpers__().resource_path(@socket, :list, @key, page: @page + 1), class: "inline-flex items-center h-8 px-4 m-2 text-sm text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800" %>
+              <%= if @page > 1, do: live_patch "Prev", to: @socket.router.__helpers__().resource_path(@socket, :list, @key, page: @page - 1), class: "resource__action--btn" %>
+              <%= live_patch "Next", to: @socket.router.__helpers__().resource_path(@socket, :list, @key, page: @page + 1), class: "resource__action--btn" %>
             </td>
           </tr>
         </tfoot>

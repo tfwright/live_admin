@@ -571,6 +571,8 @@ input:focus {
 }
 
 .resource__action--btn {
+  display: inline-flex;
+  align-items: center;
   height: 2rem;
   padding-left: 1rem;
   padding-right: 1rem;
@@ -758,10 +760,6 @@ input:focus {
   position: relative;
 }
 
-.m-2 {
-  margin: 0.5rem;
-}
-
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -770,20 +768,12 @@ input:focus {
   display: flex;
 }
 
-.inline-flex {
-  display: inline-flex;
-}
-
 .table {
   display: table;
 }
 
 .h-6 {
   height: 1.5rem;
-}
-
-.h-8 {
-  height: 2rem;
 }
 
 .w-60 {
@@ -822,11 +812,6 @@ input:focus {
   border-left-width: 1px;
 }
 
-.bg-indigo-700 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(67 56 202 / var(--tw-bg-opacity));
-}
-
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
@@ -842,36 +827,9 @@ input:focus {
   padding-bottom: 0.25rem;
 }
 
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-
 .text-gray-600 {
   --tw-text-opacity: 1;
   color: rgb(75 85 99 / var(--tw-text-opacity));
-}
-
-.text-indigo-100 {
-  --tw-text-opacity: 1;
-  color: rgb(224 231 255 / var(--tw-text-opacity));
-}
-
-.transition-colors {
-  transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-.duration-150 {
-  transition-duration: 150ms;
-}
-
-.hover\:bg-indigo-800:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(55 48 163 / var(--tw-bg-opacity));
 }
 
 .focus\:ring:focus {

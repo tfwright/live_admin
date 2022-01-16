@@ -100,6 +100,7 @@
   }
 
   .resource__action--btn {
+    @apply resource__action;
     @apply h-8;
     @apply px-4;
     @apply m-2;
