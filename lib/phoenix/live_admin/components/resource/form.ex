@@ -8,8 +8,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   def render(assigns) do
     ~H"""
     <%= form_for @changeset , "#", [as: "params", phx_change: "validate", phx_submit: @action, class: "resource__form"], fn f -> %>
-      <%= for {field, type} <- fields(@resource, @config) do %>
-        <.field field={field} type={type} form={f} />
+      <%= for {field, type, opts} <- fields(@resource, @config) do %>
+        <.field field={field} type={type} form={f} immutable={Keyword.get(opts, :immutable, false)} />
       <% end %>
       <div class="form__actions">
         <%= submit "Save", class: "form__save" %>
@@ -25,10 +25,14 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     <div>
       <h2 class="embed__title"><%= @field %></h2>
       <div class="embed__group">
-        <%= inputs_for @form, @field, fn fp -> %>
-          <%= for {field, type} <- fields_for_embed(@type) do %>
-            <.field field={field} type={type} form={fp} />
+        <%= unless @immutable do %>
+          <%= inputs_for @form, @field, fn fp -> %>
+            <%= for {field, type} <- fields_for_embed(@type) do %>
+              <.field field={field} type={type} form={fp} />
+            <% end %>
           <% end %>
+        <% else %>
+        <pre><%= @form |> input_value(@field) |> inspect() %></pre>
         <% end %>
       </div>
     </div>
@@ -37,9 +41,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
 
   def field(assigns) do
     ~H"""
-    <div class="field__group">
+    <div class={"field__group#{if @immutable, do: "--disabled"}"}>
       <%= label @form, @field, class: "field__label" %>
-      <.input form={@form} type={@type} field={@field} />
+      <.input form={@form} type={@type} field={@field} disabled={@immutable} />
       <%= error_tag @form, @field %>
     </div>
     """
@@ -47,28 +51,28 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
 
   def input(assigns = %{type: :string}) do
     ~H"""
-    <%= text_input @form, @field, class: "field__text" %>
+    <%= text_input @form, @field, class: "field__text", disabled: @disabled %>
     """
   end
 
   def input(assigns = %{type: :boolean}) do
     ~H"""
     <div class="form__checkbox">
-      <%= checkbox @form, @field, class: "field__checkbox" %>
+      <%= checkbox @form, @field, class: "field__checkbox", disabled: @disabled %>
     </div>
     """
   end
 
   def input(assigns = %{type: :date}) do
     ~H"""
-    <%= date_input @form, @field, class: "field__date" %>
+    <%= date_input @form, @field, class: "field__date", disabled: @disabled %>
     """
   end
 
   def input(assigns = %{type: :integer}) do
     ~H"""
     <div class="form__number">
-      <%= number_input @form, @field, class: "field__number" %>
+      <%= number_input @form, @field, class: "field__number", disabled: @disabled %>
     </div>
     """
   end
@@ -76,7 +80,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   def input(assigns = %{type: type}) when type in [:naive_datetime, :utc_datetime] do
     ~H"""
     <div class="form__time">
-      <%= datetime_select @form, @field, class: "field__time" %>
+      <%= datetime_select @form, @field, class: "field__time", year: [disabled: @disabled], month: [disabled: @disabled], day: [disabled: @disabled], hour: [disabled: @disabled], minute: [disabled: @disabled] %>
     </div>
     """
   end

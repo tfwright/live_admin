@@ -82,6 +82,7 @@ defmodule Demo.User do
     field :birth_date, :date
     field :stars_count, :integer
     field :private_data, :map
+    field :password, :string
 
     embeds_one :settings, Demo.User.Settings
 
@@ -116,7 +117,8 @@ defmodule Demo.Populator do
         active: true,
         birth_date: ~D[1999-12-31],
         stars_count: Enum.random(0..100),
-        private_data: %{}
+        private_data: %{},
+        password: :crypto.strong_rand_bytes(16) |> Base.encode16()
       }
       |> Demo.Repo.insert()
     end)
@@ -142,7 +144,11 @@ defmodule DemoWeb.Router do
     get "/", DemoWeb.PageController, :index
 
     live_admin "/admin", resources: [
-      {Demo.User, hidden_fields: [:private_data], create_with: {Demo.User, :create, []}, validate_with: {Demo.User, :validate, []}}
+      {Demo.User,
+        hidden_fields: [:private_data],
+        immutable_fields: [:password, :inserted_at],
+        create_with: {Demo.User, :create, []},
+        validate_with: {Demo.User, :validate, []}}
     ]
   end
 end

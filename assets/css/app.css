@@ -18,7 +18,8 @@
     @apply border;
     @apply outline-none;
     @apply focus:outline-none;
-    @apply focus:ring ;
+    @apply focus:ring;
+    @apply p-1;
   }
 
   select {
@@ -265,6 +266,14 @@
     @apply flex;
     @apply flex-col;
     @apply mb-4;
+  }
+
+  .field__group--disabled {
+    @apply field__group;
+  }
+
+  .field__group--disabled * {
+    @apply text-gray-200;
   }
 
   .field__label {

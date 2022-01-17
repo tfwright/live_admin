@@ -6,7 +6,8 @@ create table users (
   active boolean,
   stars_count integer,
   settings jsonb,
-  private_data jsonb
+  private_data jsonb,
+  password text
 );
 
 create schema alt;
@@ -19,5 +20,6 @@ create table alt.users (
   active boolean,
   stars_count integer,
   settings jsonb,
-  private_data jsonb
+  private_data jsonb,
+  password text
 );

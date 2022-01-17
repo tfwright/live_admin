@@ -253,8 +253,14 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       |> Map.get(:hidden_fields, [])
       |> Enum.member?(field_name)
       |> case do
-        false -> [{field_name, resource.__schema__(:type, field_name)}]
-        true -> []
+        false ->
+          [
+            {field_name, resource.__schema__(:type, field_name),
+             [immutable: Map.get(config, :immutable_fields, []) |> Enum.member?(field_name)]}
+          ]
+
+        true ->
+          []
       end
     end)
   end
@@ -311,7 +317,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     changeset = cast_fields(record, params, fields)
 
     Enum.reduce(fields, changeset, fn
-      {field, {_, Ecto.Embedded, %{related: embed_schema}}}, changeset ->
+      {field, {_, Ecto.Embedded, %{related: embed_schema}}, _}, changeset ->
         embed_fields = fields(embed_schema, config)
 
         Changeset.cast_embed(changeset, field,
@@ -328,8 +334,11 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   defp cast_fields(record, params, fields) do
     field_names =
       Enum.flat_map(fields, fn
-        {field, type} when is_atom(type) -> [field]
-        _ -> []
+        {field, type, opts} when is_atom(type) ->
+          if Keyword.get(opts, :immutable, false), do: [], else: [field]
+
+        _ ->
+          []
       end)
 
     Changeset.cast(record, params, field_names)

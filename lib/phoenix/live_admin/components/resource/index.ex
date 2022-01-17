@@ -10,7 +10,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
       <table class="resource__table">
         <thead>
           <tr>
-            <%= for {field, _} <- fields(@resource, @config) do %>
+            <%= for {field, _, _} <- fields(@resource, @config) do %>
               <th class="resource__header"><%= humanize(field) %></th>
             <% end %>
             <th class="resource__header">Actions</th>
@@ -19,7 +19,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
         <tbody>
           <%= for record <- @records |> elem(0) do %>
             <tr>
-              <%= for {field, _} <- fields(@resource, @config) do %>
+              <%= for {field, _, _} <- fields(@resource, @config) do %>
                 <td class="resource__cell">
                   <%= record |> Map.fetch!(field) |> inspect() %>
                 </td>
