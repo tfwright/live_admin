@@ -205,7 +205,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
                     <%= live_patch("clear", to: @socket.router.__helpers__().resource_path(@socket, :list, @key)) %>
                   </li>
                 <% end %>
-                <%= for option <- Application.fetch_env!(:phoenix_live_admin, :prefix_options), to_string(option) != assigns.metadata[:__prefix__] do %>
+                <%= for option <- get_prefix_options!(), to_string(option) != assigns.metadata[:__prefix__] do %>
                   <li>
                   <%= live_patch(option, to: @socket.router.__helpers__().resource_path(@socket, :list, @key, prefix: option)) %>
                   </li>
@@ -284,6 +284,14 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   def get_resource!(id, resource, prefix), do: repo().get!(resource, id, prefix: prefix)
+
+  def get_prefix_options!() do
+    Application.fetch_env!(:phoenix_live_admin, :prefix_options)
+    |> case do
+      {mod, func, args} -> apply(mod, func, args)
+      list when is_list(list) -> list
+    end
+  end
 
   defp changeset(record, config, params \\ %{})
 
