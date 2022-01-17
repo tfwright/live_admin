@@ -590,6 +590,7 @@ select:focus {
   display: flex;
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+  white-space: nowrap;
 }
 
 .resource__title {
@@ -602,6 +603,7 @@ select:focus {
   align-items: center;
   display: grid;
   justify-items: end;
+  white-space: nowrap;
 }
 
 .resource__action {

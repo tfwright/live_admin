@@ -102,6 +102,7 @@
   .resource__banner {
     @apply flex;
     @apply bg-white;
+    @apply whitespace-nowrap;
   }
 
   .resource__title {
@@ -114,6 +115,7 @@
     @apply items-center;
     @apply grid;
     @apply justify-items-end;
+    @apply whitespace-nowrap;
   }
 
   .resource__action {
