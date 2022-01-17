@@ -568,12 +568,13 @@ input:focus {
 .resource__action {
   display: inline-flex;
   align-items: center;
+  height: 2rem;
 }
 
 .resource__action--btn {
   display: inline-flex;
-  align-items: center;
   height: 2rem;
+  align-items: center;
   padding-left: 1rem;
   padding-right: 1rem;
   margin: 0.5rem;
@@ -770,6 +771,10 @@ input:focus {
 
 .table {
   display: table;
+}
+
+.h-8 {
+  height: 2rem;
 }
 
 .h-6 {

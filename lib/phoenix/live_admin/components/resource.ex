@@ -166,7 +166,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
             <div class="flex items-center justify-center">
               <div class="flex border-2 rounded-lg">
                   <form phx-change="search" >
-                    <input type="text" class="px-4 py-1 w-60 border-0" placeholder="Search..." name="query" onkeydown="return event.key != 'Enter'">
+                    <input type="text" class="px-4 py-1 w-60 border-0 h-8" placeholder="Search..." name="query" onkeydown="return event.key != 'Enter'">
                   </form>
                   <button phx-click="search" phx-value-query="" class="flex items-center justify-center px-2 border-l">
                     <svg class="w-6 h-6 text-gray-600" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
