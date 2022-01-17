@@ -137,6 +137,13 @@
     @apply relative;
   }
 
+  .resource__action--disabled {
+    @apply resource__action--btn;
+    @apply text-gray-700;
+    @apply bg-gray-100;
+    @apply hover:bg-gray-100;
+  }
+
   .resource__action--switch {
     @apply resource__action--btn;
   }

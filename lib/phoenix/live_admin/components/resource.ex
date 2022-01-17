@@ -272,6 +272,11 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       end)
 
     repo().all(query, prefix: prefix)
+
+    {
+      repo().all(query, prefix: prefix),
+      repo().aggregate(query |> exclude(:limit) |> exclude(:offset), :count, prefix: prefix)
+    }
   end
 
   def route_with_params(socket, segments, params) do
@@ -377,8 +382,11 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     end)
   end
 
-  defp assign_prefix(socket, %{"prefix" => prefix}), do: assign(socket, :metadata, Map.put(socket.assigns.metadata, :__prefix__, prefix))
-  defp assign_prefix(socket, _), do: assign(socket, :metadata, Map.put(socket.assigns.metadata, :__prefix__, nil))
+  defp assign_prefix(socket, %{"prefix" => prefix}),
+    do: assign(socket, :metadata, Map.put(socket.assigns.metadata, :__prefix__, prefix))
+
+  defp assign_prefix(socket, _),
+    do: assign(socket, :metadata, Map.put(socket.assigns.metadata, :__prefix__, nil))
 
   defp assign_params(socket, params) do
     assign(socket, :params, Map.take(params, ["prefix"]))
