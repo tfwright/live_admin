@@ -765,6 +765,11 @@ select:focus {
   overflow-x: auto;
 }
 
+.list__search {
+  display: flex;
+  margin: 0.25rem;
+}
+
 .resource__table {
   padding: 0.5rem;
   margin: 0.25rem;

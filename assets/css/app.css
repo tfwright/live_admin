@@ -194,6 +194,11 @@
     @apply overflow-x-auto;
   }
 
+  .list__search {
+    @apply flex;
+    @apply m-1;
+  }
+
   .resource__table {
     @apply p-2;
     @apply m-1;
