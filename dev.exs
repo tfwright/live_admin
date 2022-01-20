@@ -83,6 +83,7 @@ defmodule Demo.User do
     field :stars_count, :integer
     field :private_data, :map
     field :password, :string
+    field :status, Ecto.Enum, values: [:active, :suspended]
 
     embeds_one :settings, Demo.User.Settings
 

@@ -27,12 +27,12 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
       <div class="embed__group">
         <%= unless @immutable do %>
           <%= inputs_for @form, @field, fn fp -> %>
-            <%= for {field, type} <- fields_for_embed(@type) do %>
-              <.field field={field} type={type} form={fp} />
+            <%= for {field, type, _} <- fields_for_embed(@type) do %>
+              <.field field={field} type={type} form={fp} immutable={false} />
             <% end %>
           <% end %>
         <% else %>
-        <pre><%= @form |> input_value(@field) |> inspect() %></pre>
+          <pre><%= @form |> input_value(@field) |> inspect() %></pre>
         <% end %>
       </div>
     </div>
@@ -85,7 +85,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     """
   end
 
-  def input(assigns), do: ~H""
+  def input(assigns), do: IO.inspect(assigns) && ~H""
 
   defp fields_for_embed({_, _, %{related: schema}}), do: fields(schema, %{})
 end

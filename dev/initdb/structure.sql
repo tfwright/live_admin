@@ -7,7 +7,8 @@ create table users (
   stars_count integer,
   settings jsonb,
   private_data jsonb,
-  password text
+  password text,
+  status varchar(100)
 );
 
 create schema alt;
@@ -21,5 +22,6 @@ create table alt.users (
   stars_count integer,
   settings jsonb,
   private_data jsonb,
-  password text
+  password text,
+  status varchar(100)
 );
