@@ -303,6 +303,10 @@
     @apply w-32;
   }
 
+  .field__select {
+    @apply w-32;
+  }
+
   .form__checkbox, .form__number, .form__time {
     @apply flex-none;
     @apply ml-1;

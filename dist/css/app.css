@@ -901,6 +901,10 @@ select:focus {
   width: 8rem;
 }
 
+.field__select {
+  width: 8rem;
+}
+
 .form__checkbox, .form__number, .form__time {
   flex: none;
   margin-left: 0.25rem;

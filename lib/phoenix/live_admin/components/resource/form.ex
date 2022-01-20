@@ -85,7 +85,13 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     """
   end
 
-  def input(assigns), do: IO.inspect(assigns) && ~H""
+  def input(assigns = %{type: {_, Ecto.Enum, %{mappings: mappings}}}) do
+    ~H"""
+    <%= select @form, @field, mappings, disabled: @disabled, class: "field__select" %>
+    """
+  end
+
+  def input(assigns), do: ~H""
 
   defp fields_for_embed({_, _, %{related: schema}}), do: fields(schema, %{})
 end
