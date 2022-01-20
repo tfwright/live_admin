@@ -394,7 +394,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   defp apply_search(query, q, fields) do
-    Enum.reduce(fields, query, fn {field_name, _}, query ->
+    Enum.reduce(fields, query, fn {field_name, _, _}, query ->
       or_where(query, [r], ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%"))
     end)
   end
