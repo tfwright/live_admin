@@ -33,7 +33,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
             <tr>
               <%= for {field, _, _} <- fields(@resource, @config) do %>
                 <td class="resource__cell">
-                  <%= record |> Map.fetch!(field) |> inspect() %>
+                  <%= display_field(record, field, assigns) %>
                 </td>
               <% end %>
               <td class="resource__cell">
@@ -55,5 +55,25 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
       </table>
     </div>
     """
+  end
+
+  def display_field(record = %resource{}, field_name, assigns) do
+    assoc =
+      resource.__schema__(:associations)
+      |> Enum.find_value(fn assoc_name ->
+        resource.__schema__(:association, assoc_name)
+        |> case do
+          assoc = %{owner_key: ^field_name} -> assoc
+          _ -> nil
+        end
+      end)
+
+    label = Map.fetch!(record, field_name)
+
+    if assoc do
+      live_patch(record.id, to: route_with_params(assigns.socket, [:edit, assigns.key, record.id], Map.delete(assigns.params, :page)), class: "resource__action--btn")
+    else
+      inspect(label)
+    end
   end
 end

@@ -87,6 +87,8 @@ defmodule Demo.User do
 
     embeds_one :settings, Demo.User.Settings
 
+    has_many :posts, Demo.Post
+
     timestamps(updated_at: false)
   end
 
@@ -99,6 +101,18 @@ defmodule Demo.User do
 
   def validate(changeset, _meta) do
     Ecto.Changeset.validate_required(changeset, [:name])
+  end
+end
+
+defmodule Demo.Post do
+  use Ecto.Schema
+
+  import Ecto.Changeset
+
+  schema "posts" do
+    field :body, :string
+
+    belongs_to :user, Demo.User
   end
 end
 
@@ -119,7 +133,8 @@ defmodule Demo.Populator do
         birth_date: ~D[1999-12-31],
         stars_count: Enum.random(0..100),
         private_data: %{},
-        password: :crypto.strong_rand_bytes(16) |> Base.encode16()
+        password: :crypto.strong_rand_bytes(16) |> Base.encode16(),
+        posts: [%Demo.Post{body: Faker.Lorem.paragraphs() |> Enum.join("\n\n")}]
       }
       |> Demo.Repo.insert()
     end)
@@ -149,7 +164,9 @@ defmodule DemoWeb.Router do
         hidden_fields: [:private_data],
         immutable_fields: [:password, :inserted_at],
         create_with: {Demo.User, :create, []},
-        validate_with: {Demo.User, :validate, []}}
+        validate_with: {Demo.User, :validate, []}
+      },
+      Demo.Post
     ]
   end
 end
