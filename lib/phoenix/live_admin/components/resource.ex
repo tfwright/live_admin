@@ -47,7 +47,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
           assign(socket,
             records: list(socket.assigns.resource, page, socket.assigns.metadata[:__prefix__]),
-            page: page
+            page: page,
+            params: Map.put(socket.assigns.params, :page, page)
           )
 
         socket ->
