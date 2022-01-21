@@ -182,22 +182,22 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
           <%= live_redirect "List", to: route_with_params(@socket, [:list, @key], assigns[:params]), class: "resource__action--btn" %>
           <%= live_redirect "New", to: route_with_params(@socket, [:new, @key], assigns[:params]), class: "resource__action--btn" %>
           <%= if Application.get_env(:phoenix_live_admin, :prefix_options) do %>
-            <div class="resource__action--switch">
-            <button>Prefix: <%= assigns.metadata[:__prefix__] || "none" %></button>
-            <nav>
-              <ul>
-                <%= if assigns.metadata[:__prefix__] do %>
-                  <li>
-                    <%= live_patch("clear", to: @socket.router.__helpers__().resource_path(@socket, :list, @key)) %>
-                  </li>
-                <% end %>
-                <%= for option <- get_prefix_options!(), to_string(option) != assigns.metadata[:__prefix__] do %>
-                  <li>
-                  <%= live_patch(option, to: @socket.router.__helpers__().resource_path(@socket, :list, @key, prefix: option)) %>
-                  </li>
-                <% end %>
-              </ul>
-            </nav>
+            <div class="resource__action--drop">
+              <button>Prefix: <%= assigns.metadata[:__prefix__] || "none" %></button>
+              <nav>
+                <ul>
+                  <%= if assigns.metadata[:__prefix__] do %>
+                    <li>
+                      <%= live_patch("clear", to: @socket.router.__helpers__().resource_path(@socket, :list, @key)) %>
+                    </li>
+                  <% end %>
+                  <%= for option <- get_prefix_options!(), to_string(option) != assigns.metadata[:__prefix__] do %>
+                    <li>
+                    <%= live_patch(option, to: @socket.router.__helpers__().resource_path(@socket, :list, @key, prefix: option)) %>
+                    </li>
+                  <% end %>
+                </ul>
+              </nav>
             </div>
           <% end %>
         </div>

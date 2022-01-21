@@ -147,11 +147,11 @@
     @apply hover:bg-gray-100;
   }
 
-  .resource__action--switch {
+  .resource__action--drop {
     @apply resource__action--btn;
   }
 
-  .resource__action--switch nav {
+  .resource__action--drop nav {
     @apply appearance-none;
     @apply hidden;
     @apply absolute;
@@ -164,9 +164,10 @@
     @apply w-full;
     @apply pl-2;
     @apply truncate;
+    @apply z-50;
   }
 
-  .resource__action--switch:focus-within nav {
+  .resource__action--drop:focus-within nav {
     @apply block;
     @apply translate-y-1;
   }

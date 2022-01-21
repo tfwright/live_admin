@@ -685,7 +685,7 @@ select:focus {
   background-color: rgb(243 244 246 / var(--tw-bg-opacity));
 }
 
-.resource__action--switch {
+.resource__action--drop {
   display: inline-flex;
   height: 2rem;
   align-items: center;
@@ -707,12 +707,12 @@ select:focus {
   transition-duration: 150ms;
 }
 
-.resource__action--switch:hover {
+.resource__action--drop:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(55 48 163 / var(--tw-bg-opacity));
 }
 
-.resource__action--switch nav {
+.resource__action--drop nav {
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
@@ -731,9 +731,10 @@ select:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  z-index: 50;
 }
 
-.resource__action--switch:focus-within nav {
+.resource__action--drop:focus-within nav {
   display: block;
   --tw-translate-y: 0.25rem;
   transform: var(--tw-transform);
