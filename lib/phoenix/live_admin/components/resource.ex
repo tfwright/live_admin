@@ -48,7 +48,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
           assign(socket,
             records: list(socket.assigns.resource, page, socket.assigns.metadata[:__prefix__]),
             page: page,
-            params: Map.put(socket.assigns.params, :page, page)
+            params: Map.put(socket.assigns.params, "page", page)
           )
 
         socket ->
@@ -180,7 +180,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       <div class="resource__actions">
         <div>
           <%= live_redirect "List", to: route_with_params(@socket, [:list, @key], assigns[:params]), class: "resource__action--btn" %>
-          <%= live_redirect "New", to: route_with_params(@socket, [:new, @key], assigns[:params]), class: "resource__action--btn" %>
+          <%= live_redirect "New", to: route_with_params(@socket, [:new, @key], Map.delete(assigns[:params], "page")), class: "resource__action--btn" %>
           <%= if Application.get_env(:phoenix_live_admin, :prefix_options) do %>
             <div class="resource__action--drop">
               <button>Prefix: <%= assigns.metadata[:__prefix__] || "none" %></button>

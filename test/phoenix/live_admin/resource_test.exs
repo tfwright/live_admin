@@ -29,7 +29,7 @@ defmodule Phoenix.LiveAdmin.ResourceTest do
     end
 
     test "deletes record", %{view: view} do
-      assert {_, {:live_redirect, %{to: "/live_admin_test_user"}}} =
+      assert {_, {:live_redirect, %{to: "/live_admin_test_user?page=1"}}} =
                view
                |> element("a[phx-click='delete']")
                |> render_click()
