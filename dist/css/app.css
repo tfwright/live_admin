@@ -866,6 +866,11 @@ select:focus {
   margin-bottom: 1rem;
 }
 
+.disabled {
+  --tw-text-opacity: 1;
+  color: rgb(229 231 235 / var(--tw-text-opacity));
+}
+
 .field__group--disabled {
   margin-bottom: 1rem;
   display: flex;

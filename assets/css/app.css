@@ -276,12 +276,16 @@
     @apply mb-4;
   }
 
+  .disabled {
+    @apply text-gray-200;
+  }
+
   .field__group--disabled {
     @apply field__group;
   }
 
   .field__group--disabled * {
-    @apply text-gray-200;
+    @apply disabled;
   }
 
   .field__label {

@@ -3,6 +3,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   use Phoenix.HTML
 
   import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2, route_with_params: 3]
+  import Phoenix.LiveAdmin, only: [find_belongs_assoc_by_fk: 2]
 
   def render(assigns) do
     ~H"""
@@ -78,16 +79,5 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
     else
       _ -> inspect(field_val)
     end
-  end
-
-  defp find_belongs_assoc_by_fk(resource, field_name) do
-    resource.__schema__(:associations)
-    |> Enum.find_value(fn assoc_name ->
-      resource.__schema__(:association, assoc_name)
-      |> case do
-        assoc = %{owner_key: ^field_name, relationship: :parent} -> assoc
-        _ -> nil
-      end
-    end)
   end
 end
