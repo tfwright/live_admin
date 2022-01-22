@@ -136,12 +136,13 @@ defmodule Demo.Populator do
         password: :crypto.strong_rand_bytes(16) |> Base.encode16(),
         posts: [%Demo.Post{body: Faker.Lorem.paragraphs() |> Enum.join("\n\n")}]
       }
-      |> Demo.Repo.insert()
+      |> Demo.Repo.insert!()
     end)
   end
 
   defp teardown do
     Repo.delete_all(Demo.User)
+    Repo.delete_all(Demo.Post)
   end
 end
 

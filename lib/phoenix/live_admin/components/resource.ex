@@ -227,7 +227,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   def render("list.html", assigns) do
     ~H"""
-    <Index.render socket={@socket} resource={@resource} config={@config} key={@key} page={@page} records={@records} params={assigns[:params]} />
+    <Index.render socket={@socket} resources={@resources} resource={@resource} config={@config} key={@key} page={@page} records={@records} params={assigns[:params]} />
     """
   end
 

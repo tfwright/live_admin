@@ -58,22 +58,36 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   end
 
   def display_field(record = %resource{}, field_name, assigns) do
-    assoc =
-      resource.__schema__(:associations)
-      |> Enum.find_value(fn assoc_name ->
-        resource.__schema__(:association, assoc_name)
-        |> case do
-          assoc = %{owner_key: ^field_name} -> assoc
-          _ -> nil
-        end
-      end)
+    field_val = Map.fetch!(record, field_name)
 
-    label = Map.fetch!(record, field_name)
-
-    if assoc do
-      live_patch(record.id, to: route_with_params(assigns.socket, [:edit, assigns.key, record.id], Map.delete(assigns.params, :page)), class: "resource__action--btn")
+    with field_val when not is_nil(field_val) <- Map.fetch!(record, field_name),
+         %{related: assoc_schema} <- find_belongs_assoc_by_fk(resource, field_name),
+         key when not is_nil(key) <-
+           Enum.find_value(assigns.resources, fn {key, {mod, _}} ->
+             if mod == assoc_schema, do: key
+           end) do
+      live_redirect(field_val,
+        to:
+          route_with_params(
+            assigns.socket,
+            [:edit, key, field_val],
+            Map.delete(assigns.params, :page)
+          ),
+        class: "resource__action--btn"
+      )
     else
-      inspect(label)
+      _ -> inspect(field_val)
     end
+  end
+
+  defp find_belongs_assoc_by_fk(resource, field_name) do
+    resource.__schema__(:associations)
+    |> Enum.find_value(fn assoc_name ->
+      resource.__schema__(:association, assoc_name)
+      |> case do
+        assoc = %{owner_key: ^field_name, relationship: :parent} -> assoc
+        _ -> nil
+      end
+    end)
   end
 end
