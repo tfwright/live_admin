@@ -887,7 +887,6 @@ select:focus {
 
 .field__text {
   margin-bottom: 0.5rem;
-  text-transform: uppercase;
   font-weight: 700;
   font-size: 1.125rem;
   line-height: 1.75rem;

@@ -292,7 +292,6 @@
 
   .field__text {
     @apply mb-2;
-    @apply uppercase;
     @apply font-bold;
     @apply text-lg;
   }
