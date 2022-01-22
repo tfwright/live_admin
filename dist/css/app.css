@@ -732,6 +732,8 @@ select:focus {
   text-overflow: ellipsis;
   white-space: nowrap;
   z-index: 50;
+  max-height: 20rem;
+  overflow-y: scroll;
 }
 
 .resource__action--drop:focus-within nav {

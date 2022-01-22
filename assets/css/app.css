@@ -165,6 +165,8 @@
     @apply pl-2;
     @apply truncate;
     @apply z-50;
+    @apply max-h-80;
+    @apply overflow-y-scroll;
   }
 
   .resource__action--drop:focus-within nav {
