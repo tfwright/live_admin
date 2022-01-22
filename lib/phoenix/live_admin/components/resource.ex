@@ -283,6 +283,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       {mod, func, args} -> apply(mod, func, args)
       list when is_list(list) -> list
     end
+    |> Enum.sort()
   end
 
   defp changeset(record, config, params \\ %{})
