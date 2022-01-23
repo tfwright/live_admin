@@ -10,11 +10,21 @@ defmodule Phoenix.LiveAdmin.Components.Home do
   def render(assigns = %{title: title}) do
     ~H"""
     <h1 class="home__title"><%= title %></h1>
-    <p class="home__intro">
-      This is your admin home page.
-      You will be able to customize this text with whatever copy you'd like to help orient admin users.
-      Here will be some instructions for doing that customization.
-    </p>
+    <%= render("home.html", assigns) %>
+    """
+  end
+
+  def render("home.html", assigns) do
+    {mod, func, args} = get_in(assigns, [:components, :home]) || {__MODULE__, :render_home, []}
+
+    apply(mod, func, [assigns] ++ args)
+  end
+
+  def render_home(assigns) do
+    ~H"""
+    This is the default Phoenix LiveAdmin home page.
+
+    See README for instructions on how to configure your app to show something more useful here.
     """
   end
 end
