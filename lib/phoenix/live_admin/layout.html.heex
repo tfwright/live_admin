@@ -12,7 +12,7 @@
     <%= if assigns[:page_title] do %>
       <%= live_title_tag @page_title %>
     <% else %>
-      <title>Phoenix LiveAdmin</title>
+      <title><%= @title %></title>
     <% end %>
 
     <link rel="manifest" href="/manifest.json ">
