@@ -146,6 +146,16 @@ defmodule Demo.Populator do
   end
 end
 
+defmodule DemoWeb.UserForm do
+  use Phoenix.Component
+
+  def render(assigns) do
+    ~H"""
+    <Phoenix.LiveAdmin.Components.Resource.Form.render {assigns} />
+    """
+  end
+end
+
 defmodule DemoWeb.Router do
   use Phoenix.Router
   import Phoenix.LiveAdmin.Router
@@ -165,7 +175,11 @@ defmodule DemoWeb.Router do
         hidden_fields: [:private_data],
         immutable_fields: [:password, :inserted_at],
         create_with: {Demo.User, :create, []},
-        validate_with: {Demo.User, :validate, []}
+        validate_with: {Demo.User, :validate, []},
+        components: [
+          new: {DemoWeb.UserForm, :render, []},
+          edit: {DemoWeb.UserForm, :render, []}
+        ]
       },
       Demo.Post
     ]

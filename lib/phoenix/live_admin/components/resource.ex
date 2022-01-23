@@ -214,15 +214,19 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   def render("new.html", assigns) do
-    ~H"""
-    <Form.render resource={@resource} config={@config} changeset={@changeset} action="create" />
-    """
+    assigns = assign(assigns, :action, "create")
+
+    {mod, func, args} = get_in(assigns, [:config, :components, :new]) || {Form, :render, []}
+
+    apply(mod, func, [assigns] ++ args)
   end
 
   def render("edit.html", assigns) do
-    ~H"""
-    <Form.render resource={@resource} config={@config} changeset={@changeset} action="update" />
-    """
+    assigns = assign(assigns, :action, "update")
+
+    {mod, func, args} = get_in(assigns, [:config, :components, :edit]) || {Form, :render, []}
+
+    apply(mod, func, [assigns] ++ args)
   end
 
   def render("list.html", assigns) do
