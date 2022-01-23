@@ -9,7 +9,7 @@ defmodule Phoenix.LiveAdmin.Router do
         import Phoenix.LiveView.Router, only: [live: 4, live_session: 3]
 
         live_session :live_admin,
-          session: %{"resources" => unquote(resources)},
+          session: {unquote(__MODULE__), :build_session, [unquote(resources)]},
           root_layout: {Phoenix.LiveAdmin.View, "layout.html"},
           on_mount: {unquote(__MODULE__), :assign_resources} do
           live("/", Phoenix.LiveAdmin.Components.Home, :home, as: :home)
@@ -42,5 +42,15 @@ defmodule Phoenix.LiveAdmin.Router do
     |> String.split(".")
     |> Enum.slice(-2, 2)
     |> Enum.map_join("_", &Macro.underscore/1)
+  end
+
+  def build_session(_conn, resources) do
+    %{"resources" => resources, "id" => generate_uuid()}
+  end
+
+  defp generate_uuid() do
+    make_ref()
+    |> :erlang.ref_to_list()
+    |> List.to_string()
   end
 end

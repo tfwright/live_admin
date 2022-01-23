@@ -2,7 +2,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   use Phoenix.Component
   use Phoenix.HTML
 
-  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2, route_with_params: 3]
+  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2, route_with_params: 2, route_with_params: 3]
   import Phoenix.LiveAdmin, only: [find_belongs_assoc_by_fk: 2]
 
   def render(assigns) do
@@ -38,7 +38,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
                 </td>
               <% end %>
               <td class="resource__cell">
-                <%= live_redirect "Edit", to: route_with_params(@socket, [:edit, @key, record.id], assigns[:params]), class: "resource__action--btn" %>
+                <%= live_redirect "Edit", to: route_with_params(@socket, [:edit, @key, record.id]), class: "resource__action--btn" %>
                 <%= link "Delete", to: "#", "data-confirm": "Are you sure?", "phx-click": "delete", "phx-value-id": record.id, class: "resource__action--btn" %>
               </td>
             </tr>
@@ -47,8 +47,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
         <tfoot>
           <tr>
             <td class="w-full" colspan={@resource |> fields(@config) |> Enum.count()}>
-              <%= if @page > 1, do: live_patch("Prev", to: route_with_params(@socket, [:list, @key], Map.put(@params, "page", @page - 1)), class: "resource__action--btn"), else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
-              <%= if @page < (@records |> elem(1)) / 10, do: live_patch("Next", to: route_with_params(@socket, [:list, @key], Map.put(@params, "page", @page + 1)), class: "resource__action--btn"), else: content_tag(:span, "Next", class: "resource__action--disabled") %>
+              <%= if @page > 1, do: live_patch("Prev", to: route_with_params(@socket, [:list, @key], %{page: @page - 1}), class: "resource__action--btn"), else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
+              <%= if @page < (@records |> elem(1)) / 10, do: live_patch("Next", to: route_with_params(@socket, [:list, @key], %{page: @page + 1}), class: "resource__action--btn"), else: content_tag(:span, "Next", class: "resource__action--disabled") %>
             </td>
             <td class="text-right p-2"><%= @records |> elem(1) %> total rows</td>
           </tr>
@@ -68,12 +68,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
              if mod == assoc_schema, do: key
            end) do
       live_redirect(field_val,
-        to:
-          route_with_params(
-            assigns.socket,
-            [:edit, key, field_val],
-            Map.delete(assigns.params, "page")
-          ),
+        to: route_with_params(assigns.socket, [:edit, key, field_val]),
         class: "resource__action--btn"
       )
     else
