@@ -149,6 +149,12 @@
 
   .resource__action--drop {
     @apply resource__action--btn;
+    @apply w-28;
+  }
+
+  .resource__action--drop button {
+    @apply w-full;
+    @apply text-center;
   }
 
   .resource__action--drop nav {

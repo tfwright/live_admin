@@ -195,7 +195,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
           <%= live_redirect "New", to: route_with_params(@socket, [:new, @key]), class: "resource__action--btn" %>
           <%= if Application.get_env(:phoenix_live_admin, :prefix_options) do %>
             <div class="resource__action--drop">
-              <button>Prefix: <%= @prefix || "none" %></button>
+              <button><%= @prefix || "Set prefix" %></button>
               <nav>
                 <ul>
                   <%= if @prefix do %>

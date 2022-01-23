@@ -712,6 +712,15 @@ select:focus {
   background-color: rgb(55 48 163 / var(--tw-bg-opacity));
 }
 
+.resource__action--drop {
+  width: 7rem;
+}
+
+.resource__action--drop button {
+  width: 100%;
+  text-align: center;
+}
+
 .resource__action--drop nav {
   -webkit-appearance: none;
      -moz-appearance: none;
