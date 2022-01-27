@@ -3,6 +3,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   use Phoenix.HTML
 
   import Ecto.Query
+  import Phoenix.LiveAdmin, only: [resource_label: 2]
 
   alias Ecto.Changeset
   alias __MODULE__.{Form, Index}
@@ -193,7 +194,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     ~H"""
     <div class="resource__banner">
       <h1 class="resource__title">
-        <%= @resource |> Module.split() |> Enum.join(".") %>
+        <%= resource_label(@resource, @config) %>
       </h1>
 
       <div class="resource__actions">

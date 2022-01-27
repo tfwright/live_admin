@@ -5,6 +5,7 @@ defmodule Phoenix.LiveAdmin.View do
     namespace: Phoenix.LiveAdmin,
     root: __DIR__
 
+  import Phoenix.LiveAdmin, only: [resource_label: 2]
   import Phoenix.LiveView.Helpers
 
   js_path = Path.join(__DIR__, "../../../dist/js/app.js")

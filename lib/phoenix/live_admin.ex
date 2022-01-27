@@ -9,4 +9,12 @@ defmodule Phoenix.LiveAdmin do
       end
     end)
   end
+
+  def resource_label(resource, config) do
+    case Map.get(config, :label_with) do
+      nil -> resource |> Module.split() |> Enum.join(".")
+      {m, f, a} -> apply(m, f, a)
+      label when is_binary(label) -> label
+    end
+  end
 end
