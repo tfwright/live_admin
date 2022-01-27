@@ -2,7 +2,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   use Phoenix.Component
   use Phoenix.HTML
 
-  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2, route_with_params: 2, route_with_params: 3]
+  import Phoenix.LiveAdmin.Components.Resource,
+    only: [fields: 2, route_with_params: 2, route_with_params: 3]
+
   import Phoenix.LiveAdmin, only: [find_belongs_assoc_by_fk: 2]
 
   def render(assigns) do

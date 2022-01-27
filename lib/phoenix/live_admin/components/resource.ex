@@ -49,10 +49,11 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   def handle_params(params, _uri, socket = %{assigns: %{live_action: :list, loading: false}}) do
     page = String.to_integer(params["page"] || "1")
 
-    socket = assign(socket,
-      records: list(socket.assigns.resource, page, socket.assigns.prefix),
-      page: page
-    )
+    socket =
+      assign(socket,
+        records: list(socket.assigns.resource, page, socket.assigns.prefix),
+        page: page
+      )
 
     {:noreply, socket}
   end
@@ -91,7 +92,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   def handle_event(
         "create",
         %{"params" => params},
-        %{assigns: %{resource: resource, key: key, config: config, session_id: session_id}} = socket
+        %{assigns: %{resource: resource, key: key, config: config, session_id: session_id}} =
+          socket
       ) do
     socket =
       case create_resource(resource, config, params, SessionStore.lookup(session_id)) do
@@ -122,7 +124,12 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         } = socket
       ) do
     socket =
-      case update_resource(changeset.data, config, params, SessionStore.lookup(session_id)) do
+      case update_resource(
+             changeset.data,
+             config,
+             params,
+             SessionStore.lookup(session_id)
+           ) do
         {:ok, _} ->
           socket
           |> put_flash(:info, "Updated #{resource}")
@@ -337,11 +344,11 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   defp cast_fields(record, params, fields) do
     field_names =
       Enum.flat_map(fields, fn
-        {field, type, opts} when is_atom(type) ->
-          if Keyword.get(opts, :immutable, false), do: [], else: [field]
-
-        _ ->
+        {_, {_, Ecto.Embedded, _}, _} ->
           []
+
+        {field, _, opts} ->
+          if Keyword.get(opts, :immutable, false), do: [], else: [field]
       end)
 
     Changeset.cast(record, params, field_names)
