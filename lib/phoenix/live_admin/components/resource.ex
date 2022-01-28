@@ -325,34 +325,26 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   defp change_resource(record = %resource{}, config, params) do
     fields = fields(resource, config)
 
-    changeset = cast_fields(record, params, fields)
-
-    Enum.reduce(fields, changeset, fn
-      {field, {_, Ecto.Embedded, %{related: embed_schema}}, _}, changeset ->
-        embed_fields = fields(embed_schema, config)
-
-        Changeset.cast_embed(changeset, field,
-          with: fn embed, params ->
-            cast_fields(embed, params, embed_fields)
-          end
-        )
-
-      _, changeset ->
-        changeset
-    end)
-  end
-
-  defp cast_fields(record, params, fields) do
-    field_names =
-      Enum.flat_map(fields, fn
-        {_, {_, Ecto.Embedded, _}, _} ->
-          []
-
-        {field, _, opts} ->
-          if Keyword.get(opts, :immutable, false), do: [], else: [field]
+    {primitives, embeds} =
+      Enum.split_with(fields, fn
+        {_, {_, Ecto.Embedded, _}, _} -> false
+        _ -> true
       end)
 
-    Changeset.cast(record, params, field_names)
+    castable_fields =
+      Enum.flat_map(primitives, fn {field, _, opts} ->
+        if Keyword.get(opts, :immutable, false), do: [], else: [field]
+      end)
+
+    changeset = Changeset.cast(record, params, castable_fields)
+
+    Enum.reduce(embeds, changeset, fn {field, {_, Ecto.Embedded, _}, _}, changeset ->
+      Changeset.cast_embed(changeset, field,
+        with: fn embed, params ->
+          change_resource(embed, %{}, params)
+        end
+      )
+    end)
   end
 
   defp create_resource(resource, config, params, session) do
