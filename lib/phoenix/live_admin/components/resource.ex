@@ -260,13 +260,13 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   def fields(resource, config) do
     Enum.flat_map(resource.__schema__(:fields), fn field_name ->
       config
-      |> Map.get(:hidden_fields, [])
+      |> get_config(:hidden_fields, [])
       |> Enum.member?(field_name)
       |> case do
         false ->
           [
             {field_name, resource.__schema__(:type, field_name),
-             [immutable: Map.get(config, :immutable_fields, []) |> Enum.member?(field_name)]}
+             [immutable: get_config(config, :immutable_fields, []) |> Enum.member?(field_name)]}
           ]
 
         true ->
@@ -349,7 +349,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   defp create_resource(resource, config, params, session) do
     config
-    |> Map.get(:create_with)
+    |> get_config(:create_with)
     |> case do
       nil ->
         resource
@@ -363,7 +363,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   defp update_resource(record, config, params, session) do
     config
-    |> Map.get(:update_with)
+    |> get_config(:update_with)
     |> case do
       nil ->
         record
@@ -377,7 +377,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   defp delete_resource(record, config, session) do
     config
-    |> Map.get(:delete_with)
+    |> get_config(:delete_with)
     |> case do
       nil ->
         repo().delete(record)
@@ -389,7 +389,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   defp validate_resource(changeset, config, session) do
     config
-    |> Map.get(:validate_with)
+    |> get_config(:validate_with)
     |> case do
       nil -> changeset
       {mod, func_name, args} -> apply(mod, func_name, [changeset, session] ++ args)
@@ -405,4 +405,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   def assign_prefix(socket) do
     assign(socket, :prefix, SessionStore.lookup(socket.assigns.session_id, :__prefix__))
   end
+
+  def get_config(config, key, default \\ nil),
+    do: Application.get_env(:phoenix_live_admin, key, Map.get(config, key, default))
 end

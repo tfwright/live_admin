@@ -14,7 +14,8 @@ create table users (
 create table posts (
   id serial,
   user_id int,
-  body text
+  body text,
+  inserted_at timestamp without time zone
 );
 
 create schema alt;
@@ -35,5 +36,6 @@ create table alt.users (
 create table alt.posts (
   id serial,
   user_id int,
-  body text
+  body text,
+  inserted_at timestamp without time zone
 );
