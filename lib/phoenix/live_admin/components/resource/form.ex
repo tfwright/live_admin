@@ -2,7 +2,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   use Phoenix.Component
   use Phoenix.HTML
 
-  import Phoenix.LiveAdmin, only: [find_belongs_assoc_by_fk: 2]
   import Phoenix.LiveAdmin.ErrorHelpers
   import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2]
 
@@ -91,17 +90,11 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   end
 
   def input(assigns = %{type: :id, form: form, field: field}) do
-    if find_belongs_assoc_by_fk(form.data.__struct__, field) do
-      ~H"""
-      <div class="form__number">
-        <%= number_input @form, @field, class: "field__number", disabled: @disabled %>
-      </div>
-      """
-    else
-      ~H"""
-      <%= text_input @form, @field, class: "field__text disabled", disabled: true %>
-      """
-    end
+    ~H"""
+    <div class="form__number">
+      <%= number_input @form, @field, class: "field__number", disabled: @disabled %>
+    </div>
+    """
   end
 
   def input(assigns), do: ~H""
