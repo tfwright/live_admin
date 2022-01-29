@@ -79,7 +79,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   def input(assigns = %{type: type}) when type in [:naive_datetime, :utc_datetime] do
     ~H"""
     <div class="form__time">
-      <%= datetime_select @form, @field, class: "field__time", year: [disabled: @disabled], month: [disabled: @disabled], day: [disabled: @disabled], hour: [disabled: @disabled], minute: [disabled: @disabled] %>
+      <%= datetime_local_input @form, @field, class: "field__time", disabled: @disabled %>
     </div>
     """
   end
