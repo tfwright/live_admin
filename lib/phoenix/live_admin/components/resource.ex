@@ -397,9 +397,29 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   defp apply_search(query, q, fields) do
-    Enum.reduce(fields, query, fn {field_name, _, _}, query ->
-      or_where(query, [r], ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%"))
-    end)
+    q
+    |> String.split(~r{[^\s]*:}, include_captures: true, trim: true)
+    |> case do
+      [q] ->
+        Enum.reduce(fields, query, fn {field_name, _, _}, query ->
+          or_where(query, [r], ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%"))
+        end)
+
+      field_queries ->
+        field_queries
+        |> Enum.map(&String.trim/1)
+        |> Enum.chunk_every(2)
+        |> Enum.reduce(query, fn
+          [field_key, q], query ->
+            if {field_name, _, _} = Enum.find(fields, fn {field_name, _, _} -> "#{field_name}:" == field_key end) do
+              or_where(query, [r], ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%"))
+            else
+              query
+            end
+
+          [_], query -> query 
+        end)
+    end
   end
 
   def assign_prefix(socket) do
