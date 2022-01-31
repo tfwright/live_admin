@@ -3,7 +3,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   use Phoenix.HTML
 
   import Ecto.Query
-  import Phoenix.LiveAdmin, only: [resource_label: 2]
+  import Phoenix.LiveAdmin, only: [resource_label: 3]
 
   alias Ecto.Changeset
   alias __MODULE__.{Form, Index}
@@ -194,7 +194,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     ~H"""
     <div class="resource__banner">
       <h1 class="resource__title">
-        <%= resource_label(@resource, @config) %>
+        <%= resource_label(@resource, @config, @base_path) %>
       </h1>
 
       <div class="resource__actions">
@@ -402,7 +402,11 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     |> case do
       [q] ->
         Enum.reduce(fields, query, fn {field_name, _, _}, query ->
-          or_where(query, [r], ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%"))
+          or_where(
+            query,
+            [r],
+            ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
+          )
         end)
 
       field_queries ->
@@ -411,13 +415,19 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         |> Enum.chunk_every(2)
         |> Enum.reduce(query, fn
           [field_key, q], query ->
-            if {field_name, _, _} = Enum.find(fields, fn {field_name, _, _} -> "#{field_name}:" == field_key end) do
-              or_where(query, [r], ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%"))
+            if {field_name, _, _} =
+                 Enum.find(fields, fn {field_name, _, _} -> "#{field_name}:" == field_key end) do
+              or_where(
+                query,
+                [r],
+                ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
+              )
             else
               query
             end
 
-          [_], query -> query 
+          [_], query ->
+            query
         end)
     end
   end

@@ -64,7 +64,7 @@ defmodule DemoWeb.PageController do
   end
 end
 
-defmodule Demo.User.Settings do
+defmodule Demo.Accounts.User.Settings do
   use Ecto.Schema
 
   embedded_schema do
@@ -72,7 +72,7 @@ defmodule Demo.User.Settings do
   end
 end
 
-defmodule Demo.User do
+defmodule Demo.Accounts.User do
   use Ecto.Schema
 
   import Ecto.Changeset
@@ -86,9 +86,9 @@ defmodule Demo.User do
     field :password, :string
     field :status, Ecto.Enum, values: [:active, :suspended]
 
-    embeds_one :settings, Demo.User.Settings
+    embeds_one :settings, Demo.Accounts.User.Settings
 
-    has_many :posts, Demo.Post
+    has_many :posts, Demo.Posts.Post
 
     timestamps(updated_at: false)
   end
@@ -105,7 +105,7 @@ defmodule Demo.User do
   end
 end
 
-defmodule Demo.Post do
+defmodule Demo.Posts.Post do
   use Ecto.Schema
 
   import Ecto.Changeset
@@ -113,7 +113,7 @@ defmodule Demo.Post do
   schema "posts" do
     field :body, :string
 
-    belongs_to :user, Demo.User
+    belongs_to :user, Demo.Accounts.User
 
     timestamps(updated_at: false)
   end
@@ -129,7 +129,7 @@ defmodule Demo.Populator do
 
   def run do
     Enum.each(1..100, fn _ ->
-      %Demo.User{
+      %Demo.Accounts.User{
         name: Faker.Person.name(),
         settings: %{},
         active: true,
@@ -137,15 +137,15 @@ defmodule Demo.Populator do
         stars_count: Enum.random(0..100),
         private_data: %{},
         password: :crypto.strong_rand_bytes(16) |> Base.encode16(),
-        posts: [%Demo.Post{body: Faker.Lorem.paragraphs() |> Enum.join("\n\n")}]
+        posts: [%Demo.Posts.Post{body: Faker.Lorem.paragraphs() |> Enum.join("\n\n")}]
       }
       |> Demo.Repo.insert!()
     end)
   end
 
   defp teardown do
-    Repo.delete_all(Demo.User)
-    Repo.delete_all(Demo.Post)
+    Repo.delete_all(Demo.Accounts.User)
+    Repo.delete_all(Demo.Posts.Post)
   end
 end
 
@@ -174,17 +174,17 @@ defmodule DemoWeb.Router do
     get "/", DemoWeb.PageController, :index
 
     live_admin "/admin", resources: [
-      {Demo.User,
+      {Demo.Accounts.User,
         hidden_fields: [:private_data],
         immutable_fields: [:password, :inserted_at],
-        create_with: {Demo.User, :create, []},
-        validate_with: {Demo.User, :validate, []},
+        create_with: {Demo.Accounts.User, :create, []},
+        validate_with: {Demo.Accounts.User, :validate, []},
         components: [
           new: {DemoWeb.UserForm, :render, []},
           edit: {DemoWeb.UserForm, :render, []}
         ]
       },
-      Demo.Post
+      Demo.Posts.Post
     ]
   end
 end

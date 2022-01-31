@@ -21,7 +21,7 @@ defmodule Phoenix.LiveAdminTest do
     end
 
     test "links to resource", %{response: response} do
-      assert response |> Floki.find("a[href='/live_admin_test_user']") |> Enum.any?()
+      assert response |> Floki.find("a[href='/user']") |> Enum.any?()
     end
   end
 end

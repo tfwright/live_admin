@@ -17,19 +17,19 @@ defmodule Phoenix.LiveAdmin.ResourceTest do
   describe "resource page" do
     setup %{conn: conn} do
       Repo.insert!(%User{})
-      {:ok, view, _html} = live(conn, "/live_admin_test_user")
+      {:ok, view, _html} = live(conn, "/user")
       %{view: view}
     end
 
     test "links to new form", %{view: view} do
-      assert {_, {:live_redirect, %{to: "/live_admin_test_user/new"}}} =
+      assert {_, {:live_redirect, %{to: "/user/new"}}} =
                view
-               |> element("a[href='/live_admin_test_user/new'")
+               |> element("a[href='/user/new'")
                |> render_click()
     end
 
     test "deletes record", %{view: view} do
-      assert {_, {:live_redirect, %{to: "/live_admin_test_user?page=1"}}} =
+      assert {_, {:live_redirect, %{to: "/user?page=1"}}} =
                view
                |> element("a[phx-click='delete']")
                |> render_click()
@@ -38,7 +38,7 @@ defmodule Phoenix.LiveAdmin.ResourceTest do
 
   describe "new resource page" do
     setup %{conn: conn} do
-      {:ok, view, html} = live(conn, "/live_admin_test_user/new")
+      {:ok, view, html} = live(conn, "/user/new")
       %{response: html, view: view}
     end
 
@@ -73,7 +73,7 @@ defmodule Phoenix.LiveAdmin.ResourceTest do
     end
 
     test "creates user on form submit", %{view: view} do
-      {_, {:live_redirect, %{to: "/live_admin_test_user"}}} =
+      {_, {:live_redirect, %{to: "/user"}}} =
         view
         |> element(".resource__form")
         |> render_submit(%{name: "test", settings: %{some_option: "test"}})
@@ -85,12 +85,12 @@ defmodule Phoenix.LiveAdmin.ResourceTest do
   describe "edit resource page" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
-      {:ok, view, html} = live(conn, "/live_admin_test_user/edit/#{user.id}")
+      {:ok, view, html} = live(conn, "/user/edit/#{user.id}")
       %{response: html, view: view}
     end
 
     test "handles form submit", %{view: view} do
-      {_, {:live_redirect, %{to: "/live_admin_test_user"}}} =
+      {_, {:live_redirect, %{to: "/user"}}} =
         view
         |> element(".resource__form")
         |> render_submit(%{name: "test"})

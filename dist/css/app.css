@@ -542,20 +542,26 @@ select:focus {
   justify-content: space-between;
 }
 
-.nav__item {
-  padding: 0.5rem;
+.nav__list > .nav__item:first-of-type {
+  border-bottom-width: 1px;
+  margin-bottom: 0.25rem;
 }
 
-.nav__item:hover {
+.nav__item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav__item a:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(165 180 252 / var(--tw-bg-opacity));
 }
 
-.nav__item {
+.nav__item a {
+  padding: 0.25rem;
+  margin: 0.25rem;
   border-radius: 0.25rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .nav__item--active {
@@ -565,8 +571,42 @@ select:focus {
   white-space: nowrap;
 }
 
-.nav__item:first-of-type {
-  border-bottom-width: 1px;
+.nav__group {
+  padding-left: 0.25rem;
+}
+
+.nav__item--drop input {
+  display: none;
+}
+
+.nav__item--drop label {
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease-out;
+}
+
+.nav__item--drop label::before {
+  content: ' ';
+  display: inline-block;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+  transition: transform .2s ease-out;
+}
+
+.nav__item--drop input:checked + label::before {
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.nav__item--drop ul {
+  display: none;
+}
+
+.nav__item--drop input:checked + label + ul {
+  display: list-item;
 }
 
 .content {
@@ -967,6 +1007,10 @@ select:focus {
   width: 100%;
 }
 
+.transform {
+  transform: var(--tw-transform);
+}
+
 .items-center {
   align-items: center;
 }
@@ -1034,6 +1078,14 @@ select:focus {
 .text-gray-600 {
   --tw-text-opacity: 1;
   color: rgb(75 85 99 / var(--tw-text-opacity));
+}
+
+.transition {
+  transition-property: color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
 
 .focus\:border-blue-600:focus {

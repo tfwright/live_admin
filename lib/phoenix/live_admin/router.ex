@@ -34,23 +34,49 @@ defmodule Phoenix.LiveAdmin.Router do
         %{"resources" => resources, "title" => title, "components" => components},
         socket
       ) do
-    resources =
+    {resources, base_path} =
       resources
-      |> Enum.map(fn
-        {mod, opts} -> {derive_resource_key(mod), {mod, Map.new(opts)}}
-        mod -> {derive_resource_key(mod), {mod, %{}}}
+      |> Enum.map_reduce(nil, fn config, base_path ->
+        resource =
+          {mod, _} =
+          config
+          |> case do
+            {mod, opts} -> {mod, Map.new(opts)}
+            mod -> {mod, %{}}
+          end
+
+        resource_path = Module.split(mod)
+
+        {
+          resource,
+          (base_path || Enum.drop(resource_path, -1))
+          |> Enum.zip(resource_path)
+          |> Enum.reduce_while([], fn
+            {a, a}, new_path -> {:cont, Enum.concat(new_path, [a])}
+            _, new_path -> {:halt, new_path}
+          end)
+        }
       end)
-      |> Enum.into(%{})
+
+    resources =
+      Map.new(resources, fn resource ->
+        {derive_resource_key(elem(resource, 0), base_path), resource}
+      end)
 
     {:cont,
-     assign(socket, title: title, resources: resources, socket: socket, components: components)}
+     assign(socket,
+       title: title,
+       resources: resources,
+       socket: socket,
+       components: components,
+       base_path: base_path
+     )}
   end
 
-  defp derive_resource_key(mod) do
+  defp derive_resource_key(mod, base_path) do
     mod
-    |> to_string()
-    |> String.split(".")
-    |> Enum.slice(-2, 2)
+    |> Module.split()
+    |> Enum.drop(Enum.count(base_path))
     |> Enum.map_join("_", &Macro.underscore/1)
   end
 
