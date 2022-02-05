@@ -42,6 +42,29 @@
 }
 
 @layer components {
+  .drop::before {
+    content: ' ';
+    display: inline-block;
+
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid currentColor;
+
+    vertical-align: middle;
+    margin-right: .7rem;
+    transform: translateY(-2px);
+
+    transition: transform .2s ease-out;
+  }
+
+  .drop-down::before {
+    transform: rotate(90deg) translateX(-3px);
+  }
+
+  .drop-up::before {
+    transform: rotate(-90deg) translateX(3px);
+  }
+
   .main__content {
     @apply flex;
     @apply flex-col;
@@ -100,23 +123,12 @@
     transition: all 0.25s ease-out;
   }
 
-  .nav__item--drop label::before {
-    content: ' ';
-    display: inline-block;
-
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-left: 5px solid currentColor;
-
-    vertical-align: middle;
-    margin-right: .7rem;
-    transform: translateY(-2px);
-
-    transition: transform .2s ease-out;
+  .nav__item--drop label {
+    @apply drop;
   }
 
-  .nav__item--drop input:checked + label::before {
-    transform: rotate(90deg) translateX(-3px);
+  .nav__item--drop input:checked + label {
+    @apply drop-down;
   }
 
   .nav__item--drop ul {
@@ -270,6 +282,16 @@
     @apply px-8;
     @apply py-4;
     @apply whitespace-nowrap;
+  }
+
+  .header__link--down {
+    @apply drop;
+    @apply drop-down;
+  }
+
+  .header__link--up {
+    @apply drop;
+    @apply drop-up;
   }
 
   .resource__cell {

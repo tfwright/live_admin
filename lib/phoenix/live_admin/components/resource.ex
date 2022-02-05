@@ -49,12 +49,16 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   @impl true
   def handle_params(params, _uri, socket = %{assigns: %{live_action: :list, loading: false}}) do
     page = String.to_integer(params["page"] || "1")
+    sort = {
+      String.to_existing_atom(params["sort-dir"] || "asc"),
+      String.to_existing_atom(params["sort-attr"] || "id")
+    }
 
     socket =
-      assign(socket,
-        records: list(socket.assigns.resource, page, socket.assigns.prefix),
-        page: page
-      )
+      socket
+      |> assign(page: page)
+      |> assign(sort: sort)
+      |> reload_list()
 
     {:noreply, socket}
   end
@@ -175,14 +179,10 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   @impl true
-  def handle_event(
-        "search",
-        %{"query" => q},
-        %{assigns: %{resource: resource, page: page}} = socket
-      ) do
-    records = list(resource, page, socket.assigns.prefix, search: q)
-
-    socket = assign(socket, :records, records)
+  def handle_event("search", %{"query" => q}, socket) do
+    socket = socket
+      |> assign(:search, q)
+      |> reload_list()
 
     {:noreply, socket}
   end
@@ -251,7 +251,17 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   def render("list.html", assigns) do
     ~H"""
-    <Index.render socket={@socket} resources={@resources} resource={@resource} config={@config} key={@key} page={@page} records={@records} />
+    <Index.render
+      socket={@socket}
+      resources={@resources}
+      resource={@resource}
+      config={@config}
+      key={@key}
+      page={@page}
+      records={@records}
+      sort_attr={elem(@sort, 1)}
+      sort_dir={elem(@sort, 0)}
+    />
     """
   end
 
@@ -275,23 +285,31 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     end)
   end
 
-  def list(resource, page, prefix, opts \\ []) do
+  def list(resource, opts \\ []) do
+    opts =
+      opts
+      |> Enum.into(%{})
+      |> Map.put_new(:page, 1)
+      |> Map.put_new(:sort, {:asc, :id})
+
     query =
       resource
       |> limit(10)
-      |> offset(^((page - 1) * 10))
+      |> offset(^((opts[:page] - 1) * 10))
+      |> order_by(^[opts[:sort]])
 
     query =
       opts
       |> Enum.reduce(query, fn
         {:search, q}, query -> apply_search(query, q, fields(resource, %{}))
+        _, query -> query
       end)
 
-    repo().all(query, prefix: prefix)
+    repo().all(query, prefix: opts[:prefix])
 
     {
-      repo().all(query, prefix: prefix),
-      repo().aggregate(query |> exclude(:limit) |> exclude(:offset), :count, prefix: prefix)
+      repo().all(query, prefix: opts[:prefix]),
+      repo().aggregate(query |> exclude(:limit) |> exclude(:offset), :count, prefix: opts[:prefix])
     }
   end
 
@@ -438,4 +456,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   def get_config(config, key, default \\ nil),
     do: Application.get_env(:phoenix_live_admin, key, Map.get(config, key, default))
+
+  defp reload_list(socket), do: assign(socket, records: list(socket.assigns.resource, Map.take(socket.assigns, [:prefix, :sort, :page, :search])))
 end

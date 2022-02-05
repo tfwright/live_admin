@@ -26,7 +26,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
         <thead>
           <tr>
             <%= for {field, _, _} <- fields(@resource, @config) do %>
-              <th class="resource__header"><%= humanize(field) %></th>
+              <th class="resource__header">
+                <%= list_link @socket, humanize(field), @key, %{page: @page, "sort-attr": field, "sort-dir": (if field == @sort_attr, do: Enum.find([:asc, :desc], & &1 != @sort_dir), else: @sort_dir)}, class: "header__link#{if field == @sort_attr, do: "--#{[asc: :down, desc: :up][@sort_dir]}"}" %>
+              </th>
             <% end %>
             <th class="resource__header">Actions</th>
           </tr>
@@ -49,8 +51,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
         <tfoot>
           <tr>
             <td class="w-full" colspan={@resource |> fields(@config) |> Enum.count()}>
-              <%= if @page > 1, do: live_patch("Prev", to: route_with_params(@socket, [:list, @key], %{page: @page - 1}), class: "resource__action--btn"), else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
-              <%= if @page < (@records |> elem(1)) / 10, do: live_patch("Next", to: route_with_params(@socket, [:list, @key], %{page: @page + 1}), class: "resource__action--btn"), else: content_tag(:span, "Next", class: "resource__action--disabled") %>
+              <%= if @page > 1, do: list_link(@socket, "Prev", @key, %{page: @page - 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir}, class: "resource__action--btn"), else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
+              <%= if @page < (@records |> elem(1)) / 10, do: list_link(@socket, "Next", @key, %{page: @page + 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir}, class: "resource__action--btn"), else: content_tag(:span, "Next", class: "resource__action--disabled") %>
             </td>
             <td class="text-right p-2"><%= @records |> elem(1) %> total rows</td>
           </tr>
@@ -77,4 +79,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
       _ -> inspect(field_val)
     end
   end
+
+  def list_link(socket, content, key, params, opts \\ []), do: live_patch content, Keyword.put(opts, :to, route_with_params(socket, [:list, key], params))
 end

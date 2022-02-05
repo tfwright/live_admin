@@ -518,6 +518,18 @@ select:focus {
   --tw-shadow-colored: 0 0 #0000;
 }
 
+.drop::before {
+  content: ' ';
+  display: inline-block;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+  transition: transform .2s ease-out;
+}
+
 .main__content {
   display: flex;
   flex-direction: column;
@@ -843,6 +855,32 @@ select:focus {
   padding-top: 1rem;
   padding-bottom: 1rem;
   white-space: nowrap;
+}
+
+.header__link--down::before {
+  content: ' ';
+  display: inline-block;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+  transition: transform .2s ease-out;
+  transform: rotate(90deg) translateX(-3px);
+}
+
+.header__link--up::before {
+  content: ' ';
+  display: inline-block;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid currentColor;
+  vertical-align: middle;
+  margin-right: .7rem;
+  transform: translateY(-2px);
+  transition: transform .2s ease-out;
+  transform: rotate(-90deg) translateX(3px);
 }
 
 .resource__cell {
