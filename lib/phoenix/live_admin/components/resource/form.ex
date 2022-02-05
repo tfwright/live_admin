@@ -5,6 +5,16 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   import Phoenix.LiveAdmin.ErrorHelpers
   import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2]
 
+  @supported_field_types [
+    :string,
+    :boolean,
+    :date,
+    :integer,
+    :naive_datetime,
+    :utc_datetime,
+    :id
+  ]
+
   def render(assigns) do
     ~H"""
     <%= form_for @changeset , "#", [as: "params", phx_change: "validate", phx_submit: @action, class: "resource__form"], fn f -> %>
@@ -17,6 +27,10 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     <% end %>
     """
   end
+
+  def field(assigns = %{type: type}) when type in @supported_field_types, do: field_group(assigns)
+
+  def field(assigns = %{type: {_, Ecto.Enum, _}}), do: field_group(assigns)
 
   def field(assigns = %{type: {_, Ecto.Embedded, _}}) do
     ~H"""
@@ -38,6 +52,15 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   end
 
   def field(assigns) do
+    ~H"""
+    <div class={"field__group--disabled"}>
+      <%= label @form, @field, class: "field__label" %>
+      <%= textarea @form, @field, disabled: true, value: @form |> input_value(@field) |> inspect() %>
+    </div>
+    """
+  end
+
+  def field_group(assigns) do
     ~H"""
     <div class={"field__group#{if @immutable, do: "--disabled"}"}>
       <%= label @form, @field, class: "field__label" %>
@@ -67,7 +90,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     """
   end
 
-  def input(assigns = %{type: :integer}) do
+  def input(assigns = %{type: number}) when number in [:integer, :id] do
     ~H"""
     <div class="form__number">
       <%= number_input @form, @field, class: "field__number", disabled: @disabled %>
@@ -88,16 +111,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     <%= select @form, @field, mappings, disabled: @disabled, class: "field__select" %>
     """
   end
-
-  def input(assigns = %{type: :id, form: form, field: field}) do
-    ~H"""
-    <div class="form__number">
-      <%= number_input @form, @field, class: "field__number", disabled: @disabled %>
-    </div>
-    """
-  end
-
-  def input(assigns), do: ~H""
 
   defp fields_for_embed({_, _, %{related: schema}}), do: fields(schema, %{})
 end

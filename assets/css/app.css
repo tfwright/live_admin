@@ -10,7 +10,7 @@
     @apply font-extrabold;
   }
 
-  input {
+  input, textarea {
     @apply relative ;
     @apply bg-white ;
     @apply rounded;
