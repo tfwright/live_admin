@@ -842,6 +842,7 @@ select:focus {
   padding-right: 2rem;
   padding-top: 1rem;
   padding-bottom: 1rem;
+  white-space: nowrap;
 }
 
 .resource__cell {

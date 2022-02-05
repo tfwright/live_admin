@@ -269,6 +269,7 @@
     @apply text-left;
     @apply px-8;
     @apply py-4;
+    @apply whitespace-nowrap;
   }
 
   .resource__cell {
