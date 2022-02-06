@@ -3,7 +3,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   use Phoenix.HTML
 
   import Ecto.Query
-  import Phoenix.LiveAdmin, only: [resource_label: 3]
+  import Phoenix.LiveAdmin, only: [resource_title: 3, parent_associations: 1]
 
   alias Ecto.Changeset
   alias __MODULE__.{Form, Index}
@@ -202,7 +202,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     ~H"""
     <div class="resource__banner">
       <h1 class="resource__title">
-        <%= resource_label(@resource, @config, @base_path) %>
+        <%= resource_title(@resource, @config, @base_path) %>
       </h1>
 
       <div class="resource__actions">
@@ -294,7 +294,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     end)
   end
 
-  def list(resource, opts \\ []) do
+  def list(resource, config, opts \\ []) do
     opts =
       opts
       |> Enum.into(%{})
@@ -306,15 +306,17 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       |> limit(10)
       |> offset(^((opts[:page] - 1) * 10))
       |> order_by(^[opts[:sort]])
+      |> preload(^preloads_for_resource(resource, config))
 
     query =
       opts
       |> Enum.reduce(query, fn
-        {:search, q}, query when byte_size(q) > 0 -> apply_search(query, q, fields(resource, %{}))
-        _, query -> query
-      end)
+        {:search, q}, query when byte_size(q) > 0 ->
+          apply_search(query, q, fields(resource, config))
 
-    repo().all(query, prefix: opts[:prefix])
+        _, query ->
+          query
+      end)
 
     {
       repo().all(query, prefix: opts[:prefix]),
@@ -425,7 +427,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   defp apply_search(query, q, fields) do
     q
-    |> IO.inspect
+    |> IO.inspect()
     |> String.split(~r{[^\s]*:}, include_captures: true, trim: true)
     |> case do
       [q] ->
@@ -473,7 +475,18 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         records:
           list(
             socket.assigns.resource,
+            socket.assigns.config,
             Map.take(socket.assigns, [:prefix, :sort, :page, :search])
           )
       )
+
+  defp preloads_for_resource(resource, config) do
+    config
+    |> Map.get(:preload)
+    |> case do
+      nil -> resource |> parent_associations() |> Enum.map(& &1.field)
+      {m, f, a} -> apply(m, f, [resource | a])
+      preloads when is_list(preloads) -> preloads
+    end
+  end
 end

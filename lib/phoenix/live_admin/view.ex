@@ -5,7 +5,7 @@ defmodule Phoenix.LiveAdmin.View do
     namespace: Phoenix.LiveAdmin,
     root: __DIR__
 
-  import Phoenix.LiveAdmin, only: [resource_label: 3, resource_path: 2]
+  import Phoenix.LiveAdmin, only: [resource_title: 3, resource_path: 2]
   import Phoenix.LiveView.Helpers
 
   js_path = Path.join(__DIR__, "../../../dist/js/app.js")
@@ -45,7 +45,7 @@ defmodule Phoenix.LiveAdmin.View do
     |> Enum.map(fn
       {{key, {schema, config}}, %{}} ->
         content_tag :li, class: "nav__item" do
-          live_redirect(resource_label(schema, config, base_path),
+          live_redirect(resource_title(schema, config, base_path),
             to: build_route(socket, [:list, key])
           )
         end

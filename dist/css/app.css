@@ -696,6 +696,7 @@ select:focus {
 .resource__action--btn {
   border-radius: 0.5rem;
   position: relative;
+  white-space: nowrap;
 }
 
 .resource__action--disabled {
@@ -704,6 +705,7 @@ select:focus {
   align-items: center;
   position: relative;
   margin: 0.5rem;
+  white-space: nowrap;
   border-radius: 0.5rem;
   --tw-bg-opacity: 1;
   background-color: rgb(67 56 202 / var(--tw-bg-opacity));
@@ -743,6 +745,7 @@ select:focus {
   align-items: center;
   position: relative;
   margin: 0.5rem;
+  white-space: nowrap;
   border-radius: 0.5rem;
   --tw-bg-opacity: 1;
   background-color: rgb(67 56 202 / var(--tw-bg-opacity));
