@@ -3,9 +3,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   use Phoenix.HTML
 
   import Phoenix.LiveAdmin.Components.Resource,
-    only: [fields: 2, route_with_params: 2, route_with_params: 3]
+    only: [repo: 0, fields: 2, route_with_params: 2, route_with_params: 3]
 
-  import Phoenix.LiveAdmin, only: [find_belongs_assoc_by_fk: 2]
+  import Phoenix.LiveAdmin, only: [associated_resource: 3, record_label: 2]
 
   def render(assigns) do
     ~H"""
@@ -72,13 +72,20 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   def display_field(record = %resource{}, field_name, assigns) do
     field_val = Map.fetch!(record, field_name)
 
-    with field_val when not is_nil(field_val) <- Map.fetch!(record, field_name),
-         %{related: assoc_schema} <- find_belongs_assoc_by_fk(resource, field_name),
-         key when not is_nil(key) <-
-           Enum.find_value(assigns.resources, fn {key, {mod, _}} ->
-             if mod == assoc_schema, do: key
+    with field_val when not is_nil(field_val) <- field_val,
+         {key, {_, config}} <- associated_resource(resource, field_name, assigns.resources),
+         assoc_name when not is_nil(assoc_name) <-
+           Enum.find(resource.__schema__(:associations), fn assoc_name ->
+             case resource.__schema__(:association, assoc_name) do
+               %{owner_key: ^field_name, relationship: :parent} -> assoc_name
+               _ -> nil
+             end
            end) do
-      live_redirect(field_val,
+      record
+      |> repo().preload(assoc_name)
+      |> Map.fetch!(assoc_name)
+      |> record_label(config)
+      |> live_redirect(
         to: route_with_params(assigns.socket, [:edit, key, field_val]),
         class: "resource__action--btn"
       )

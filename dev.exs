@@ -182,7 +182,8 @@ defmodule DemoWeb.Router do
         components: [
           new: {DemoWeb.UserForm, :render, []},
           edit: {DemoWeb.UserForm, :render, []}
-        ]
+        ],
+        label_with: :name
       },
       Demo.Posts.Post
     ]

@@ -196,6 +196,7 @@
     @apply relative;
     @apply rounded-lg;
     @apply relative;
+    @apply whitespace-nowrap;
   }
 
   .resource__action--disabled {
