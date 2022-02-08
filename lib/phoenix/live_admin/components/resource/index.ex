@@ -13,7 +13,14 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
       <div class="list__search">
         <div class="flex border-2 rounded-lg">
             <form phx-change="search" >
-              <input type="text" class="px-4 py-1 w-60 border-0 h-8" placeholder="Search..." name="query" onkeydown="return event.key != 'Enter'">
+              <input
+                type="text"
+                class="px-4 py-1 w-60 border-0 h-8"
+                placeholder="Search..."
+                name="query"
+                onkeydown="return event.key != 'Enter'"
+                value={@search}
+              />
             </form>
             <button phx-click="search" phx-value-query="" class="flex items-center justify-center px-2 border-l">
               <svg class="w-6 h-6 text-gray-600" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -51,8 +58,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
         <tfoot>
           <tr>
             <td class="w-full" colspan={@resource |> fields(@config) |> Enum.count()}>
-              <%= if @page > 1, do: list_link(@socket, "Prev", @key, %{page: @page - 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir}, class: "resource__action--btn"), else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
-              <%= if @page < (@records |> elem(1)) / 10, do: list_link(@socket, "Next", @key, %{page: @page + 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir}, class: "resource__action--btn"), else: content_tag(:span, "Next", class: "resource__action--disabled") %>
+              <%= if @page > 1, do: list_link(@socket, "Prev", @key, %{page: @page - 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir, search: @search}, class: "resource__action--btn"), else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
+              <%= if @page < (@records |> elem(1)) / 10, do: list_link(@socket, "Next", @key, %{page: @page + 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir, search: @search}, class: "resource__action--btn"), else: content_tag(:span, "Next", class: "resource__action--disabled") %>
             </td>
             <td class="text-right p-2"><%= @records |> elem(1) %> total rows</td>
           </tr>
@@ -80,5 +87,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
     end
   end
 
-  def list_link(socket, content, key, params, opts \\ []), do: live_patch content, Keyword.put(opts, :to, route_with_params(socket, [:list, key], params))
+  def list_link(socket, content, key, params, opts \\ []),
+    do:
+      live_patch(content, Keyword.put(opts, :to, route_with_params(socket, [:list, key], params)))
 end

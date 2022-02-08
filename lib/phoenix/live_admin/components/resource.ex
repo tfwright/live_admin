@@ -49,6 +49,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   @impl true
   def handle_params(params, _uri, socket = %{assigns: %{live_action: :list, loading: false}}) do
     page = String.to_integer(params["page"] || "1")
+
     sort = {
       String.to_existing_atom(params["sort-dir"] || "asc"),
       String.to_existing_atom(params["sort-attr"] || "id")
@@ -58,6 +59,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       socket
       |> assign(page: page)
       |> assign(sort: sort)
+      |> assign(search: params["s"])
       |> reload_list()
 
     {:noreply, socket}
@@ -179,10 +181,16 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   @impl true
-  def handle_event("search", %{"query" => q}, socket) do
-    socket = socket
-      |> assign(:search, q)
-      |> reload_list()
+  def handle_event("search", %{"query" => query}, socket) do
+    params = %{
+      page: socket.assigns.page,
+      "sort-attr": elem(socket.assigns.sort, 1),
+      "sort-dir": elem(socket.assigns.sort, 0),
+      s: query
+    }
+
+    socket =
+      push_patch(socket, to: route_with_params(socket, [:list, socket.assigns.key], params))
 
     {:noreply, socket}
   end
@@ -261,6 +269,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       records={@records}
       sort_attr={elem(@sort, 1)}
       sort_dir={elem(@sort, 0)}
+      search={@search}
     />
     """
   end
@@ -301,7 +310,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     query =
       opts
       |> Enum.reduce(query, fn
-        {:search, q}, query -> apply_search(query, q, fields(resource, %{}))
+        {:search, q}, query when byte_size(q) > 0 -> apply_search(query, q, fields(resource, %{}))
         _, query -> query
       end)
 
@@ -416,6 +425,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   defp apply_search(query, q, fields) do
     q
+    |> IO.inspect
     |> String.split(~r{[^\s]*:}, include_captures: true, trim: true)
     |> case do
       [q] ->
@@ -457,5 +467,13 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   def get_config(config, key, default \\ nil),
     do: Application.get_env(:phoenix_live_admin, key, Map.get(config, key, default))
 
-  defp reload_list(socket), do: assign(socket, records: list(socket.assigns.resource, Map.take(socket.assigns, [:prefix, :sort, :page, :search])))
+  defp reload_list(socket),
+    do:
+      assign(socket,
+        records:
+          list(
+            socket.assigns.resource,
+            Map.take(socket.assigns, [:prefix, :sort, :page, :search])
+          )
+      )
 end
