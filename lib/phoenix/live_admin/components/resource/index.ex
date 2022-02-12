@@ -33,7 +33,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
         <thead>
           <tr>
             <%= for {field, _, _} <- fields(@resource, @config) do %>
-              <th class="resource__header">
+              <th class="resource__header" title={field}>
                 <%= list_link @socket, humanize(field), @key, %{page: @page, "sort-attr": field, "sort-dir": (if field == @sort_attr, do: Enum.find([:asc, :desc], & &1 != @sort_dir), else: @sort_dir)}, class: "header__link#{if field == @sort_attr, do: "--#{[asc: :down, desc: :up][@sort_dir]}"}" %>
               </th>
             <% end %>
