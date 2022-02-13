@@ -10,7 +10,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   alias Phoenix.LiveAdmin.SessionStore
 
   @impl true
-  def mount(params = %{"resource_id" => key}, %{"id" => session_id}, socket) do
+  def mount(%{"resource_id" => key}, %{"id" => session_id}, socket) do
     {resource, config} = Map.fetch!(socket.assigns.resources, key)
 
     SessionStore.get_or_init(session_id)
@@ -24,26 +24,32 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       )
       |> assign_prefix()
       |> case do
-        socket = %{assigns: %{live_action: :list}} ->
+        socket = %{assigns: %{live_action: action}} when action in [:list, :edit] ->
           assign(socket, :loading, !connected?(socket))
 
         socket = %{assigns: %{live_action: :new}} ->
           assign(socket, :changeset, changeset(socket.assigns.resource, socket.assigns.config))
-
-        socket = %{assigns: %{live_action: :edit}} ->
-          changeset =
-            params
-            |> Map.fetch!("record_id")
-            |> get_resource!(socket.assigns.resource, socket.assigns.prefix)
-            |> changeset(socket.assigns.config)
-
-          assign(socket, changeset: changeset)
 
         socket ->
           socket
       end
 
     {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(params, _uri, socket = %{assigns: %{live_action: :edit, loading: false}}) do
+    socket = assign_prefix(socket, params["prefix"])
+
+    changeset =
+      params
+      |> Map.fetch!("record_id")
+      |> get_resource!(socket.assigns.resource, socket.assigns.prefix)
+      |> changeset(socket.assigns.config)
+
+    socket = assign(socket, changeset: changeset)
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -75,7 +81,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     socket =
       socket
       |> assign_prefix()
-      |> push_redirect(to: route_with_params(socket, [:list, socket.assigns.key]))
+      |> push_redirect(
+        to: route_with_params(socket, [:list, socket.assigns.key], prefix: params["prefix"])
+      )
 
     {:noreply, socket}
   end
@@ -207,7 +215,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
       <div class="resource__actions">
         <div>
-          <%= live_redirect "List", to: route_with_params(@socket, [:list, @key]), class: "resource__action--btn" %>
+          <%= live_redirect "List", to: route_with_params(@socket, [:list, @key], prefix: @prefix), class: "resource__action--btn" %>
           <%= live_redirect "New", to: route_with_params(@socket, [:new, @key]), class: "resource__action--btn" %>
           <%= if Application.get_env(:phoenix_live_admin, :prefix_options) do %>
             <div class="resource__action--drop">
@@ -270,6 +278,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       sort_attr={elem(@sort, 1)}
       sort_dir={elem(@sort, 0)}
       search={@search}
+      prefix={@prefix}
     />
     """
   end
@@ -325,6 +334,12 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   def route_with_params(socket, segments, params \\ %{}) do
+    params =
+      Enum.flat_map(params, fn
+        {:prefix, nil} -> []
+        pair -> [pair]
+      end)
+
     apply(socket.router.__helpers__(), :resource_path, [socket] ++ segments ++ [params])
   end
 
@@ -462,8 +477,15 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     end
   end
 
-  def assign_prefix(socket) do
-    assign(socket, :prefix, SessionStore.lookup(socket.assigns.session_id, :__prefix__))
+  def assign_prefix(_, prefix \\ nil)
+
+  def assign_prefix(socket, nil),
+    do: assign(socket, :prefix, SessionStore.lookup(socket.assigns.session_id, :__prefix__))
+
+  def assign_prefix(socket, prefix) do
+    SessionStore.set(socket.assigns.session_id, :__prefix__, prefix)
+
+    assign(socket, :prefix, prefix)
   end
 
   def get_config(config, key, default \\ nil),

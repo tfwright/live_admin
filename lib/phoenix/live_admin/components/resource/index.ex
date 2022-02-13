@@ -3,7 +3,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   use Phoenix.HTML
 
   import Phoenix.LiveAdmin.Components.Resource,
-    only: [repo: 0, fields: 2, route_with_params: 2, route_with_params: 3]
+    only: [repo: 0, fields: 2, route_with_params: 3]
 
   import Phoenix.LiveAdmin, only: [associated_resource: 3, record_label: 2]
 
@@ -34,7 +34,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
           <tr>
             <%= for {field, _, _} <- fields(@resource, @config) do %>
               <th class="resource__header" title={field}>
-                <%= list_link @socket, humanize(field), @key, %{page: @page, "sort-attr": field, "sort-dir": (if field == @sort_attr, do: Enum.find([:asc, :desc], & &1 != @sort_dir), else: @sort_dir)}, class: "header__link#{if field == @sort_attr, do: "--#{[asc: :down, desc: :up][@sort_dir]}"}" %>
+                <%= list_link @socket, humanize(field), @key, %{prefix: @prefix, page: @page, "sort-attr": field, "sort-dir": (if field == @sort_attr, do: Enum.find([:asc, :desc], & &1 != @sort_dir), else: @sort_dir)}, class: "header__link#{if field == @sort_attr, do: "--#{[asc: :down, desc: :up][@sort_dir]}"}" %>
               </th>
             <% end %>
             <th class="resource__header">Actions</th>
@@ -49,7 +49,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
                 </td>
               <% end %>
               <td class="resource__cell">
-                <%= live_redirect "Edit", to: route_with_params(@socket, [:edit, @key, record.id]), class: "resource__action--btn" %>
+                <%= live_redirect "Edit", to: route_with_params(@socket, [:edit, @key, record.id], prefix: @prefix), class: "resource__action--btn" %>
                 <%= link "Delete", to: "#", "data-confirm": "Are you sure?", "phx-click": "delete", "phx-value-id": record.id, class: "resource__action--btn" %>
               </td>
             </tr>
@@ -58,8 +58,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
         <tfoot>
           <tr>
             <td class="w-full" colspan={@resource |> fields(@config) |> Enum.count()}>
-              <%= if @page > 1, do: list_link(@socket, "Prev", @key, %{page: @page - 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir, search: @search}, class: "resource__action--btn"), else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
-              <%= if @page < (@records |> elem(1)) / 10, do: list_link(@socket, "Next", @key, %{page: @page + 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir, search: @search}, class: "resource__action--btn"), else: content_tag(:span, "Next", class: "resource__action--disabled") %>
+              <%= if @page > 1, do: list_link(@socket, "Prev", @key, %{prefix: @prefix, page: @page - 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir, search: @search}, class: "resource__action--btn"), else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
+              <%= if @page < (@records |> elem(1)) / 10, do: list_link(@socket, "Next", @key, %{prefix: @prefix, page: @page + 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir, search: @search}, class: "resource__action--btn"), else: content_tag(:span, "Next", class: "resource__action--disabled") %>
             </td>
             <td class="text-right p-2"><%= @records |> elem(1) %> total rows</td>
           </tr>
@@ -86,7 +86,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
       |> Map.fetch!(assoc_name)
       |> record_label(config)
       |> live_redirect(
-        to: route_with_params(assigns.socket, [:edit, key, field_val]),
+        to: route_with_params(assigns.socket, [:edit, key, field_val], prefix: assigns.prefix),
         class: "resource__action--btn"
       )
     else
