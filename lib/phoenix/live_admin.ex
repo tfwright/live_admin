@@ -1,4 +1,11 @@
 defmodule Phoenix.LiveAdmin do
+  def get_config(config, key, default \\ nil),
+    do: Application.get_env(:phoenix_live_admin, key, Map.get(config, key, default))
+
+  def repo, do: Application.fetch_env!(:phoenix_live_admin, :ecto_repo)
+
+  def delete_resource(record), do: repo().delete(record)
+
   def associated_resource(resource, field_name, resources) do
     with %{related: assoc_schema} <-
            resource |> parent_associations() |> Enum.find(&(&1.owner_key == field_name)),
@@ -19,7 +26,9 @@ defmodule Phoenix.LiveAdmin do
   end
 
   def resource_title(resource, config, base_path) do
-    case Map.get(config, :title_with) do
+    config
+    |> get_config(:title_with)
+    |> case do
       nil -> resource |> resource_path(base_path) |> Enum.join(".")
       {m, f, a} -> apply(m, f, a)
       title when is_binary(title) -> title
@@ -27,7 +36,9 @@ defmodule Phoenix.LiveAdmin do
   end
 
   def record_label(record, config) do
-    case Map.get(config, :label_with, :id) do
+    config
+    |> get_config(:label_with, :id)
+    |> case do
       {m, f, a} -> apply(m, f, [record, a])
       label when is_atom(label) -> Map.fetch!(record, label)
     end

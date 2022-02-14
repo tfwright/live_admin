@@ -3,9 +3,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   use Phoenix.HTML
 
   import Phoenix.LiveAdmin.Components.Resource,
-    only: [repo: 0, fields: 2, route_with_params: 3]
+    only: [fields: 2, route_with_params: 3]
 
-  import Phoenix.LiveAdmin, only: [associated_resource: 3, record_label: 2]
+  import Phoenix.LiveAdmin, only: [repo: 0, associated_resource: 3, record_label: 2]
 
   def render(assigns) do
     ~H"""

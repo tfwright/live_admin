@@ -3,7 +3,15 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   use Phoenix.HTML
 
   import Ecto.Query
-  import Phoenix.LiveAdmin, only: [resource_title: 3, parent_associations: 1]
+
+  import Phoenix.LiveAdmin,
+    only: [
+      get_config: 2,
+      get_config: 3,
+      repo: 0,
+      resource_title: 3,
+      parent_associations: 1
+    ]
 
   alias Ecto.Changeset
   alias __MODULE__.{Form, Index}
@@ -283,8 +291,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     """
   end
 
-  def repo, do: Application.fetch_env!(:phoenix_live_admin, :ecto_repo)
-
   def fields(resource, config) do
     Enum.flat_map(resource.__schema__(:fields), fn field_name ->
       config
@@ -487,9 +493,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
     assign(socket, :prefix, prefix)
   end
-
-  def get_config(config, key, default \\ nil),
-    do: Application.get_env(:phoenix_live_admin, key, Map.get(config, key, default))
 
   defp reload_list(socket),
     do:
