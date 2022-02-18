@@ -194,7 +194,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       page: socket.assigns.page,
       "sort-attr": elem(socket.assigns.sort, 1),
       "sort-dir": elem(socket.assigns.sort, 0),
-      s: query
+      s: query,
+      prefix: socket.assigns.prefix
     }
 
     socket =
