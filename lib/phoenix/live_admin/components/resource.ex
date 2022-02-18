@@ -189,6 +189,41 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   @impl true
+  def handle_event("action", %{"action" => action, "id" => id}, socket) do
+    record = socket.assigns.records |> elem(0) |> Enum.find(&(to_string(&1.id) == id))
+
+    action_name = String.to_existing_atom(action)
+
+    {m, f, a} =
+      socket.assigns
+      |> get_in([:config, :actions, action_name])
+      |> case do
+        nil -> {socket.assigns.resource, action_name, []}
+        tuple when tuple_size(tuple) == 3 -> tuple
+      end
+
+    socket =
+      case apply(m, f, [record | a]) do
+        {:ok, result} ->
+          socket
+          |> put_flash(:info, "Successfully completed #{action}: #{inspect(result)}")
+          |> push_redirect(
+            to:
+              route_with_params(
+                socket,
+                [:list, socket.assigns.key],
+                Map.take(socket.assigns, [:prefix, :page])
+              )
+          )
+
+        {:error, error} ->
+          put_flash(socket, :error, "#{action} failed: #{error}")
+      end
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("search", %{"query" => query}, socket) do
     params = %{
       page: socket.assigns.page,

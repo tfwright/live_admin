@@ -103,6 +103,16 @@ defmodule Demo.Accounts.User do
   def validate(changeset, _meta) do
     Ecto.Changeset.validate_required(changeset, [:name])
   end
+
+  def deactivate(user) do
+    user
+    |> Ecto.Changeset.change(active: false)
+    |> Demo.Repo.update()
+    |> case do
+      {:ok, _} -> {:ok, "deactivated!"}
+      error -> error
+    end
+  end
 end
 
 defmodule Demo.Posts.Post do
@@ -183,7 +193,8 @@ defmodule DemoWeb.Router do
           new: {DemoWeb.UserForm, :render, []},
           edit: {DemoWeb.UserForm, :render, []}
         ],
-        label_with: :name
+        label_with: :name,
+        actions: [:deactivate]
       },
       Demo.Posts.Post
     ]

@@ -52,6 +52,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
               <td class="resource__cell">
                 <%= live_redirect "Edit", to: route_with_params(@socket, [:edit, @key, record.id], prefix: @prefix), class: "resource__action--btn" %>
                 <%= link "Delete", to: "#", "data-confirm": "Are you sure?", "phx-click": "delete", "phx-value-id": record.id, class: "resource__action--btn" %>
+                <%= for action <- Map.get(@config, :actions, []) do %>
+                  <%= link action |> to_string() |> humanize(), to: "#", "data-confirm": "Are you sure?", "phx-click": "action", "phx-value-id": record.id, "phx-value-action": action, class: "resource__action--btn" %>
+                <% end %>
               </td>
             </tr>
           <% end %>
