@@ -20,6 +20,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
                 name="query"
                 onkeydown="return event.key != 'Enter'"
                 value={@search}
+                phx-debounce="500"
               />
             </form>
             <button phx-click="search" phx-value-query="" class="flex items-center justify-center px-2 border-l">
