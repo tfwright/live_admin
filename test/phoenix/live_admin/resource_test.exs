@@ -34,6 +34,13 @@ defmodule Phoenix.LiveAdmin.ResourceTest do
                |> element("a[phx-click='delete']")
                |> render_click()
     end
+
+    test "runs configured actions", %{view: view} do
+      assert {_, {:live_redirect, %{to: "/user?page=1"}}} =
+               view
+               |> element("a[phx-value-action='run_action']")
+               |> render_click()
+    end
   end
 
   describe "new resource page" do

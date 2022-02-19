@@ -194,6 +194,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
     action_name = String.to_existing_atom(action)
 
+    session = SessionStore.lookup(socket.assigns.session_id)
+
     {m, f, a} =
       socket.assigns
       |> get_in([:config, :actions, action_name])
@@ -203,7 +205,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       end
 
     socket =
-      case apply(m, f, [record | a]) do
+      case apply(m, f, [record, session] ++ a) do
         {:ok, result} ->
           socket
           |> put_flash(:info, "Successfully completed #{action}: #{inspect(result)}")
