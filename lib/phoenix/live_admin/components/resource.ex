@@ -525,7 +525,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   def get_config(config, key, default \\ nil),
-    do: Application.get_env(:phoenix_live_admin, key, Map.get(config, key, default))
+    do: Map.get(config, key, Application.get_env(:phoenix_live_admin, key, default))
 
   defp reload_list(socket),
     do:

@@ -95,5 +95,12 @@ defmodule Phoenix.LiveAdmin.ResourceTest do
         |> element(".resource__form")
         |> render_submit(%{name: "test"})
     end
+
+    test "disables immutable fields", %{response: response} do
+      assert ["disabled"] ==
+               response
+               |> Floki.find("input[name='params[password]']")
+               |> Floki.attribute("disabled")
+    end
   end
 end
