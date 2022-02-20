@@ -46,7 +46,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
             <tr>
               <%= for {field, _, _} <- fields(@resource, @config) do %>
                 <td class="resource__cell">
-                  <%= display_field(record, field, assigns) %>
+                  <div class="cell__contents">
+                    <%= display_field(record, field, assigns) %>
+                  </div>
                 </td>
               <% end %>
               <td class="resource__cell">

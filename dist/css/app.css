@@ -894,6 +894,11 @@ select:focus {
   padding-bottom: 0.5rem;
 }
 
+.cell__contents {
+  max-height: 5rem;
+  overflow-y: auto;
+}
+
 .resource__form {
   border-radius: 0.25rem;
   border-collapse: collapse;

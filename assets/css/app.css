@@ -301,6 +301,11 @@
     @apply py-2;
   }
 
+  .cell__contents {
+    @apply max-h-20;
+    @apply overflow-y-auto;
+  }
+
   .resource__form {
     @apply shadow-md;
     @apply rounded;
