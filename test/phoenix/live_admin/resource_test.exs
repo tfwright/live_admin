@@ -51,13 +51,13 @@ defmodule Phoenix.LiveAdmin.ResourceTest do
 
     test "includes castable form field", %{response: response} do
       assert response
-             |> Floki.find("input[name='params[name]']")
+             |> Floki.find("textarea[name='params[name]']")
              |> Enum.any?()
     end
 
     test "includes embed form field", %{response: response} do
       assert response
-             |> Floki.find("input[name='params[settings][some_option]']")
+             |> Floki.find("textarea[name='params[settings][some_option]']")
              |> Enum.any?()
     end
 
@@ -106,7 +106,7 @@ defmodule Phoenix.LiveAdmin.ResourceTest do
     test "disables immutable fields", %{response: response} do
       assert ["disabled"] ==
                response
-               |> Floki.find("input[name='params[password]']")
+               |> Floki.find("textarea[name='params[password]']")
                |> Floki.attribute("disabled")
     end
   end

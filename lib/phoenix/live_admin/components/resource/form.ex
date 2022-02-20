@@ -72,7 +72,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
 
   def input(assigns = %{type: :string}) do
     ~H"""
-    <%= text_input @form, @field, class: "field__text", disabled: @disabled %>
+    <%= textarea @form, @field, rows: 1, class: "field__text", disabled: @disabled %>
     """
   end
 
