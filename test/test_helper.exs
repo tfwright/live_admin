@@ -39,13 +39,14 @@ defmodule Phoenix.LiveAdminTest.Router do
   scope "/" do
     pipe_through(:browser)
 
-    live_admin("/", resources: [
-      {
-        Phoenix.LiveAdminTest.User,
-        immutable_fields: [:password],
-        actions: [:run_action]
-      }
-    ])
+    live_admin("/",
+      resources: [
+        {
+          Phoenix.LiveAdminTest.User,
+          immutable_fields: [:password], actions: [:run_action]
+        }
+      ]
+    )
   end
 end
 

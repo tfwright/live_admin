@@ -3,7 +3,9 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   use Phoenix.HTML
 
   import Ecto.Query
-  import Phoenix.LiveAdmin, only: [resource_title: 3, parent_associations: 1, get_config: 2, get_config: 3]
+
+  import Phoenix.LiveAdmin,
+    only: [resource_title: 3, parent_associations: 1, get_config: 2, get_config: 3]
 
   alias Ecto.Changeset
   alias __MODULE__.{Form, Index}
@@ -66,6 +68,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       |> assign(page: page)
       |> assign(sort: sort)
       |> assign(search: params["s"])
+      |> assign_prefix(params["prefix"])
       |> reload_list()
 
     {:noreply, socket}
@@ -76,16 +79,12 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
   @impl true
   def handle_event("set_prefix", params, socket) do
-    SessionStore.set(socket.assigns.session_id, :__prefix__, params["prefix"])
-
-    socket =
-      socket
-      |> assign_prefix()
-      |> push_redirect(
+    {
+      :noreply,
+      push_redirect(socket,
         to: route_with_params(socket, [:list, socket.assigns.key], prefix: params["prefix"])
       )
-
-    {:noreply, socket}
+    }
   end
 
   @impl true
