@@ -19,7 +19,7 @@ defmodule Phoenix.LiveAdmin do
   end
 
   def resource_title(resource, config, base_path) do
-    case Map.get(config, :title_with) do
+    case get_config(config, :title_with) do
       nil -> resource |> resource_path(base_path) |> Enum.join(".")
       {m, f, a} -> apply(m, f, a)
       title when is_binary(title) -> title
@@ -27,7 +27,7 @@ defmodule Phoenix.LiveAdmin do
   end
 
   def record_label(record, config) do
-    case Map.get(config, :label_with, :id) do
+    case get_config(config, :label_with, :id) do
       {m, f, a} -> apply(m, f, [record, a])
       label when is_atom(label) -> Map.fetch!(record, label)
     end
@@ -35,4 +35,7 @@ defmodule Phoenix.LiveAdmin do
 
   def resource_path(resource, base_path),
     do: resource |> Module.split() |> Enum.drop(Enum.count(base_path))
+
+  def get_config(config, key, default \\ nil),
+    do: Map.get(config, key, Application.get_env(:phoenix_live_admin, key, default))
 end
