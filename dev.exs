@@ -104,7 +104,7 @@ defmodule Demo.Accounts.User do
     Ecto.Changeset.validate_required(changeset, [:name])
   end
 
-  def deactivate(user) do
+  def deactivate(user, _) do
     user
     |> Ecto.Changeset.change(active: false)
     |> Demo.Repo.update()
