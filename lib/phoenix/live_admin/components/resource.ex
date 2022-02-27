@@ -3,9 +3,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   use Phoenix.HTML
 
   import Phoenix.LiveAdmin,
-    only: [resource_title: 3, get_config: 2, get_config: 3]
+    only: [resource_title: 3, get_config: 3]
 
-  alias Ecto.Changeset
   alias __MODULE__.{Form, Index}
   alias Phoenix.LiveAdmin.SessionStore
 
@@ -20,19 +19,10 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         resource: resource,
         key: key,
         config: config,
-        session_id: session_id
+        session_id: session_id,
+        loading: !connected?(socket)
       )
       |> assign_prefix()
-      |> case do
-        socket = %{assigns: %{live_action: action}} when action in [:list, :edit] ->
-          assign(socket, :loading, !connected?(socket))
-
-        socket = %{assigns: %{live_action: :new}} ->
-          assign(socket, :changeset, changeset(socket.assigns.resource, socket.assigns.config))
-
-        socket ->
-          socket
-      end
 
     {:ok, socket}
   end
@@ -41,13 +31,12 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   def handle_params(params, _uri, socket = %{assigns: %{live_action: :edit, loading: false}}) do
     socket = assign_prefix(socket, params["prefix"])
 
-    changeset =
+    record =
       params
       |> Map.fetch!("record_id")
       |> get_resource!(socket.assigns.resource, socket.assigns.prefix)
-      |> changeset(socket.assigns.config)
 
-    socket = assign(socket, changeset: changeset)
+    socket = assign(socket, record: record)
 
     {:noreply, socket}
   end
@@ -82,75 +71,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
         to: route_with_params(socket, [:list, socket.assigns.key], prefix: params["prefix"])
       )
     }
-  end
-
-  @impl true
-  def handle_event(
-        "validate",
-        %{"params" => params},
-        %{assigns: %{changeset: changeset, config: config, session_id: session_id}} = socket
-      ) do
-    changeset =
-      changeset.data
-      |> changeset(config, params)
-      |> validate_resource(config, SessionStore.lookup(session_id))
-      |> Map.put(:action, :validate)
-
-    {:noreply, assign(socket, changeset: changeset)}
-  end
-
-  @impl true
-  def handle_event(
-        "create",
-        %{"params" => params},
-        %{assigns: %{resource: resource, key: key, config: config, session_id: session_id}} =
-          socket
-      ) do
-    socket =
-      case create_resource(resource, config, params, SessionStore.lookup(session_id)) do
-        {:ok, _} ->
-          socket
-          |> put_flash(:info, "Created #{resource}")
-          |> push_redirect(to: route_with_params(socket, [:list, key]))
-
-        {:error, _} ->
-          put_flash(socket, :error, "Could not create #{resource}")
-      end
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_event(
-        "update",
-        %{"params" => params},
-        %{
-          assigns: %{
-            resource: resource,
-            key: key,
-            config: config,
-            session_id: session_id,
-            changeset: changeset
-          }
-        } = socket
-      ) do
-    socket =
-      case update_resource(
-             changeset.data,
-             config,
-             params,
-             SessionStore.lookup(session_id)
-           ) do
-        {:ok, _} ->
-          socket
-          |> put_flash(:info, "Updated #{resource}")
-          |> push_redirect(to: route_with_params(socket, [:list, key]))
-
-        {:error, _} ->
-          put_flash(socket, :error, "Could not update #{resource}")
-      end
-
-    {:noreply, socket}
   end
 
   def render(assigns = %{loading: true}), do: ~H""
@@ -200,19 +120,38 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
   end
 
   def render("new.html", assigns) do
-    assigns = assign(assigns, :action, "create")
+    changeset =
+      assigns.resource
+      |> struct()
+      |> Ecto.Changeset.change()
 
-    {mod, func, args} = get_in(assigns, [:config, :components, :new]) || {Form, :render, []}
-
-    apply(mod, func, [assigns] ++ args)
+    ~H"""
+    <.live_component
+      module={Form}
+      id="new"
+      resource={@resource}
+      config={@config}
+      changeset={changeset}
+      action="create"
+      session_id={@session_id}
+      key={@key}
+    />
+    """
   end
 
   def render("edit.html", assigns) do
-    assigns = assign(assigns, :action, "update")
-
-    {mod, func, args} = get_in(assigns, [:config, :components, :edit]) || {Form, :render, []}
-
-    apply(mod, func, [assigns] ++ args)
+    ~H"""
+    <.live_component
+      module={Form}
+      id="edit"
+      resource={@resource}
+      config={@config}
+      action="update"
+      session_id={@session_id}
+      key={@key}
+      record={@record}
+    />
+    """
   end
 
   def render("list.html", assigns) do
@@ -273,80 +212,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
       list when is_list(list) -> list
     end
     |> Enum.sort()
-  end
-
-  defp changeset(record, config, params \\ %{})
-
-  defp changeset(record, config, params) when is_struct(record) do
-    change_resource(record, config, params)
-  end
-
-  defp changeset(resource, config, params) do
-    resource
-    |> struct(%{})
-    |> change_resource(config, params)
-  end
-
-  defp change_resource(record = %resource{}, config, params) do
-    fields = fields(resource, config)
-
-    {primitives, embeds} =
-      Enum.split_with(fields, fn
-        {_, {_, Ecto.Embedded, _}, _} -> false
-        _ -> true
-      end)
-
-    castable_fields =
-      Enum.flat_map(primitives, fn {field, _, opts} ->
-        if Keyword.get(opts, :immutable, false), do: [], else: [field]
-      end)
-
-    changeset = Changeset.cast(record, params, castable_fields)
-
-    Enum.reduce(embeds, changeset, fn {field, {_, Ecto.Embedded, _}, _}, changeset ->
-      Changeset.cast_embed(changeset, field,
-        with: fn embed, params ->
-          change_resource(embed, %{}, params)
-        end
-      )
-    end)
-  end
-
-  defp create_resource(resource, config, params, session) do
-    config
-    |> get_config(:create_with)
-    |> case do
-      nil ->
-        resource
-        |> changeset(config, params)
-        |> repo().insert(prefix: session[:__prefix__])
-
-      {mod, func_name, args} ->
-        apply(mod, func_name, [params, session] ++ args)
-    end
-  end
-
-  defp update_resource(record, config, params, session) do
-    config
-    |> get_config(:update_with)
-    |> case do
-      nil ->
-        record
-        |> changeset(config, params)
-        |> repo().update()
-
-      {mod, func_name, args} ->
-        apply(mod, func_name, [params, session] ++ args)
-    end
-  end
-
-  defp validate_resource(changeset, config, session) do
-    config
-    |> get_config(:validate_with)
-    |> case do
-      nil -> changeset
-      {mod, func_name, args} -> apply(mod, func_name, [changeset, session] ++ args)
-    end
   end
 
   def assign_prefix(_, prefix \\ nil)

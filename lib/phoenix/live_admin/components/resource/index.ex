@@ -5,7 +5,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   import Phoenix.LiveAdmin.Components.Resource,
     only: [repo: 0, fields: 2, route_with_params: 3, get_resource!: 3]
 
-  import Phoenix.LiveAdmin, only: [associated_resource: 3, record_label: 2, get_config: 2, parent_associations: 1]
+  import Phoenix.LiveAdmin,
+    only: [associated_resource: 3, record_label: 2, get_config: 2, parent_associations: 1]
 
   import Ecto.Query
 

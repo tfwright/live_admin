@@ -159,16 +159,6 @@ defmodule Demo.Populator do
   end
 end
 
-defmodule DemoWeb.UserForm do
-  use Phoenix.Component
-
-  def render(assigns) do
-    ~H"""
-    <Phoenix.LiveAdmin.Components.Resource.Form.render {assigns} />
-    """
-  end
-end
-
 defmodule DemoWeb.Router do
   use Phoenix.Router
   import Phoenix.LiveAdmin.Router
@@ -190,8 +180,8 @@ defmodule DemoWeb.Router do
         create_with: {Demo.Accounts.User, :create, []},
         validate_with: {Demo.Accounts.User, :validate, []},
         components: [
-          new: {DemoWeb.UserForm, :render, []},
-          edit: {DemoWeb.UserForm, :render, []}
+          new: {Phoenix.LiveAdmin.Components.Resource.Form, :default_render, []},
+          edit: {Phoenix.LiveAdmin.Components.Resource.Form, :default_render, []}
         ],
         label_with: :name,
         actions: [:deactivate]
