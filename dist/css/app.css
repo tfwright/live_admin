@@ -744,6 +744,14 @@ select:focus {
   height: 2rem;
   align-items: center;
   position: relative;
+  width: 7rem;
+}
+
+.resource__action--drop button {
+  display: inline-flex;
+  height: 2rem;
+  align-items: center;
+  position: relative;
   margin: 0.5rem;
   white-space: nowrap;
   border-radius: 0.5rem;
@@ -762,17 +770,13 @@ select:focus {
   transition-duration: 150ms;
 }
 
-.resource__action--drop:hover {
+.resource__action--drop button:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(55 48 163 / var(--tw-bg-opacity));
 }
 
-.resource__action--drop {
-  width: 7rem;
-}
-
 .resource__action--drop button {
-  width: 100%;
+  width: 7rem;
   text-align: center;
 }
 
@@ -1022,6 +1026,10 @@ select:focus {
   position: relative;
 }
 
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -1042,6 +1050,10 @@ select:focus {
   height: 1.5rem;
 }
 
+.h-4 {
+  height: 1rem;
+}
+
 .w-60 {
   width: 15rem;
 }
@@ -1052,6 +1064,10 @@ select:focus {
 
 .w-full {
   width: 100%;
+}
+
+.w-4 {
+  width: 1rem;
 }
 
 .transform {

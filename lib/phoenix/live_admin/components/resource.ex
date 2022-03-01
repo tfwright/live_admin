@@ -128,13 +128,14 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     ~H"""
     <.live_component
       module={Form}
-      id="new"
+      id="create-form"
       resource={@resource}
       config={@config}
       changeset={changeset}
       action="create"
       session_id={@session_id}
       key={@key}
+      resources={@resources}
     />
     """
   end
@@ -143,13 +144,14 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     ~H"""
     <.live_component
       module={Form}
-      id="edit"
+      id="edit-form"
       resource={@resource}
       config={@config}
       action="update"
       session_id={@session_id}
       key={@key}
       record={@record}
+      resources={@resources}
     />
     """
   end

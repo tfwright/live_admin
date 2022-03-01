@@ -124,12 +124,15 @@ defmodule Demo.Posts.Post do
     field :body, :string
 
     belongs_to :user, Demo.Accounts.User
+    belongs_to :disabled_user, Demo.Accounts.User
 
     timestamps(updated_at: false)
   end
 end
 
 defmodule Demo.Populator do
+  import Ecto.Query
+
   alias Demo.Repo
 
   def reset do
@@ -147,7 +150,12 @@ defmodule Demo.Populator do
         stars_count: Enum.random(0..100),
         private_data: %{},
         password: :crypto.strong_rand_bytes(16) |> Base.encode16(),
-        posts: [%Demo.Posts.Post{body: Faker.Lorem.paragraphs() |> Enum.join("\n\n")}]
+        posts: [
+          %Demo.Posts.Post{
+            body: Faker.Lorem.paragraphs() |> Enum.join("\n\n"),
+            disabled_user: get_user_if(:rand.uniform(2) == 1)
+          }
+        ]
       }
       |> Demo.Repo.insert!()
     end)
@@ -157,6 +165,9 @@ defmodule Demo.Populator do
     Repo.delete_all(Demo.Accounts.User)
     Repo.delete_all(Demo.Posts.Post)
   end
+
+  defp get_user_if(true), do: from(Demo.Accounts.User, order_by: fragment("RANDOM()"), limit: 1) |> Demo.Repo.one()
+  defp get_user_if(false), do: nil
 end
 
 defmodule DemoWeb.Router do
@@ -186,7 +197,7 @@ defmodule DemoWeb.Router do
         label_with: :name,
         actions: [:deactivate]
       },
-      Demo.Posts.Post
+      {Demo.Posts.Post, immutable_fields: [:disabled_user_id]}
     ]
   end
 end

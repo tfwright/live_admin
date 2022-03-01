@@ -206,19 +206,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
     do:
       live_patch(content, Keyword.put(opts, :to, route_with_params(socket, [:list, key], params)))
 
-  defp delete_resource(record, config, session) do
-    config
-    |> get_config(:delete_with)
-    |> case do
-      nil ->
-        repo().delete(record)
-
-      {mod, func_name, args} ->
-        apply(mod, func_name, [record, session] ++ args)
-    end
-  end
-
-  defp list(resource, config, opts) do
+  def list(resource, config, opts) do
     opts =
       opts
       |> Enum.into(%{})
@@ -246,6 +234,18 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
       repo().all(query, prefix: opts[:prefix]),
       repo().aggregate(query |> exclude(:limit) |> exclude(:offset), :count, prefix: opts[:prefix])
     }
+  end
+
+  defp delete_resource(record, config, session) do
+    config
+    |> get_config(:delete_with)
+    |> case do
+      nil ->
+        repo().delete(record)
+
+      {mod, func_name, args} ->
+        apply(mod, func_name, [record, session] ++ args)
+    end
   end
 
   defp apply_search(query, q, fields) do

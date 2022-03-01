@@ -14,6 +14,7 @@ create table users (
 create table posts (
   id serial,
   user_id int,
+  disabled_user_id int,
   body text,
   inserted_at timestamp without time zone
 );
@@ -36,6 +37,7 @@ create table alt.users (
 create table alt.posts (
   id serial,
   user_id int,
+  disabled_user_id int,
   body text,
   inserted_at timestamp without time zone
 );

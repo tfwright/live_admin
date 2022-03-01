@@ -2,10 +2,12 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
+  import Phoenix.LiveView.Helpers
   import Phoenix.LiveAdmin.ErrorHelpers
   import Phoenix.LiveAdmin.Components.Resource, only: [repo: 0, fields: 2, route_with_params: 2]
-  import Phoenix.LiveAdmin, only: [get_config: 2]
+  import Phoenix.LiveAdmin, only: [get_config: 2, associated_resource: 3]
 
+  alias __MODULE__.SearchSelect
   alias Ecto.Changeset
   alias Phoenix.LiveAdmin.SessionStore
 
@@ -48,15 +50,34 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
 
   def default_render(assigns) do
     ~H"""
-    <%= form_for @changeset , "#", [as: "params", phx_change: "validate", phx_submit: @action, phx_target: @myself, class: "resource__form"], fn f -> %>
+    <.form let={f} for={@changeset} as={"params"} phx_change="validate" phx_submit={@action} phx_target={@myself} class="resource__form">
       <%= for {field, type, opts} <- fields(@resource, @config) do %>
-        <.field field={field} type={type} form={f} immutable={Keyword.get(opts, :immutable, false)} />
+        <.field
+          field={field}
+          type={type}
+          form={f}
+          immutable={Keyword.get(opts, :immutable, false)}
+          resource={@resource}
+          resources={@resources}
+          form_ref={@myself}
+        />
       <% end %>
       <div class="form__actions">
         <%= submit "Save", class: "form__save" %>
       </div>
-    <% end %>
+    </.form>
     """
+  end
+
+  @impl true
+  def handle_event(
+        "put_change",
+        params = %{"field" => field},
+        socket = %{assigns: %{changeset: changeset}}
+      ) do
+    changeset = Changeset.put_change(changeset, String.to_existing_atom(field), params["value"])
+
+    {:noreply, assign(socket, :changeset, changeset)}
   end
 
   @impl true
@@ -141,7 +162,15 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
         <%= unless @immutable do %>
           <%= inputs_for @form, @field, fn fp -> %>
             <%= for {field, type, _} <- fields_for_embed(@type) do %>
-              <.field field={field} type={type} form={fp} immutable={false} />
+              <.field
+                field={field}
+                type={type}
+                form={fp}
+                immutable={false}
+                resource={@resource}
+                resources={@resources}
+                form_ref={@form_ref}
+              />
             <% end %>
           <% end %>
         <% else %>
@@ -165,10 +194,49 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     ~H"""
     <div class={"field__group#{if @immutable, do: "--disabled"}"}>
       <%= label @form, @field, class: "field__label" %>
-      <.input form={@form} type={@type} field={@field} disabled={@immutable} />
+      <.input
+        form={@form}
+        type={@type}
+        field={@field}
+        disabled={@immutable}
+        resource={@resource}
+        resources={@resources}
+        form_ref={@form_ref}
+      />
       <%= error_tag @form, @field %>
     </div>
     """
+  end
+
+  defp input(assigns = %{type: :id}) do
+    assigns.resource
+    |> associated_resource(assigns.field, assigns.resources)
+    |> case do
+      nil ->
+        ~H"""
+        <%= textarea @form, @field, rows: 1, class: "field__text", disabled: @disabled %>
+        """
+
+      {_, {resource, config}} ->
+        ~H"""
+        <%= unless @form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(@field) do %>
+          <.live_component
+            module={SearchSelect}
+            id={assigns.field}
+            form={@form}
+            field={@field}
+            disabled={@disabled}
+            resource={resource}
+            config={config}
+            form_ref={@form_ref}
+          />
+        <% else %>
+          <div class="form__number">
+            <%= number_input @form, @field, class: "field__number", disabled: @disabled %>
+          </div>
+        <% end %>
+        """
+    end
   end
 
   defp input(assigns = %{type: :string}) do
