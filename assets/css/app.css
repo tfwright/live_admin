@@ -339,6 +339,13 @@
     @apply hover:bg-indigo-800;
   }
 
+  .form__save--disabled {
+    @apply form__save;
+    @apply text-gray-700;
+    @apply bg-gray-100;
+    @apply hover:bg-gray-100;
+  }
+
   .embed__title {
     @apply mb-2;
     @apply uppercase;

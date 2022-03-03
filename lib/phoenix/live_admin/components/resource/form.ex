@@ -4,12 +4,11 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
 
   import Phoenix.LiveView.Helpers
   import Phoenix.LiveAdmin.ErrorHelpers
-  import Phoenix.LiveAdmin.Components.Resource, only: [repo: 0, fields: 2, route_with_params: 2]
-  import Phoenix.LiveAdmin, only: [get_config: 2, associated_resource: 3]
+  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2, route_with_params: 2]
+  import Phoenix.LiveAdmin, only: [associated_resource: 3, get_config: 3]
 
   alias __MODULE__.SearchSelect
-  alias Ecto.Changeset
-  alias Phoenix.LiveAdmin.SessionStore
+  alias Phoenix.LiveAdmin.{Resource, SessionStore}
 
   @supported_field_types [
     :string,
@@ -22,18 +21,24 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   ]
 
   @impl true
-  def update(assigns = %{record: record, config: config}, socket) do
+  def update(assigns = %{record: record, config: config, action: action}, socket) do
     socket =
       socket
       |> assign(assigns)
-      |> assign(:changeset, changeset(record, config))
+      |> assign(:enabled, get_config(config, :"#{action}_with", true))
+      |> assign(:changeset, Resource.change(record, config))
 
     {:ok, socket}
   end
 
   @impl true
-  def update(assigns, socket) do
-    {:ok, assign(socket, assigns)}
+  def update(assigns = %{config: config, action: action}, socket) do
+    socket =
+      socket
+      |> assign(assigns)
+      |> assign(:enabled, get_config(config, :"#{action}_with", true))
+
+    {:ok, socket}
   end
 
   @impl true
@@ -63,7 +68,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
         />
       <% end %>
       <div class="form__actions">
-        <%= submit "Save", class: "form__save" %>
+        <%= submit "Save", class: "form__save#{if !@enabled, do: "--disabled"}", disabled: !@enabled %>
       </div>
     </.form>
     """
@@ -75,7 +80,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
         params = %{"field" => field},
         socket = %{assigns: %{changeset: changeset}}
       ) do
-    changeset = Changeset.put_change(changeset, String.to_existing_atom(field), params["value"])
+    changeset = Resource.put_change(changeset, String.to_existing_atom(field), params["value"])
 
     {:noreply, assign(socket, :changeset, changeset)}
   end
@@ -88,8 +93,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
       ) do
     changeset =
       changeset.data
-      |> changeset(config, params)
-      |> validate_resource(config, SessionStore.lookup(session_id))
+      |> Resource.change(config, params)
+      |> Resource.validate(config, SessionStore.lookup(session_id))
       |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, changeset: changeset)}
@@ -103,7 +108,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
           socket
       ) do
     socket =
-      case create_resource(resource, config, params, SessionStore.lookup(session_id)) do
+      case Resource.create(resource, config, params, SessionStore.lookup(session_id)) do
         {:ok, _} ->
           socket
           |> put_flash(:info, "Created #{resource}")
@@ -131,7 +136,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
         } = socket
       ) do
     socket =
-      case update_resource(
+      case Resource.update(
              record,
              config,
              params,
@@ -282,78 +287,4 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   end
 
   defp fields_for_embed({_, _, %{related: schema}}), do: fields(schema, %{})
-
-  defp changeset(record, config, params \\ %{})
-
-  defp changeset(record, config, params) when is_struct(record) do
-    change_resource(record, config, params)
-  end
-
-  defp changeset(resource, config, params) do
-    resource
-    |> struct(%{})
-    |> change_resource(config, params)
-  end
-
-  defp change_resource(record = %resource{}, config, params) do
-    fields = fields(resource, config)
-
-    {primitives, embeds} =
-      Enum.split_with(fields, fn
-        {_, {_, Ecto.Embedded, _}, _} -> false
-        _ -> true
-      end)
-
-    castable_fields =
-      Enum.flat_map(primitives, fn {field, _, opts} ->
-        if Keyword.get(opts, :immutable, false), do: [], else: [field]
-      end)
-
-    changeset = Changeset.cast(record, params, castable_fields)
-
-    Enum.reduce(embeds, changeset, fn {field, {_, Ecto.Embedded, _}, _}, changeset ->
-      Changeset.cast_embed(changeset, field,
-        with: fn embed, params ->
-          change_resource(embed, %{}, params)
-        end
-      )
-    end)
-  end
-
-  defp create_resource(resource, config, params, session) do
-    config
-    |> get_config(:create_with)
-    |> case do
-      nil ->
-        resource
-        |> changeset(config, params)
-        |> repo().insert(prefix: session[:__prefix__])
-
-      {mod, func_name, args} ->
-        apply(mod, func_name, [params, session] ++ args)
-    end
-  end
-
-  defp update_resource(record, config, params, session) do
-    config
-    |> get_config(:update_with)
-    |> case do
-      nil ->
-        record
-        |> changeset(config, params)
-        |> repo().update()
-
-      {mod, func_name, args} ->
-        apply(mod, func_name, [params, session] ++ args)
-    end
-  end
-
-  defp validate_resource(changeset, config, session) do
-    config
-    |> get_config(:validate_with)
-    |> case do
-      nil -> changeset
-      {mod, func_name, args} -> apply(mod, func_name, [changeset, session] ++ args)
-    end
-  end
 end
