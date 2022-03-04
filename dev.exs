@@ -42,7 +42,7 @@ Application.put_env(:phoenix_live_admin, DemoWeb.Endpoint,
 )
 
 Application.put_env(:phoenix_live_admin, :ecto_repo, Demo.Repo)
-Application.put_env(:phoenix_live_admin, :prefix_options, ["public", "fake", "alt"])
+Application.put_env(:phoenix_live_admin, :prefix_options, ["public", "this-is-a-fake-schema-with-a-really-long-name", "alt"])
 Application.put_env(:phoenix_live_admin, :immutable_fields, [:inserted_at])
 
 defmodule DemoWeb.PageController do

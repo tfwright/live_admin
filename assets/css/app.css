@@ -209,12 +209,10 @@
   .resource__action--drop {
     @apply resource__action;
     @apply relative;
-    @apply w-28;
   }
 
   .resource__action--drop button {
     @apply resource__action--btn;
-    @apply w-28;
     @apply text-center;
   }
 
