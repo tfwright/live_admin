@@ -65,20 +65,22 @@ defmodule Phoenix.LiveAdmin.Components.Container.Form.SearchSelect do
         <% else %>
           <%= text_input :search, :select, disabled: @disabled, placeholder: "Search", phx_focus: "load_options", phx_keyup: "load_options", phx_target: @myself, phx_debounce: 200 %>
         <% end %>
-        <nav>
-          <ul>
-            <%= if Enum.empty?(@options) do %>
-              <li>No options</li>
-            <% end %>
-            <%= for option <- @options, option.id != input_value(@form, @field) do %>
-              <li>
-                <a href="#" phx-click="put_change" phx-value-field={@field} phx-value-value={option.id} phx-target={@form_ref}>
-                  <%= record_label(option, @config) %>
-                </a>
-              </li>
-            <% end %>
-          </ul>
-        </nav>
+        <%= unless @selected_option do %>
+          <nav>
+            <ul>
+              <%= if Enum.empty?(@options) do %>
+                <li>No options</li>
+              <% end %>
+              <%= for option <- @options, option.id != input_value(@form, @field) do %>
+                <li>
+                  <a href="#" phx-click="put_change" phx-value-field={@field} phx-value-value={option.id} phx-target={@form_ref}>
+                    <%= record_label(option, @config) %>
+                  </a>
+                </li>
+              <% end %>
+            </ul>
+          </nav>
+        <% end %>
       </div>
     </div>
     """
