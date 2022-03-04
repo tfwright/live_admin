@@ -4,6 +4,7 @@ defmodule Phoenix.LiveAdmin.Components.Container.Index do
 
   import Phoenix.LiveAdmin,
     only: [repo: 0, associated_resource: 3, record_label: 2]
+
   import Phoenix.LiveAdmin.Components.Container, only: [route_with_params: 3]
 
   alias Phoenix.LiveAdmin.{Resource, SessionStore}

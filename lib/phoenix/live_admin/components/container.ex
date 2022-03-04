@@ -22,7 +22,6 @@ defmodule Phoenix.LiveAdmin.Components.Container do
         session_id: session_id,
         loading: !connected?(socket)
       )
-      |> assign_prefix()
 
     {:ok, socket}
   end
@@ -198,8 +197,20 @@ defmodule Phoenix.LiveAdmin.Components.Container do
 
   def assign_prefix(_, prefix \\ nil)
 
-  def assign_prefix(socket, nil),
-    do: assign(socket, :prefix, SessionStore.lookup(socket.assigns.session_id, :__prefix__))
+  def assign_prefix(socket, nil) do
+    case SessionStore.lookup(socket.assigns.session_id, :__prefix__) do
+      nil ->
+        assign(socket, :prefix, nil)
+
+      prefix ->
+        IO.inspect(socket.assigns)
+        socket
+        |> assign(:prefix, prefix)
+        |> push_redirect(
+          to: route_with_params(socket, [:list, socket.assigns.key], prefix: prefix)
+        )
+    end
+  end
 
   def assign_prefix(socket, prefix) do
     SessionStore.set(socket.assigns.session_id, :__prefix__, prefix)
