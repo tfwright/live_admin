@@ -191,8 +191,8 @@ defmodule DemoWeb.Router do
         create_with: {Demo.Accounts.User, :create, []},
         validate_with: {Demo.Accounts.User, :validate, []},
         components: [
-          new: {Phoenix.LiveAdmin.Components.Resource.Form, :default_render, []},
-          edit: {Phoenix.LiveAdmin.Components.Resource.Form, :default_render, []}
+          new: {Phoenix.LiveAdmin.Components.Container.Form, :default_render, []},
+          edit: {Phoenix.LiveAdmin.Components.Container.Form, :default_render, []}
         ],
         label_with: :name,
         actions: [:deactivate]

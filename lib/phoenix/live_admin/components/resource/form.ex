@@ -1,11 +1,11 @@
-defmodule Phoenix.LiveAdmin.Components.Resource.Form do
+defmodule Phoenix.LiveAdmin.Components.Container.Form do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
   import Phoenix.LiveView.Helpers
   import Phoenix.LiveAdmin.ErrorHelpers
-  import Phoenix.LiveAdmin.Components.Resource, only: [fields: 2, route_with_params: 2]
   import Phoenix.LiveAdmin, only: [associated_resource: 3, get_config: 3]
+  import Phoenix.LiveAdmin.Components.Container, only: [route_with_params: 2]
 
   alias __MODULE__.SearchSelect
   alias Phoenix.LiveAdmin.{Resource, SessionStore}
@@ -56,7 +56,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
   def default_render(assigns) do
     ~H"""
     <.form let={f} for={@changeset} as={"params"} phx_change="validate" phx_submit={@action} phx_target={@myself} class="resource__form">
-      <%= for {field, type, opts} <- fields(@resource, @config) do %>
+      <%= for {field, type, opts} <- Resource.fields(@resource, @config) do %>
         <.field
           field={field}
           type={type}
@@ -286,5 +286,5 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form do
     """
   end
 
-  defp fields_for_embed({_, _, %{related: schema}}), do: fields(schema, %{})
+  defp fields_for_embed({_, _, %{related: schema}}), do: Resource.fields(schema, %{})
 end

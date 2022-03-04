@@ -1,4 +1,4 @@
-defmodule Phoenix.LiveAdmin.Components.Resource do
+defmodule Phoenix.LiveAdmin.Components.Container do
   use Phoenix.LiveView
   use Phoenix.HTML
 
@@ -6,7 +6,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     only: [resource_title: 3, get_config: 3]
 
   alias __MODULE__.{Form, Index}
-  alias Phoenix.LiveAdmin.SessionStore
+  alias Phoenix.LiveAdmin.{Resource, SessionStore}
 
   @impl true
   def mount(%{"resource_id" => key}, %{"id" => session_id}, socket) do
@@ -34,7 +34,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     record =
       params
       |> Map.fetch!("record_id")
-      |> get_resource!(socket.assigns.resource, socket.assigns.prefix)
+      |> Resource.find!(socket.assigns.resource, socket.assigns.prefix)
 
     socket = assign(socket, record: record)
 
@@ -177,26 +177,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
     """
   end
 
-  def repo, do: Application.fetch_env!(:phoenix_live_admin, :ecto_repo)
-
-  def fields(resource, config) do
-    Enum.flat_map(resource.__schema__(:fields), fn field_name ->
-      config
-      |> get_config(:hidden_fields, [])
-      |> Enum.member?(field_name)
-      |> case do
-        false ->
-          [
-            {field_name, resource.__schema__(:type, field_name),
-             [immutable: get_config(config, :immutable_fields, []) |> Enum.member?(field_name)]}
-          ]
-
-        true ->
-          []
-      end
-    end)
-  end
-
   def route_with_params(socket, segments, params \\ %{}) do
     params =
       Enum.flat_map(params, fn
@@ -206,8 +186,6 @@ defmodule Phoenix.LiveAdmin.Components.Resource do
 
     apply(socket.router.__helpers__(), :resource_path, [socket] ++ segments ++ [params])
   end
-
-  def get_resource!(id, resource, prefix), do: repo().get!(resource, id, prefix: prefix)
 
   def get_prefix_options!() do
     Application.fetch_env!(:phoenix_live_admin, :prefix_options)

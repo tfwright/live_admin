@@ -1,10 +1,9 @@
-defmodule Phoenix.LiveAdmin.Components.Resource.Form.SearchSelect do
+defmodule Phoenix.LiveAdmin.Components.Container.Form.SearchSelect do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
   import Phoenix.LiveAdmin, only: [record_label: 2]
-  import Phoenix.LiveAdmin.Components.Resource, only: [get_resource!: 3]
-  import Phoenix.LiveAdmin.Components.Resource.Index, only: [list: 3]
+  alias Phoenix.LiveAdmin.Resource
 
   @impl true
   def mount(socket) do
@@ -19,7 +18,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form.SearchSelect do
       |> case do
         nil -> nil
         "" -> nil
-        id -> get_resource!(id, resource, Ecto.get_meta(form.data, :prefix))
+        id -> Resource.find!(id, resource, Ecto.get_meta(form.data, :prefix))
       end
 
     socket =
@@ -93,7 +92,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Form.SearchSelect do
       ) do
     options =
       resource
-      |> list(config, search: q)
+      |> Resource.list(config, search: q)
       |> elem(0)
 
     {:noreply, assign(socket, :options, options)}

@@ -17,10 +17,10 @@ defmodule Phoenix.LiveAdmin.Router do
           root_layout: {Phoenix.LiveAdmin.View, "layout.html"},
           on_mount: {unquote(__MODULE__), :assign_options} do
           live("/", Phoenix.LiveAdmin.Components.Home, :home, as: :home)
-          live("/:resource_id", Phoenix.LiveAdmin.Components.Resource, :list, as: :resource)
-          live("/:resource_id/new", Phoenix.LiveAdmin.Components.Resource, :new, as: :resource)
+          live("/:resource_id", Phoenix.LiveAdmin.Components.Container, :list, as: :resource)
+          live("/:resource_id/new", Phoenix.LiveAdmin.Components.Container, :new, as: :resource)
 
-          live("/:resource_id/edit/:record_id", Phoenix.LiveAdmin.Components.Resource, :edit,
+          live("/:resource_id/edit/:record_id", Phoenix.LiveAdmin.Components.Container, :edit,
             as: :resource
           )
         end

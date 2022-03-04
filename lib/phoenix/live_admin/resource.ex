@@ -1,8 +1,52 @@
 defmodule Phoenix.LiveAdmin.Resource do
-  import Phoenix.LiveAdmin, only: [get_config: 2, get_config: 3]
-  import Phoenix.LiveAdmin.Components.Resource, only: [repo: 0, fields: 2]
+  import Ecto.Query
+  import Phoenix.LiveAdmin, only: [get_config: 2, get_config: 3, repo: 0, parent_associations: 1]
 
   alias Ecto.Changeset
+
+  def find!(id, resource, prefix), do: repo().get!(resource, id, prefix: prefix)
+
+  def delete(record, config, session) do
+    config
+    |> get_config(:delete_with)
+    |> case do
+      nil ->
+        repo().delete(record)
+
+      {mod, func_name, args} ->
+        apply(mod, func_name, [record, session] ++ args)
+    end
+  end
+
+  def list(resource, config, opts) do
+    opts =
+      opts
+      |> Enum.into(%{})
+      |> Map.put_new(:page, 1)
+      |> Map.put_new(:sort, {:asc, :id})
+
+    query =
+      resource
+      |> limit(10)
+      |> offset(^((opts[:page] - 1) * 10))
+      |> order_by(^[opts[:sort]])
+      |> preload(^preloads(resource, config))
+
+    query =
+      opts
+      |> Enum.reduce(query, fn
+        {:search, q}, query when byte_size(q) > 0 ->
+          apply_search(query, q, fields(resource, config))
+
+        _, query ->
+          query
+      end)
+
+    {
+      repo().all(query, prefix: opts[:prefix]),
+      repo().aggregate(query |> exclude(:limit) |> exclude(:offset), :count, prefix: opts[:prefix])
+    }
+  end
 
   def put_change(changeset, field, value) do
     Changeset.put_change(changeset, field, value)
@@ -57,6 +101,60 @@ defmodule Phoenix.LiveAdmin.Resource do
     end
   end
 
+  def fields(resource, config) do
+    Enum.flat_map(resource.__schema__(:fields), fn field_name ->
+      config
+      |> get_config(:hidden_fields, [])
+      |> Enum.member?(field_name)
+      |> case do
+        false ->
+          [
+            {field_name, resource.__schema__(:type, field_name),
+             [immutable: get_config(config, :immutable_fields, []) |> Enum.member?(field_name)]}
+          ]
+
+        true ->
+          []
+      end
+    end)
+  end
+
+  defp apply_search(query, q, fields) do
+    q
+    |> String.split(~r{[^\s]*:}, include_captures: true, trim: true)
+    |> case do
+      [q] ->
+        Enum.reduce(fields, query, fn {field_name, _, _}, query ->
+          or_where(
+            query,
+            [r],
+            ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
+          )
+        end)
+
+      field_queries ->
+        field_queries
+        |> Enum.map(&String.trim/1)
+        |> Enum.chunk_every(2)
+        |> Enum.reduce(query, fn
+          [field_key, q], query ->
+            if {field_name, _, _} =
+                 Enum.find(fields, fn {field_name, _, _} -> "#{field_name}:" == field_key end) do
+              or_where(
+                query,
+                [r],
+                ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
+              )
+            else
+              query
+            end
+
+          [_], query ->
+            query
+        end)
+    end
+  end
+
   defp build_changeset(record = %resource{}, config, params) do
     fields = fields(resource, config)
 
@@ -80,5 +178,15 @@ defmodule Phoenix.LiveAdmin.Resource do
         end
       )
     end)
+  end
+
+  defp preloads(resource, config) do
+    config
+    |> Map.get(:preload)
+    |> case do
+      nil -> resource |> parent_associations() |> Enum.map(& &1.field)
+      {m, f, a} -> apply(m, f, [resource | a])
+      preloads when is_list(preloads) -> preloads
+    end
   end
 end

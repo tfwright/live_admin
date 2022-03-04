@@ -1,4 +1,4 @@
-defmodule Phoenix.LiveAdmin.ResourceTest do
+defmodule Phoenix.LiveAdmin.Components.ContainerTest do
   use ExUnit.Case, async: true
 
   import Phoenix.ConnTest

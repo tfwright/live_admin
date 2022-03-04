@@ -1,23 +1,19 @@
-defmodule Phoenix.LiveAdmin.Components.Resource.Index do
+defmodule Phoenix.LiveAdmin.Components.Container.Index do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import Phoenix.LiveAdmin.Components.Resource,
-    only: [repo: 0, fields: 2, route_with_params: 3, get_resource!: 3]
-
   import Phoenix.LiveAdmin,
-    only: [associated_resource: 3, record_label: 2, get_config: 2, parent_associations: 1]
+    only: [repo: 0, associated_resource: 3, record_label: 2]
+  import Phoenix.LiveAdmin.Components.Container, only: [route_with_params: 3]
 
-  import Ecto.Query
-
-  alias Phoenix.LiveAdmin.SessionStore
+  alias Phoenix.LiveAdmin.{Resource, SessionStore}
 
   @impl true
   def render(assigns) do
     assigns =
       assign(assigns,
         records:
-          list(
+          Resource.list(
             assigns.resource,
             assigns.config,
             Map.take(assigns, [:prefix, :sort, :page, :search])
@@ -51,7 +47,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
       <table class="resource__table">
         <thead>
           <tr>
-            <%= for {field, _, _} <- fields(@resource, @config) do %>
+            <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
               <th class="resource__header" title={field}>
                 <%= list_link @socket, humanize(field), @key, %{prefix: @prefix, page: @page, "sort-attr": field, "sort-dir": (if field == @sort_attr, do: Enum.find([:asc, :desc], & &1 != @sort_dir), else: @sort_dir)}, class: "header__link#{if field == @sort_attr, do: "--#{[asc: :down, desc: :up][@sort_dir]}"}" %>
               </th>
@@ -62,7 +58,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
         <tbody>
           <%= for record <- @records |> elem(0) do %>
             <tr>
-              <%= for {field, _, _} <- fields(@resource, @config) do %>
+              <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
                 <td class="resource__cell">
                   <div class="cell__contents">
                     <%= display_field(record, field, assigns) %>
@@ -81,7 +77,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
         </tbody>
         <tfoot>
           <tr>
-            <td class="w-full" colspan={@resource |> fields(@config) |> Enum.count()}>
+            <td class="w-full" colspan={@resource |> Resource.fields(@config) |> Enum.count()}>
               <%= if @page > 1, do: list_link(@socket, "Prev", @key, %{prefix: @prefix, page: @page - 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir, search: @search}, class: "resource__action--btn"), else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
               <%= if @page < (@records |> elem(1)) / 10, do: list_link(@socket, "Next", @key, %{prefix: @prefix, page: @page + 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir, search: @search}, class: "resource__action--btn"), else: content_tag(:span, "Next", class: "resource__action--disabled") %>
             </td>
@@ -109,8 +105,8 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
       ) do
     socket =
       id
-      |> get_resource!(resource, socket.assigns.prefix)
-      |> delete_resource(config, SessionStore.lookup(session_id))
+      |> Resource.find!(resource, socket.assigns.prefix)
+      |> Resource.delete(config, SessionStore.lookup(session_id))
       |> case do
         {:ok, _} ->
           socket
@@ -126,7 +122,7 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
 
   @impl true
   def handle_event("action", %{"action" => action, "id" => id}, socket) do
-    record = get_resource!(id, socket.assigns.resource, socket.assigns.prefix)
+    record = Resource.find!(id, socket.assigns.resource, socket.assigns.prefix)
 
     action_name = String.to_existing_atom(action)
 
@@ -205,92 +201,4 @@ defmodule Phoenix.LiveAdmin.Components.Resource.Index do
   def list_link(socket, content, key, params, opts \\ []),
     do:
       live_patch(content, Keyword.put(opts, :to, route_with_params(socket, [:list, key], params)))
-
-  def list(resource, config, opts) do
-    opts =
-      opts
-      |> Enum.into(%{})
-      |> Map.put_new(:page, 1)
-      |> Map.put_new(:sort, {:asc, :id})
-
-    query =
-      resource
-      |> limit(10)
-      |> offset(^((opts[:page] - 1) * 10))
-      |> order_by(^[opts[:sort]])
-      |> preload(^preloads_for_resource(resource, config))
-
-    query =
-      opts
-      |> Enum.reduce(query, fn
-        {:search, q}, query when byte_size(q) > 0 ->
-          apply_search(query, q, fields(resource, config))
-
-        _, query ->
-          query
-      end)
-
-    {
-      repo().all(query, prefix: opts[:prefix]),
-      repo().aggregate(query |> exclude(:limit) |> exclude(:offset), :count, prefix: opts[:prefix])
-    }
-  end
-
-  defp delete_resource(record, config, session) do
-    config
-    |> get_config(:delete_with)
-    |> case do
-      nil ->
-        repo().delete(record)
-
-      {mod, func_name, args} ->
-        apply(mod, func_name, [record, session] ++ args)
-    end
-  end
-
-  defp apply_search(query, q, fields) do
-    q
-    |> String.split(~r{[^\s]*:}, include_captures: true, trim: true)
-    |> case do
-      [q] ->
-        Enum.reduce(fields, query, fn {field_name, _, _}, query ->
-          or_where(
-            query,
-            [r],
-            ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
-          )
-        end)
-
-      field_queries ->
-        field_queries
-        |> Enum.map(&String.trim/1)
-        |> Enum.chunk_every(2)
-        |> Enum.reduce(query, fn
-          [field_key, q], query ->
-            if {field_name, _, _} =
-                 Enum.find(fields, fn {field_name, _, _} -> "#{field_name}:" == field_key end) do
-              or_where(
-                query,
-                [r],
-                ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
-              )
-            else
-              query
-            end
-
-          [_], query ->
-            query
-        end)
-    end
-  end
-
-  defp preloads_for_resource(resource, config) do
-    config
-    |> Map.get(:preload)
-    |> case do
-      nil -> resource |> parent_associations() |> Enum.map(& &1.field)
-      {m, f, a} -> apply(m, f, [resource | a])
-      preloads when is_list(preloads) -> preloads
-    end
-  end
 end

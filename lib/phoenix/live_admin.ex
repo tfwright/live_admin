@@ -1,4 +1,6 @@
 defmodule Phoenix.LiveAdmin do
+  def repo, do: Application.fetch_env!(:phoenix_live_admin, :ecto_repo)
+
   def associated_resource(resource, field_name, resources) do
     with %{related: assoc_schema} <-
            resource |> parent_associations() |> Enum.find(&(&1.owner_key == field_name)),
