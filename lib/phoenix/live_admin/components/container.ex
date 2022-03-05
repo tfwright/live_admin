@@ -60,7 +60,7 @@ defmodule Phoenix.LiveAdmin.Components.Container do
   end
 
   @impl true
-  def handle_params(_params, _uri, socket), do: {:noreply, socket}
+  def handle_params(params, _uri, socket), do: {:noreply, assign_prefix(socket, params["prefix"])}
 
   @impl true
   def handle_event("set_prefix", params, socket) do
