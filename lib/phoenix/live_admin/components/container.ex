@@ -72,6 +72,41 @@ defmodule Phoenix.LiveAdmin.Components.Container do
     }
   end
 
+  @impl true
+  def handle_event("task", %{"task" => task}, socket) do
+    task_name = String.to_existing_atom(task)
+
+    session = SessionStore.lookup(socket.assigns.session_id)
+
+    {m, f, a} =
+      socket.assigns
+      |> get_in([:config, :tasks, task_name])
+      |> case do
+        nil -> {socket.assigns.resource, task_name, []}
+        tuple when tuple_size(tuple) == 3 -> tuple
+      end
+
+    socket =
+      case apply(m, f, [session] ++ a) do
+        {:ok, result} ->
+          socket
+          |> put_flash(:info, "Successfully completed #{task}: #{inspect(result)}")
+          |> push_redirect(
+            to:
+              route_with_params(
+                socket,
+                [:list, socket.assigns.key],
+                Map.take(socket.assigns, [:prefix, :page])
+              )
+          )
+
+        {:error, error} ->
+          put_flash(socket, :error, "#{task} failed: #{error}")
+      end
+
+    {:noreply, socket}
+  end
+
   def render(assigns = %{loading: true}), do: ~H""
 
   @impl true
@@ -88,6 +123,10 @@ defmodule Phoenix.LiveAdmin.Components.Container do
           <%= if get_config(@config, :create_with, true) do %>
             <%= live_redirect "New", to: route_with_params(@socket, [:new, @key]), class: "resource__action--btn" %>
           <% end %>
+          <%= for task <- Map.get(@config, :tasks, []) do %>
+            <%= link task |> to_string() |> humanize(), to: "#", "data-confirm": "Are you sure?", "phx-click": "task", "phx-value-task": task, class: "resource__action--btn" %>
+          <% end %>
+          |
           <%= if Application.get_env(:phoenix_live_admin, :prefix_options) do %>
             <div class="resource__action--drop">
               <button><%= @prefix || "Set prefix" %></button>

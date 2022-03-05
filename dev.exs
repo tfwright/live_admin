@@ -113,6 +113,18 @@ defmodule Demo.Accounts.User do
       error -> error
     end
   end
+
+  def regenerate_passwords(_) do
+    __MODULE__
+    |> Demo.Repo.all()
+    |> Enum.each(fn user ->
+      user
+      |> Ecto.Changeset.change(password: :crypto.strong_rand_bytes(16) |> Base.encode16())
+      |> Demo.Repo.update()
+    end)
+
+    {:ok, "updated"}
+  end
 end
 
 defmodule Demo.Posts.Post do
@@ -195,7 +207,8 @@ defmodule DemoWeb.Router do
           edit: {Phoenix.LiveAdmin.Components.Container.Form, :default_render, []}
         ],
         label_with: :name,
-        actions: [:deactivate]
+        actions: [:deactivate],
+        tasks: [:regenerate_passwords]
       },
       {Demo.Posts.Post, immutable_fields: [:disabled_user_id]}
     ]
