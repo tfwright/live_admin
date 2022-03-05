@@ -203,7 +203,6 @@ defmodule Phoenix.LiveAdmin.Components.Container do
         assign(socket, :prefix, nil)
 
       prefix ->
-        IO.inspect(socket.assigns)
         socket
         |> assign(:prefix, prefix)
         |> push_redirect(
