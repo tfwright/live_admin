@@ -3,7 +3,7 @@ defmodule Phoenix.LiveAdmin.Components.Container.Index do
   use Phoenix.HTML
 
   import Phoenix.LiveAdmin,
-    only: [repo: 0, associated_resource: 3, record_label: 2]
+    only: [repo: 0, associated_resource: 3, record_label: 2, get_config: 3]
 
   import Phoenix.LiveAdmin.Components.Container, only: [route_with_params: 3]
 
@@ -130,12 +130,12 @@ defmodule Phoenix.LiveAdmin.Components.Container.Index do
     session = SessionStore.lookup(socket.assigns.session_id)
 
     {m, f, a} =
-      socket.assigns
-      |> get_in([:config, :actions, action_name])
-      |> case do
-        nil -> {socket.assigns.resource, action_name, []}
-        tuple when tuple_size(tuple) == 3 -> tuple
-      end
+      socket.assigns.config
+      |> get_config(:actions, [])
+      |> Enum.find_value(fn
+        {^action_name, mfa} -> mfa
+        ^action_name -> {socket.assigns.resource, action_name, []}
+      end)
 
     socket =
       case apply(m, f, [record, session] ++ a) do

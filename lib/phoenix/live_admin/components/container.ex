@@ -79,12 +79,12 @@ defmodule Phoenix.LiveAdmin.Components.Container do
     session = SessionStore.lookup(socket.assigns.session_id)
 
     {m, f, a} =
-      socket.assigns
-      |> get_in([:config, :tasks, task_name])
-      |> case do
-        nil -> {socket.assigns.resource, task_name, []}
-        tuple when tuple_size(tuple) == 3 -> tuple
-      end
+      socket.assigns.config
+      |> get_config(:tasks, [])
+      |> Enum.find_value(fn
+        {^task_name, mfa} -> mfa
+        ^task_name -> {socket.assigns.resource, task_name, []}
+      end)
 
     socket =
       case apply(m, f, [session] ++ a) do
@@ -123,8 +123,8 @@ defmodule Phoenix.LiveAdmin.Components.Container do
           <%= if get_config(@config, :create_with, true) do %>
             <%= live_redirect "New", to: route_with_params(@socket, [:new, @key]), class: "resource__action--btn" %>
           <% end %>
-          <%= for task <- Map.get(@config, :tasks, []) do %>
-            <%= link task |> to_string() |> humanize(), to: "#", "data-confirm": "Are you sure?", "phx-click": "task", "phx-value-task": task, class: "resource__action--btn" %>
+          <%= for key <- get_task_keys(@config) do %>
+            <%= link key |> to_string() |> humanize(), to: "#", "data-confirm": "Are you sure?", "phx-click": "task", "phx-value-task": key, class: "resource__action--btn" %>
           <% end %>
           |
           <%= if Application.get_env(:phoenix_live_admin, :prefix_options) do %>
@@ -254,5 +254,14 @@ defmodule Phoenix.LiveAdmin.Components.Container do
     SessionStore.set(socket.assigns.session_id, :__prefix__, prefix)
 
     assign(socket, :prefix, prefix)
+  end
+
+  defp get_task_keys(config) do
+    config
+    |> Map.get(:tasks, [])
+    |> Enum.map(fn
+      {key, _} -> key
+      key -> key
+    end)
   end
 end
