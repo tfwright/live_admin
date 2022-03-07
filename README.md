@@ -13,13 +13,15 @@ Significant features:
 
 ## Installation
 
+First, ensure your Phoenix app has been configured to use [LiveView](https://hexdocs.pm/phoenix_live_view/installation.html).
+
 Add to your app's `deps`:
 
 ```
 {:live_admin, "~> 0.1"}
 ```
 
-Add the following to your Phoenix router:
+Add the following to your Phoenix router in any scope ready to serve a live route:
 
 ```
 import LiveAdmin.Router
