@@ -64,6 +64,12 @@ defmodule Phoenix.LiveAdmin.Components.Container do
 
   @impl true
   def handle_event("set_prefix", params, socket) do
+    prefix = params["prefix"]
+
+    if is_nil(prefix) do
+      SessionStore.set(socket.assigns.session_id, :__prefix__, prefix)
+    end
+
     {
       :noreply,
       push_redirect(socket,
