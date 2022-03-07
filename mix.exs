@@ -13,7 +13,9 @@ defmodule LiveAdmin.MixProject do
       package: [
         maintainers: ["Thomas Floyd Wright"],
         licenses: ["Apache-2.0"],
-        links: %{"GitHub" => "https://github.com/tfwright/live_admin"}
+        links: %{"GitHub" => "https://github.com/tfwright/live_admin"},
+        files: ~w(lib priv .formatter.exs mix.exs README* readme* LICENSE*
+                license* CHANGELOG* changelog* src dist),
       ],
       source_url: "https://github.com/tfwright/live_admin"
     ]
