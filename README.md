@@ -50,7 +50,7 @@ In addition, most resource configuration can be set here in order to set a globa
 Example:
 
 ```
-config :phoenix_live_admin,
+config :live_admin,
   ecto_repo: MyApp.Repo,
   prefix_options: {MyApp.Accounts, :list_tenant_prefixes, []},
   immutable_fields: [:id, :inserted_at, :updated_at],
