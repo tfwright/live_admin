@@ -2,6 +2,13 @@
 
 An admin UI for Phoenix applications built on [Phoenix LiveView](https://github.com/phoenixframework/phoenix_live_view) and [Ecto](https://github.com/elixir-ecto/ecto/).
 
+Significant features:
+
+* First class support for multi tenant applications via Ecto's `prefix` option
+* Overridable views and API
+* Easily add custom actions at the schema and record level
+* Ability to edit (nested) embedded schemas
+
 ## Installation
 
 Add the following to your Phoenix router:
