@@ -17,7 +17,7 @@ defmodule LiveAdminTest do
     end
 
     test "routes live view", %{response: response} do
-      assert response =~ ~s|<title>Phoenix LiveAdmin</title>|
+      assert response =~ ~s|<title>LiveAdmin</title>|
     end
 
     test "links to resource", %{response: response} do
