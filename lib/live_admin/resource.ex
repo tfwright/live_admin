@@ -8,9 +8,9 @@ defmodule LiveAdmin.Resource do
 
   def delete(record, config, session) do
     config
-    |> get_config(:delete_with)
+    |> get_config(:delete_with, :default)
     |> case do
-      nil ->
+      :default ->
         repo().delete(record)
 
       {mod, func_name, args} ->

@@ -68,7 +68,9 @@ defmodule LiveAdmin.Components.Container.Index do
               <% end %>
               <td class="resource__cell">
                 <%= live_redirect "Edit", to: route_with_params(@socket, [:edit, @key, record.id], prefix: @prefix), class: "resource__action--btn" %>
-                <%= link "Delete", to: "#", "data-confirm": "Are you sure?", "phx-click": "delete", "phx-value-id": record.id, "phx-target": @myself, class: "resource__action--btn" %>
+                <%= if get_config(@config, :delete_with, true) do %>
+                  <%= link "Delete", to: "#", "data-confirm": "Are you sure?", "phx-click": "delete", "phx-value-id": record.id, "phx-target": @myself, class: "resource__action--btn" %>
+                <% end %>
                 <%= for action <- Map.get(@config, :actions, []) do %>
                   <%= link action |> to_string() |> humanize(), to: "#", "data-confirm": "Are you sure?", "phx-click": "action", "phx-value-id": record.id, "phx-value-action": action, "phx-target": @myself, class: "resource__action--btn" %>
                 <% end %>
