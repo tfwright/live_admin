@@ -1,9 +1,9 @@
-defmodule Phoenix.LiveAdmin.Router do
+defmodule LiveAdmin.Router do
   import Phoenix.LiveView, only: [assign: 2]
 
   defmacro live_admin(path, opts) do
     resources = Keyword.get(opts, :resources, [])
-    title = Keyword.get(opts, :title, "Phoenix LiveAdmin")
+    title = Keyword.get(opts, :title, "LiveAdmin")
     components = Keyword.get(opts, :components, [])
 
     quote do
@@ -14,13 +14,13 @@ defmodule Phoenix.LiveAdmin.Router do
           session:
             {unquote(__MODULE__), :build_session,
              [unquote(resources), unquote(title), unquote(components)]},
-          root_layout: {Phoenix.LiveAdmin.View, "layout.html"},
+          root_layout: {LiveAdmin.View, "layout.html"},
           on_mount: {unquote(__MODULE__), :assign_options} do
-          live("/", Phoenix.LiveAdmin.Components.Home, :home, as: :home)
-          live("/:resource_id", Phoenix.LiveAdmin.Components.Container, :list, as: :resource)
-          live("/:resource_id/new", Phoenix.LiveAdmin.Components.Container, :new, as: :resource)
+          live("/", LiveAdmin.Components.Home, :home, as: :home)
+          live("/:resource_id", LiveAdmin.Components.Container, :list, as: :resource)
+          live("/:resource_id/new", LiveAdmin.Components.Container, :new, as: :resource)
 
-          live("/:resource_id/edit/:record_id", Phoenix.LiveAdmin.Components.Container, :edit,
+          live("/:resource_id/edit/:record_id", LiveAdmin.Components.Container, :edit,
             as: :resource
           )
         end

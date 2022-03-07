@@ -1,15 +1,15 @@
-defmodule Phoenix.LiveAdmin.View do
+defmodule LiveAdmin.View do
   use Phoenix.HTML
 
   use Phoenix.View,
-    namespace: Phoenix.LiveAdmin,
+    namespace: LiveAdmin,
     root: __DIR__
 
-  import Phoenix.LiveAdmin, only: [resource_title: 3, resource_path: 2]
+  import LiveAdmin, only: [resource_title: 3, resource_path: 2]
   import Phoenix.LiveView.Helpers
 
-  js_path = Path.join(__DIR__, "../../../dist/js/app.js")
-  css_path = Path.join(__DIR__, "../../../dist/css/app.css")
+  js_path = Path.join(__DIR__, "../../dist/js/app.js")
+  css_path = Path.join(__DIR__, "../../dist/css/app.css")
 
   @external_resource js_path
   @external_resource css_path

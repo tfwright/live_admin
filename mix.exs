@@ -1,9 +1,9 @@
-defmodule PhoenixLiveAdmin.MixProject do
+defmodule LiveAdmin.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :phoenix_live_admin,
+      app: :live_admin,
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
@@ -15,7 +15,7 @@ defmodule PhoenixLiveAdmin.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {PhoenixLiveAdmin.Application, []},
+      mod: {LiveAdmin.Application, []},
       extra_applications: [:logger]
     ]
   end

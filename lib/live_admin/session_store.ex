@@ -1,4 +1,4 @@
-defmodule Phoenix.LiveAdmin.SessionStore do
+defmodule LiveAdmin.SessionStore do
   use Agent
 
   def start_link(%{} = initial_state) do

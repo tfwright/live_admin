@@ -2,17 +2,17 @@ Logger.configure(level: :debug)
 
 pg_url = System.get_env("PG_URL") || "postgres:postgres@127.0.0.1"
 
-Application.put_env(:phoenix_live_admin, Demo.Repo,
+Application.put_env(:live_admin, Demo.Repo,
   url: "ecto://#{pg_url}/phx_admin_dev"
 )
 
 defmodule Demo.Repo do
-  use Ecto.Repo, otp_app: :phoenix_live_admin, adapter: Ecto.Adapters.Postgres
+  use Ecto.Repo, otp_app: :live_admin, adapter: Ecto.Adapters.Postgres
 end
 
 _ = Ecto.Adapters.Postgres.storage_up(Demo.Repo.config())
 
-Application.put_env(:phoenix_live_admin, DemoWeb.Endpoint,
+Application.put_env(:live_admin, DemoWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "Hu4qQN3iKzTV4fJxhorPQlA/osH9fAMtbtjVS58PFgfw3ja5Z18Q/WSNR9wP4OfW",
   live_view: [signing_salt: "hMegieSe"],
@@ -33,17 +33,17 @@ Application.put_env(:phoenix_live_admin, DemoWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"dist/.*(js|css|png|jpeg|jpg|gif|svg)$",
-      ~r"lib/phoenix/live_admin/components/.*(ex)$",
-      ~r"lib/phoenix/live_admin/templates/.*/.*(ex)$",
-      ~r"lib/phoenix/live_admin/.*(ex)$"
+      ~r"lib/live_admin/components/.*(ex)$",
+      ~r"lib/live_admin/templates/.*/.*(ex)$",
+      ~r"lib/live_admin/.*(ex)$"
     ]
   ],
   pubsub_server: Demo.PubSub
 )
 
-Application.put_env(:phoenix_live_admin, :ecto_repo, Demo.Repo)
-Application.put_env(:phoenix_live_admin, :prefix_options, ["public", "this-is-a-fake-schema-with-a-really-long-name", "alt"])
-Application.put_env(:phoenix_live_admin, :immutable_fields, [:inserted_at])
+Application.put_env(:live_admin, :ecto_repo, Demo.Repo)
+Application.put_env(:live_admin, :prefix_options, ["public", "this-is-a-fake-schema-with-a-really-long-name", "alt"])
+Application.put_env(:live_admin, :immutable_fields, [:inserted_at])
 
 defmodule DemoWeb.PageController do
   import Plug.Conn
@@ -52,7 +52,7 @@ defmodule DemoWeb.PageController do
 
   def call(conn, :index) do
     content(conn, """
-    <h2>Phoenix LiveAdmin Dev</h2>
+    <h2>LiveAdmin Dev</h2>
     <a href="/admin">Open Admin</a>
     """)
   end
@@ -184,7 +184,7 @@ end
 
 defmodule DemoWeb.Router do
   use Phoenix.Router
-  import Phoenix.LiveAdmin.Router
+  import LiveAdmin.Router
   import Phoenix.LiveView.Router
 
   pipeline :browser do
@@ -203,8 +203,8 @@ defmodule DemoWeb.Router do
         create_with: {Demo.Accounts.User, :create, []},
         validate_with: {Demo.Accounts.User, :validate, []},
         components: [
-          new: {Phoenix.LiveAdmin.Components.Container.Form, :default_render, []},
-          edit: {Phoenix.LiveAdmin.Components.Container.Form, :default_render, []}
+          new: {LiveAdmin.Components.Container.Form, :default_render, []},
+          edit: {LiveAdmin.Components.Container.Form, :default_render, []}
         ],
         label_with: :name,
         actions: [:deactivate],
@@ -216,7 +216,7 @@ defmodule DemoWeb.Router do
 end
 
 defmodule DemoWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :phoenix_live_admin
+  use Phoenix.Endpoint, otp_app: :live_admin
 
   socket "/live", Phoenix.LiveView.Socket
   socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket

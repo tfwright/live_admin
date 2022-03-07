@@ -1,13 +1,13 @@
-defmodule Phoenix.LiveAdmin.Components.Container.Index do
+defmodule LiveAdmin.Components.Container.Index do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import Phoenix.LiveAdmin,
+  import LiveAdmin,
     only: [repo: 0, associated_resource: 3, record_label: 2, get_config: 3]
 
-  import Phoenix.LiveAdmin.Components.Container, only: [route_with_params: 3]
+  import LiveAdmin.Components.Container, only: [route_with_params: 3]
 
-  alias Phoenix.LiveAdmin.{Resource, SessionStore}
+  alias LiveAdmin.{Resource, SessionStore}
 
   @impl true
   def render(assigns) do

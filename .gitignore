@@ -20,7 +20,7 @@ erl_crash.dump
 *.ez
 
 # Ignore package tarball (built via "mix hex.build").
-phoenix_live_admin-*.tar
+live_admin-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/

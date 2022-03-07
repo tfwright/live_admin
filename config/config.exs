@@ -6,7 +6,7 @@ config :phoenix, :stacktrace_depth, 20
 config :logger, level: :warn
 config :logger, :console, format: "[$level] $message\n"
 
-config :phoenix, PhoenixLiveAdmin.Endpoint,
+config :phoenix, LiveAdmin.Endpoint,
   watchers: [
     node: ["esbuild.js", "--watch", cd: Path.expand("../assets", __DIR__)]
   ]

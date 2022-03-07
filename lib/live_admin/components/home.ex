@@ -1,4 +1,4 @@
-defmodule Phoenix.LiveAdmin.Components.Home do
+defmodule LiveAdmin.Components.Home do
   use Phoenix.LiveView
 
   @impl true
@@ -22,7 +22,7 @@ defmodule Phoenix.LiveAdmin.Components.Home do
 
   def render_home(assigns) do
     ~H"""
-    This is the default Phoenix LiveAdmin home page.
+    This is the default LiveAdmin home page.
 
     See README for instructions on how to configure your app to show something more useful here.
     """

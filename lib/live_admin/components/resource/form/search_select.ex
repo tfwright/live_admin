@@ -1,9 +1,9 @@
-defmodule Phoenix.LiveAdmin.Components.Container.Form.SearchSelect do
+defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import Phoenix.LiveAdmin, only: [record_label: 2]
-  alias Phoenix.LiveAdmin.Resource
+  import LiveAdmin, only: [record_label: 2]
+  alias LiveAdmin.Resource
 
   @impl true
   def mount(socket) do

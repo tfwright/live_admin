@@ -1,6 +1,6 @@
-defmodule Phoenix.LiveAdmin.Resource do
+defmodule LiveAdmin.Resource do
   import Ecto.Query
-  import Phoenix.LiveAdmin, only: [get_config: 2, get_config: 3, repo: 0, parent_associations: 1]
+  import LiveAdmin, only: [get_config: 2, get_config: 3, repo: 0, parent_associations: 1]
 
   alias Ecto.Changeset
 

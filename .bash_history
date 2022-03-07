@@ -18,3 +18,10 @@ exit
 cd assets/
 npx tailwindcss init
 exit
+ls
+cd assets/
+ls
+npm build
+npm run build
+npm install
+exit

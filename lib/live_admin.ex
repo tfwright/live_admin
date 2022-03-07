@@ -1,5 +1,5 @@
-defmodule Phoenix.LiveAdmin do
-  def repo, do: Application.fetch_env!(:phoenix_live_admin, :ecto_repo)
+defmodule LiveAdmin do
+  def repo, do: Application.fetch_env!(:live_admin, :ecto_repo)
 
   def associated_resource(resource, field_name, resources) do
     with %{related: assoc_schema} <-
@@ -39,5 +39,5 @@ defmodule Phoenix.LiveAdmin do
     do: resource |> Module.split() |> Enum.drop(Enum.count(base_path))
 
   def get_config(config, key, default \\ nil),
-    do: Map.get(config, key, Application.get_env(:phoenix_live_admin, key, default))
+    do: Map.get(config, key, Application.get_env(:live_admin, key, default))
 end

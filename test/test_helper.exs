@@ -1,26 +1,26 @@
 pg_url = System.get_env("PG_URL") || "postgres:postgres@127.0.0.1"
 
-Application.put_env(:phoenix_live_admin, Phoenix.LiveAdminTest.Repo,
+Application.put_env(:live_admin, LiveAdminTest.Repo,
   url: "ecto://#{pg_url}/phx_admin_dev",
   pool: Ecto.Adapters.SQL.Sandbox
 )
 
-defmodule Phoenix.LiveAdminTest.Repo do
-  use Ecto.Repo, otp_app: :phoenix_live_admin, adapter: Ecto.Adapters.Postgres
+defmodule LiveAdminTest.Repo do
+  use Ecto.Repo, otp_app: :live_admin, adapter: Ecto.Adapters.Postgres
 end
 
-_ = Ecto.Adapters.Postgres.storage_up(Phoenix.LiveAdminTest.Repo.config())
+_ = Ecto.Adapters.Postgres.storage_up(LiveAdminTest.Repo.config())
 
-Application.put_env(:phoenix_live_admin, Phoenix.LiveAdminTest.Endpoint,
+Application.put_env(:live_admin, LiveAdminTest.Endpoint,
   url: [host: "localhost", port: 4000],
   secret_key_base: "Hu4qQN3iKzTV4fJxhorPQlA/osH9fAMtbtjVS58PFgfw3ja5Z18Q/WSNR9wP4OfW",
   live_view: [signing_salt: "hMegieSe"],
-  render_errors: [view: Phoenix.LiveAdminTest.ErrorView],
+  render_errors: [view: LiveAdminTest.ErrorView],
   check_origin: false,
-  pubsub_server: Phoenix.LiveAdminTest.PubSub
+  pubsub_server: LiveAdminTest.PubSub
 )
 
-defmodule Phoenix.LiveAdminTest.ErrorView do
+defmodule LiveAdminTest.ErrorView do
   use Phoenix.View, root: "test/templates"
 
   def template_not_found(template, _assigns) do
@@ -28,9 +28,9 @@ defmodule Phoenix.LiveAdminTest.ErrorView do
   end
 end
 
-defmodule Phoenix.LiveAdminTest.Router do
+defmodule LiveAdminTest.Router do
   use Phoenix.Router
-  import Phoenix.LiveAdmin.Router
+  import LiveAdmin.Router
 
   pipeline :browser do
     plug(:fetch_session)
@@ -42,7 +42,7 @@ defmodule Phoenix.LiveAdminTest.Router do
     live_admin("/",
       resources: [
         {
-          Phoenix.LiveAdminTest.User,
+          LiveAdminTest.User,
           immutable_fields: [:password], actions: [:run_action]
         }
       ]
@@ -50,8 +50,8 @@ defmodule Phoenix.LiveAdminTest.Router do
   end
 end
 
-defmodule Phoenix.LiveAdminTest.Endpoint do
-  use Phoenix.Endpoint, otp_app: :phoenix_live_admin
+defmodule LiveAdminTest.Endpoint do
+  use Phoenix.Endpoint, otp_app: :live_admin
 
   plug(Plug.Session,
     store: :cookie,
@@ -59,23 +59,23 @@ defmodule Phoenix.LiveAdminTest.Endpoint do
     signing_salt: "/VEDsdfsffMnp5"
   )
 
-  plug(Phoenix.LiveAdminTest.Router)
+  plug(LiveAdminTest.Router)
 end
 
-defmodule Phoenix.LiveAdminTest.User do
+defmodule LiveAdminTest.User do
   use Ecto.Schema
 
   schema "users" do
     field(:name, :string)
     field(:password, :string)
 
-    embeds_one(:settings, Phoenix.LiveAdminTest.Settings)
+    embeds_one(:settings, LiveAdminTest.Settings)
   end
 
   def run_action(%__MODULE__{}, %{}), do: {:ok, "worked"}
 end
 
-defmodule Phoenix.LiveAdminTest.Settings do
+defmodule LiveAdminTest.Settings do
   use Ecto.Schema
 
   embedded_schema do
@@ -85,19 +85,19 @@ end
 
 Application.ensure_all_started(:os_mon)
 
-Application.put_env(:phoenix_live_admin, :ecto_repo, Phoenix.LiveAdminTest.Repo)
+Application.put_env(:live_admin, :ecto_repo, LiveAdminTest.Repo)
 
 Supervisor.start_link(
   [
-    Phoenix.LiveAdminTest.Repo,
-    {Phoenix.PubSub, name: Phoenix.LiveAdminTest.PubSub, adapter: Phoenix.PubSub.PG2},
-    Phoenix.LiveAdminTest.Endpoint
+    LiveAdminTest.Repo,
+    {Phoenix.PubSub, name: LiveAdminTest.PubSub, adapter: Phoenix.PubSub.PG2},
+    LiveAdminTest.Endpoint
   ],
   strategy: :one_for_one
 )
 
-Phoenix.LiveAdminTest.Repo.delete_all(Phoenix.LiveAdminTest.User)
+LiveAdminTest.Repo.delete_all(LiveAdminTest.User)
 
 ExUnit.start()
 
-Ecto.Adapters.SQL.Sandbox.mode(Phoenix.LiveAdminTest.Repo, :manual)
+Ecto.Adapters.SQL.Sandbox.mode(LiveAdminTest.Repo, :manual)

@@ -1,12 +1,12 @@
-defmodule Phoenix.LiveAdmin.Components.Container do
+defmodule LiveAdmin.Components.Container do
   use Phoenix.LiveView
   use Phoenix.HTML
 
-  import Phoenix.LiveAdmin,
+  import LiveAdmin,
     only: [resource_title: 3, get_config: 3]
 
   alias __MODULE__.{Form, Index}
-  alias Phoenix.LiveAdmin.{Resource, SessionStore}
+  alias LiveAdmin.{Resource, SessionStore}
 
   @impl true
   def mount(%{"resource_id" => key}, %{"id" => session_id}, socket) do
@@ -133,7 +133,7 @@ defmodule Phoenix.LiveAdmin.Components.Container do
             <%= link key |> to_string() |> humanize(), to: "#", "data-confirm": "Are you sure?", "phx-click": "task", "phx-value-task": key, class: "resource__action--btn" %>
           <% end %>
           |
-          <%= if Application.get_env(:phoenix_live_admin, :prefix_options) do %>
+          <%= if Application.get_env(:live_admin, :prefix_options) do %>
             <div class="resource__action--drop">
               <button><%= @prefix || "Set prefix" %></button>
               <nav>
@@ -232,7 +232,7 @@ defmodule Phoenix.LiveAdmin.Components.Container do
   end
 
   def get_prefix_options!() do
-    Application.fetch_env!(:phoenix_live_admin, :prefix_options)
+    Application.fetch_env!(:live_admin, :prefix_options)
     |> case do
       {mod, func, args} -> apply(mod, func, args)
       list when is_list(list) -> list

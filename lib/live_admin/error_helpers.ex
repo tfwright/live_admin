@@ -1,4 +1,4 @@
-defmodule Phoenix.LiveAdmin.ErrorHelpers do
+defmodule LiveAdmin.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
   """

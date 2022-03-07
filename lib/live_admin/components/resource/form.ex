@@ -1,14 +1,14 @@
-defmodule Phoenix.LiveAdmin.Components.Container.Form do
+defmodule LiveAdmin.Components.Container.Form do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
   import Phoenix.LiveView.Helpers
-  import Phoenix.LiveAdmin.ErrorHelpers
-  import Phoenix.LiveAdmin, only: [associated_resource: 3, get_config: 3]
-  import Phoenix.LiveAdmin.Components.Container, only: [route_with_params: 2]
+  import LiveAdmin.ErrorHelpers
+  import LiveAdmin, only: [associated_resource: 3, get_config: 3]
+  import LiveAdmin.Components.Container, only: [route_with_params: 2]
 
   alias __MODULE__.SearchSelect
-  alias Phoenix.LiveAdmin.{Resource, SessionStore}
+  alias LiveAdmin.{Resource, SessionStore}
 
   @supported_field_types [
     :string,

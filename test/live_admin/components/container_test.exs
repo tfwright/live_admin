@@ -1,15 +1,15 @@
-defmodule Phoenix.LiveAdmin.Components.ContainerTest do
+defmodule LiveAdmin.Components.ContainerTest do
   use ExUnit.Case, async: true
 
   import Phoenix.ConnTest
   import Phoenix.LiveViewTest
 
-  alias Phoenix.LiveAdminTest.{Repo, User}
+  alias LiveAdminTest.{Repo, User}
 
-  @endpoint Phoenix.LiveAdminTest.Endpoint
+  @endpoint LiveAdminTest.Endpoint
 
   setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Phoenix.LiveAdminTest.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(LiveAdminTest.Repo)
 
     %{conn: build_conn()}
   end
