@@ -20,6 +20,8 @@ Add to your app's `deps`:
 Add the following to your Phoenix router:
 
 ```
+import LiveAdmin.Router
+# ...
 live_admin "/admin", resources: [MyApp.SomeEctoSchema]
 ```
 
