@@ -127,7 +127,7 @@ defmodule Phoenix.LiveAdmin.Components.Container do
         <div>
           <%= live_redirect "List", to: route_with_params(@socket, [:list, @key], prefix: @prefix), class: "resource__action--btn" %>
           <%= if get_config(@config, :create_with, true) do %>
-            <%= live_redirect "New", to: route_with_params(@socket, [:new, @key]), class: "resource__action--btn" %>
+            <%= live_redirect "New", to: route_with_params(@socket, [:new, @key], prefix: @prefix), class: "resource__action--btn" %>
           <% end %>
           <%= for key <- get_task_keys(@config) do %>
             <%= link key |> to_string() |> humanize(), to: "#", "data-confirm": "Are you sure?", "phx-click": "task", "phx-value-task": key, class: "resource__action--btn" %>
