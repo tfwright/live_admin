@@ -11,6 +11,12 @@ Significant features:
 
 ## Installation
 
+Add to your app's `deps`:
+
+```
+{:live_admin, "~> 0.1"}
+```
+
 Add the following to your Phoenix router:
 
 ```
