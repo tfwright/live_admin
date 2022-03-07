@@ -38,7 +38,7 @@ Example:
 config :phoenix_live_admin,
   ecto_repo: MyApp.Repo,
   prefix_options: {MyApp.Accounts, :list_tenant_prefixes, []},
-  immutable_fields: [:id, :created_at, :updated_at],
+  immutable_fields: [:id, :inserted_at, :updated_at],
   label_with: :name
 ```
 

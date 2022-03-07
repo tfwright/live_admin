@@ -4,11 +4,18 @@ defmodule LiveAdmin.MixProject do
   def project do
     [
       app: :live_admin,
+      description: "A admin UI for Phoenix applications built with LiveView",
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      package: [
+        maintainers: ["Thomas Floyd Wright"],
+        licenses: ["Apache-2.0"],
+        links: %{"GitHub" => "https://github.com/tfwright/live_admin"}
+      ],
+      source_url: "https://github.com/tfwright/live_admin"
     ]
   end
 
