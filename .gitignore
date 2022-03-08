@@ -31,3 +31,5 @@ live_admin-*.tar
 # Node artifacts
 /.npm/
 /assets/node_modules/
+
+.bash_history
