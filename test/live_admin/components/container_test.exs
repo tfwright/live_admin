@@ -43,6 +43,26 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
+  describe "resource page with search param" do
+    setup %{conn: conn} do
+      Repo.insert!(%User{name: "Tom"})
+      {:ok, view, html} = live(conn, "/user?s=fred")
+      %{view: view, response: html}
+    end
+
+    test "filters results", %{view: view} do
+      assert render(view) =~ "0 total"
+    end
+
+    test "clears search", %{view: view} do
+      view
+      |> element("button[phx-click='search']")
+      |> render_click()
+
+      assert render(view) =~ "1 total"
+    end
+  end
+
   describe "new resource page" do
     setup %{conn: conn} do
       {:ok, view, html} = live(conn, "/user/new")
