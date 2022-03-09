@@ -30,7 +30,7 @@ defmodule LiveAdmin do
 
   def record_label(record, config) do
     case get_config(config, :label_with, :id) do
-      {m, f, a} -> apply(m, f, [record, a])
+      {m, f, a} -> apply(m, f, [record | a])
       label when is_atom(label) -> Map.fetch!(record, label)
     end
   end

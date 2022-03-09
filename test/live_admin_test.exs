@@ -16,4 +16,8 @@ defmodule LiveAdminTest do
       assert {_, {LiveAdminTest.User, _}} = LiveAdmin.associated_resource(LiveAdminTest.Post, :user_id, [{nil, {LiveAdminTest.User, nil}}])
     end
   end
+
+  describe "record_label/2 when config uses mfa" do
+    assert 1 = LiveAdmin.record_label(%{id: 1}, %{label_with: {Map, :get, [:id]}})
+  end
 end
