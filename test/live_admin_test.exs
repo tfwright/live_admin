@@ -1,27 +1,19 @@
 defmodule LiveAdminTest do
   use ExUnit.Case, async: true
 
-  import Phoenix.ConnTest
-
-  @endpoint LiveAdminTest.Endpoint
-
   setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(LiveAdminTest.Repo)
-
-    %{conn: build_conn()}
+    Ecto.Adapters.SQL.Sandbox.checkout(LiveAdminTest.Repo)
   end
 
-  describe "home page" do
-    setup %{conn: conn} do
-      %{response: conn |> get("/") |> html_response(200)}
+  describe "associated_resource/3 when association schema is not a configured resource" do
+    test "returns nil" do
+      assert is_nil(LiveAdmin.associated_resource(LiveAdminTest.User, :some_id, []))
     end
+  end
 
-    test "routes live view", %{response: response} do
-      assert response =~ ~s|<title>LiveAdmin</title>|
-    end
-
-    test "links to resource", %{response: response} do
-      assert response |> Floki.find("a[href='/user']") |> Enum.any?()
+  describe "associated_resource/3 when association schema is a configured resource" do
+    test "returns the association schema" do
+      assert {_, {LiveAdminTest.User, _}} = LiveAdmin.associated_resource(LiveAdminTest.Post, :user_id, [{nil, {LiveAdminTest.User, nil}}])
     end
   end
 end

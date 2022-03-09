@@ -4,7 +4,7 @@ defmodule LiveAdmin do
   def associated_resource(resource, field_name, resources) do
     with %{related: assoc_schema} <-
            resource |> parent_associations() |> Enum.find(&(&1.owner_key == field_name)),
-         config <- Enum.find(resources, :missing, fn {_, {mod, _}} -> mod == assoc_schema end) do
+         config <- Enum.find(resources, fn {_, {mod, _}} -> mod == assoc_schema end) do
       config
     else
       _ -> nil

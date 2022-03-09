@@ -69,10 +69,20 @@ defmodule LiveAdminTest.User do
     field(:name, :string)
     field(:password, :string)
 
+    belongs_to :other_resource, OtherResource
+
     embeds_one(:settings, LiveAdminTest.Settings)
   end
 
   def run_action(%__MODULE__{}, %{}), do: {:ok, "worked"}
+end
+
+defmodule LiveAdminTest.Post do
+  use Ecto.Schema
+
+  schema "posts" do
+    belongs_to :user, LiveAdminTest.User
+  end
 end
 
 defmodule LiveAdminTest.Settings do
