@@ -35,10 +35,11 @@ Currently supported options:
 
 * `title_with` - a binary or MFA specifying how to identify the resource
 * `label_with` - a binary or MFA specifying how to identify individual records
-* `create_with` - an atom or MFA that identifies the function that implements creating a new record
-* `update_with` - an atom or MFA that identifies the function that implements updating an existing record
 * `list_with` - an atom or MFA that identifies the function that implements listing a resource
-* `validate_with` - an atom or MFA that identifies the function that implements validating an Ecto changeset for the resource
+* `create_with` - an atom or MFA that identifies the function that implements creating a resource
+* `update_with` - an atom or MFA that identifies the function that implements updating a record
+* `delete_with` - an atom or MFA that identifies the function that implements deleting a record
+* `validate_with` - an atom or MFA that identifies the function that implements validating a changed record
 * `hidden_fields` - a list of fields that should not be displayed in the UI
 * `immutable_fields` - a list of fields that should not be editable in forms
 * `actions` - actions to perform on a record
