@@ -1,0 +1,34 @@
+name: CI
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      MIX_ENV: test
+
+    strategy:
+      matrix:
+        elixir: [1.13.1]
+        otp: [24.2.2]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: ${{ matrix.elixir }}
+        otp-version: ${{ matrix.otp }}
+        experimental-otp: true
+    - uses: actions/cache@v2
+      with:
+        path: deps
+        key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+    - name: Build services
+      run: docker-compose build
+    - name: Get deps
+      run: docker-compose run web mix deps.get
+    - name: Run tests
+      run: docker-compose run web mix test
