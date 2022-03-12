@@ -159,13 +159,19 @@
   }
 
   .resource__banner {
-    @apply flex;
+    @apply grid;
+    @apply grid-cols-1;
+    @apply md:grid-cols-2;
     @apply bg-white;
     @apply whitespace-nowrap;
   }
 
   .resource__title {
-    @apply flex-none;
+    @apply flex;
+    @apply items-center;
+    @apply justify-items-center;
+    @apply md:justify-items-end;
+    @apply h-full;
   }
 
   .resource__actions {
@@ -173,7 +179,8 @@
     @apply flex-1;
     @apply items-center;
     @apply grid;
-    @apply justify-items-end;
+    @apply justify-items-center;
+    @apply md:justify-items-end;
     @apply whitespace-nowrap;
   }
 
