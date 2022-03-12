@@ -44,12 +44,11 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def render(assigns) do
     {mod, func, args} =
-      get_in(assigns, [:config, :components, :new]) ||
-        {__MODULE__, :default_render, [SessionStore.lookup(assigns.session_id)]}
+      get_in(assigns, [:config, :components, :new]) || {__MODULE__, :default_render, []}
 
     ~H"""
     <div>
-      <%= apply(mod, func, args ++ [assigns]) %>
+      <%= apply(mod, func, args ++ [SessionStore.lookup(@session_id), assigns]) %>
     </div>
     """
   end
