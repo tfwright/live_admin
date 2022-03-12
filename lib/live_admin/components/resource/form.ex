@@ -44,16 +44,17 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def render(assigns) do
     {mod, func, args} =
-      get_in(assigns, [:config, :components, :new]) || {__MODULE__, :default_render, []}
+      get_in(assigns, [:config, :components, :new]) ||
+        {__MODULE__, :default_render, [SessionStore.lookup(assigns.session_id)]}
 
     ~H"""
     <div>
-      <%= apply(mod, func, [args ++ assigns]) %>
+      <%= apply(mod, func, args ++ [assigns]) %>
     </div>
     """
   end
 
-  def default_render(assigns) do
+  def default_render(session, assigns) do
     ~H"""
     <.form let={f} for={@changeset} as={"params"} phx_change="validate" phx_submit={@action} phx_target={@myself} class="resource__form">
       <%= for {field, type, opts} <- Resource.fields(@resource, @config) do %>
@@ -65,6 +66,7 @@ defmodule LiveAdmin.Components.Container.Form do
           resource={@resource}
           resources={@resources}
           form_ref={@myself}
+          session={session}
         />
       <% end %>
       <div class="form__actions">
@@ -175,6 +177,7 @@ defmodule LiveAdmin.Components.Container.Form do
                 resource={@resource}
                 resources={@resources}
                 form_ref={@form_ref}
+                session={@session}
               />
             <% end %>
           <% end %>
@@ -207,6 +210,7 @@ defmodule LiveAdmin.Components.Container.Form do
         resource={@resource}
         resources={@resources}
         form_ref={@form_ref}
+        session={@session}
       />
       <%= error_tag @form, @field %>
     </div>
@@ -234,6 +238,7 @@ defmodule LiveAdmin.Components.Container.Form do
             resource={resource}
             config={config}
             form_ref={@form_ref}
+            session={@session}
           />
         <% else %>
           <div class="form__number">

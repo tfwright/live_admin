@@ -18,34 +18,16 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def list(resource, config, opts) do
-    opts =
-      opts
-      |> Enum.into(%{})
-      |> Map.put_new(:page, 1)
-      |> Map.put_new(:sort, {:asc, :id})
+  def list(resource, config, opts, session) do
+    config
+    |> get_config(:list_with, :default)
+    |> case do
+      :default ->
+        build_list(resource, config, opts)
 
-    query =
-      resource
-      |> limit(10)
-      |> offset(^((opts[:page] - 1) * 10))
-      |> order_by(^[opts[:sort]])
-      |> preload(^preloads(resource, config))
-
-    query =
-      opts
-      |> Enum.reduce(query, fn
-        {:search, q}, query when byte_size(q) > 0 ->
-          apply_search(query, q, fields(resource, config))
-
-        _, query ->
-          query
-      end)
-
-    {
-      repo().all(query, prefix: opts[:prefix]),
-      repo().aggregate(query |> exclude(:limit) |> exclude(:offset), :count, prefix: opts[:prefix])
-    }
+      {mod, func_name, args} ->
+        apply(mod, func_name, [resource, opts, session] ++ args)
+    end
   end
 
   def put_change(changeset, field, value) do
@@ -117,6 +99,36 @@ defmodule LiveAdmin.Resource do
           []
       end
     end)
+  end
+
+  defp build_list(resource, config, opts) do
+    opts =
+      opts
+      |> Enum.into(%{})
+      |> Map.put_new(:page, 1)
+      |> Map.put_new(:sort, {:asc, :id})
+
+    query =
+      resource
+      |> limit(10)
+      |> offset(^((opts[:page] - 1) * 10))
+      |> order_by(^[opts[:sort]])
+      |> preload(^preloads(resource, config))
+
+    query =
+      opts
+      |> Enum.reduce(query, fn
+        {:search, q}, query when byte_size(q) > 0 ->
+          apply_search(query, q, fields(resource, config))
+
+        _, query ->
+          query
+      end)
+
+    {
+      repo().all(query, prefix: opts[:prefix]),
+      repo().aggregate(query |> exclude(:limit) |> exclude(:offset), :count, prefix: opts[:prefix])
+    }
   end
 
   defp apply_search(query, q, fields) do

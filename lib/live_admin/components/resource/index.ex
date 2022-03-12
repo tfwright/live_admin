@@ -17,7 +17,8 @@ defmodule LiveAdmin.Components.Container.Index do
           Resource.list(
             assigns.resource,
             assigns.config,
-            Map.take(assigns, [:prefix, :sort, :page, :search])
+            Map.take(assigns, [:prefix, :sort, :page, :search]),
+            SessionStore.lookup(assigns.session_id)
           ),
         sort_attr: elem(assigns.sort, 1),
         sort_dir: elem(assigns.sort, 0)

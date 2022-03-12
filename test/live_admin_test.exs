@@ -13,7 +13,10 @@ defmodule LiveAdminTest do
 
   describe "associated_resource/3 when association schema is a configured resource" do
     test "returns the association schema" do
-      assert {_, {LiveAdminTest.User, _}} = LiveAdmin.associated_resource(LiveAdminTest.Post, :user_id, [{nil, {LiveAdminTest.User, nil}}])
+      assert {_, {LiveAdminTest.User, _}} =
+               LiveAdmin.associated_resource(LiveAdminTest.Post, :user_id, [
+                 {nil, {LiveAdminTest.User, nil}}
+               ])
     end
   end
 
