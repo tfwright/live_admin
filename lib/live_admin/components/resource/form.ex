@@ -115,8 +115,8 @@ defmodule LiveAdmin.Components.Container.Form do
           |> put_flash(:info, "Created #{resource}")
           |> push_redirect(to: route_with_params(socket, [:list, key]))
 
-        {:error, _} ->
-          put_flash(socket, :error, "Could not create #{resource}")
+        {:error, changeset} ->
+          assign(socket, changeset: changeset)
       end
 
     {:noreply, socket}
@@ -148,8 +148,8 @@ defmodule LiveAdmin.Components.Container.Form do
           |> put_flash(:info, "Updated #{resource}")
           |> push_redirect(to: route_with_params(socket, [:list, key]))
 
-        {:error, _} ->
-          put_flash(socket, :error, "Could not update #{resource}")
+        {:error, changeset} ->
+          assign(socket, changeset: changeset)
       end
 
     {:noreply, socket}
