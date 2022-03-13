@@ -7,10 +7,10 @@ defmodule LiveAdmin.Components.Container.Form do
   import LiveAdmin, only: [associated_resource: 3, get_config: 3]
   import LiveAdmin.Components.Container, only: [route_with_params: 2]
 
-  alias __MODULE__.SearchSelect
+  alias __MODULE__.{ArrayInput, SearchSelect}
   alias LiveAdmin.{Resource, SessionStore}
 
-  @supported_field_types [
+  @supported_primitive_types [
     :string,
     :boolean,
     :date,
@@ -155,10 +155,12 @@ defmodule LiveAdmin.Components.Container.Form do
     {:noreply, socket}
   end
 
-  defp field(assigns = %{type: type}) when type in @supported_field_types,
+  defp field(assigns = %{type: type}) when type in @supported_primitive_types,
     do: field_group(assigns)
 
   defp field(assigns = %{type: {_, Ecto.Enum, _}}), do: field_group(assigns)
+
+  defp field(assigns = %{type: {:array, :string}}), do: field_group(assigns)
 
   defp field(assigns = %{type: {_, Ecto.Embedded, _}}) do
     ~H"""
@@ -246,6 +248,19 @@ defmodule LiveAdmin.Components.Container.Form do
         <% end %>
         """
     end
+  end
+
+  defp input(assigns = %{type: {:array, :string}}) do
+    ~H"""
+    <.live_component
+      module={ArrayInput}
+      id={assigns.field}
+      form={@form}
+      field={@field}
+      disabled={@disabled}
+      form_ref={@form_ref}
+    />
+    """
   end
 
   defp input(assigns = %{type: :string}) do

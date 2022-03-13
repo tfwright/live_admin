@@ -9,7 +9,8 @@ create table users (
   private_data jsonb,
   password text,
   status varchar(100),
-  other_resource_id int
+  other_resource_id int,
+  tags jsonb
 );
 
 create table posts (
@@ -33,7 +34,8 @@ create table alt.users (
   private_data jsonb,
   password text,
   status varchar(100),
-  other_resource_id int
+  other_resource_id int,
+  tags jsonb
 );
 
 create table alt.posts (

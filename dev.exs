@@ -85,6 +85,7 @@ defmodule Demo.Accounts.User do
     field :private_data, :map
     field :password, :string
     field :status, Ecto.Enum, values: [:active, :suspended]
+    field :tags, {:array, :string}, default: []
 
     embeds_one :settings, Demo.Accounts.User.Settings
 

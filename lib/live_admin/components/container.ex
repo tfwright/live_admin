@@ -174,7 +174,7 @@ defmodule LiveAdmin.Components.Container do
     ~H"""
     <.live_component
       module={Form}
-      id="create-form"
+      id="form"
       resource={@resource}
       config={@config}
       changeset={changeset}
@@ -190,7 +190,7 @@ defmodule LiveAdmin.Components.Container do
     ~H"""
     <.live_component
       module={Form}
-      id="edit-form"
+      id="form"
       resource={@resource}
       config={@config}
       action="update"
