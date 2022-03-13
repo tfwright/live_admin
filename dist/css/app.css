@@ -1114,10 +1114,6 @@ select:focus {
   position: relative;
 }
 
-.mr-2 {
-  margin-right: 0.5rem;
-}
-
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -1138,10 +1134,6 @@ select:focus {
   height: 1.5rem;
 }
 
-.h-4 {
-  height: 1rem;
-}
-
 .w-60 {
   width: 15rem;
 }
@@ -1152,10 +1144,6 @@ select:focus {
 
 .w-full {
   width: 100%;
-}
-
-.w-4 {
-  width: 1rem;
 }
 
 .transform {
