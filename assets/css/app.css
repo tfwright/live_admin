@@ -170,8 +170,9 @@
     @apply grid;
     @apply items-center;
     @apply justify-items-center;
-    @apply md:justify-items-start;
+    @apply md:justify-items-end;
     @apply h-full;
+    direction: rtl;
   }
 
   .resource__actions {
