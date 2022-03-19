@@ -177,32 +177,30 @@ defmodule LiveAdmin.Components.Container.Index do
     {:noreply, socket}
   end
 
-  def display_field(record = %resource{}, field_name, assigns) do
-    field_val = Map.fetch!(record, field_name)
-
-    with field_val when not is_nil(field_val) <- field_val,
-         {key, {_, config}} <- associated_resource(resource, field_name, assigns.resources),
-         assoc_name when not is_nil(assoc_name) <-
-           Enum.find(resource.__schema__(:associations), fn assoc_name ->
-             case resource.__schema__(:association, assoc_name) do
-               %{owner_key: ^field_name, relationship: :parent} -> assoc_name
-               _ -> nil
-             end
-           end) do
-      record
-      |> repo().preload(assoc_name)
-      |> Map.fetch!(assoc_name)
+  defp display_field(record = %schema{}, field_name, assigns) do
+    with {key, {_, config}} <-
+           associated_resource(schema, field_name, assigns.resources),
+         assoc_name <- get_assoc_name!(schema, field_name),
+         %{^assoc_name => assoc_record} when not is_nil(assoc_record) <-
+           repo().preload(record, assoc_name) do
+      assoc_record
       |> record_label(config)
       |> live_redirect(
-        to: route_with_params(assigns.socket, [:edit, key, field_val], prefix: assigns.prefix),
+        to: route_with_params(assigns.socket, [:edit, key, assoc_record], prefix: assigns.prefix),
         class: "resource__action--btn"
       )
     else
-      _ -> inspect(field_val)
+      _ -> record |> Map.fetch!(field_name) |> inspect()
     end
   end
 
-  def list_link(socket, content, key, params, opts \\ []),
+  defp list_link(socket, content, key, params, opts \\ []),
     do:
       live_patch(content, Keyword.put(opts, :to, route_with_params(socket, [:list, key], params)))
+
+  defp get_assoc_name!(schema, fk) do
+    Enum.find(schema.__schema__(:associations), fn assoc_name ->
+      fk == schema.__schema__(:association, assoc_name).owner_key
+    end)
+  end
 end
