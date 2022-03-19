@@ -167,10 +167,10 @@
   }
 
   .resource__title {
-    @apply flex;
+    @apply grid;
     @apply items-center;
     @apply justify-items-center;
-    @apply md:justify-items-end;
+    @apply md:justify-items-start;
     @apply h-full;
   }
 

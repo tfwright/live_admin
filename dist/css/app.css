@@ -660,14 +660,14 @@ select:focus {
 }
 
 .resource__title {
-  display: flex;
+  display: grid;
   align-items: center;
   justify-items: center;
 }
 
 @media (min-width: 768px) {
   .resource__title {
-    justify-items: end;
+    justify-items: start;
   }
 }
 
