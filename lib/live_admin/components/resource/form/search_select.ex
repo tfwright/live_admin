@@ -60,7 +60,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
             <%= record_label(@selected_option, @config) %>
           </a>
         <% else %>
-          <%= text_input :search, :select, disabled: @disabled, placeholder: "Search", phx_focus: "load_options", phx_keyup: "load_options", phx_target: @myself, phx_debounce: 200 %>
+          <%= text_input :search, :select, id: input_id(@form, @field) <> "search_select", disabled: @disabled, placeholder: "Search", phx_focus: "load_options", phx_keyup: "load_options", phx_target: @myself, phx_debounce: 200 %>
         <% end %>
         <%= unless @selected_option do %>
           <nav>
