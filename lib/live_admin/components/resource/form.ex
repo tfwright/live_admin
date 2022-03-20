@@ -46,6 +46,8 @@ defmodule LiveAdmin.Components.Container.Form do
     {mod, func, args} =
       get_in(assigns, [:config, :components, :new]) || {__MODULE__, :default_render, []}
 
+    assigns = assign(assigns, form_ref: assigns.myself)
+
     ~H"""
     <div>
       <%= apply(mod, func, args ++ [SessionStore.lookup(@session_id), assigns]) %>
@@ -64,7 +66,7 @@ defmodule LiveAdmin.Components.Container.Form do
           immutable={Keyword.get(opts, :immutable, false)}
           resource={@resource}
           resources={@resources}
-          form_ref={@myself}
+          form_ref={@form_ref}
           session={session}
         />
       <% end %>
