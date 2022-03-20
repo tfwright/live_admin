@@ -194,7 +194,7 @@ defmodule LiveAdmin.Components.Container.Index do
     end
   end
 
-  defp list_link(socket, content, key, params, opts \\ []),
+  defp list_link(socket, content, key, params, opts),
     do:
       live_patch(content, Keyword.put(opts, :to, route_with_params(socket, [:list, key], params)))
 
