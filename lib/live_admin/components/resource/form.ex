@@ -170,7 +170,7 @@ defmodule LiveAdmin.Components.Container.Form do
       <h2 class="embed__title"><%= @field %></h2>
       <div class="embed__group">
         <%= unless @immutable do %>
-          <%= inputs_for @form, @field, fn fp -> %>
+          <%= for fp <- inputs_for(@form, @field) do %>
             <%= for {field, type, _} <- fields_for_embed(@type) do %>
               <.field
                 field={field}
