@@ -30,9 +30,11 @@ import LiveAdmin.Router
 live_admin "/admin", resources: [MyApp.SomeEctoSchema]
 ```
 
+See `LiveAdmin.Router.live_admin/2` for full list of options.
+
 To customize a resource, pass a two element tuple when the schema module as the first element, and a keyword list of options is the second: `{MyApp.SomeEctoSchema, opts}`
 
-Currently supported options:
+Resource specific options:
 
 * `title_with` - a binary or MFA specifying how to identify the resource
 * `label_with` - a binary or MFA specifying how to identify individual records

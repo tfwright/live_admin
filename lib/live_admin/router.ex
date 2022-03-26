@@ -1,6 +1,18 @@
 defmodule LiveAdmin.Router do
   import Phoenix.LiveView, only: [assign: 2]
 
+  @doc """
+  Defines a route that can be used to access the Admin UI for all configured resources.
+
+  ## Arguments
+
+  * `:path` - Defines a scope to be added to the router under which the resources will be grouped in a single live session
+  * `:opts` - Opts for the Admin UI added at configured path
+    * `:resources` - A list of Ecto schema modules to be exposed in the UI
+    * `:title` - Title for the UI home view (Default: 'LiveAdmin')
+    * `:components` - A list of UI level component overrides
+      * `:home` - Override for the view loaded at the base path, before the user navigates to a specific resource
+  """
   defmacro live_admin(path, opts) do
     resources = Keyword.get(opts, :resources, [])
     title = Keyword.get(opts, :title, "LiveAdmin")

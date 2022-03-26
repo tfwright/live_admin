@@ -4,6 +4,7 @@ defmodule LiveAdmin.MixProject do
   def project do
     [
       app: :live_admin,
+      name: "LiveAdmin",
       description: "A admin UI for Phoenix applications built with LiveView",
       version: "0.2.0",
       elixir: "~> 1.11",
@@ -16,7 +17,11 @@ defmodule LiveAdmin.MixProject do
         links: %{"GitHub" => "https://github.com/tfwright/live_admin"},
         files: ~w(lib .formatter.exs mix.exs README* dist)
       ],
-      source_url: "https://github.com/tfwright/live_admin"
+      source_url: "https://github.com/tfwright/live_admin",
+      docs: [
+        main: "readme",
+        extras: ["README.md"]
+      ]
     ]
   end
 
