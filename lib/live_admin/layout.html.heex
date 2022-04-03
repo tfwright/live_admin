@@ -7,14 +7,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="data:;base64,=">
+    <title><%= @title %></title>
     <style><%= raw(render("app.css")) %></style>
     <%= csrf_meta_tag() %>
-    <%= if assigns[:page_title] do %>
-      <%= live_title_tag @page_title %>
-    <% else %>
-      <title><%= @title %></title>
-    <% end %>
-
     <link rel="manifest" href="/manifest.json ">
   </head>
   <body>
