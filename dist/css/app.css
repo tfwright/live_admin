@@ -423,6 +423,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   display: none;
 }
 
+* {
+  background-color: inherit;
+}
+
 h1 {
   font-size: 1.875rem;
   line-height: 2.25rem;
@@ -442,8 +446,6 @@ h1 {
 
 input, textarea {
   position: relative;
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
   border-radius: 0.25rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -468,16 +470,10 @@ select {
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
-  --tw-text-opacity: 1;
-  color: rgb(55 65 81 / var(--tw-text-opacity));
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
   background-clip: padding-box;
   background-repeat: no-repeat;
   border-width: 1px;
   border-style: solid;
-  --tw-border-opacity: 1;
-  border-color: rgb(209 213 219 / var(--tw-border-opacity));
   border-radius: 0.25rem;
   transition-property: color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
@@ -487,12 +483,6 @@ select {
 }
 
 select:focus {
-  --tw-text-opacity: 1;
-  color: rgb(55 65 81 / var(--tw-text-opacity));
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
-  --tw-border-opacity: 1;
-  border-color: rgb(37 99 235 / var(--tw-border-opacity));
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
@@ -516,6 +506,10 @@ select:focus {
   --tw-ring-shadow: 0 0 #0000;
   --tw-shadow: 0 0 #0000;
   --tw-shadow-colored: 0 0 #0000;
+}
+
+.disabled {
+  opacity: 0.3;
 }
 
 .drop::before {
@@ -542,8 +536,6 @@ select:focus {
 }
 
 .nav {
-  --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
   width: 20%;
   padding: 1rem;
 }
@@ -563,11 +555,6 @@ select:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.nav__item a:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(165 180 252 / var(--tw-bg-opacity));
 }
 
 .nav__item a {
@@ -654,8 +641,6 @@ select:focus {
 }
 
 .resource__banner {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
   white-space: nowrap;
 }
 
@@ -709,26 +694,15 @@ select:focus {
   margin: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  --tw-text-opacity: 1;
-  color: rgb(224 231 255 / var(--tw-text-opacity));
   transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-  --tw-bg-opacity: 1;
-  background-color: rgb(67 56 202 / var(--tw-bg-opacity));
-}
-
-.resource__action--btn:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(55 48 163 / var(--tw-bg-opacity));
-}
-
-.resource__action--btn {
   border-radius: 0.5rem;
   position: relative;
   white-space: nowrap;
+  border-width: 1px;
 }
 
 .resource__action--disabled {
@@ -739,36 +713,28 @@ select:focus {
   margin: 0.5rem;
   white-space: nowrap;
   border-radius: 0.5rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(67 56 202 / var(--tw-bg-opacity));
+  border-width: 1px;
   padding-left: 1rem;
   padding-right: 1rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  --tw-text-opacity: 1;
-  color: rgb(224 231 255 / var(--tw-text-opacity));
   transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+  background-color: rgb(67, 56, 202);
+  border-color: rgb(67, 56, 202);
+  color: rgb(243 244 246);
 }
 
 .resource__action--disabled:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(55 48 163 / var(--tw-bg-opacity));
+  background-color: rgb(55 48 163);
+  border-color: rgb(67, 56, 202);
 }
 
 .resource__action--disabled {
-  --tw-text-opacity: 1;
-  color: rgb(55 65 81 / var(--tw-text-opacity));
-  --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
-}
-
-.resource__action--disabled:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+  opacity: 0.3;
 }
 
 .resource__action--drop {
@@ -786,24 +752,24 @@ select:focus {
   margin: 0.5rem;
   white-space: nowrap;
   border-radius: 0.5rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(67 56 202 / var(--tw-bg-opacity));
+  border-width: 1px;
   padding-left: 1rem;
   padding-right: 1rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  --tw-text-opacity: 1;
-  color: rgb(224 231 255 / var(--tw-text-opacity));
   transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+  background-color: rgb(67, 56, 202);
+  border-color: rgb(67, 56, 202);
+  color: rgb(243 244 246);
 }
 
 .resource__action--drop button:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(55 48 163 / var(--tw-bg-opacity));
+  background-color: rgb(55 48 163);
+  border-color: rgb(67, 56, 202);
 }
 
 .resource__action--drop button {
@@ -818,10 +784,6 @@ select:focus {
   position: absolute;
   top: 100%;
   left: 0px;
-  --tw-text-opacity: 1;
-  color: rgb(0 0 0 / var(--tw-text-opacity));
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
   border-width: 1px;
   border-radius: 0.375rem;
   width: 100%;
@@ -841,13 +803,9 @@ select:focus {
 }
 
 .resource__error {
-  --tw-text-opacity: 1;
-  color: rgb(239 68 68 / var(--tw-text-opacity));
   padding: 0.5rem;
   border-width: 1px;
   border-radius: 0.375rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 226 226 / var(--tw-bg-opacity));
 }
 
 .flash > p:empty {
@@ -858,8 +816,6 @@ select:focus {
   padding: 0.5rem;
   border-width: 1px;
   border-radius: 0.375rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(219 234 254 / var(--tw-bg-opacity));
 }
 
 .resource__list {
@@ -883,8 +839,6 @@ select:focus {
 }
 
 .resource__header {
-  --tw-bg-opacity: 1;
-  background-color: rgb(224 231 255 / var(--tw-bg-opacity));
   border-width: 1px;
   text-align: left;
   padding-left: 2rem;
@@ -951,66 +905,87 @@ select:focus {
 
 .form__save {
   display: inline-flex;
-  align-items: center;
   height: 2rem;
+  align-items: center;
+  position: relative;
+  margin: 0.5rem;
+  white-space: nowrap;
+  border-radius: 0.5rem;
+  border-width: 1px;
   padding-left: 1rem;
   padding-right: 1rem;
-  margin: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  --tw-text-opacity: 1;
-  color: rgb(224 231 255 / var(--tw-text-opacity));
   transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-  --tw-bg-opacity: 1;
-  background-color: rgb(67 56 202 / var(--tw-bg-opacity));
-  border-radius: 0.5rem;
+  background-color: rgb(67, 56, 202);
+  border-color: rgb(67, 56, 202);
+  color: rgb(243 244 246);
 }
 
 .form__save:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(55 48 163 / var(--tw-bg-opacity));
+  background-color: rgb(55 48 163);
+  border-color: rgb(67, 56, 202);
 }
 
 .form__save--disabled {
+  position: relative;
+  white-space: nowrap;
+  border-width: 1px;
   margin: 0.5rem;
   display: inline-flex;
   height: 2rem;
   align-items: center;
   border-radius: 0.5rem;
-  --tw-bg-opacity: 1;
-  background-color: rgb(67 56 202 / var(--tw-bg-opacity));
   padding-left: 1rem;
   padding-right: 1rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  --tw-text-opacity: 1;
-  color: rgb(224 231 255 / var(--tw-text-opacity));
   transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+  background-color: rgb(67, 56, 202);
+  border-color: rgb(67, 56, 202);
+  color: rgb(243 244 246);
 }
 
 .form__save--disabled:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(55 48 163 / var(--tw-bg-opacity));
+  background-color: rgb(55 48 163);
+  border-color: rgb(67, 56, 202);
 }
 
 .form__save--disabled {
-  --tw-text-opacity: 1;
-  color: rgb(55 65 81 / var(--tw-text-opacity));
-  --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+  opacity: 0.3;
+  display: inline-flex;
+  height: 2rem;
+  align-items: center;
+  position: relative;
+  margin: 0.5rem;
+  white-space: nowrap;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  background-color: rgb(67, 56, 202);
+  border-color: rgb(67, 56, 202);
+  color: rgb(243 244 246);
 }
 
 .form__save--disabled:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+  background-color: rgb(55 48 163);
+  border-color: rgb(67, 56, 202);
 }
 
 .embed__title {
@@ -1034,20 +1009,11 @@ select:focus {
   margin-bottom: 1rem;
 }
 
-.disabled {
-  --tw-text-opacity: 1;
-  color: rgb(229 231 235 / var(--tw-text-opacity));
-}
-
 .field__group--disabled {
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
-}
-
-.field__group--disabled * {
-  --tw-text-opacity: 1;
-  color: rgb(229 231 235 / var(--tw-text-opacity));
+  opacity: 0.3;
 }
 
 .field__label {
@@ -1111,10 +1077,6 @@ select:focus {
   margin-left: 0.25rem;
 }
 
-.relative {
-  position: relative;
-}
-
 .mb-2 {
   margin-bottom: 0.5rem;
 }
@@ -1171,25 +1133,8 @@ select:focus {
   border-width: 0px;
 }
 
-.border {
-  border-width: 1px;
-}
-
 .border-l {
   border-left-width: 1px;
-}
-
-.border-solid {
-  border-style: solid;
-}
-
-.bg-white {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
-}
-
-.bg-clip-padding {
-  background-clip: padding-box;
 }
 
 .p-2 {
@@ -1228,17 +1173,34 @@ select:focus {
   transition-duration: 150ms;
 }
 
-.focus\:border-blue-600:focus {
-  --tw-border-opacity: 1;
-  border-color: rgb(37 99 235 / var(--tw-border-opacity));
+body {
+  background-color: #FFF;
 }
 
-.focus\:bg-white:focus {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+.nav {
+  background-color: rgb(243 244 246);
 }
 
-.focus\:text-gray-700:focus {
-  --tw-text-opacity: 1;
-  color: rgb(55 65 81 / var(--tw-text-opacity));
+.resource__action--btn {
+  background-color: rgb(67, 56, 202);
+  border-color: rgb(67, 56, 202);
+  color: rgb(243 244 246);
+}
+
+.resource__action--btn:hover {
+  background-color: rgb(55 48 163);
+  border-color: rgb(67, 56, 202);
+}
+
+.resource__header {
+  background-color: rgb(224 231 255);
+}
+
+.nav a:hover {
+  background-color: rgb(165 180 252);
+}
+
+.resource__error {
+  border-color: rgb(239, 68, 68);
+  color: rgb(239, 68, 68);
 }
