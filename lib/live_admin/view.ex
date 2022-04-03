@@ -18,7 +18,7 @@ defmodule LiveAdmin.View do
   @app_css File.read!(css_path)
 
   def render("app.js", _), do: @app_js
-  def render("app.css", _), do: @app_css
+  def render("app.css", _), do: @app_css <> Application.get_env(:live_admin, :css_overrides, "")
 
   def render_nav_menu(resources, socket, base_path) do
     Enum.reduce(resources, %{}, fn resource = {_, {schema, _}}, groups ->
