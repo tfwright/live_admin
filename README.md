@@ -54,7 +54,7 @@ Resource specific options:
 * `ecto_repo` - the Ecto repo to use for db operations
 * `prefix_options` - a list or MFA specifying `prefix` options to be passed to Ecto functions
 
-In addition, most resource configuration can be set here in order to set a global default to apply to all resources unless overriden in their individual config.
+In addition, most resource configuration can be set here in order to set a global default to apply to all resources unless overridden in their individual config.
 
 Example:
 
