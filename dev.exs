@@ -87,7 +87,7 @@ defmodule Demo.Accounts.User do
     field :status, Ecto.Enum, values: [:active, :suspended]
     field :tags, {:array, :string}, default: []
 
-    embeds_one :settings, Demo.Accounts.User.Settings
+    embeds_one :settings, Demo.Accounts.User.Settings, on_replace: :delete
 
     has_many :posts, Demo.Posts.Post
 
