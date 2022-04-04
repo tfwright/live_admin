@@ -1,0 +1,31 @@
+body {
+  background-color: #FFF;
+}
+
+.nav {
+  background-color: rgb(243 244 246);
+}
+
+.resource__action--btn {
+  background-color: rgb(67, 56, 202);
+  border-color: rgb(67, 56, 202);
+  color: rgb(243 244 246);
+}
+
+.resource__action--btn:hover {
+  background-color: rgb(55 48 163);
+  border-color: rgb(67, 56, 202);
+}
+
+.resource__header {
+  background-color: rgb(224 231 255);
+}
+
+.nav a:hover {
+  background-color: rgb(165 180 252);
+}
+
+.resource__error {
+  border-color: rgb(239, 68, 68);
+  color: rgb(239, 68, 68);
+}

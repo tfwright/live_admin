@@ -723,17 +723,6 @@ select:focus {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-  background-color: rgb(67, 56, 202);
-  border-color: rgb(67, 56, 202);
-  color: rgb(243 244 246);
-}
-
-.resource__action--disabled:hover {
-  background-color: rgb(55 48 163);
-  border-color: rgb(67, 56, 202);
-}
-
-.resource__action--disabled {
   opacity: 0.3;
 }
 
@@ -742,38 +731,6 @@ select:focus {
   height: 2rem;
   align-items: center;
   position: relative;
-}
-
-.resource__action--drop button {
-  display: inline-flex;
-  height: 2rem;
-  align-items: center;
-  position: relative;
-  margin: 0.5rem;
-  white-space: nowrap;
-  border-radius: 0.5rem;
-  border-width: 1px;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-  background-color: rgb(67, 56, 202);
-  border-color: rgb(67, 56, 202);
-  color: rgb(243 244 246);
-}
-
-.resource__action--drop button:hover {
-  background-color: rgb(55 48 163);
-  border-color: rgb(67, 56, 202);
-}
-
-.resource__action--drop button {
-  text-align: center;
 }
 
 .resource__action--drop nav {
@@ -921,42 +878,6 @@ select:focus {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-  background-color: rgb(67, 56, 202);
-  border-color: rgb(67, 56, 202);
-  color: rgb(243 244 246);
-}
-
-.form__save:hover {
-  background-color: rgb(55 48 163);
-  border-color: rgb(67, 56, 202);
-}
-
-.form__save--disabled {
-  position: relative;
-  white-space: nowrap;
-  border-width: 1px;
-  margin: 0.5rem;
-  display: inline-flex;
-  height: 2rem;
-  align-items: center;
-  border-radius: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-  background-color: rgb(67, 56, 202);
-  border-color: rgb(67, 56, 202);
-  color: rgb(243 244 246);
-}
-
-.form__save--disabled:hover {
-  background-color: rgb(55 48 163);
-  border-color: rgb(67, 56, 202);
 }
 
 .form__save--disabled {
@@ -978,14 +899,6 @@ select:focus {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-  background-color: rgb(67, 56, 202);
-  border-color: rgb(67, 56, 202);
-  color: rgb(243 244 246);
-}
-
-.form__save--disabled:hover {
-  background-color: rgb(55 48 163);
-  border-color: rgb(67, 56, 202);
 }
 
 .embed__title {
@@ -1171,36 +1084,4 @@ select:focus {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
-}
-
-body {
-  background-color: #FFF;
-}
-
-.nav {
-  background-color: rgb(243 244 246);
-}
-
-.resource__action--btn {
-  background-color: rgb(67, 56, 202);
-  border-color: rgb(67, 56, 202);
-  color: rgb(243 244 246);
-}
-
-.resource__action--btn:hover {
-  background-color: rgb(55 48 163);
-  border-color: rgb(67, 56, 202);
-}
-
-.resource__header {
-  background-color: rgb(224 231 255);
-}
-
-.nav a:hover {
-  background-color: rgb(165 180 252);
-}
-
-.resource__error {
-  border-color: rgb(239, 68, 68);
-  color: rgb(239, 68, 68);
 }
