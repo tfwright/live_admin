@@ -71,7 +71,7 @@ defmodule LiveAdmin.Components.Container.Form do
         />
       <% end %>
       <div class="form__actions">
-        <%= submit "Save", class: "form__save#{if !@enabled, do: "--disabled"}", disabled: !@enabled %>
+        <%= submit "Save", class: "resource__action#{if !@enabled, do: "--disabled", else: "--btn"}", disabled: !@enabled %>
       </div>
     </.form>
     """

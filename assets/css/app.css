@@ -310,24 +310,6 @@
     @apply text-right;
   }
 
-  .form__save {
-    @apply inline-flex;
-    @apply items-center;
-    @apply h-8;
-    @apply px-4;
-    @apply m-2;
-    @apply text-sm;
-    @apply transition-colors;
-    @apply duration-150;
-    @apply rounded-lg;
-    @apply resource__action--btn;
-  }
-
-  .form__save--disabled {
-    @apply form__save;
-    @apply resource__action--disabled;
-  }
-
   .embed__title {
     @apply mb-2;
     @apply uppercase;
