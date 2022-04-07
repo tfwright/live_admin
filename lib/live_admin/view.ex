@@ -10,23 +10,20 @@ defmodule LiveAdmin.View do
 
   js_path = Path.join(__DIR__, "../../dist/js/app.js")
   css_path = Path.join(__DIR__, "../../dist/css/app.css")
+  default_css_overrides_path = Path.join(__DIR__, "../../dist/css/default_overrides.css")
 
   @external_resource js_path
   @external_resource css_path
+  @external_resource default_css_overrides_path
 
   @app_js File.read!(js_path)
   @app_css File.read!(css_path)
+  @default_css_overrides File.read!(default_css_overrides_path)
 
   def render("app.js", _), do: @app_js
 
   def render("app.css", _),
-    do:
-      @app_css <>
-        Application.get_env(
-          :live_admin,
-          :css_overrides,
-          File.read!(Path.join(__DIR__, "../../dist/css/default_overrides.css"))
-        )
+    do: @app_css <> Application.get_env(:live_admin, :css_overrides, @default_css_overrides)
 
   def render_nav_menu(resources, socket, base_path) do
     Enum.reduce(resources, %{}, fn resource = {_, {schema, _}}, groups ->
