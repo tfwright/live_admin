@@ -303,7 +303,7 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp input(assigns = %{type: {_, Ecto.Enum, %{mappings: mappings}}}) do
     ~H"""
-    <%= select @form, @field, mappings, disabled: @disabled, class: "field__select" %>
+    <%= select @form, @field, [nil | Keyword.keys(mappings)], disabled: @disabled, class: "field__select" %>
     """
   end
 
