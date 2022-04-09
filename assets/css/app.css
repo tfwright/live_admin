@@ -256,6 +256,19 @@
     @apply m-1;
   }
 
+  .list__search input {
+    @apply px-4;
+    @apply py-1;
+    @apply w-60;
+    @apply border-0;
+    @apply h-8;
+  }
+
+  .list__search svg {
+    @apply w-5;
+    @apply h-5;
+  }
+
   .resource__table {
     @apply p-2;
     @apply m-1;
