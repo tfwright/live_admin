@@ -57,7 +57,15 @@ defmodule LiveAdmin.Components.Container.Form do
 
   def default_render(session, assigns) do
     ~H"""
-    <.form let={f} for={@changeset} as={"params"} phx_change="validate" phx_submit={@action} phx_target={@myself} class="resource__form">
+    <.form
+      let={f}
+      for={@changeset}
+      as="params"
+      phx_change="validate"
+      phx_submit={@action}
+      phx_target={@myself}
+      class="resource__form"
+    >
       <%= for {field, type, opts} <- Resource.fields(@resource, @config) do %>
         <.field
           field={field}
@@ -71,7 +79,10 @@ defmodule LiveAdmin.Components.Container.Form do
         />
       <% end %>
       <div class="form__actions">
-        <%= submit "Save", class: "resource__action#{if !@enabled, do: "--disabled", else: "--btn"}", disabled: !@enabled %>
+        <%= submit("Save",
+          class: "resource__action#{if !@enabled, do: "--disabled", else: "--btn"}",
+          disabled: !@enabled
+        ) %>
       </div>
     </.form>
     """
@@ -194,9 +205,9 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp field(assigns) do
     ~H"""
-    <div class={"field__group--disabled"}>
-      <%= label @form, @field, class: "field__label" %>
-      <%= textarea @form, @field, disabled: true, value: @form |> input_value(@field) |> inspect() %>
+    <div class="field__group--disabled">
+      <%= label(@form, @field, class: "field__label") %>
+      <%= textarea(@form, @field, disabled: true, value: @form |> input_value(@field) |> inspect()) %>
     </div>
     """
   end
@@ -204,7 +215,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp field_group(assigns) do
     ~H"""
     <div class={"field__group#{if @immutable, do: "--disabled"}"}>
-      <%= label @form, @field, class: "field__label" %>
+      <%= label(@form, @field, class: "field__label") %>
       <.input
         form={@form}
         type={@type}
@@ -215,7 +226,7 @@ defmodule LiveAdmin.Components.Container.Form do
         form_ref={@form_ref}
         session={@session}
       />
-      <%= error_tag @form, @field %>
+      <%= error_tag(@form, @field) %>
     </div>
     """
   end
@@ -226,7 +237,7 @@ defmodule LiveAdmin.Components.Container.Form do
     |> case do
       nil ->
         ~H"""
-        <%= textarea @form, @field, rows: 1, class: "field__text", disabled: @disabled %>
+        <%= textarea(@form, @field, rows: 1, class: "field__text", disabled: @disabled) %>
         """
 
       {_, {resource, config}} ->
@@ -245,7 +256,7 @@ defmodule LiveAdmin.Components.Container.Form do
           />
         <% else %>
           <div class="form__number">
-            <%= number_input @form, @field, class: "field__number", disabled: @disabled %>
+            <%= number_input(@form, @field, class: "field__number", disabled: @disabled) %>
           </div>
         <% end %>
         """
@@ -267,28 +278,28 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp input(assigns = %{type: :string}) do
     ~H"""
-    <%= textarea @form, @field, rows: 1, class: "field__text", disabled: @disabled %>
+    <%= textarea(@form, @field, rows: 1, class: "field__text", disabled: @disabled) %>
     """
   end
 
   defp input(assigns = %{type: :boolean}) do
     ~H"""
     <div class="form__checkbox">
-      <%= checkbox @form, @field, class: "field__checkbox", disabled: @disabled %>
+      <%= checkbox(@form, @field, class: "field__checkbox", disabled: @disabled) %>
     </div>
     """
   end
 
   defp input(assigns = %{type: :date}) do
     ~H"""
-    <%= date_input @form, @field, class: "field__date", disabled: @disabled %>
+    <%= date_input(@form, @field, class: "field__date", disabled: @disabled) %>
     """
   end
 
   defp input(assigns = %{type: number}) when number in [:integer, :id] do
     ~H"""
     <div class="form__number">
-      <%= number_input @form, @field, class: "field__number", disabled: @disabled %>
+      <%= number_input(@form, @field, class: "field__number", disabled: @disabled) %>
     </div>
     """
   end
@@ -296,14 +307,17 @@ defmodule LiveAdmin.Components.Container.Form do
   defp input(assigns = %{type: type}) when type in [:naive_datetime, :utc_datetime] do
     ~H"""
     <div class="form__time">
-      <%= datetime_local_input @form, @field, class: "field__time", disabled: @disabled %>
+      <%= datetime_local_input(@form, @field, class: "field__time", disabled: @disabled) %>
     </div>
     """
   end
 
   defp input(assigns = %{type: {_, Ecto.Enum, %{mappings: mappings}}}) do
     ~H"""
-    <%= select @form, @field, [nil | Keyword.keys(mappings)], disabled: @disabled, class: "field__select" %>
+    <%= select(@form, @field, [nil | Keyword.keys(mappings)],
+      disabled: @disabled,
+      class: "field__select"
+    ) %>
     """
   end
 

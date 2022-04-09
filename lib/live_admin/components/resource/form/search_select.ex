@@ -54,13 +54,27 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     ~H"""
     <div>
       <div class="resource__action--drop">
-        <%= hidden_input @form, @field, disabled: @disabled %>
+        <%= hidden_input(@form, @field, disabled: @disabled) %>
         <%= if @selected_option do %>
-          <a href="#" phx-click="put_change" phx-value-field={@field} phx-target={@form_ref} class="resource__action--btn">
+          <a
+            href="#"
+            phx-click="put_change"
+            phx-value-field={@field}
+            phx-target={@form_ref}
+            class="resource__action--btn"
+          >
             <%= record_label(@selected_option, @config) %>
           </a>
         <% else %>
-          <%= text_input :search, :select, id: input_id(@form, @field) <> "search_select", disabled: @disabled, placeholder: "Search", phx_focus: "load_options", phx_keyup: "load_options", phx_target: @myself, phx_debounce: 200 %>
+          <%= text_input(:search, :select,
+            id: input_id(@form, @field) <> "search_select",
+            disabled: @disabled,
+            placeholder: "Search",
+            phx_focus: "load_options",
+            phx_keyup: "load_options",
+            phx_target: @myself,
+            phx_debounce: 200
+          ) %>
         <% end %>
         <%= unless @selected_option do %>
           <nav>
@@ -70,7 +84,13 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
               <% end %>
               <%= for option <- @options, option.id != input_value(@form, @field) do %>
                 <li>
-                  <a href="#" phx-click="put_change" phx-value-field={@field} phx-value-value={option.id} phx-target={@form_ref}>
+                  <a
+                    href="#"
+                    phx-click="put_change"
+                    phx-value-field={@field}
+                    phx-value-value={option.id}
+                    phx-target={@form_ref}
+                  >
                     <%= record_label(option, @config) %>
                   </a>
                 </li>

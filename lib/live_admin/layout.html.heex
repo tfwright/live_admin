@@ -1,16 +1,18 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="data:;base64,=">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link rel="icon" href="data:;base64,=" />
     <title><%= @title %></title>
-    <style><%= raw(render("app.css")) %></style>
+    <style>
+      <%= raw(render("app.css")) %>
+    </style>
     <%= csrf_meta_tag() %>
-    <link rel="manifest" href="/manifest.json ">
+    <link rel="manifest" href="/manifest.json " />
   </head>
   <body>
     <main class="main__content">
@@ -18,7 +20,7 @@
         <div class="nav">
           <ul class="nav__list">
             <li class="nav__item">
-              <%= live_redirect "Home", to: @socket.router.__helpers__().home_path(@socket, :home) %>
+              <%= live_redirect("Home", to: @socket.router.__helpers__().home_path(@socket, :home)) %>
             </li>
             <%= render_nav_menu(@resources, @socket, @base_path) %>
           </ul>
@@ -29,5 +31,7 @@
       </div>
     </main>
   </body>
-   <script><%= raw(render("app.js")) %></script>
+  <script>
+    <%= raw(render("app.js")) %>
+  </script>
 </html>

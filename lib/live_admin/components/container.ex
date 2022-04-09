@@ -113,7 +113,8 @@ defmodule LiveAdmin.Components.Container do
     {:noreply, socket}
   end
 
-  def render(assigns = %{loading: true}), do: ~H""
+  def render(assigns = %{loading: true}), do: ~H"
+"
 
   @impl true
   def render(assigns) do
@@ -125,12 +126,24 @@ defmodule LiveAdmin.Components.Container do
 
       <div class="resource__actions">
         <div>
-          <%= live_redirect "List", to: route_with_params(@socket, [:list, @key], prefix: @prefix), class: "resource__action--btn" %>
+          <%= live_redirect("List",
+            to: route_with_params(@socket, [:list, @key], prefix: @prefix),
+            class: "resource__action--btn"
+          ) %>
           <%= if get_config(@config, :create_with, true) do %>
-            <%= live_redirect "New", to: route_with_params(@socket, [:new, @key], prefix: @prefix), class: "resource__action--btn" %>
+            <%= live_redirect("New",
+              to: route_with_params(@socket, [:new, @key], prefix: @prefix),
+              class: "resource__action--btn"
+            ) %>
           <% end %>
           <%= for key <- get_task_keys(@config) do %>
-            <%= link key |> to_string() |> humanize(), to: "#", "data-confirm": "Are you sure?", "phx-click": "task", "phx-value-task": key, class: "resource__action--btn" %>
+            <%= link(key |> to_string() |> humanize(),
+              to: "#",
+              "data-confirm": "Are you sure?",
+              "phx-click": "task",
+              "phx-value-task": key,
+              class: "resource__action--btn"
+            ) %>
           <% end %>
           |
           <%= if Application.get_env(:live_admin, :prefix_options) do %>
@@ -163,7 +176,7 @@ defmodule LiveAdmin.Components.Container do
       <p class="resource__info"><%= live_flash(@flash, :info) %></p>
     </div>
 
-    <%= render "#{@live_action}.html", assigns %>
+    <%= render("#{@live_action}.html", assigns) %>
     """
   end
 

@@ -39,22 +39,32 @@ defmodule LiveAdmin.Components.Container.Index do
     <div class="resource__list">
       <div class="list__search">
         <div class="flex border-2 rounded-lg">
-            <form phx-change="search" phx-target={@myself}>
-              <input
-                type="text"
-                class="px-4 py-1 w-60 border-0 h-8"
-                placeholder="Search..."
-                name="query"
-                onkeydown="return event.key != 'Enter'"
-                value={@search}
-                phx-debounce="500"
-              />
-            </form>
-            <button phx-click="search" phx-value-query="" phx-target={@myself} class="flex items-center justify-center px-2 border-l">
-              <svg class="w-6 h-6 text-gray-600" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" />
-              </svg>
-            </button>
+          <form phx-change="search" phx-target={@myself}>
+            <input
+              type="text"
+              class="px-4 py-1 w-60 border-0 h-8"
+              placeholder="Search..."
+              name="query"
+              onkeydown="return event.key != 'Enter'"
+              value={@search}
+              phx-debounce="500"
+            />
+          </form>
+          <button
+            phx-click="search"
+            phx-value-query=""
+            phx-target={@myself}
+            class="flex items-center justify-center px-2 border-l"
+          >
+            <svg
+              class="w-6 h-6 text-gray-600"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <path d="M16.32 14.9l5.39 5.4a1 1 0 0 1-1.42 1.4l-5.38-5.38a8 8 0 1 1 1.41-1.41zM10 16a6 6 0 1 0 0-12 6 6 0 0 0 0 12z" />
+            </svg>
+          </button>
         </div>
       </div>
       <table class="resource__table">
@@ -62,7 +72,23 @@ defmodule LiveAdmin.Components.Container.Index do
           <tr>
             <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
               <th class="resource__header" title={field}>
-                <%= list_link @socket, humanize(field), @key, %{prefix: @prefix, page: @page, "sort-attr": field, "sort-dir": (if field == @sort_attr, do: Enum.find([:asc, :desc], & &1 != @sort_dir), else: @sort_dir)}, class: "header__link#{if field == @sort_attr, do: "--#{[asc: :up, desc: :down][@sort_dir]}"}" %>
+                <%= list_link(
+                  @socket,
+                  humanize(field),
+                  @key,
+                  %{
+                    prefix: @prefix,
+                    page: @page,
+                    "sort-attr": field,
+                    "sort-dir":
+                      if(field == @sort_attr,
+                        do: Enum.find([:asc, :desc], &(&1 != @sort_dir)),
+                        else: @sort_dir
+                      )
+                  },
+                  class:
+                    "header__link#{if field == @sort_attr, do: "--#{[asc: :up, desc: :down][@sort_dir]}"}"
+                ) %>
               </th>
             <% end %>
             <th class="resource__header">Actions</th>
@@ -79,12 +105,30 @@ defmodule LiveAdmin.Components.Container.Index do
                 </td>
               <% end %>
               <td class="resource__cell">
-                <%= live_redirect "Edit", to: route_with_params(@socket, [:edit, @key, record], prefix: @prefix), class: "resource__action--btn" %>
+                <%= live_redirect("Edit",
+                  to: route_with_params(@socket, [:edit, @key, record], prefix: @prefix),
+                  class: "resource__action--btn"
+                ) %>
                 <%= if get_config(@config, :delete_with, true) do %>
-                  <%= link "Delete", to: "#", "data-confirm": "Are you sure?", "phx-click": "delete", "phx-value-id": record.id, "phx-target": @myself, class: "resource__action--btn" %>
+                  <%= link("Delete",
+                    to: "#",
+                    "data-confirm": "Are you sure?",
+                    "phx-click": "delete",
+                    "phx-value-id": record.id,
+                    "phx-target": @myself,
+                    class: "resource__action--btn"
+                  ) %>
                 <% end %>
                 <%= for action <- Map.get(@config, :actions, []) do %>
-                  <%= link action |> to_string() |> humanize(), to: "#", "data-confirm": "Are you sure?", "phx-click": "action", "phx-value-id": record.id, "phx-value-action": action, "phx-target": @myself, class: "resource__action--btn" %>
+                  <%= link(action |> to_string() |> humanize(),
+                    to: "#",
+                    "data-confirm": "Are you sure?",
+                    "phx-click": "action",
+                    "phx-value-id": record.id,
+                    "phx-value-action": action,
+                    "phx-target": @myself,
+                    class: "resource__action--btn"
+                  ) %>
                 <% end %>
               </td>
             </tr>
@@ -93,8 +137,38 @@ defmodule LiveAdmin.Components.Container.Index do
         <tfoot>
           <tr>
             <td class="w-full" colspan={@resource |> Resource.fields(@config) |> Enum.count()}>
-              <%= if @page > 1, do: list_link(@socket, "Prev", @key, %{prefix: @prefix, page: @page - 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir, search: @search}, class: "resource__action--btn"), else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
-              <%= if @page < (@records |> elem(1)) / 10, do: list_link(@socket, "Next", @key, %{prefix: @prefix, page: @page + 1, "sort-attr": @sort_attr, "sort-dir": @sort_dir, search: @search}, class: "resource__action--btn"), else: content_tag(:span, "Next", class: "resource__action--disabled") %>
+              <%= if @page > 1,
+                do:
+                  list_link(
+                    @socket,
+                    "Prev",
+                    @key,
+                    %{
+                      prefix: @prefix,
+                      page: @page - 1,
+                      "sort-attr": @sort_attr,
+                      "sort-dir": @sort_dir,
+                      search: @search
+                    },
+                    class: "resource__action--btn"
+                  ),
+                else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
+              <%= if @page < (@records |> elem(1)) / 10,
+                do:
+                  list_link(
+                    @socket,
+                    "Next",
+                    @key,
+                    %{
+                      prefix: @prefix,
+                      page: @page + 1,
+                      "sort-attr": @sort_attr,
+                      "sort-dir": @sort_dir,
+                      search: @search
+                    },
+                    class: "resource__action--btn"
+                  ),
+                else: content_tag(:span, "Next", class: "resource__action--disabled") %>
             </td>
             <td class="text-right p-2"><%= @records |> elem(1) %> total rows</td>
           </tr>
