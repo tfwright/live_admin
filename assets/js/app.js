@@ -1,14 +1,30 @@
 import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
+import ClipboardJS from 'clipboard'
+import Toastify from 'toastify-js'
 import topbar from "topbar"
 
 topbar.config({barColors: {0: "rgb(67, 56, 202)"}, shadowColor: "rgba(0, 0, 0, .3)"})
 window.addEventListener("phx:page-loading-start", info => topbar.show())
 window.addEventListener("phx:page-loading-stop", info => topbar.hide())
 
+let Hooks = {}
+Hooks.IndexPage = {
+  mounted() {
+    var clipboard = new ClipboardJS(this.el.querySelectorAll('.cell__copy'));
+
+    clipboard.on('success', function(e) {
+      Toastify({
+        text: "Copied column value",
+        className: "toast__container",
+      }).showToast();
+    });
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+let liveSocket = new LiveSocket("/live", Socket, {hooks: Hooks, params: {_csrf_token: csrfToken}})
 
 // Connect if there are any LiveViews on the page
 liveSocket.connect()

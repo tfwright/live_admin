@@ -300,11 +300,30 @@
     @apply border;
     @apply px-4;
     @apply py-2;
+    @apply relative;
   }
 
   .cell__contents {
     @apply max-h-20;
     @apply overflow-y-auto;
+  }
+
+  .cell__copy {
+    @apply hidden;
+    @apply absolute;
+    @apply bottom-0;
+    @apply right-0;
+    @apply m-1;
+    @apply cursor-pointer;
+  }
+
+  .resource__cell:hover .cell__copy {
+    @apply block;
+  }
+
+  .cell__copy svg {
+    @apply w-5;
+    @apply h-5;
   }
 
   .resource__form {
@@ -403,5 +422,20 @@
   .form__checkbox, .form__number, .form__time {
     @apply flex-none;
     @apply ml-1;
+  }
+
+  .toast__container {
+    @apply fixed;
+    @apply w-48;
+    @apply z-40;
+    @apply rounded;
+    @apply p-1;
+    @apply text-center;
+    @apply border;
+    @apply bottom-5;
+
+    top: auto !important;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
   }
 }

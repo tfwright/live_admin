@@ -852,11 +852,30 @@ select:focus {
   padding-right: 1rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+  position: relative;
 }
 
 .cell__contents {
   max-height: 5rem;
   overflow-y: auto;
+}
+
+.cell__copy {
+  display: none;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  margin: 0.25rem;
+  cursor: pointer;
+}
+
+.resource__cell:hover .cell__copy {
+  display: block;
+}
+
+.cell__copy svg {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .resource__form {
@@ -962,6 +981,20 @@ select:focus {
 .form__checkbox, .form__number, .form__time {
   flex: none;
   margin-left: 0.25rem;
+}
+
+.toast__container {
+  position: fixed;
+  width: 12rem;
+  z-index: 40;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+  text-align: center;
+  border-width: 1px;
+  bottom: 1.25rem;
+  top: auto !important;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
 }
 
 .mb-2 {
