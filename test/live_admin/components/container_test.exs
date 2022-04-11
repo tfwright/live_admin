@@ -43,17 +43,19 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
 
     test "deletes record", %{view: view} do
-      assert {_, {:live_redirect, %{to: "/user?page=1"}}} =
-               view
-               |> element("a[phx-click='delete']")
-               |> render_click()
+      view
+      |> element("a[phx-click='delete']")
+      |> render_click()
+
+      assert_push_event(view, "success", %{})
     end
 
     test "runs configured actions", %{view: view} do
-      assert {_, {:live_redirect, %{to: "/user?page=1"}}} =
-               view
-               |> element("a[phx-value-action='run_action']")
-               |> render_click()
+      view
+      |> element("a[phx-value-action='run_action']")
+      |> render_click()
+
+      assert_push_event(view, "success", %{})
     end
   end
 

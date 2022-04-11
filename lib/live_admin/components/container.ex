@@ -95,19 +95,12 @@ defmodule LiveAdmin.Components.Container do
     socket =
       case apply(m, f, [session] ++ a) do
         {:ok, result} ->
-          socket
-          |> put_flash(:info, "Successfully completed #{task}: #{inspect(result)}")
-          |> push_redirect(
-            to:
-              route_with_params(
-                socket,
-                [:list, socket.assigns.key],
-                Map.take(socket.assigns, [:prefix, :page])
-              )
-          )
+          push_event(socket, "success", %{
+            msg: "Successfully completed #{task}: #{inspect(result)}"
+          })
 
         {:error, error} ->
-          put_flash(socket, :error, "#{task} failed: #{error}")
+          push_event(socket, "error", %{msg: "#{task} failed: #{error}"})
       end
 
     {:noreply, socket}
@@ -169,11 +162,6 @@ defmodule LiveAdmin.Components.Container do
           <% end %>
         </div>
       </div>
-    </div>
-
-    <div class="flash">
-      <p class="resource__error"><%= live_flash(@flash, :error) %></p>
-      <p class="resource__info"><%= live_flash(@flash, :info) %></p>
     </div>
 
     <%= render("#{@live_action}.html", assigns) %>

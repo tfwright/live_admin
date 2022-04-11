@@ -25,7 +25,12 @@ body {
   background-color: rgb(165 180 252);
 }
 
-.resource__error {
+.toast__container--error {
   border-color: rgb(239, 68, 68);
   color: rgb(239, 68, 68);
+}
+
+.toast__container--success {
+  border-color: rgb(102, 153, 0);
+  color: rgb(102, 153, 0);
 }

@@ -149,11 +149,6 @@
     @apply text-xl;
   }
 
-  .flash {
-    @apply clear-both;
-    @apply m-1;
-  }
-
   .resource__banner {
     @apply grid;
     @apply grid-cols-1;
@@ -229,22 +224,6 @@
   .resource__action--drop:focus-within nav {
     @apply block;
     @apply translate-y-1;
-  }
-
-  .resource__error {
-    @apply p-2;
-    @apply border;
-    @apply rounded-md;
-  }
-
-  .flash > p:empty {
-    @apply hidden;
-  }
-
-  .resource__info {
-    @apply p-2;
-    @apply border;
-    @apply rounded-md;
   }
 
   .resource__list {
@@ -434,8 +413,20 @@
     @apply border;
     @apply bottom-5;
 
-    top: auto !important;
     left: 50%;
+    top: auto !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  .toast__container--error {
+    @apply toast__container;
+    top: auto !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  .toast__container--success {
+    @apply toast__container;
+    top: auto !important;
     transform: translate(-50%, -50%) !important;
   }
 }

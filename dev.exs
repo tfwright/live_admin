@@ -141,6 +141,10 @@ defmodule Demo.Posts.Post do
 
     timestamps(updated_at: false)
   end
+
+  def fail(_) do
+    {:error, "failed"}
+  end
 end
 
 defmodule Demo.Populator do
@@ -190,7 +194,6 @@ defmodule DemoWeb.Router do
 
   pipeline :browser do
     plug :fetch_session
-    plug :fetch_live_flash
   end
 
   scope "/" do
@@ -211,7 +214,7 @@ defmodule DemoWeb.Router do
         actions: [:deactivate],
         tasks: [:regenerate_passwords]
       },
-      {Demo.Posts.Post, immutable_fields: [:disabled_user_id]}
+      {Demo.Posts.Post, immutable_fields: [:disabled_user_id], tasks: [:fail]}
     ]
   end
 end

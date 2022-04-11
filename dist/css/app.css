@@ -624,11 +624,6 @@ select:focus {
   line-height: 1.75rem;
 }
 
-.flash {
-  clear: both;
-  margin: 0.25rem;
-}
-
 .resource__banner {
   display: grid;
   grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -757,22 +752,6 @@ select:focus {
   display: block;
   --tw-translate-y: 0.25rem;
   transform: var(--tw-transform);
-}
-
-.resource__error {
-  padding: 0.5rem;
-  border-width: 1px;
-  border-radius: 0.375rem;
-}
-
-.flash > p:empty {
-  display: none;
-}
-
-.resource__info {
-  padding: 0.5rem;
-  border-width: 1px;
-  border-radius: 0.375rem;
 }
 
 .resource__list {
@@ -992,8 +971,36 @@ select:focus {
   text-align: center;
   border-width: 1px;
   bottom: 1.25rem;
-  top: auto !important;
   left: 50%;
+  top: auto !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.toast__container--error {
+  left: 50%;
+  position: fixed;
+  bottom: 1.25rem;
+  z-index: 40;
+  width: 12rem;
+  border-radius: 0.25rem;
+  border-width: 1px;
+  padding: 0.25rem;
+  text-align: center;
+  top: auto !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.toast__container--success {
+  left: 50%;
+  position: fixed;
+  bottom: 1.25rem;
+  z-index: 40;
+  width: 12rem;
+  border-radius: 0.25rem;
+  border-width: 1px;
+  padding: 0.25rem;
+  text-align: center;
+  top: auto !important;
   transform: translate(-50%, -50%) !important;
 }
 
