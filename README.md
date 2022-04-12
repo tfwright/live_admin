@@ -19,7 +19,7 @@ First, ensure your Phoenix app has been configured to use [LiveView](https://hex
 Add to your app's `deps`:
 
 ```
-{:live_admin, "~> 0.2"}
+{:live_admin, "~> 0.3"}
 ```
 
 Add the following to your Phoenix router in any scope ready to serve a live route:
