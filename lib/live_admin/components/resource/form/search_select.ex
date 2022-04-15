@@ -73,7 +73,8 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
             phx_focus: "load_options",
             phx_keyup: "load_options",
             phx_target: @myself,
-            phx_debounce: 200
+            phx_debounce: 200,
+            autocomplete: "off"
           ) %>
         <% end %>
         <%= unless @selected_option do %>
