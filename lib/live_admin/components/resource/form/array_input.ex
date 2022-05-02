@@ -47,8 +47,7 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
           <%= text_input(:form, :array,
             id: input_id(@form, @field) <> "_#{idx}",
             name: input_name(@form, @field) <> "[]",
-            value: item,
-            disabled: @disabled
+            value: item
           ) %>
         </div>
       <% end %>
