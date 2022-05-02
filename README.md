@@ -47,7 +47,7 @@ Resource specific options:
 * `immutable_fields` - a list of fields that should not be editable in forms
 * `actions` - actions to perform on a record
 * `tasks` - actions to perform on a resource
-* `components` - overrides for specific views
+* `components` - overrides for specific views (`:list`, `:new`, `:edit`)
 
 ## App config
 

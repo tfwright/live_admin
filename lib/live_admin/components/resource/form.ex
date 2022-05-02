@@ -37,54 +37,44 @@ defmodule LiveAdmin.Components.Container.Form do
       socket
       |> assign(assigns)
       |> assign(:enabled, get_config(config, :"#{action}_with", true))
+      |> assign(:changeset, Resource.change(assigns.resource, config))
 
     {:ok, socket}
   end
 
   @impl true
   def render(assigns) do
-    {mod, func, args} =
-      get_in(assigns, [:config, :components, :new]) || {__MODULE__, :default_render, []}
-
-    assigns = assign(assigns, form_ref: assigns.myself)
-
     ~H"""
     <div>
-      <%= apply(mod, func, args ++ [SessionStore.lookup(@session_id), assigns]) %>
+      <.form
+        let={f}
+        for={@changeset}
+        as="params"
+        phx_change="validate"
+        phx_submit={@action}
+        phx_target={@myself}
+        class="resource__form"
+      >
+        <%= for {field, type, opts} <- Resource.fields(@resource, @config) do %>
+          <.field
+            field={field}
+            type={type}
+            form={f}
+            immutable={Keyword.get(opts, :immutable, false)}
+            resource={@resource}
+            resources={@resources}
+            form_ref={@myself}
+            session={SessionStore.lookup(@session_id)}
+          />
+        <% end %>
+        <div class="form__actions">
+          <%= submit("Save",
+            class: "resource__action#{if !@enabled, do: "--disabled", else: "--btn"}",
+            disabled: !@enabled
+          ) %>
+        </div>
+      </.form>
     </div>
-    """
-  end
-
-  def default_render(session, assigns) do
-    ~H"""
-    <.form
-      let={f}
-      for={@changeset}
-      as="params"
-      phx_change="validate"
-      phx_submit={@action}
-      phx_target={@myself}
-      class="resource__form"
-    >
-      <%= for {field, type, opts} <- Resource.fields(@resource, @config) do %>
-        <.field
-          field={field}
-          type={type}
-          form={f}
-          immutable={Keyword.get(opts, :immutable, false)}
-          resource={@resource}
-          resources={@resources}
-          form_ref={@form_ref}
-          session={session}
-        />
-      <% end %>
-      <div class="form__actions">
-        <%= submit("Save",
-          class: "resource__action#{if !@enabled, do: "--disabled", else: "--btn"}",
-          disabled: !@enabled
-        ) %>
-      </div>
-    </.form>
     """
   end
 

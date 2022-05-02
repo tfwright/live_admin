@@ -168,43 +168,6 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def render("new.html", assigns) do
-    changeset =
-      assigns.resource
-      |> struct()
-      |> Ecto.Changeset.change()
-
-    ~H"""
-    <.live_component
-      module={Form}
-      id="form"
-      resource={@resource}
-      config={@config}
-      changeset={changeset}
-      action="create"
-      session_id={@session_id}
-      key={@key}
-      resources={@resources}
-    />
-    """
-  end
-
-  def render("edit.html", assigns) do
-    ~H"""
-    <.live_component
-      module={Form}
-      id="form"
-      resource={@resource}
-      config={@config}
-      action="update"
-      session_id={@session_id}
-      key={@key}
-      record={@record}
-      resources={@resources}
-    />
-    """
-  end
-
   def render("list.html", assigns) do
     ~H"""
     <.live_component
@@ -220,6 +183,49 @@ defmodule LiveAdmin.Components.Container do
       search={@search}
       prefix={@prefix}
       session_id={@session_id}
+    />
+    """
+  end
+
+  def render("new.html", assigns) do
+    {mod, func, args} = get_in(assigns, [:config, :components, :new]) || {__MODULE__, :render_new, []}
+
+    apply(mod, func, [assigns | args])
+  end
+
+  def render("edit.html", assigns) do
+    {mod, func, args} = get_in(assigns, [:config, :components, :edit]) || {__MODULE__, :render_edit, []}
+
+    apply(mod, func, [assigns | args])
+  end
+
+  def render_new(assigns) do
+    ~H"""
+    <.live_component
+      module={Form}
+      id="form"
+      resource={@resource}
+      config={@config}
+      action="create"
+      session_id={@session_id}
+      key={@key}
+      resources={@resources}
+    />
+    """
+  end
+
+  def render_edit(assigns) do
+    ~H"""
+    <.live_component
+      module={Form}
+      id="form"
+      resource={@resource}
+      config={@config}
+      action="update"
+      session_id={@session_id}
+      key={@key}
+      record={@record}
+      resources={@resources}
     />
     """
   end

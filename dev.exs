@@ -207,8 +207,8 @@ defmodule DemoWeb.Router do
         create_with: {Demo.Accounts.User, :create, []},
         validate_with: {Demo.Accounts.User, :validate, []},
         components: [
-          new: {LiveAdmin.Components.Container.Form, :default_render, []},
-          edit: {LiveAdmin.Components.Container.Form, :default_render, []}
+          new: {LiveAdmin.Components.Container, :render_new, []},
+          edit: {LiveAdmin.Components.Container, :render_edit, []}
         ],
         label_with: :name,
         actions: [:deactivate],
