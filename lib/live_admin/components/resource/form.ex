@@ -97,7 +97,7 @@ defmodule LiveAdmin.Components.Container.Form do
       ) do
     changeset =
       changeset.data
-      |> Resource.change(config, params)
+      |> Resource.change(config, params |> IO.inspect)
       |> Resource.validate(config, SessionStore.lookup(session_id))
       |> Map.put(:action, :validate)
 
@@ -153,6 +153,8 @@ defmodule LiveAdmin.Components.Container.Form do
   defp field(assigns = %{type: {_, Ecto.Enum, _}}), do: field_group(assigns)
 
   defp field(assigns = %{type: {:array, :string}}), do: field_group(assigns)
+
+  defp field(assigns = %{type: {:array, {_, Ecto.Enum, _}}}), do: field_group(assigns)
 
   defp field(assigns = %{type: {_, Ecto.Embedded, _}}) do
     ~H"""
@@ -297,6 +299,28 @@ defmodule LiveAdmin.Components.Container.Form do
       disabled: @disabled,
       class: "field__select"
     ) %>
+    """
+  end
+
+  defp input(assigns = %{type: {:array, {_, Ecto.Enum, %{mappings: mappings}}}}) do
+    ~H"""
+    <div class="field__checkbox--group">
+      <%= hidden_input @form, @field, name: input_name(@form, @field) <> "[]", value: nil %>
+      <%= for option <- Keyword.keys(mappings) do %>
+        <%= checkbox(@form, @field,
+          name: input_name(@form, @field) <> "[]",
+          checked_value: option,
+          value: @form |> input_value(@field) |> Enum.find(&(&1 == option)),
+          unchecked_value: "",
+          hidden_input: false,
+          disabled: @disabled,
+          id: input_id(@form, @field) <> to_string(option)
+        ) %>
+        <label for={input_id(@form, @field) <> to_string(option)}>
+          <%= option %>
+        </label>
+      <% end %>
+    </div>
     """
   end
 
