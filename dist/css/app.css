@@ -922,6 +922,14 @@ select:focus {
   transform: var(--tw-transform);
 }
 
+.field__checkbox--group {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.25rem;
+  justify-items: start;
+  margin-left: 0.75rem;
+}
+
 .field__array > div {
   display: flex;
   align-items: center;

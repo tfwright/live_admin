@@ -86,6 +86,7 @@ defmodule Demo.Accounts.User do
     field :password, :string
     field :status, Ecto.Enum, values: [:active, :suspended]
     field :tags, {:array, :string}, default: []
+    field :roles, {:array, Ecto.Enum}, values: [:admin, :staff]
 
     embeds_one :settings, Demo.Accounts.User.Settings, on_replace: :delete
 
@@ -96,7 +97,7 @@ defmodule Demo.Accounts.User do
 
   def create(params, meta) do
     %__MODULE__{}
-    |> cast(params, [:name, :stars_count])
+    |> cast(params, [:name, :stars_count, :roles])
     |> validate_number(:stars_count, greater_than_or_equal_to: 0)
     |> Demo.Repo.insert(prefix: meta[:__prefix__])
   end

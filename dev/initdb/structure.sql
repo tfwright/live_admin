@@ -10,7 +10,8 @@ create table users (
   password text,
   status varchar(100),
   other_resource_id int,
-  tags jsonb
+  tags jsonb,
+  roles character varying[] DEFAULT '{}'::character varying[]
 );
 
 create table posts (
@@ -35,7 +36,8 @@ create table alt.users (
   password text,
   status varchar(100),
   other_resource_id int,
-  tags jsonb
+  tags jsonb,
+  roles character varying[] DEFAULT '{}'::character varying[]
 );
 
 create table alt.posts (

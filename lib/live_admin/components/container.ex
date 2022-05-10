@@ -188,13 +188,15 @@ defmodule LiveAdmin.Components.Container do
   end
 
   def render("new.html", assigns) do
-    {mod, func, args} = get_in(assigns, [:config, :components, :new]) || {__MODULE__, :render_new, []}
+    {mod, func, args} =
+      get_in(assigns, [:config, :components, :new]) || {__MODULE__, :render_new, []}
 
     apply(mod, func, [assigns | args])
   end
 
   def render("edit.html", assigns) do
-    {mod, func, args} = get_in(assigns, [:config, :components, :edit]) || {__MODULE__, :render_edit, []}
+    {mod, func, args} =
+      get_in(assigns, [:config, :components, :edit]) || {__MODULE__, :render_edit, []}
 
     apply(mod, func, [assigns | args])
   end
