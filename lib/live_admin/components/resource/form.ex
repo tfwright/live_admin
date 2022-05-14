@@ -97,7 +97,7 @@ defmodule LiveAdmin.Components.Container.Form do
       ) do
     changeset =
       changeset.data
-      |> Resource.change(config, params |> IO.inspect())
+      |> Resource.change(config, params)
       |> Resource.validate(config, SessionStore.lookup(session_id))
       |> Map.put(:action, :validate)
 
