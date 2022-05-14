@@ -21,7 +21,8 @@ defmodule LiveAdmin.MixProject do
       docs: [
         main: "readme",
         extras: ["README.md"]
-      ]
+      ],
+      compilers: Mix.compilers() ++ compilers(Mix.env()),
     ]
   end
 
@@ -46,7 +47,8 @@ defmodule LiveAdmin.MixProject do
       {:ecto_psql_extras, "~> 0.7", only: [:dev, :test]},
       {:faker, "~> 0.17", only: :dev},
       {:floki, ">= 0.30.0", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:docout, github: "tfwright/docout", branch: "main", runtime: false}
     ]
   end
 
@@ -55,4 +57,7 @@ defmodule LiveAdmin.MixProject do
       dev: ["run --no-halt dev.exs"]
     ]
   end
+
+  defp compilers(:dev), do: [:docout]
+  defp compilers(_), do: []
 end

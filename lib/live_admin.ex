@@ -1,4 +1,6 @@
 defmodule LiveAdmin do
+  @moduledoc docout: [LiveAdmin.READMECompiler]
+
   def repo, do: Application.fetch_env!(:live_admin, :ecto_repo)
 
   def associated_resource(resource, field_name, resources) do
