@@ -825,7 +825,7 @@ select:focus {
   transform: rotate(-90deg) translateX(3px);
 }
 
-.resource__cell {
+[class^="resource__cell"] {
   border-width: 1px;
   padding-left: 1rem;
   padding-right: 1rem;

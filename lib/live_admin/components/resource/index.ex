@@ -91,8 +91,8 @@ defmodule LiveAdmin.Components.Container.Index do
         <tbody id="index-page" phx-hook="IndexPage">
           <%= for record <- @records |> elem(0) do %>
             <tr>
-              <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
-                <td class="resource__cell">
+              <%= for {field, type, _} <- Resource.fields(@resource, @config) do %>
+                <td class={"resource__cell--#{type_to_css_class(type)}"}>
                   <div class="cell__contents">
                     <%= display_field(record, field, assigns) %>
                   </div>
@@ -108,7 +108,7 @@ defmodule LiveAdmin.Components.Container.Index do
                   <% end %>
                 </td>
               <% end %>
-              <td class="resource__cell">
+              <td class="resource__cell--actions">
                 <%= live_redirect("Edit",
                   to: route_with_params(@socket, [:edit, @key, record], prefix: @prefix),
                   class: "resource__action--btn"
@@ -304,4 +304,11 @@ defmodule LiveAdmin.Components.Container.Index do
 
   defp print(term) when is_binary(term), do: term
   defp print(term), do: inspect(term)
+
+  defp type_to_css_class({_, type, _}), do: type_to_css_class(type)
+  defp type_to_css_class({:array, {_, type, _}}), do: {:array, type} |> type_to_css_class()
+  defp type_to_css_class({:array, type}), do: "array.#{type}" |> type_to_css_class()
+
+  defp type_to_css_class(type),
+    do: type |> to_string() |> Phoenix.Naming.underscore() |> String.replace("/", "_")
 end

@@ -97,7 +97,7 @@ defmodule LiveAdmin.Components.Container.Form do
       ) do
     changeset =
       changeset.data
-      |> Resource.change(config, params |> IO.inspect)
+      |> Resource.change(config, params |> IO.inspect())
       |> Resource.validate(config, SessionStore.lookup(session_id))
       |> Map.put(:action, :validate)
 
@@ -305,7 +305,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp input(assigns = %{type: {:array, {_, Ecto.Enum, %{mappings: mappings}}}}) do
     ~H"""
     <div class="field__checkbox--group">
-      <%= hidden_input @form, @field, name: input_name(@form, @field) <> "[]", value: nil %>
+      <%= hidden_input(@form, @field, name: input_name(@form, @field) <> "[]", value: nil) %>
       <%= for option <- Keyword.keys(mappings) do %>
         <%= checkbox(@form, @field,
           name: input_name(@form, @field) <> "[]",

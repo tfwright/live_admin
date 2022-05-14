@@ -275,7 +275,7 @@
     @apply drop-up;
   }
 
-  .resource__cell {
+  [class^="resource__cell"] {
     @apply border;
     @apply px-4;
     @apply py-2;
