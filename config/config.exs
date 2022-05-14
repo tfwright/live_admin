@@ -14,5 +14,3 @@ config :phoenix, LiveAdmin.Endpoint,
 config :docout,
   app_name: :live_admin,
   formatters: [LiveAdmin.READMECompiler]
-
-config :docout, LiveAdmin.READMECompiler, output_path: "README.md"

@@ -1,5 +1,5 @@
 defmodule LiveAdmin.READMECompiler do
-  @behaviour Docout.Formatter
+  use Docout, output_path: "README.md"
 
   @impl true
   def format(_) do
