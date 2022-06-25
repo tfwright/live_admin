@@ -22,7 +22,7 @@ defmodule LiveAdmin.MixProject do
         main: "readme",
         extras: ["README.md"]
       ],
-      compilers: Mix.compilers() ++ compilers(Mix.env()),
+      compilers: Mix.compilers() ++ compilers(Mix.env())
     ]
   end
 

@@ -17,7 +17,8 @@ defmodule LiveAdmin.Components.Container.Form do
     :integer,
     :naive_datetime,
     :utc_datetime,
-    :id
+    :id,
+    :float
   ]
 
   @impl true
@@ -281,6 +282,14 @@ defmodule LiveAdmin.Components.Container.Form do
     ~H"""
     <div class="form__number">
       <%= number_input(@form, @field, class: "field__number", disabled: @disabled) %>
+    </div>
+    """
+  end
+
+  defp input(assigns = %{type: :float}) do
+    ~H"""
+    <div class="form__number">
+      <%= number_input(@form, @field, class: "field__number", disabled: @disabled, step: "any") %>
     </div>
     """
   end

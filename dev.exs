@@ -87,6 +87,7 @@ defmodule Demo.Accounts.User do
     field :status, Ecto.Enum, values: [:active, :suspended]
     field :tags, {:array, :string}, default: []
     field :roles, {:array, Ecto.Enum}, values: [:admin, :staff]
+    field :rating, :float
 
     embeds_one :settings, Demo.Accounts.User.Settings, on_replace: :delete
 

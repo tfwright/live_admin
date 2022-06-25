@@ -11,7 +11,8 @@ create table users (
   status varchar(100),
   other_resource_id int,
   tags jsonb,
-  roles character varying[] DEFAULT '{}'::character varying[]
+  roles character varying[] DEFAULT '{}'::character varying[],
+  rating real
 );
 
 create table posts (
