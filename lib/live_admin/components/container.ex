@@ -169,9 +169,11 @@ defmodule LiveAdmin.Components.Container do
   end
 
   def render("list.html", assigns) do
+    mod = get_in(assigns, [:config, :components, :list]) || Index
+
     ~H"""
     <.live_component
-      module={Index}
+      module={mod}
       id="list"
       socket={@socket}
       resources={@resources}
@@ -188,23 +190,11 @@ defmodule LiveAdmin.Components.Container do
   end
 
   def render("new.html", assigns) do
-    {mod, func, args} =
-      get_in(assigns, [:config, :components, :new]) || {__MODULE__, :render_new, []}
+    mod = get_in(assigns, [:config, :components, :new]) || Form
 
-    apply(mod, func, [assigns | args])
-  end
-
-  def render("edit.html", assigns) do
-    {mod, func, args} =
-      get_in(assigns, [:config, :components, :edit]) || {__MODULE__, :render_edit, []}
-
-    apply(mod, func, [assigns | args])
-  end
-
-  def render_new(assigns) do
     ~H"""
     <.live_component
-      module={Form}
+      module={mod}
       id="form"
       resource={@resource}
       config={@config}
@@ -216,10 +206,12 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def render_edit(assigns) do
+  def render("edit.html", assigns) do
+    mod = get_in(assigns, [:config, :components, :edit]) || Form
+
     ~H"""
     <.live_component
-      module={Form}
+      module={mod}
       id="form"
       resource={@resource}
       config={@config}
