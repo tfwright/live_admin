@@ -83,11 +83,13 @@ defmodule Demo.Accounts.User do
     field :birth_date, :date
     field :stars_count, :integer
     field :private_data, :map
-    field :password, :string
+    field :encrypted_password, :string
     field :status, Ecto.Enum, values: [:active, :suspended]
     field :tags, {:array, :string}, default: []
     field :roles, {:array, Ecto.Enum}, values: [:admin, :staff]
     field :rating, :float
+
+    field :password, :string, virtual: true
 
     embeds_one :settings, Demo.Accounts.User.Settings, on_replace: :delete
 
@@ -101,10 +103,6 @@ defmodule Demo.Accounts.User do
     |> cast(params, [:name, :stars_count, :roles])
     |> validate_number(:stars_count, greater_than_or_equal_to: 0)
     |> Demo.Repo.insert(prefix: meta[:__prefix__])
-  end
-
-  def validate(changeset, _meta) do
-    Ecto.Changeset.validate_required(changeset, [:name])
   end
 
   def deactivate(user, _) do
@@ -122,7 +120,7 @@ defmodule Demo.Accounts.User do
     |> Demo.Repo.all()
     |> Enum.each(fn user ->
       user
-      |> Ecto.Changeset.change(password: :crypto.strong_rand_bytes(16) |> Base.encode16())
+      |> Ecto.Changeset.change(encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16())
       |> Demo.Repo.update()
     end)
 
@@ -168,7 +166,7 @@ defmodule Demo.Populator do
         birth_date: ~D[1999-12-31],
         stars_count: Enum.random(0..100),
         private_data: %{},
-        password: :crypto.strong_rand_bytes(16) |> Base.encode16(),
+        encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16(),
         posts: [
           %Demo.Posts.Post{
             body: Faker.Lorem.paragraphs() |> Enum.join("\n\n"),
@@ -189,6 +187,96 @@ defmodule Demo.Populator do
   defp get_user_if(false), do: nil
 end
 
+defmodule DemoWeb.CreateUserForm do
+  use Phoenix.LiveComponent
+  use Phoenix.HTML
+
+  import LiveAdmin.Components.Container, only: [route_with_params: 2]
+  import LiveAdmin.ErrorHelpers
+
+  @impl true
+  def update(assigns, socket) do
+    socket =
+      socket
+      |> assign(assigns)
+      |> assign(:changeset, Ecto.Changeset.change(%Demo.Accounts.User{}))
+
+    {:ok, socket}
+  end
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div>
+      <.form
+        let={f}
+        for={@changeset}
+        as="params"
+        phx_change="validate"
+        phx_submit="create"
+        phx_target={@myself}
+        class="resource__form"
+      >
+
+        <div class={"field__group"}>
+          <%= label(f, :name, class: "field__label") %>
+          <%= textarea(f, :name, rows: 1, class: "field__text") %>
+          <%= error_tag(f, :name) %>
+        </div>
+
+        <div class={"field__group"}>
+          <%= label(f, :password, class: "field__label") %>
+          <%= password_input(f, :password, class: "field__text", value: input_value(f, :password)) %>
+          <%= error_tag(f, :password) %>
+        </div>
+
+        <div class={"field__group"}>
+          <%= label(f, :password_confirmation, class: "field__label") %>
+          <%= password_input(f, :password_confirmation, class: "field__text") %>
+          <%= error_tag(f, :password_confirmation) %>
+        </div>
+
+        <div class="form__actions">
+          <%= submit("Save", class: "resource__action--btn") %>
+        </div>
+      </.form>
+    </div>
+    """
+  end
+
+  @impl true
+  def handle_event(
+        "validate",
+        %{"params" => params},
+        %{assigns: %{changeset: changeset}} = socket
+      ) do
+    changeset =
+      changeset.data
+      |> Ecto.Changeset.cast(params, [:name, :password])
+      |> Ecto.Changeset.validate_required([:name, :password])
+      |> Ecto.Changeset.validate_confirmation(:password)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, changeset: changeset)}
+  end
+
+  @impl true
+  def handle_event(
+        "create",
+        %{"params" => params},
+        %{assigns: %{key: key, session_id: session_id}} =
+          socket
+      ) do
+    socket =
+      case Demo.Accounts.User.create(params, LiveAdmin.SessionStore.lookup(session_id)) do
+        {:ok, _} -> push_redirect(socket, to: route_with_params(socket, [:list, key]))
+        {:error, _} -> socket
+      end
+
+    {:noreply, socket}
+  end
+end
+
 defmodule DemoWeb.Router do
   use Phoenix.Router
   import LiveAdmin.Router
@@ -205,13 +293,9 @@ defmodule DemoWeb.Router do
     live_admin "/admin", resources: [
       {Demo.Accounts.User,
         hidden_fields: [:private_data],
-        immutable_fields: [:password, :inserted_at],
+        immutable_fields: [:encrypted_password, :inserted_at],
         create_with: {Demo.Accounts.User, :create, []},
-        validate_with: {Demo.Accounts.User, :validate, []},
-        components: [
-          new: {LiveAdmin.Components.Container, :render_new, []},
-          edit: {LiveAdmin.Components.Container, :render_edit, []}
-        ],
+        components: [new: DemoWeb.CreateUserForm],
         label_with: :name,
         actions: [:deactivate],
         tasks: [:regenerate_passwords]

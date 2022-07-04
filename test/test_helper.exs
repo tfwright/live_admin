@@ -43,7 +43,7 @@ defmodule LiveAdminTest.Router do
       resources: [
         {
           LiveAdminTest.User,
-          immutable_fields: [:password], actions: [:run_action]
+          immutable_fields: [:encrypted_password], actions: [:run_action]
         }
       ]
     )
@@ -67,7 +67,7 @@ defmodule LiveAdminTest.User do
 
   schema "users" do
     field(:name, :string)
-    field(:password, :string)
+    field(:encrypted_password, :string)
 
     belongs_to(:other_resource, OtherResource)
 

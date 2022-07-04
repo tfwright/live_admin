@@ -142,7 +142,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     test "disables immutable fields", %{response: response} do
       assert ["disabled"] ==
                response
-               |> Floki.find("textarea[name='params[password]']")
+               |> Floki.find("textarea[name='params[encrypted_password]']")
                |> Floki.attribute("disabled")
     end
   end
