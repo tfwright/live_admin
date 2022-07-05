@@ -30,11 +30,13 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def put_change(changeset, field, value) do
-    Changeset.put_change(changeset, field, value)
-  end
-
   def change(record, config, params \\ %{})
+
+  def change(changeset = %Ecto.Changeset{}, config, params) do
+    changeset
+    |> Changeset.apply_changes()
+    |> build_changeset(config, params)
+  end
 
   def change(record, config, params) when is_struct(record) do
     build_changeset(record, config, params)
@@ -81,6 +83,7 @@ defmodule LiveAdmin.Resource do
       nil -> changeset
       {mod, func_name, args} -> apply(mod, func_name, [changeset, session] ++ args)
     end
+    |> Map.put(:action, :validate)
   end
 
   def fields(resource, config) do

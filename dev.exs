@@ -145,6 +145,10 @@ defmodule Demo.Posts.Post do
   def fail(_) do
     {:error, "failed"}
   end
+
+  def validate(changeset, _meta) do
+    Ecto.Changeset.validate_required(changeset, [:body, :user_id])
+  end
 end
 
 defmodule Demo.Populator do
@@ -300,7 +304,11 @@ defmodule DemoWeb.Router do
         actions: [:deactivate],
         tasks: [:regenerate_passwords]
       },
-      {Demo.Posts.Post, immutable_fields: [:disabled_user_id], tasks: [:fail]}
+      {Demo.Posts.Post,
+        immutable_fields: [:disabled_user_id],
+        tasks: [:fail],
+        validate_with: {Demo.Posts.Post, :validate, []}
+      }
     ]
   end
 end

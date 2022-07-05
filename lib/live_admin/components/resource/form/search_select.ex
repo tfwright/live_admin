@@ -58,8 +58,9 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
         <%= if @selected_option do %>
           <a
             href="#"
-            phx-click="put_change"
+            phx-click={@handle_select}
             phx-value-field={@field}
+            phx-value-value=""
             phx-target={@form_ref}
             class="resource__action--btn"
           >
@@ -87,7 +88,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
                 <li>
                   <a
                     href="#"
-                    phx-click="put_change"
+                    phx-click={@handle_select}
                     phx-value-field={@field}
                     phx-value-value={option.id}
                     phx-target={@form_ref}

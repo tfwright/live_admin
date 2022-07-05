@@ -81,11 +81,11 @@ defmodule LiveAdmin.Components.Container.Form do
 
   @impl true
   def handle_event(
-        "put_change",
-        params = %{"field" => field},
-        socket = %{assigns: %{changeset: changeset}}
+        "validate",
+        %{"field" => field, "value" => value},
+        socket = %{assigns: %{changeset: changeset, config: config, session_id: session_id}}
       ) do
-    changeset = Resource.put_change(changeset, String.to_existing_atom(field), params["value"])
+    changeset = validate(changeset, %{field => value}, config, session_id)
 
     {:noreply, assign(socket, :changeset, changeset)}
   end
@@ -94,13 +94,9 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "validate",
         %{"params" => params},
-        %{assigns: %{changeset: changeset, config: config, session_id: session_id}} = socket
+        socket = %{assigns: %{changeset: changeset, config: config, session_id: session_id}}
       ) do
-    changeset =
-      changeset.data
-      |> Resource.change(config, params)
-      |> Resource.validate(config, SessionStore.lookup(session_id))
-      |> Map.put(:action, :validate)
+    changeset = validate(changeset, params, config, session_id)
 
     {:noreply, assign(socket, changeset: changeset)}
   end
@@ -235,6 +231,7 @@ defmodule LiveAdmin.Components.Container.Form do
             config={config}
             form_ref={@form_ref}
             session={@session}
+            handle_select="validate"
           />
         <% else %>
           <div class="form__number">
@@ -334,4 +331,10 @@ defmodule LiveAdmin.Components.Container.Form do
   end
 
   defp fields_for_embed({_, _, %{related: schema}}), do: Resource.fields(schema, %{})
+
+  defp validate(changeset, params, config, session_id) do
+    changeset
+    |> Resource.change(config, params)
+    |> Resource.validate(config, SessionStore.lookup(session_id))
+  end
 end
