@@ -32,12 +32,6 @@ defmodule LiveAdmin.Resource do
 
   def change(record, config, params \\ %{})
 
-  def change(changeset = %Ecto.Changeset{}, config, params) do
-    changeset
-    |> Changeset.apply_changes()
-    |> build_changeset(config, params)
-  end
-
   def change(record, config, params) when is_struct(record) do
     build_changeset(record, config, params)
   end

@@ -26,7 +26,7 @@ defmodule LiveAdmin.Components.Container.Form do
     socket =
       socket
       |> assign(assigns)
-      |> assign(:enabled, get_config(config, :"#{action}_with", true))
+      |> assign(:enabled, false)
       |> assign(:changeset, Resource.change(record, config))
 
     {:ok, socket}
@@ -37,7 +37,7 @@ defmodule LiveAdmin.Components.Container.Form do
     socket =
       socket
       |> assign(assigns)
-      |> assign(:enabled, get_config(config, :"#{action}_with", true))
+      |> assign(:enabled, false)
       |> assign(:changeset, Resource.change(assigns.resource, config))
 
     {:ok, socket}
@@ -85,9 +85,19 @@ defmodule LiveAdmin.Components.Container.Form do
         %{"field" => field, "value" => value},
         socket = %{assigns: %{changeset: changeset, config: config, session_id: session_id}}
       ) do
-    changeset = validate(changeset, %{field => value}, config, session_id)
+    changeset =
+      validate(
+        changeset,
+        Map.put(changeset.changes, String.to_existing_atom(field), value),
+        config,
+        session_id
+      )
 
-    {:noreply, assign(socket, :changeset, changeset)}
+    {:noreply,
+     assign(socket,
+       changeset: changeset,
+       enabled: enabled?(changeset, socket.assigns.action, config)
+     )}
   end
 
   @impl true
@@ -98,7 +108,11 @@ defmodule LiveAdmin.Components.Container.Form do
       ) do
     changeset = validate(changeset, params, config, session_id)
 
-    {:noreply, assign(socket, changeset: changeset)}
+    {:noreply,
+     assign(socket,
+       changeset: changeset,
+       enabled: enabled?(changeset, socket.assigns.action, config)
+     )}
   end
 
   @impl true
@@ -333,8 +347,12 @@ defmodule LiveAdmin.Components.Container.Form do
   defp fields_for_embed({_, _, %{related: schema}}), do: Resource.fields(schema, %{})
 
   defp validate(changeset, params, config, session_id) do
-    changeset
+    changeset.data
     |> Resource.change(config, params)
     |> Resource.validate(config, SessionStore.lookup(session_id))
+  end
+
+  def enabled?(changeset, action, config) do
+    get_config(config, :"#{action}_with", true) && Enum.empty?(changeset.errors)
   end
 end

@@ -140,6 +140,7 @@ defmodule Demo.Posts.Post do
   import Ecto.Changeset
 
   schema "posts" do
+    field :title, :string
     field :body, :string
 
     belongs_to :user, Demo.Accounts.User
@@ -153,7 +154,9 @@ defmodule Demo.Posts.Post do
   end
 
   def validate(changeset, _meta) do
-    Ecto.Changeset.validate_required(changeset, [:body, :user_id])
+    changeset
+    |> Ecto.Changeset.validate_required([:title, :body, :user_id])
+    |> Ecto.Changeset.validate_length(:title, max: 10, message: "cannot be longer than 10 characters")
   end
 end
 
