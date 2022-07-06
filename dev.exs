@@ -101,8 +101,14 @@ defmodule Demo.Accounts.User do
   def create(params, meta) do
     %__MODULE__{}
     |> cast(params, [:name, :stars_count, :roles])
-    |> validate_number(:stars_count, greater_than_or_equal_to: 0)
+    |> Ecto.Changeset.validate_required([:name])
     |> Demo.Repo.insert(prefix: meta[:__prefix__])
+  end
+
+  def validate(changeset, _meta) do
+    changeset
+    |> Ecto.Changeset.validate_required([:name])
+    |> Ecto.Changeset.validate_number(:stars_count, greater_than_or_equal_to: 0)
   end
 
   def deactivate(user, _) do
@@ -210,6 +216,8 @@ defmodule DemoWeb.CreateUserForm do
 
   @impl true
   def render(assigns) do
+    assigns = assign(assigns, :enabled, Enum.empty?(assigns.changeset.errors))
+
     ~H"""
     <div>
       <.form
@@ -241,7 +249,10 @@ defmodule DemoWeb.CreateUserForm do
         </div>
 
         <div class="form__actions">
-          <%= submit("Save", class: "resource__action--btn") %>
+        <%= submit("Save",
+          class: "resource__action#{if !@enabled, do: "--disabled", else: "--btn"}",
+          disabled: !@enabled
+          ) %>
         </div>
       </.form>
     </div>
@@ -298,6 +309,7 @@ defmodule DemoWeb.Router do
       {Demo.Accounts.User,
         hidden_fields: [:private_data],
         immutable_fields: [:encrypted_password, :inserted_at],
+        validate_with: {Demo.Accounts.User, :validate, []},
         create_with: {Demo.Accounts.User, :create, []},
         components: [new: DemoWeb.CreateUserForm],
         label_with: :name,
