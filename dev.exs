@@ -79,6 +79,7 @@ defmodule Demo.Accounts.User do
 
   schema "users" do
     field :name, :string
+    field :email, :string
     field :active, :boolean
     field :birth_date, :date
     field :stars_count, :integer
@@ -100,14 +101,15 @@ defmodule Demo.Accounts.User do
 
   def create(params, meta) do
     %__MODULE__{}
-    |> cast(params, [:name, :stars_count, :roles])
-    |> Ecto.Changeset.validate_required([:name])
+    |> cast(params, [:name, :email, :stars_count, :roles])
+    |> Ecto.Changeset.validate_required([:name, :email])
+    |> Ecto.Changeset.unique_constraint(:email)
     |> Demo.Repo.insert(prefix: meta[:__prefix__])
   end
 
   def validate(changeset, _meta) do
     changeset
-    |> Ecto.Changeset.validate_required([:name])
+    |> Ecto.Changeset.validate_required([:name, :email])
     |> Ecto.Changeset.validate_number(:stars_count, greater_than_or_equal_to: 0)
   end
 
@@ -158,6 +160,21 @@ defmodule Demo.Posts.Post do
     |> Ecto.Changeset.validate_required([:title, :body, :user_id])
     |> Ecto.Changeset.validate_length(:title, max: 10, message: "cannot be longer than 10 characters")
   end
+
+  def update(record, params, _meta) do
+    record
+    |> Ecto.Changeset.cast(params, [:title, :body, :user_id, :inserted_at])
+    |> Ecto.Changeset.validate_required([:title, :body, :user_id, :inserted_at])
+    |> Ecto.Changeset.validate_length(:title, max: 10, message: "cannot be longer than 10 characters")
+    |> Ecto.Changeset.validate_change(:title, fn _, new_title ->
+      if !String.contains?(new_title, record.title) do
+        [title: "must contain original"]
+      else
+        []
+      end
+    end)
+    |> Demo.Repo.update()
+  end
 end
 
 defmodule Demo.Populator do
@@ -174,6 +191,7 @@ defmodule Demo.Populator do
     Enum.each(1..100, fn _ ->
       %Demo.Accounts.User{
         name: Faker.Person.name(),
+        email: "#{Ecto.UUID.generate()}@example.com",
         settings: %{},
         active: true,
         birth_date: ~D[1999-12-31],
@@ -182,6 +200,7 @@ defmodule Demo.Populator do
         encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16(),
         posts: [
           %Demo.Posts.Post{
+            title: Faker.Lorem.paragraph(1) |> String.slice(0..9),
             body: Faker.Lorem.paragraphs() |> Enum.join("\n\n"),
             disabled_user: get_user_if(:rand.uniform(2) == 1)
           }
@@ -240,6 +259,12 @@ defmodule DemoWeb.CreateUserForm do
         </div>
 
         <div class={"field__group"}>
+          <%= label(f, :email, class: "field__label") %>
+          <%= textarea(f, :email, rows: 1, class: "field__text") %>
+          <%= error_tag(f, :email) %>
+        </div>
+
+        <div class={"field__group"}>
           <%= label(f, :password, class: "field__label") %>
           <%= password_input(f, :password, class: "field__text", value: input_value(f, :password)) %>
           <%= error_tag(f, :password) %>
@@ -270,8 +295,8 @@ defmodule DemoWeb.CreateUserForm do
       ) do
     changeset =
       changeset.data
-      |> Ecto.Changeset.cast(params, [:name, :password])
-      |> Ecto.Changeset.validate_required([:name, :password])
+      |> Ecto.Changeset.cast(params, [:name, :email, :password])
+      |> Ecto.Changeset.validate_required([:name, :email, :password])
       |> Ecto.Changeset.validate_confirmation(:password)
       |> Map.put(:action, :validate)
 
@@ -288,7 +313,7 @@ defmodule DemoWeb.CreateUserForm do
     socket =
       case Demo.Accounts.User.create(params, LiveAdmin.SessionStore.lookup(session_id)) do
         {:ok, _} -> push_redirect(socket, to: route_with_params(socket, [:list, key]))
-        {:error, _} -> socket
+        {:error, changeset} -> assign(socket, changeset: changeset)
       end
 
     {:noreply, socket}
@@ -322,7 +347,8 @@ defmodule DemoWeb.Router do
       {Demo.Posts.Post,
         immutable_fields: [:disabled_user_id],
         tasks: [:fail],
-        validate_with: {Demo.Posts.Post, :validate, []}
+        validate_with: {Demo.Posts.Post, :validate, []},
+        update_with: {Demo.Posts.Post, :update, []}
       }
     ]
   end

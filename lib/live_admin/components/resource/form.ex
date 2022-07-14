@@ -125,7 +125,7 @@ defmodule LiveAdmin.Components.Container.Form do
     socket =
       case Resource.create(resource, config, params, SessionStore.lookup(session_id)) do
         {:ok, _} -> push_redirect(socket, to: route_with_params(socket, [:list, key]))
-        {:error, _} -> socket
+        {:error, changeset} -> assign(socket, changeset: changeset)
       end
 
     {:noreply, socket}
@@ -152,7 +152,7 @@ defmodule LiveAdmin.Components.Container.Form do
              SessionStore.lookup(session_id)
            ) do
         {:ok, _} -> push_redirect(socket, to: route_with_params(socket, [:list, key]))
-        {:error, _} -> socket
+        {:error, changeset} -> assign(socket, changeset: changeset)
       end
 
     {:noreply, socket}

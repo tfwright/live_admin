@@ -1,6 +1,7 @@
 create table users (
   id serial,
   name varchar(100),
+  email varchar(100),
   birth_date date,
   inserted_at timestamp without time zone,
   active boolean,
@@ -15,11 +16,13 @@ create table users (
   rating real
 );
 
+CREATE UNIQUE INDEX users_email_index ON users USING btree (email);
+
 create table posts (
   id serial,
   user_id int,
   disabled_user_id int,
-  title text,
+  title text NOT NULL,
   body text,
   inserted_at timestamp without time zone
 );
@@ -29,6 +32,7 @@ create schema alt;
 create table alt.users (
   id serial,
   name varchar(100),
+  email varchar(100),
   birth_date date,
   inserted_at timestamp without time zone,
   active boolean,
@@ -42,11 +46,13 @@ create table alt.users (
   roles character varying[] DEFAULT '{}'::character varying[]
 );
 
+CREATE UNIQUE INDEX users_email_index ON alt.users USING btree (email);
+
 create table alt.posts (
   id serial,
   user_id int,
   disabled_user_id int,
-  title text,
+  title text NOT NULL,
   body text,
   inserted_at timestamp without time zone
 );
