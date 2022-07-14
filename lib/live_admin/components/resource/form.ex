@@ -22,7 +22,7 @@ defmodule LiveAdmin.Components.Container.Form do
   ]
 
   @impl true
-  def update(assigns = %{record: record, config: config, action: action}, socket) do
+  def update(assigns = %{record: record, config: config}, socket) do
     socket =
       socket
       |> assign(assigns)
@@ -33,7 +33,7 @@ defmodule LiveAdmin.Components.Container.Form do
   end
 
   @impl true
-  def update(assigns = %{config: config, action: action}, socket) do
+  def update(assigns = %{config: config}, socket) do
     socket =
       socket
       |> assign(assigns)
