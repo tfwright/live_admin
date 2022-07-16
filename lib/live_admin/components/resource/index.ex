@@ -11,9 +11,6 @@ defmodule LiveAdmin.Components.Container.Index do
 
   @impl true
   def render(assigns) do
-    {mod, func, args} =
-      get_in(assigns, [:config, :components, :index]) || {__MODULE__, :default_render, []}
-
     assigns =
       assign(assigns,
         records:
@@ -27,14 +24,6 @@ defmodule LiveAdmin.Components.Container.Index do
         sort_dir: elem(assigns.sort, 0)
       )
 
-    ~H"""
-    <div>
-      <%= apply(mod, func, args ++ [SessionStore.lookup(@session_id), assigns]) %>
-    </div>
-    """
-  end
-
-  def default_render(_, assigns) do
     ~H"""
     <div class="resource__list">
       <div class="list__search">
