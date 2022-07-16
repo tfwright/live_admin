@@ -78,7 +78,8 @@ defmodule LiveAdmin.Components.Container.Index do
                       if(field == @sort_attr,
                         do: Enum.find([:asc, :desc], &(&1 != @sort_dir)),
                         else: @sort_dir
-                      )
+                      ),
+                    s: @search
                   },
                   class:
                     "header__link#{if field == @sort_attr, do: "--#{[asc: :up, desc: :down][@sort_dir]}"}"
@@ -152,7 +153,7 @@ defmodule LiveAdmin.Components.Container.Index do
                       page: @page - 1,
                       "sort-attr": @sort_attr,
                       "sort-dir": @sort_dir,
-                      search: @search
+                      s: @search
                     },
                     class: "resource__action--btn"
                   ),
@@ -168,7 +169,7 @@ defmodule LiveAdmin.Components.Container.Index do
                       page: @page + 1,
                       "sort-attr": @sort_attr,
                       "sort-dir": @sort_dir,
-                      search: @search
+                      s: @search
                     },
                     class: "resource__action--btn"
                   ),
