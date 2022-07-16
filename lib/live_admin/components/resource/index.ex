@@ -10,9 +10,11 @@ defmodule LiveAdmin.Components.Container.Index do
   alias LiveAdmin.{Resource, SessionStore}
 
   @impl true
-  def render(assigns) do
-    assigns =
-      assign(assigns,
+  def update(assigns, socket) do
+    socket =
+      socket
+      |> assign(assigns)
+      |> assign(
         records:
           Resource.list(
             assigns.resource,
@@ -24,6 +26,11 @@ defmodule LiveAdmin.Components.Container.Index do
         sort_dir: elem(assigns.sort, 0)
       )
 
+    {:ok, socket}
+  end
+
+  @impl true
+  def render(assigns) do
     ~H"""
     <div class="resource__list">
       <div class="list__search">
