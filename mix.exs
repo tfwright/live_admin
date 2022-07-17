@@ -6,7 +6,7 @@ defmodule LiveAdmin.MixProject do
       app: :live_admin,
       name: "LiveAdmin",
       description: "A admin UI for Phoenix applications built with LiveView",
-      version: "0.4.0",
+      version: "0.5.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
