@@ -147,18 +147,23 @@ defmodule LiveAdmin.Resource do
         |> Enum.chunk_every(2)
         |> Enum.reduce(query, fn
           [field_key, q], query ->
-            if {field_name, _, _} =
-                 Enum.find(fields, fn {field_name, _, _} -> "#{field_name}:" == field_key end) do
-              or_where(
-                query,
-                [r],
-                ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
-              )
-            else
-              query
+            fields
+            |> Enum.find_value(fn {field_name, _, _} ->
+              if "#{field_name}:" == field_key, do: field_name
+            end)
+            |> case do
+              nil ->
+                query
+
+              field_name ->
+                or_where(
+                  query,
+                  [r],
+                  ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
+                )
             end
 
-          [_], query ->
+          _, query ->
             query
         end)
     end
