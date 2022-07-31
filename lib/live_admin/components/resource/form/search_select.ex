@@ -109,11 +109,11 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   def handle_event(
         "load_options",
         %{"value" => q},
-        socket = %{assigns: %{resource: resource, config: config, session: session}}
+        socket = %{assigns: %{resource: resource, session: session}}
       ) do
     options =
       resource
-      |> Resource.list(config, [search: q], session)
+      |> Resource.list([search: q], session)
       |> elem(0)
 
     {:noreply, assign(socket, :options, options)}

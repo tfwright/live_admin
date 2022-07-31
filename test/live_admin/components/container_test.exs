@@ -79,7 +79,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
-  describe "new resource page" do
+  describe "new parent resource page" do
     setup %{conn: conn} do
       {:ok, view, html} = live(conn, "/user/new")
       %{response: html, view: view}
@@ -122,6 +122,25 @@ defmodule LiveAdmin.Components.ContainerTest do
         |> render_submit(%{name: "test", settings: %{some_option: "test"}})
 
       assert [%{}] = Repo.all(User)
+    end
+  end
+
+  describe "new child resource page" do
+    setup %{conn: conn} do
+      {:ok, view, html} = live(conn, "/post/new")
+      %{response: html, view: view}
+    end
+
+    test "includes search select field", %{response: response} do
+      assert response
+             |> Floki.find("input[name='search[select]']")
+             |> Enum.any?()
+    end
+
+    test "search select responds to focus", %{view: view} do
+      view
+      |> element("input[name='search[select]']")
+      |> render_focus(%{value: "xxx"})
     end
   end
 

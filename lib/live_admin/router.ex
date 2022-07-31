@@ -1,6 +1,8 @@
 defmodule LiveAdmin.Router do
   import Phoenix.LiveView, only: [assign: 2]
 
+  alias LiveAdmin.Resource
+
   @doc """
   Defines a route that can be used to access the Admin UI for all configured resources.
 
@@ -49,18 +51,19 @@ defmodule LiveAdmin.Router do
     {resources, base_path} =
       resources
       |> Enum.map_reduce(nil, fn config, base_path ->
-        resource =
-          {mod, _} =
-          config
-          |> case do
-            {mod, opts} -> {mod, Map.new(opts)}
-            mod -> {mod, %{}}
+        resource_params =
+          case config do
+            {mod, opts} -> [schema: mod, config: Map.new(opts)]
+            mod -> [schema: mod, config: %{}]
           end
 
-        resource_path = Module.split(mod)
+        resource_path =
+          resource_params
+          |> Keyword.fetch!(:schema)
+          |> Module.split()
 
         {
-          resource,
+          struct!(Resource, resource_params),
           (base_path || Enum.drop(resource_path, -1))
           |> Enum.zip(resource_path)
           |> Enum.reduce_while([], fn
@@ -70,15 +73,13 @@ defmodule LiveAdmin.Router do
         }
       end)
 
-    resources =
-      Map.new(resources, fn resource ->
-        {derive_resource_key(elem(resource, 0), base_path), resource}
-      end)
+    resources_by_key =
+      Map.new(resources, fn r -> {derive_resource_key(r.schema, base_path), r} end)
 
     {:cont,
      assign(socket,
        title: title,
-       resources: resources,
+       resources: resources_by_key,
        socket: socket,
        components: components,
        base_path: base_path

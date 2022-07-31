@@ -1,10 +1,12 @@
 defmodule LiveAdmin.Resource do
+  defstruct [:schema, :config]
+
   import Ecto.Query
   import LiveAdmin, only: [get_config: 2, get_config: 3, repo: 0, parent_associations: 1]
 
   alias Ecto.Changeset
 
-  def find!(id, resource, prefix), do: repo().get!(resource, id, prefix: prefix)
+  def find!(id, resource, prefix), do: repo().get!(resource.schema, id, prefix: prefix)
 
   def delete(record, config, session) do
     config
@@ -18,37 +20,37 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def list(resource, config, opts, session) do
-    config
+  def list(resource, opts, session) do
+    resource.config
     |> get_config(:list_with, :default)
     |> case do
       :default ->
-        build_list(resource, config, opts, session[:__prefix__])
+        build_list(resource, opts, session[:__prefix__])
 
       {mod, func_name, args} ->
         apply(mod, func_name, [resource, opts, session] ++ args)
     end
   end
 
-  def change(record, config, params \\ %{})
+  def change(resource, record \\ nil, params \\ %{})
 
-  def change(record, config, params) when is_struct(record) do
-    build_changeset(record, config, params)
+  def change(resource, record, params) when is_struct(record) do
+    build_changeset(record, resource.config, params)
   end
 
-  def change(resource, config, params) do
-    resource
+  def change(resource, nil, params) do
+    resource.schema
     |> struct(%{})
-    |> build_changeset(config, params)
+    |> build_changeset(resource.config, params)
   end
 
-  def create(resource, config, params, session) do
-    config
+  def create(resource, params, session) do
+    resource.config
     |> get_config(:create_with, :default)
     |> case do
       :default ->
         resource
-        |> change(config, params)
+        |> change(nil, params)
         |> repo().insert(prefix: session[:__prefix__])
 
       {mod, func_name, args} ->
@@ -80,15 +82,19 @@ defmodule LiveAdmin.Resource do
     |> Map.put(:action, :validate)
   end
 
-  def fields(resource, config) do
-    Enum.flat_map(resource.__schema__(:fields), fn field_name ->
+  def fields(schema_or_resource, config \\ %{})
+
+  def fields(%{schema: schema, config: config}, _), do: fields(schema, config)
+
+  def fields(schema, config) do
+    Enum.flat_map(schema.__schema__(:fields), fn field_name ->
       config
       |> get_config(:hidden_fields, [])
       |> Enum.member?(field_name)
       |> case do
         false ->
           [
-            {field_name, resource.__schema__(:type, field_name),
+            {field_name, schema.__schema__(:type, field_name),
              [immutable: get_config(config, :immutable_fields, []) |> Enum.member?(field_name)]}
           ]
 
@@ -98,7 +104,7 @@ defmodule LiveAdmin.Resource do
     end)
   end
 
-  defp build_list(resource, config, opts, prefix) do
+  defp build_list(resource, opts, prefix) do
     opts =
       opts
       |> Enum.into(%{})
@@ -106,17 +112,17 @@ defmodule LiveAdmin.Resource do
       |> Map.put_new(:sort, {:asc, :id})
 
     query =
-      resource
+      resource.schema
       |> limit(10)
       |> offset(^((opts[:page] - 1) * 10))
       |> order_by(^[opts[:sort]])
-      |> preload(^preloads(resource, config))
+      |> preload(^preloads(resource))
 
     query =
       opts
       |> Enum.reduce(query, fn
         {:search, q}, query when byte_size(q) > 0 ->
-          apply_search(query, q, fields(resource, config))
+          apply_search(query, q, fields(resource))
 
         _, query ->
           query
@@ -169,8 +175,8 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  defp build_changeset(record = %resource{}, config, params) do
-    fields = fields(resource, config)
+  defp build_changeset(record = %schema{}, config, params) do
+    fields = fields(schema, config)
 
     {primitives, embeds} =
       Enum.split_with(fields, fn
@@ -194,11 +200,11 @@ defmodule LiveAdmin.Resource do
     end)
   end
 
-  defp preloads(resource, config) do
-    config
+  defp preloads(resource) do
+    resource.config
     |> Map.get(:preload)
     |> case do
-      nil -> resource |> parent_associations() |> Enum.map(& &1.field)
+      nil -> resource.schema |> parent_associations() |> Enum.map(& &1.field)
       {m, f, a} -> apply(m, f, [resource | a])
       preloads when is_list(preloads) -> preloads
     end

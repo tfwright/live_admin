@@ -5,7 +5,7 @@ defmodule LiveAdmin.View do
     namespace: LiveAdmin,
     root: __DIR__
 
-  import LiveAdmin, only: [resource_title: 3, resource_path: 2]
+  import LiveAdmin, only: [resource_title: 2, resource_path: 2]
   import Phoenix.LiveView.Helpers
 
   js_path = Path.join(__DIR__, "../../dist/js/app.js")
@@ -25,10 +25,11 @@ defmodule LiveAdmin.View do
   def render("app.css", _),
     do: @app_css <> Application.get_env(:live_admin, :css_overrides, @default_css_overrides)
 
-  def render_nav_menu(resources, socket, base_path) do
-    Enum.reduce(resources, %{}, fn resource = {_, {schema, _}}, groups ->
+  def render_nav_menu(resources_by_key, socket, base_path) do
+    resources_by_key
+    |> Enum.reduce(%{}, fn {key, resource}, groups ->
       path =
-        schema
+        resource
         |> resource_path(base_path)
         |> case do
           list when length(list) == 1 -> list
@@ -36,7 +37,7 @@ defmodule LiveAdmin.View do
         end
         |> Enum.map(&Access.key(&1, %{}))
 
-      update_in(groups, path, &Map.put(&1, resource, %{}))
+      update_in(groups, path, &Map.put(&1, {key, resource}, %{}))
     end)
     |> render_nav_group(socket, base_path)
   end
@@ -48,9 +49,9 @@ defmodule LiveAdmin.View do
     group
     |> Enum.sort()
     |> Enum.map(fn
-      {{key, {schema, config}}, %{}} ->
+      {{key, resource}, %{}} ->
         content_tag :li, class: "nav__item" do
-          live_redirect(resource_title(schema, config, base_path),
+          live_redirect(resource_title(resource, base_path),
             to: build_route(socket, [:list, key])
           )
         end
