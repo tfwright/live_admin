@@ -44,7 +44,8 @@ defmodule LiveAdminTest.Router do
         {
           LiveAdminTest.User,
           immutable_fields: [:encrypted_password], actions: [:run_action]
-        }
+        },
+        LiveAdminTest.Post
       ]
     )
   end

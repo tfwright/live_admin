@@ -4,7 +4,7 @@ defmodule LiveAdmin.Components.Container.Form do
 
   import Phoenix.LiveView.Helpers
   import LiveAdmin.ErrorHelpers
-  import LiveAdmin, only: [associated_resource: 3, get_config: 3]
+  import LiveAdmin, only: [associated_resource: 3, get_config: 3, get_resource: 1]
   import LiveAdmin.Components.Container, only: [route_with_params: 2]
 
   alias __MODULE__.{ArrayInput, SearchSelect}
@@ -22,23 +22,29 @@ defmodule LiveAdmin.Components.Container.Form do
   ]
 
   @impl true
-  def update(assigns = %{record: record, config: config}, socket) do
+  def update(assigns = %{record: record}, socket) do
+    resource = get_resource(assigns)
+
     socket =
       socket
       |> assign(assigns)
+      |> assign(:resource, resource)
       |> assign(:enabled, false)
-      |> assign(:changeset, Resource.change(record, config))
+      |> assign(:changeset, Resource.change(resource, record))
 
     {:ok, socket}
   end
 
   @impl true
-  def update(assigns = %{config: config}, socket) do
+  def update(assigns, socket) do
+    resource = get_resource(assigns)
+
     socket =
       socket
       |> assign(assigns)
+      |> assign(:resource, resource)
       |> assign(:enabled, false)
-      |> assign(:changeset, Resource.change(assigns.resource, config))
+      |> assign(:changeset, Resource.change(resource))
 
     {:ok, socket}
   end
@@ -56,7 +62,7 @@ defmodule LiveAdmin.Components.Container.Form do
         phx_target={@myself}
         class="resource__form"
       >
-        <%= for {field, type, opts} <- Resource.fields(@resource, @config) do %>
+        <%= for {field, type, opts} <- Resource.fields(@resource) do %>
           <.field
             field={field}
             type={type}
@@ -83,20 +89,20 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "validate",
         %{"field" => field, "value" => value},
-        socket = %{assigns: %{changeset: changeset, config: config, session_id: session_id}}
+        socket = %{assigns: %{resource: resource, changeset: changeset, session_id: session_id}}
       ) do
     changeset =
       validate(
+        resource,
         changeset,
         Map.put(changeset.changes, String.to_existing_atom(field), value),
-        config,
         session_id
       )
 
     {:noreply,
      assign(socket,
        changeset: changeset,
-       enabled: enabled?(changeset, socket.assigns.action, config)
+       enabled: enabled?(changeset, socket.assigns.action, resource.config)
      )}
   end
 
@@ -104,14 +110,14 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "validate",
         %{"params" => params},
-        socket = %{assigns: %{changeset: changeset, config: config, session_id: session_id}}
+        socket = %{assigns: %{resource: resource, changeset: changeset, session_id: session_id}}
       ) do
-    changeset = validate(changeset, params, config, session_id)
+    changeset = validate(resource, changeset, params, session_id)
 
     {:noreply,
      assign(socket,
        changeset: changeset,
-       enabled: enabled?(changeset, socket.assigns.action, config)
+       enabled: enabled?(changeset, socket.assigns.action, resource.config)
      )}
   end
 
@@ -119,11 +125,10 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "create",
         %{"params" => params},
-        %{assigns: %{resource: resource, key: key, config: config, session_id: session_id}} =
-          socket
+        %{assigns: %{resource: resource, key: key, session_id: session_id}} = socket
       ) do
     socket =
-      case Resource.create(resource, config, params, SessionStore.lookup(session_id)) do
+      case Resource.create(resource, params, SessionStore.lookup(session_id)) do
         {:ok, _} -> push_redirect(socket, to: route_with_params(socket, [:list, key]))
         {:error, changeset} -> assign(socket, changeset: changeset)
       end
@@ -135,19 +140,13 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "update",
         %{"params" => params},
-        %{
-          assigns: %{
-            key: key,
-            config: config,
-            session_id: session_id,
-            record: record
-          }
-        } = socket
+        %{assigns: %{resource: resource, key: key, session_id: session_id, record: record}} =
+          socket
       ) do
     socket =
       case Resource.update(
+             resource,
              record,
-             config,
              params,
              SessionStore.lookup(session_id)
            ) do
@@ -224,7 +223,7 @@ defmodule LiveAdmin.Components.Container.Form do
   end
 
   defp input(assigns = %{type: :id}) do
-    assigns.resource
+    assigns.resource.schema
     |> associated_resource(assigns.field, assigns.resources)
     |> case do
       nil ->
@@ -232,7 +231,7 @@ defmodule LiveAdmin.Components.Container.Form do
         <%= textarea(@form, @field, rows: 1, class: "field__text", disabled: @disabled) %>
         """
 
-      {_, {resource, config}} ->
+      {_, resource} ->
         ~H"""
         <%= unless @form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(@field) do %>
           <.live_component
@@ -242,7 +241,6 @@ defmodule LiveAdmin.Components.Container.Form do
             field={@field}
             disabled={@disabled}
             resource={resource}
-            config={config}
             form_ref={@form_ref}
             session={@session}
             handle_select="validate"
@@ -346,10 +344,10 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp fields_for_embed({_, _, %{related: schema}}), do: Resource.fields(schema, %{})
 
-  defp validate(changeset, params, config, session_id) do
-    changeset.data
-    |> Resource.change(config, params)
-    |> Resource.validate(config, SessionStore.lookup(session_id))
+  defp validate(resource, changeset, params, session_id) do
+    resource
+    |> Resource.change(changeset.data, params)
+    |> Resource.validate(resource.config, SessionStore.lookup(session_id))
   end
 
   def enabled?(changeset, action, config) do

@@ -3,7 +3,7 @@ defmodule LiveAdmin.Components.Container.Index do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [repo: 0, associated_resource: 3, record_label: 2, get_config: 3]
+    only: [repo: 0, associated_resource: 3, record_label: 2, get_config: 3, get_resource: 1]
 
   import LiveAdmin.Components.Container, only: [route_with_params: 3]
 
@@ -11,14 +11,16 @@ defmodule LiveAdmin.Components.Container.Index do
 
   @impl true
   def update(assigns, socket) do
+    resource = get_resource(assigns)
+
     socket =
       socket
       |> assign(assigns)
       |> assign(
+        resource: resource,
         records:
           Resource.list(
-            assigns.resource,
-            assigns.config,
+            resource,
             Map.take(assigns, [:prefix, :sort, :page, :search]),
             SessionStore.lookup(assigns.session_id)
           ),
@@ -60,7 +62,7 @@ defmodule LiveAdmin.Components.Container.Index do
       <table class="resource__table">
         <thead>
           <tr>
-            <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
+            <%= for {field, _, _} <- Resource.fields(@resource) do %>
               <th class="resource__header" title={field}>
                 <%= list_link(
                   @socket,
@@ -88,7 +90,7 @@ defmodule LiveAdmin.Components.Container.Index do
         <tbody id="index-page" phx-hook="IndexPage">
           <%= for record <- @records |> elem(0) do %>
             <tr>
-              <%= for {field, type, _} <- Resource.fields(@resource, @config) do %>
+              <%= for {field, type, _} <- Resource.fields(@resource) do %>
                 <td class={"resource__cell--#{type_to_css_class(type)}"}>
                   <div class="cell__contents">
                     <%= display_field(record, field, assigns) %>
@@ -110,7 +112,7 @@ defmodule LiveAdmin.Components.Container.Index do
                   to: route_with_params(@socket, [:edit, @key, record], prefix: @prefix),
                   class: "resource__action--btn"
                 ) %>
-                <%= if get_config(@config, :delete_with, true) do %>
+                <%= if get_config(@resource.config, :delete_with, true) do %>
                   <%= link("Delete",
                     to: "#",
                     "data-confirm": "Are you sure?",
@@ -120,7 +122,7 @@ defmodule LiveAdmin.Components.Container.Index do
                     class: "resource__action--btn"
                   ) %>
                 <% end %>
-                <%= for action <- Map.get(@config, :actions, []) do %>
+                <%= for action <- Map.get(@resource.config, :actions, []) do %>
                   <%= link(action |> to_string() |> humanize(),
                     to: "#",
                     "data-confirm": "Are you sure?",
@@ -137,7 +139,7 @@ defmodule LiveAdmin.Components.Container.Index do
         </tbody>
         <tfoot>
           <tr>
-            <td class="w-full" colspan={@resource |> Resource.fields(@config) |> Enum.count()}>
+            <td class="w-full" colspan={@resource |> Resource.fields() |> Enum.count()}>
               <%= if @page > 1,
                 do:
                   list_link(
@@ -186,7 +188,6 @@ defmodule LiveAdmin.Components.Container.Index do
         %{
           assigns: %{
             resource: resource,
-            config: config,
             session_id: session_id
           }
         } = socket
@@ -194,23 +195,22 @@ defmodule LiveAdmin.Components.Container.Index do
     socket =
       id
       |> Resource.find!(resource, socket.assigns.prefix)
-      |> Resource.delete(config, SessionStore.lookup(session_id))
+      |> Resource.delete(resource.config, SessionStore.lookup(session_id))
       |> case do
         {:ok, _} ->
           socket
-          |> push_event("success", %{msg: "Deleted #{resource}"})
+          |> push_event("success", %{msg: "Deleted #{resource.schema}"})
           |> assign(
             :records,
             Resource.list(
               resource,
-              config,
               Map.take(socket.assigns, [:prefix, :sort, :page, :search]),
               SessionStore.lookup(session_id)
             )
           )
 
         {:error, _} ->
-          push_event(socket, "error", %{msg: "Could not delete #{resource}"})
+          push_event(socket, "error", %{msg: "Could not delete #{resource.schema}"})
       end
 
     {:noreply, socket}
@@ -225,11 +225,11 @@ defmodule LiveAdmin.Components.Container.Index do
     session = SessionStore.lookup(socket.assigns.session_id)
 
     {m, f, a} =
-      socket.assigns.config
+      socket.assigns.resource.config
       |> get_config(:actions, [])
       |> Enum.find_value(fn
         {^action_name, mfa} -> mfa
-        ^action_name -> {socket.assigns.resource, action_name, []}
+        ^action_name -> {socket.assigns.resource.schema, action_name, []}
       end)
 
     socket =
@@ -243,7 +243,6 @@ defmodule LiveAdmin.Components.Container.Index do
             :records,
             Resource.list(
               socket.assigns.resource,
-              socket.assigns.config,
               Map.take(socket.assigns, [:prefix, :sort, :page, :search]),
               SessionStore.lookup(socket.assigns.session_id)
             )

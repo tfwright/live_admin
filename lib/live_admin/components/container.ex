@@ -3,22 +3,18 @@ defmodule LiveAdmin.Components.Container do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [resource_title: 3, get_config: 3]
+    only: [resource_title: 2, get_config: 3, get_resource: 1]
 
   alias __MODULE__.{Form, Index}
   alias LiveAdmin.{Resource, SessionStore}
 
   @impl true
   def mount(%{"resource_id" => key}, %{"id" => session_id}, socket) do
-    {resource, config} = Map.fetch!(socket.assigns.resources, key)
-
     SessionStore.get_or_init(session_id)
 
     socket =
       assign(socket,
-        resource: resource,
         key: key,
-        config: config,
         session_id: session_id,
         loading: !connected?(socket)
       )
@@ -27,13 +23,14 @@ defmodule LiveAdmin.Components.Container do
   end
 
   @impl true
-  def handle_params(params, _uri, socket = %{assigns: %{live_action: :edit, loading: false}}) do
+  def handle_params(
+        params = %{"record_id" => id},
+        _uri,
+        socket = %{assigns: %{live_action: :edit, loading: false}}
+      ) do
     socket = assign_prefix(socket, params["prefix"])
 
-    record =
-      params
-      |> Map.fetch!("record_id")
-      |> Resource.find!(socket.assigns.resource, socket.assigns.prefix)
+    record = Resource.find!(id, get_resource(socket.assigns), socket.assigns.prefix)
 
     socket = assign(socket, record: record)
 
@@ -84,12 +81,14 @@ defmodule LiveAdmin.Components.Container do
 
     session = SessionStore.lookup(socket.assigns.session_id)
 
+    resource = get_resource(socket.assigns)
+
     {m, f, a} =
-      socket.assigns.config
+      resource.config
       |> get_config(:tasks, [])
       |> Enum.find_value(fn
         {^task_name, mfa} -> mfa
-        ^task_name -> {socket.assigns.resource, task_name, []}
+        ^task_name -> {resource.schema, task_name, []}
       end)
 
     socket =
@@ -111,10 +110,12 @@ defmodule LiveAdmin.Components.Container do
 
   @impl true
   def render(assigns) do
+    assigns = assign(assigns, :resource, get_resource(assigns))
+
     ~H"""
     <div class="resource__banner">
       <h1 class="resource__title">
-        <%= resource_title(@resource, @config, @base_path) %>
+        <%= resource_title(@resource, @base_path) %>
       </h1>
 
       <div class="resource__actions">
@@ -123,13 +124,13 @@ defmodule LiveAdmin.Components.Container do
             to: route_with_params(@socket, [:list, @key], prefix: @prefix),
             class: "resource__action--btn"
           ) %>
-          <%= if get_config(@config, :create_with, true) do %>
+          <%= if get_config(@resource, :create_with, true) do %>
             <%= live_redirect("New",
               to: route_with_params(@socket, [:new, @key], prefix: @prefix),
               class: "resource__action--btn"
             ) %>
           <% end %>
-          <%= for key <- get_task_keys(@config) do %>
+          <%= for key <- get_task_keys(@resource.config) do %>
             <%= link(key |> to_string() |> humanize(),
               to: "#",
               "data-confirm": "Are you sure?",
@@ -177,8 +178,6 @@ defmodule LiveAdmin.Components.Container do
       id="list"
       socket={@socket}
       resources={@resources}
-      resource={@resource}
-      config={@config}
       key={@key}
       page={@page}
       sort={@sort}
@@ -196,8 +195,6 @@ defmodule LiveAdmin.Components.Container do
     <.live_component
       module={mod}
       id="form"
-      resource={@resource}
-      config={@config}
       action="create"
       session_id={@session_id}
       key={@key}
@@ -213,8 +210,6 @@ defmodule LiveAdmin.Components.Container do
     <.live_component
       module={mod}
       id="form"
-      resource={@resource}
-      config={@config}
       action="update"
       session_id={@session_id}
       key={@key}
