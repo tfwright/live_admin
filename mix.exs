@@ -58,6 +58,11 @@ defmodule LiveAdmin.MixProject do
     ]
   end
 
-  defp compilers(:dev), do: [:docout]
-  defp compilers(_), do: []
+  defp compilers(env) do
+    if env == :dev && System.get_env("LIVE_ADMIN_DEV") do
+      [:docout]
+    else
+      []
+    end
+  end
 end
