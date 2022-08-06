@@ -9,6 +9,7 @@ defmodule LiveAdmin.MixProject do
       version: "0.5.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       aliases: aliases(),
       package: [
@@ -58,6 +59,19 @@ defmodule LiveAdmin.MixProject do
     ]
   end
 
-  defp compilers(:dev), do: [:docout]
-  defp compilers(_), do: []
+  defp compilers(env) do
+    if env == :dev && System.get_env("LIVE_ADMIN_DEV") do
+      [:docout]
+    else
+      []
+    end
+  end
+
+  defp elixirc_paths(env) do
+    if env == :dev && System.get_env("LIVE_ADMIN_DEV") do
+      ["lib", "dev"]
+    else
+      ["lib"]
+    end
+  end
 end
