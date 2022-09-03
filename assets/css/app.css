@@ -300,7 +300,7 @@
     @apply cursor-pointer;
   }
 
-  .resource__cell:hover .cell__copy {
+  [class^="resource__cell"]:hover .cell__copy {
     @apply block;
   }
 
