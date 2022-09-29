@@ -1,5 +1,5 @@
 defmodule LiveAdmin.Router do
-  import Phoenix.LiveView, only: [assign: 2]
+  import Phoenix.Component, only: [assign: 2]
 
   alias LiveAdmin.Resource
 
