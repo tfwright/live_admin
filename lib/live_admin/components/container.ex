@@ -170,7 +170,10 @@ defmodule LiveAdmin.Components.Container do
   end
 
   def render("list.html", assigns) do
-    mod = get_in(assigns, [:config, :components, :list]) || Index
+    mod =
+      assigns.resource.config
+      |> get_config(:components, [])
+      |> Keyword.get(:list, Index)
 
     ~H"""
     <.live_component
@@ -189,7 +192,10 @@ defmodule LiveAdmin.Components.Container do
   end
 
   def render("new.html", assigns) do
-    mod = get_in(assigns, [:config, :components, :new]) || Form
+    mod =
+      assigns.resource.config
+      |> get_config(:components, [])
+      |> Keyword.get(:new, Form)
 
     ~H"""
     <.live_component
@@ -204,7 +210,10 @@ defmodule LiveAdmin.Components.Container do
   end
 
   def render("edit.html", assigns) do
-    mod = get_in(assigns, [:config, :components, :edit]) || Form
+    mod =
+      assigns.resource.config
+      |> get_config(:components, [])
+      |> Keyword.get(:edit, Form)
 
     ~H"""
     <.live_component
