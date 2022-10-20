@@ -109,6 +109,10 @@
     @apply pl-1;
   }
 
+  .nav__item--drop {
+    @apply whitespace-nowrap;
+  }
+
   .nav__item--drop input {
     @apply hidden;
   }

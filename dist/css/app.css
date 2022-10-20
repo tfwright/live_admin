@@ -574,6 +574,10 @@ select:focus {
   padding-left: 0.25rem;
 }
 
+.nav__item--drop {
+  white-space: nowrap;
+}
+
 .nav__item--drop input {
   display: none;
 }

@@ -9,7 +9,7 @@ services:
       - .:/opt/app
     environment:
       PG_URL: postgres:postgres@db
-      LIVE_ADMIN_DEV: true
+      LIVE_ADMIN_DEV: 'true'
     depends_on:
       - db
     command: mix dev

@@ -40,7 +40,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     <div>
       <span class="resource__action--disabled">
         <%= if @selected_option do %>
-          <%= record_label(@selected_option, @config) %>
+          <%= record_label(@selected_option, @resource) %>
         <% else %>
           None
         <% end %>
@@ -64,7 +64,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
             phx-target={@form_ref}
             class="resource__action--btn"
           >
-            <%= record_label(@selected_option, @config) %>
+            <%= record_label(@selected_option, @resource) %>
           </a>
         <% else %>
           <%= text_input(:search, :select,
@@ -93,7 +93,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
                     phx-value-value={option.id}
                     phx-target={@form_ref}
                   >
-                    <%= record_label(option, @config) %>
+                    <%= record_label(option, @resource) %>
                   </a>
                 </li>
               <% end %>
@@ -109,11 +109,11 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   def handle_event(
         "load_options",
         %{"value" => q},
-        socket = %{assigns: %{resource: resource, config: config, session: session}}
+        socket = %{assigns: %{resource: resource, session: session}}
       ) do
     options =
       resource
-      |> Resource.list(config, [search: q], session)
+      |> Resource.list([search: q], session)
       |> elem(0)
 
     {:noreply, assign(socket, :options, options)}
