@@ -272,13 +272,13 @@ defmodule LiveAdmin.Components.Container.Index do
   end
 
   defp display_field(record = %schema{}, field_name, assigns) do
-    with {key, {_, config}} <-
+    with {key, resource} <-
            associated_resource(schema, field_name, assigns.resources),
          assoc_name <- get_assoc_name!(schema, field_name),
          %{^assoc_name => assoc_record} when not is_nil(assoc_record) <-
            repo().preload(record, assoc_name) do
       assoc_record
-      |> record_label(config)
+      |> record_label(resource)
       |> live_redirect(
         to: route_with_params(assigns.socket, [:edit, key, assoc_record], prefix: assigns.prefix),
         class: "resource__action--btn"
