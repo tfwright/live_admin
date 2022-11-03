@@ -77,6 +77,7 @@ defmodule Demo.Accounts.User do
 
   import Ecto.Changeset
 
+  @primary_key {:id, :binary_id, autogenerate: true}
   schema "users" do
     field :name, :string
     field :email, :string
@@ -145,8 +146,8 @@ defmodule Demo.Posts.Post do
     field :title, :string
     field :body, :string
 
-    belongs_to :user, Demo.Accounts.User
-    belongs_to :disabled_user, Demo.Accounts.User
+    belongs_to :user, Demo.Accounts.User, type: :binary_id
+    belongs_to :disabled_user, Demo.Accounts.User, type: :binary_id
 
     timestamps(updated_at: false)
   end

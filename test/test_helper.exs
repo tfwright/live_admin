@@ -66,6 +66,7 @@ end
 defmodule LiveAdminTest.User do
   use Ecto.Schema
 
+  @primary_key {:id, :binary_id, autogenerate: true}
   schema "users" do
     field(:name, :string)
     field(:encrypted_password, :string)
@@ -82,7 +83,7 @@ defmodule LiveAdminTest.Post do
   use Ecto.Schema
 
   schema "posts" do
-    belongs_to(:user, LiveAdminTest.User)
+    belongs_to(:user, LiveAdminTest.User, type: :binary_id)
   end
 end
 
