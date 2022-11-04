@@ -1,5 +1,5 @@
 create table users (
-  id serial,
+  id uuid,
   name varchar(100),
   email varchar(100),
   birth_date date,
@@ -20,8 +20,8 @@ CREATE UNIQUE INDEX users_email_index ON users USING btree (email);
 
 create table posts (
   id serial,
-  user_id int,
-  disabled_user_id int,
+  user_id uuid,
+  disabled_user_id uuid,
   title text NOT NULL,
   body text,
   inserted_at timestamp without time zone
@@ -30,7 +30,7 @@ create table posts (
 create schema alt;
 
 create table alt.users (
-  id serial,
+  id uuid,
   name varchar(100),
   email varchar(100),
   birth_date date,
@@ -50,8 +50,8 @@ CREATE UNIQUE INDEX users_email_index ON alt.users USING btree (email);
 
 create table alt.posts (
   id serial,
-  user_id int,
-  disabled_user_id int,
+  user_id uuid,
+  disabled_user_id uuid,
   title text NOT NULL,
   body text,
   inserted_at timestamp without time zone

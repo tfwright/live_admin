@@ -18,6 +18,7 @@ defmodule LiveAdmin.Components.Container.Form do
     :naive_datetime,
     :utc_datetime,
     :id,
+    :binary_id,
     :float
   ]
 
@@ -222,7 +223,7 @@ defmodule LiveAdmin.Components.Container.Form do
     """
   end
 
-  defp input(assigns = %{type: :id}) do
+  defp input(assigns = %{type: id}) when id in [:id, :binary_id] do
     assigns.resource.schema
     |> associated_resource(assigns.field, assigns.resources)
     |> case do
