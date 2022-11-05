@@ -243,6 +243,7 @@
   }
 
   .list__search {
+    @apply bg-transparent;
     @apply flex;
     @apply m-1;
   }
