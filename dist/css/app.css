@@ -508,6 +508,10 @@ select:focus {
   --tw-shadow-colored: 0 0 #0000;
 }
 
+.topbar {
+  background-color: transparent;
+}
+
 .disabled {
   opacity: 0.3;
 }

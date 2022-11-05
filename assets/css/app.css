@@ -39,6 +39,10 @@
 }
 
 @layer components {
+  .topbar {
+    @apply bg-transparent;
+  }
+
   .disabled {
     @apply opacity-30;
   }

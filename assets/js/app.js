@@ -5,7 +5,7 @@ import ClipboardJS from 'clipboard'
 import Toastify from 'toastify-js'
 import topbar from "topbar"
 
-topbar.config({barColors: {0: "rgb(67, 56, 202)"}, shadowColor: "rgba(0, 0, 0, .3)"})
+topbar.config({barColors: {0: "rgb(67, 56, 202)"}, shadowColor: "rgba(0, 0, 0, .3)", className: "topbar"})
 window.addEventListener("phx:page-loading-start", info => topbar.show())
 window.addEventListener("phx:page-loading-stop", info => topbar.hide())
 window.addEventListener("phx:success", (e) => {
@@ -43,7 +43,7 @@ liveSocket.connect()
 
 // Expose liveSocket on window for web console debug logs and latency simulation:
 // >> liveSocket.enableDebug()
-// >> liveSocket.enableLatencySim(1000)
+liveSocket.enableLatencySim(1000)
 // The latency simulator is enabled for the duration of the browser session.
 // Call disableLatencySim() to disable:
 // >> liveSocket.disableLatencySim()
