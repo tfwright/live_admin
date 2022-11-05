@@ -548,7 +548,10 @@ select:focus {
 
 .nav__list > .nav__item:first-of-type {
   border-bottom-width: 1px;
-  margin-bottom: 0.25rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
 }
 
 .nav__item {
@@ -560,6 +563,7 @@ select:focus {
 .nav__item a {
   padding: 0.25rem;
   margin: 0.25rem;
+  margin-left: 0.75rem;
   border-radius: 0.25rem;
 }
 
@@ -583,6 +587,7 @@ select:focus {
 }
 
 .nav__item--drop label {
+  padding-left: 0.25rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.25s ease-out;
