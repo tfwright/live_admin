@@ -28,7 +28,7 @@ Hooks.IndexPage = {
 
     clipboard.on('success', function(e) {
       Toastify({
-        text: "Copied column value",
+        text: e.trigger.dataset.message,
         className: "toast__container",
       }).showToast();
     });

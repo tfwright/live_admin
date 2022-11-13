@@ -217,7 +217,7 @@
     @apply relative;
   }
 
-  .resource__action--drop nav {
+  [class$="--drop"] nav {
     @apply appearance-none;
     @apply hidden;
     @apply absolute;
@@ -231,11 +231,27 @@
     @apply z-50;
     @apply max-h-80;
     @apply overflow-y-scroll;
+    @apply p-1;
   }
 
-  .resource__action--drop:focus-within nav {
+  [class$="--drop"]:focus-within nav {
     @apply block;
     @apply translate-y-1;
+    @apply bg-white;
+  }
+
+  [class$="--drop"] nav a:hover {
+    @apply underline;
+  }
+
+  [class^="resource__cell"] nav {
+    @apply ml-2;
+    @apply w-auto;
+  }
+
+  [class^="resource__cell"] nav li:last-child:not(:only-child) {
+    @apply border-t;
+    @apply mt-1;
   }
 
   .resource__list {
@@ -293,29 +309,25 @@
     @apply px-4;
     @apply py-2;
     @apply relative;
+    @apply h-20;
+  }
+
+  [class^="resource__cell"]:hover {
+    @apply cursor-pointer;
+    @apply delay-100;
   }
 
   .cell__contents {
-    @apply max-h-20;
     @apply overflow-y-auto;
+    @apply flex;
+    @apply h-full;
+    @apply w-full;
+    @apply justify-center;
+    align-items: safe center;
   }
 
   .cell__copy {
-    @apply hidden;
-    @apply absolute;
-    @apply bottom-0;
-    @apply right-0;
-    @apply m-1;
     @apply cursor-pointer;
-  }
-
-  [class^="resource__cell"]:hover .cell__copy {
-    @apply block;
-  }
-
-  .cell__copy svg {
-    @apply w-5;
-    @apply h-5;
   }
 
   .resource__form {

@@ -741,7 +741,7 @@ select:focus {
   position: relative;
 }
 
-.resource__action--drop nav {
+[class$="--drop"] nav {
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
@@ -759,12 +759,30 @@ select:focus {
   z-index: 50;
   max-height: 20rem;
   overflow-y: scroll;
+  padding: 0.25rem;
 }
 
-.resource__action--drop:focus-within nav {
+[class$="--drop"]:focus-within nav {
   display: block;
   --tw-translate-y: 0.25rem;
   transform: var(--tw-transform);
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
+[class$="--drop"] nav a:hover {
+  -webkit-text-decoration-line: underline;
+          text-decoration-line: underline;
+}
+
+[class^="resource__cell"] nav {
+  margin-left: 0.5rem;
+  width: auto;
+}
+
+[class^="resource__cell"] nav li:last-child:not(:only-child) {
+  border-top-width: 1px;
+  margin-top: 0.25rem;
 }
 
 .resource__list {
@@ -846,29 +864,25 @@ select:focus {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   position: relative;
+  height: 5rem;
+}
+
+[class^="resource__cell"]:hover {
+  cursor: pointer;
+  transition-delay: 100ms;
 }
 
 .cell__contents {
-  max-height: 5rem;
   overflow-y: auto;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: safe center;
 }
 
 .cell__copy {
-  display: none;
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
-  margin: 0.25rem;
   cursor: pointer;
-}
-
-[class^="resource__cell"]:hover .cell__copy {
-  display: block;
-}
-
-.cell__copy svg {
-  width: 1.25rem;
-  height: 1.25rem;
 }
 
 .resource__form {
@@ -1036,6 +1050,10 @@ select:focus {
 
 .table {
   display: table;
+}
+
+.contents {
+  display: contents;
 }
 
 .w-full {

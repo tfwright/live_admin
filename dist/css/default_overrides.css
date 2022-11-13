@@ -21,6 +21,14 @@ body {
   background-color: rgb(224 231 255);
 }
 
+[class^="resource__cell"]:focus-within {
+  background-color: rgb(224 231 255);
+}
+
+[class^="resource__cell"]:hover {
+  background-color: rgb(224 231 255);
+}
+
 .nav a:hover {
   background-color: rgb(165 180 252);
 }

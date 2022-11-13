@@ -8,11 +8,12 @@ defmodule LiveAdmin do
   def get_resource(resources, schema) when is_atom(schema),
     do: Enum.find(resources, &(&1.schema == schema))
 
-  def associated_resource(schema, field_name, resources) do
+  def associated_resource(schema, field_name, resources, elem \\ :resource) do
     with %{related: assoc_schema} <-
            schema |> parent_associations() |> Enum.find(&(&1.owner_key == field_name)),
-         config <- Enum.find(resources, fn {_, resource} -> resource.schema == assoc_schema end) do
-      config
+         config when not is_nil(config) <-
+           Enum.find(resources, fn {_, resource} -> resource.schema == assoc_schema end) do
+      elem(config, if(elem == :key, do: 0, else: 1))
     else
       _ -> nil
     end
@@ -34,6 +35,8 @@ defmodule LiveAdmin do
       title when is_binary(title) -> title
     end
   end
+
+  def record_label(nil, _), do: nil
 
   def record_label(record, resource) do
     case get_config(resource.config, :label_with, :id) do
