@@ -225,13 +225,13 @@
     @apply left-0;
     @apply border;
     @apply rounded-md;
-    @apply w-full;
     @apply pl-2;
     @apply truncate;
     @apply z-50;
     @apply max-h-80;
     @apply overflow-y-scroll;
     @apply p-1;
+    @apply ml-2;
   }
 
   [class$="--drop"]:focus-within nav {
@@ -242,11 +242,6 @@
 
   [class$="--drop"] nav a:hover {
     @apply underline;
-  }
-
-  [class^="resource__cell"] nav {
-    @apply ml-2;
-    @apply w-auto;
   }
 
   [class^="resource__cell"] nav li:last-child:not(:only-child) {

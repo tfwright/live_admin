@@ -751,7 +751,6 @@ select:focus {
   left: 0px;
   border-width: 1px;
   border-radius: 0.375rem;
-  width: 100%;
   padding-left: 0.5rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -760,6 +759,7 @@ select:focus {
   max-height: 20rem;
   overflow-y: scroll;
   padding: 0.25rem;
+  margin-left: 0.5rem;
 }
 
 [class$="--drop"]:focus-within nav {
@@ -773,11 +773,6 @@ select:focus {
 [class$="--drop"] nav a:hover {
   -webkit-text-decoration-line: underline;
           text-decoration-line: underline;
-}
-
-[class^="resource__cell"] nav {
-  margin-left: 0.5rem;
-  width: auto;
 }
 
 [class^="resource__cell"] nav li:last-child:not(:only-child) {
