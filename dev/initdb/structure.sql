@@ -43,7 +43,8 @@ create table alt.users (
   status varchar(100),
   other_resource_id int,
   tags jsonb,
-  roles character varying[] DEFAULT '{}'::character varying[]
+  roles character varying[] DEFAULT '{}'::character varying[],
+  rating real
 );
 
 CREATE UNIQUE INDEX users_email_index ON alt.users USING btree (email);
