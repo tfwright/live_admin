@@ -41,10 +41,9 @@ let liveSocket = new LiveSocket("/live", Socket, {hooks: Hooks, params: {_csrf_t
 // Connect if there are any LiveViews on the page
 liveSocket.connect()
 
-// Expose liveSocket on window for web console debug logs and latency simulation:
-// >> liveSocket.enableDebug()
-liveSocket.enableLatencySim(1000)
-// The latency simulator is enabled for the duration of the browser session.
-// Call disableLatencySim() to disable:
-// >> liveSocket.disableLatencySim()
+if (ENV == "dev") {
+  liveSocket.enableDebug()
+  liveSocket.enableLatencySim(1000)
+}
+
 window.liveSocket = liveSocket
