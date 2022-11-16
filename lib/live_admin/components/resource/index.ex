@@ -3,7 +3,14 @@ defmodule LiveAdmin.Components.Container.Index do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [repo: 0, associated_resource: 3, record_label: 2, get_config: 3, get_resource: 1]
+    only: [
+      repo: 0,
+      associated_resource: 3,
+      associated_resource: 4,
+      record_label: 2,
+      get_config: 3,
+      get_resource: 1
+    ]
 
   import LiveAdmin.Components.Container, only: [route_with_params: 3]
 
@@ -84,62 +91,84 @@ defmodule LiveAdmin.Components.Container.Index do
                 ) %>
               </th>
             <% end %>
-            <th class="resource__header">Actions</th>
           </tr>
         </thead>
         <tbody id="index-page" phx-hook="IndexPage">
           <%= for record <- @records |> elem(0) do %>
             <tr>
-              <%= for {field, type, _} <- Resource.fields(@resource) do %>
-                <td class={"resource__cell--#{type_to_css_class(type)}"}>
-                  <div class="cell__contents">
-                    <%= display_field(record, field, assigns) %>
-                  </div>
-                  <%= if Map.fetch!(record, field) do %>
-                    <div
-                      class="cell__copy"
-                      data-clipboard-text={record |> Map.fetch!(field) |> print()}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M 4 2 C 2.895 2 2 2.895 2 4 L 2 18 L 4 18 L 4 4 L 18 4 L 18 2 L 4 2 z M 8 6 C 6.895 6 6 6.895 6 8 L 6 20 C 6 21.105 6.895 22 8 22 L 20 22 C 21.105 22 22 21.105 22 20 L 22 8 C 22 6.895 21.105 6 20 6 L 8 6 z M 8 8 L 20 8 L 20 20 L 8 20 L 8 8 z" />
-                      </svg>
-                    </div>
-                  <% end %>
+              <%= for {field, type, _} <- Resource.fields(@resource), contents = cell_contents(record, field, @resource, @resources) do %>
+                <td class={"resource__cell--#{type_to_css_class(type)} resource__cell--drop"}>
+                  <a class="cell__contents" href="#">
+                    <%= contents %>
+                  </a>
+                  <nav>
+                    <ul>
+                      <%= if @resource.schema.__schema__(:primary_key) |> List.first() == field do %>
+                        <li>
+                          <%= live_redirect("Edit",
+                            to: route_with_params(@socket, [:edit, @key, record], prefix: @prefix)
+                          ) %>
+                        </li>
+                        <%= if get_config(@resource.config, :delete_with, true) do %>
+                          <li>
+                            <%= link("Delete",
+                              to: "#",
+                              "data-confirm": "Are you sure?",
+                              "phx-click": "delete",
+                              "phx-value-id": record.id,
+                              "phx-target": @myself
+                            ) %>
+                          </li>
+                        <% end %>
+                        <%= for action <- Map.get(@resource.config, :actions, []) do %>
+                          <li>
+                            <%= link(action |> to_string() |> humanize(),
+                              to: "#",
+                              "data-confirm": "Are you sure?",
+                              "phx-click": "action",
+                              "phx-value-id": record.id,
+                              "phx-value-action": action,
+                              "phx-target": @myself
+                            ) %>
+                          </li>
+                        <% end %>
+                      <% end %>
+                      <%= if associated_resource(@resource.schema, field, @resources) && associated_record(record, field) do %>
+                        <li>
+                          <%= live_redirect("Edit associated record",
+                            to:
+                              route_with_params(
+                                assigns.socket,
+                                [
+                                  :edit,
+                                  associated_resource(@resource.schema, field, @resources, :key),
+                                  associated_record(record, field)
+                                ],
+                                prefix: assigns.prefix
+                              )
+                          ) %>
+                        </li>
+                      <% end %>
+                      <li>
+                        <a
+                          href="#"
+                          class="cell__copy"
+                          data-message="Copied cell contents to clipboard"
+                          data-clipboard-text={print(contents)}
+                        >
+                          Copy
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
                 </td>
               <% end %>
-              <td class="resource__cell--actions">
-                <%= live_redirect("Edit",
-                  to: route_with_params(@socket, [:edit, @key, record], prefix: @prefix),
-                  class: "resource__action--btn"
-                ) %>
-                <%= if get_config(@resource.config, :delete_with, true) do %>
-                  <%= link("Delete",
-                    to: "#",
-                    "data-confirm": "Are you sure?",
-                    "phx-click": "delete",
-                    "phx-value-id": record.id,
-                    "phx-target": @myself,
-                    class: "resource__action--btn"
-                  ) %>
-                <% end %>
-                <%= for action <- Map.get(@resource.config, :actions, []) do %>
-                  <%= link(action |> to_string() |> humanize(),
-                    to: "#",
-                    "data-confirm": "Are you sure?",
-                    "phx-click": "action",
-                    "phx-value-id": record.id,
-                    "phx-value-action": action,
-                    "phx-target": @myself,
-                    class: "resource__action--btn"
-                  ) %>
-                <% end %>
-              </td>
             </tr>
           <% end %>
         </tbody>
         <tfoot>
           <tr>
-            <td class="w-full" colspan={@resource |> Resource.fields() |> Enum.count()}>
+            <td class="w-full" colspan={@resource |> Resource.fields() |> Enum.count() |> Kernel.-(1)}>
               <%= if @page > 1,
                 do:
                   list_link(
@@ -271,21 +300,25 @@ defmodule LiveAdmin.Components.Container.Index do
     {:noreply, socket}
   end
 
-  defp display_field(record = %schema{}, field_name, assigns) do
-    with {key, resource} <-
-           associated_resource(schema, field_name, assigns.resources),
-         assoc_name <- get_assoc_name!(schema, field_name),
-         %{^assoc_name => assoc_record} when not is_nil(assoc_record) <-
-           repo().preload(record, assoc_name) do
+  defp associated_record(record = %schema{}, field_name) do
+    with assoc_name when not is_nil(assoc_name) <- get_assoc_name!(schema, field_name),
+         %{^assoc_name => assoc_record} <- repo().preload(record, assoc_name) do
       assoc_record
-      |> record_label(resource)
-      |> live_redirect(
-        to: route_with_params(assigns.socket, [:edit, key, assoc_record], prefix: assigns.prefix),
-        class: "resource__action--btn"
+    else
+      _ -> nil
+    end
+  end
+
+  def cell_contents(record, field, resource, resources) do
+    if associated_resource(resource.schema, field, resources) do
+      record_label(
+        associated_record(record, field),
+        associated_resource(resource.schema, field, resources)
       )
     else
-      _ -> record |> Map.fetch!(field_name) |> print()
+      record |> Map.fetch!(field)
     end
+    |> print()
   end
 
   defp list_link(socket, content, key, params, opts),

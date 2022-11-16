@@ -232,7 +232,7 @@ defmodule LiveAdmin.Components.Container.Form do
         <%= textarea(@form, @field, rows: 1, class: "field__text", disabled: @disabled) %>
         """
 
-      {_, resource} ->
+      resource ->
         ~H"""
         <%= unless @form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(@field) do %>
           <.live_component
