@@ -7,9 +7,9 @@ defmodule LiveAdmin.Components.Home do
   end
 
   @impl true
-  def render(assigns = %{title: title}) do
+  def render(assigns = %{title: _title}) do
     ~H"""
-    <h1 class="home__title"><%= title %></h1>
+    <h1 class="home__title"><%= @title %></h1>
     <%= render("home.html", assigns) %>
     """
   end
