@@ -20,7 +20,9 @@ defmodule LiveAdmin.View do
   @app_css File.read!(css_path)
   @default_css_overrides File.read!(default_css_overrides_path)
 
-  def render("app.js", _), do: @app_js
+  @env Mix.env()
+
+  def render("app.js", _), do: "var ENV = \"#{@env}\";" <> @app_js
 
   def render("app.css", _),
     do: @app_css <> Application.get_env(:live_admin, :css_overrides, @default_css_overrides)
