@@ -32,7 +32,7 @@
     </main>
   </body>
   <script>
-    var ENV = "<%= Mix.env() %>";
+    var ENV = "<%= if(Application.get_env(:live_admin, :debug), do: "dev", else: "prod") %>";
     <%= raw(render("app.js")) %>
   </script>
 </html>

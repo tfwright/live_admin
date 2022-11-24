@@ -40,7 +40,7 @@ Application.put_env(:live_admin, DemoWeb.Endpoint,
   ],
   pubsub_server: Demo.PubSub
 )
-
+Application.put_env(:live_admin, :debug, true)
 Application.put_env(:live_admin, :ecto_repo, Demo.Repo)
 Application.put_env(:live_admin, :prefix_options, ["public", "this-is-a-fake-schema-with-a-really-long-name", "alt"])
 Application.put_env(:live_admin, :immutable_fields, [:inserted_at])
