@@ -148,7 +148,7 @@ defmodule LiveAdmin.Components.Container do
             </nav>
           </div>
           <%= if Application.get_env(:live_admin, :prefix_options) do %>
-            <div class="resource__action--drop">
+            <div id="prefix-select" class="resource__action--drop">
               <button class="resource__action--btn">
                 <%= @prefix || "Set prefix" %>
               </button>
