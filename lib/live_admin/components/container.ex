@@ -134,16 +134,16 @@ defmodule LiveAdmin.Components.Container do
             <button class="resource__action--btn">Run task</button>
             <nav>
               <ul>
-              <%= for key <- get_task_keys(@resource.config) do %>
-                <li>
-                  <%= link(key |> to_string() |> humanize(),
-                    to: "#",
-                    "data-confirm": "Are you sure?",
-                    "phx-click": "task",
-                    "phx-value-task": key
-                  ) %>
-                </li>
-              <% end %>
+                <%= for key <- get_task_keys(@resource.config) do %>
+                  <li>
+                    <%= link(key |> to_string() |> humanize(),
+                      to: "#",
+                      "data-confirm": "Are you sure?",
+                      "phx-click": "task",
+                      "phx-value-task": key
+                    ) %>
+                  </li>
+                <% end %>
               </ul>
             </nav>
           </div>
