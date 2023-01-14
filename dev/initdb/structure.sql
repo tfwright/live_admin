@@ -11,7 +11,6 @@ create table users (
   encrypted_password text,
   status varchar(100),
   other_resource_id int,
-  tags jsonb,
   roles character varying[] DEFAULT '{}'::character varying[],
   rating real
 );
@@ -24,7 +23,8 @@ create table posts (
   disabled_user_id uuid,
   title text NOT NULL,
   body text,
-  inserted_at timestamp without time zone
+  inserted_at timestamp without time zone,
+  tags jsonb
 );
 
 create schema alt;
@@ -42,7 +42,6 @@ create table alt.users (
   encrypted_password text,
   status varchar(100),
   other_resource_id int,
-  tags jsonb,
   roles character varying[] DEFAULT '{}'::character varying[],
   rating real
 );
@@ -55,5 +54,6 @@ create table alt.posts (
   disabled_user_id uuid,
   title text NOT NULL,
   body text,
-  inserted_at timestamp without time zone
+  inserted_at timestamp without time zone,
+  tags jsonb
 );

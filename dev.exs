@@ -87,7 +87,6 @@ defmodule Demo.Accounts.User do
     field :private_data, :map
     field :encrypted_password, :string
     field :status, Ecto.Enum, values: [:active, :suspended]
-    field :tags, {:array, :string}, default: []
     field :roles, {:array, Ecto.Enum}, values: [:admin, :staff]
     field :rating, :float
 
@@ -145,6 +144,7 @@ defmodule Demo.Posts.Post do
   schema "posts" do
     field :title, :string
     field :body, :string
+    field :tags, {:array, :string}, default: []
 
     belongs_to :user, Demo.Accounts.User, type: :binary_id
     belongs_to :disabled_user, Demo.Accounts.User, type: :binary_id
