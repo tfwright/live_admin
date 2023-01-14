@@ -38,8 +38,8 @@ To customize a resource, pass a two element tuple when the schema module as the 
 
 Resource specific options:
 
-* `title_with` - a binary or MFA specifying how to identify the resource
-* `label_with` - a binary or MFA specifying how to identify individual records
+* `title_with` - a binary, or MFA that returns a binary, used to identify the resource
+* `label_with` - a binary, or MFA that returns a binary, used to identify individual records
 * `list_with` - an atom or MFA that identifies the function that implements listing a resource
 * `create_with` - an atom or MFA that identifies the function that implements creating a resource
 * `update_with` - an atom or MFA that identifies the function that implements updating a record
