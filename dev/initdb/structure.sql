@@ -24,7 +24,8 @@ create table posts (
   title text NOT NULL,
   body text,
   inserted_at timestamp without time zone,
-  tags jsonb
+  tags jsonb,
+  previous_version jsonb DEFAULT '{}'::jsonb NOT NULL
 );
 
 create schema alt;
@@ -55,5 +56,6 @@ create table alt.posts (
   title text NOT NULL,
   body text,
   inserted_at timestamp without time zone,
-  tags jsonb
+  tags jsonb,
+  previous_version jsonb DEFAULT '{}'::jsonb NOT NULL
 );

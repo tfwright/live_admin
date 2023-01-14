@@ -92,13 +92,7 @@ defmodule LiveAdmin.Components.Container.Form do
         %{"field" => field, "value" => value},
         socket = %{assigns: %{resource: resource, changeset: changeset, session_id: session_id}}
       ) do
-    changeset =
-      validate(
-        resource,
-        changeset,
-        Map.put(changeset.changes, String.to_existing_atom(field), value),
-        session_id
-      )
+    changeset = validate(resource, changeset, Map.put(changeset.params, field, value), session_id)
 
     {:noreply,
      assign(socket,

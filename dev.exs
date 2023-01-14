@@ -136,6 +136,17 @@ defmodule Demo.Accounts.User do
   end
 end
 
+defmodule Demo.Posts.Post.Version do
+  use Ecto.Schema
+
+  @primary_key false
+  embedded_schema do
+    field :body, :string
+
+    timestamps(updated_at: false)
+  end
+end
+
 defmodule Demo.Posts.Post do
   use Ecto.Schema
 
@@ -145,6 +156,8 @@ defmodule Demo.Posts.Post do
     field :title, :string
     field :body, :string
     field :tags, {:array, :string}, default: []
+
+    embeds_one :previous_version, __MODULE__.Version, on_replace: :delete
 
     belongs_to :user, Demo.Accounts.User, type: :binary_id
     belongs_to :disabled_user, Demo.Accounts.User, type: :binary_id
