@@ -229,9 +229,12 @@
     @apply truncate;
     @apply z-50;
     @apply max-h-80;
-    @apply overflow-y-scroll;
     @apply p-1;
     @apply ml-2;
+  }
+
+  #prefix-select nav {
+    @apply overflow-y-scroll;
   }
 
   [class$="--drop"]:focus-within nav {

@@ -259,6 +259,7 @@ defmodule LiveAdmin.Components.Container.Index do
       |> Enum.find_value(fn
         {^action_name, mfa} -> mfa
         ^action_name -> {socket.assigns.resource.schema, action_name, []}
+        _ -> false
       end)
 
     socket =

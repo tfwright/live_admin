@@ -38,8 +38,8 @@ To customize a resource, pass a two element tuple when the schema module as the 
 
 Resource specific options:
 
-* `title_with` - a binary or MFA specifying how to identify the resource
-* `label_with` - a binary or MFA specifying how to identify individual records
+* `title_with` - a binary, or MFA that returns a binary, used to identify the resource
+* `label_with` - a binary, or MFA that returns a binary, used to identify individual records
 * `list_with` - an atom or MFA that identifies the function that implements listing a resource
 * `create_with` - an atom or MFA that identifies the function that implements creating a resource
 * `update_with` - an atom or MFA that identifies the function that implements updating a record
@@ -47,9 +47,9 @@ Resource specific options:
 * `validate_with` - an atom or MFA that identifies the function that implements validating a changed record
 * `hidden_fields` - a list of fields that should not be displayed in the UI
 * `immutable_fields` - a list of fields that should not be editable in forms
-* `actions` - actions to perform on a record
-* `tasks` - actions to perform on a resource
-* `components` - overrides for specific views (`:list`, `:new`, `:edit`)
+* `actions` - list of atoms or MFAs that identify a function that operates on a record
+* `tasks` - list atoms or MFAs that identify a function that operates on a resource
+* `components` - keyword list of component module overrides for specific views (`:list`, `:new`, `:edit`, `:home`)
 
 ## App config
 
@@ -72,3 +72,7 @@ config :live_admin,
 ```
 
 See [development app](/dev.exs) for more example configuration.
+
+---
+
+README generated with [docout](https://github.com/tfwright/docout)
