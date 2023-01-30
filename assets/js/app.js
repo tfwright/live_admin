@@ -24,7 +24,14 @@ window.addEventListener("phx:error", (e) => {
 let Hooks = {}
 Hooks.IndexPage = {
   mounted() {
-    var clipboard = new ClipboardJS(this.el.querySelectorAll('.cell__copy'));
+    var clipboard = new ClipboardJS(
+      this.el.querySelectorAll('.cell__copy'),
+      {
+        text: function (trigger) {
+          return trigger.parentElement.textContent.trim()
+        },
+      }
+    );
 
     clipboard.on('success', function(e) {
       Toastify({
