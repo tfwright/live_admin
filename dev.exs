@@ -257,7 +257,7 @@ defmodule DemoWeb.CreateUserForm do
     ~H"""
     <div>
       <.form
-        let={f}
+        :let={f}
         for={@changeset}
         as="params"
         phx_change="validate"

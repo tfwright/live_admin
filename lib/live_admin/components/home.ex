@@ -10,11 +10,11 @@ defmodule LiveAdmin.Components.Home do
 
   @impl true
   def render(assigns = %{title: title}) do
-    mod = Keyword.get(assigns.components, :home, Content)
+    assigns = assign(assigns, mod: Keyword.get(assigns.components, :home, Content), title: title)
 
     ~H"""
-    <h1 class="home__title"><%= title %></h1>
-    <.live_component module={mod} id="content" />
+    <h1 class="home__title"><%= @title %></h1>
+    <.live_component module={@mod} id="content" />
     """
   end
 end

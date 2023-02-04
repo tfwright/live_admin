@@ -2,7 +2,6 @@ defmodule LiveAdmin.Components.Container.Form do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import Phoenix.LiveView.Helpers
   import LiveAdmin.ErrorHelpers
   import LiveAdmin, only: [associated_resource: 3, get_config: 3, get_resource: 1]
   import LiveAdmin.Components.Container, only: [route_with_params: 2]
@@ -55,7 +54,7 @@ defmodule LiveAdmin.Components.Container.Form do
     ~H"""
     <div>
       <.form
-        let={f}
+        :let={f}
         for={@changeset}
         as="params"
         phx_change="validate"
@@ -218,35 +217,36 @@ defmodule LiveAdmin.Components.Container.Form do
   end
 
   defp input(assigns = %{type: id}) when id in [:id, :binary_id] do
-    assigns.resource.schema
-    |> associated_resource(assigns.field, assigns.resources)
-    |> case do
-      nil ->
-        ~H"""
-        <%= textarea(@form, @field, rows: 1, class: "field__text", disabled: @disabled) %>
-        """
+    assigns =
+      assign(
+        assigns,
+        :associated_resource,
+        associated_resource(assigns.resource.schema, assigns.field, assigns.resources)
+      )
 
-      resource ->
-        ~H"""
-        <%= unless @form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(@field) do %>
-          <.live_component
-            module={SearchSelect}
-            id={assigns.field}
-            form={@form}
-            field={@field}
-            disabled={@disabled}
-            resource={resource}
-            form_ref={@form_ref}
-            session={@session}
-            handle_select="validate"
-          />
-        <% else %>
-          <div class="form__number">
-            <%= number_input(@form, @field, class: "field__number", disabled: @disabled) %>
-          </div>
-        <% end %>
-        """
-    end
+    ~H"""
+    <%= if @associated_resource do %>
+      <%= unless @form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(@field) do %>
+        <.live_component
+          module={SearchSelect}
+          id={assigns.field}
+          form={@form}
+          field={@field}
+          disabled={@disabled}
+          resource={@associated_resource}
+          form_ref={@form_ref}
+          session={@session}
+          handle_select="validate"
+        />
+      <% else %>
+        <div class="form__number">
+          <%= number_input(@form, @field, class: "field__number", disabled: @disabled) %>
+        </div>
+      <% end %>
+    <% else %>
+      <%= textarea(@form, @field, rows: 1, class: "field__text", disabled: @disabled) %>
+    <% end %>
+    """
   end
 
   defp input(assigns = %{type: {:array, :string}}) do
@@ -307,8 +307,10 @@ defmodule LiveAdmin.Components.Container.Form do
   end
 
   defp input(assigns = %{type: {_, Ecto.Enum, %{mappings: mappings}}}) do
+    assigns = assign(assigns, :mappings, mappings)
+
     ~H"""
-    <%= select(@form, @field, [nil | Keyword.keys(mappings)],
+    <%= select(@form, @field, [nil | Keyword.keys(@mappings)],
       disabled: @disabled,
       class: "field__select"
     ) %>
@@ -316,10 +318,12 @@ defmodule LiveAdmin.Components.Container.Form do
   end
 
   defp input(assigns = %{type: {:array, {_, Ecto.Enum, %{mappings: mappings}}}}) do
+    assigns = assign(assigns, :mappings, mappings)
+
     ~H"""
     <div class="field__checkbox--group">
       <%= hidden_input(@form, @field, name: input_name(@form, @field) <> "[]", value: nil) %>
-      <%= for option <- Keyword.keys(mappings) do %>
+      <%= for option <- Keyword.keys(@mappings) do %>
         <%= checkbox(@form, @field,
           name: input_name(@form, @field) <> "[]",
           checked_value: option,

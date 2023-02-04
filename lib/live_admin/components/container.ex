@@ -182,9 +182,11 @@ defmodule LiveAdmin.Components.Container do
       |> get_config(:components, [])
       |> Keyword.get(:list, Index)
 
+    assigns = assign(assigns, :mod, mod)
+
     ~H"""
     <.live_component
-      module={mod}
+      module={@mod}
       id="list"
       socket={@socket}
       resources={@resources}
@@ -204,9 +206,11 @@ defmodule LiveAdmin.Components.Container do
       |> get_config(:components, [])
       |> Keyword.get(:new, Form)
 
+    assigns = assign(assigns, :mod, mod)
+
     ~H"""
     <.live_component
-      module={mod}
+      module={@mod}
       id="form"
       action="create"
       session_id={@session_id}
@@ -222,9 +226,11 @@ defmodule LiveAdmin.Components.Container do
       |> get_config(:components, [])
       |> Keyword.get(:edit, Form)
 
+    assigns = assign(assigns, :mod, mod)
+
     ~H"""
     <.live_component
-      module={mod}
+      module={@mod}
       id="form"
       action="update"
       session_id={@session_id}
