@@ -111,7 +111,7 @@ defmodule LiveAdmin.Components.Container.Index do
                         <g stroke-linecap="round" stroke-linejoin="round"></g>
                         <g>
                           <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <rect id="Container" x="0" y="0" width="24" height="24"></rect>
+                            <rect x="0" y="0" width="24" height="24"></rect>
 
                             <path
                               d="M5,14 C6.1045695,14 7,13.1045695 7,12 C7,10.8954305 6.1045695,10 5,10 C3.8954305,10 3,10.8954305 3,12 C3,13.1045695 3.8954305,14 5,14 Z"
