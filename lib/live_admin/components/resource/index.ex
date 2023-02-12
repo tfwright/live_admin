@@ -14,6 +14,7 @@ defmodule LiveAdmin.Components.Container.Index do
   import LiveAdmin.Components.Container, only: [route_with_params: 3]
 
   alias LiveAdmin.{Resource, SessionStore}
+  alias Phoenix.LiveView.JS
 
   @impl true
   def update(assigns, socket) do
@@ -43,7 +44,7 @@ defmodule LiveAdmin.Components.Container.Index do
     <div class="resource__list">
       <div class="list__search">
         <div class="flex border-2 rounded-lg">
-          <form phx-change="search" phx-target={@myself}>
+          <form phx-change={JS.push("search", target: @myself, page_loading: true)}>
             <input
               type="text"
               placeholder="Search..."
