@@ -187,6 +187,10 @@
     @apply whitespace-nowrap;
   }
 
+  .resource__actions > div > * {
+    @apply ml-2;
+  }
+
   .resource__action {
     @apply inline-flex;
     @apply items-center;
@@ -196,7 +200,6 @@
   .resource__action--btn {
     @apply resource__action;
     @apply px-4;
-    @apply m-2;
     @apply text-sm;
     @apply transition-colors;
     @apply duration-150;
@@ -214,6 +217,9 @@
 
   .resource__action--drop {
     @apply resource__action;
+  }
+
+  [class$="--drop"] {
     @apply relative;
   }
 
@@ -230,7 +236,6 @@
     @apply z-50;
     @apply max-h-80;
     @apply p-1;
-    @apply ml-2;
   }
 
   #prefix-select nav {
@@ -245,11 +250,6 @@
 
   [class$="--drop"] nav a:hover {
     @apply underline;
-  }
-
-  [class^="resource__cell"] nav li:last-child:not(:only-child) {
-    @apply border-t;
-    @apply mt-1;
   }
 
   .resource__list {
@@ -303,20 +303,18 @@
   }
 
   [class^="resource__cell"] {
-    @apply border;
     @apply px-4;
     @apply py-2;
-    @apply relative;
     @apply h-20;
+    @apply relative;
   }
 
-  [class^="resource__cell"]:hover {
-    @apply cursor-pointer;
-    @apply delay-100;
+  .resource__menu--drop svg {
+    @apply w-5;
+    @apply h-5;
   }
 
   .cell__contents {
-    @apply overflow-y-auto;
     @apply flex;
     @apply h-full;
     @apply w-full;
@@ -460,4 +458,22 @@
     top: auto !important;
     transform: translate(-50%, -50%) !important;
   }
+}
+
+.cell__copy {
+  display: none;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  margin: 0.25rem;
+  cursor: pointer;
+}
+
+[class^="resource__cell"]:hover .cell__copy {
+  @apply block;
+}
+
+.cell__copy svg {
+  width: 1.25rem;
+  height: 1.25rem;
 }

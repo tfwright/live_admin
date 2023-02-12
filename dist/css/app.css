@@ -687,6 +687,10 @@ select:focus {
   white-space: nowrap;
 }
 
+.resource__actions > div > * {
+  margin-left: 0.5rem;
+}
+
 .resource__action {
   display: inline-flex;
   align-items: center;
@@ -699,7 +703,6 @@ select:focus {
   align-items: center;
   padding-left: 1rem;
   padding-right: 1rem;
-  margin: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
@@ -718,7 +721,6 @@ select:focus {
   height: 2rem;
   align-items: center;
   position: relative;
-  margin: 0.5rem;
   white-space: nowrap;
   border-radius: 0.5rem;
   border-width: 1px;
@@ -738,6 +740,9 @@ select:focus {
   display: inline-flex;
   height: 2rem;
   align-items: center;
+}
+
+[class$="--drop"] {
   position: relative;
 }
 
@@ -758,7 +763,6 @@ select:focus {
   z-index: 50;
   max-height: 20rem;
   padding: 0.25rem;
-  margin-left: 0.5rem;
 }
 
 #prefix-select nav {
@@ -776,11 +780,6 @@ select:focus {
 [class$="--drop"] nav a:hover {
   -webkit-text-decoration-line: underline;
           text-decoration-line: underline;
-}
-
-[class^="resource__cell"] nav li:last-child:not(:only-child) {
-  border-top-width: 1px;
-  margin-top: 0.25rem;
 }
 
 .resource__list {
@@ -856,22 +855,20 @@ select:focus {
 }
 
 [class^="resource__cell"] {
-  border-width: 1px;
   padding-left: 1rem;
   padding-right: 1rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-  position: relative;
   height: 5rem;
+  position: relative;
 }
 
-[class^="resource__cell"]:hover {
-  cursor: pointer;
-  transition-delay: 100ms;
+.resource__menu--drop svg {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .cell__contents {
-  overflow-y: auto;
   display: flex;
   height: 100%;
   width: 100%;
@@ -1101,4 +1098,22 @@ select:focus {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+.cell__copy {
+  display: none;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  margin: 0.25rem;
+  cursor: pointer;
+}
+
+[class^="resource__cell"]:hover .cell__copy {
+  display: block;
+}
+
+.cell__copy svg {
+  width: 1.25rem;
+  height: 1.25rem;
 }

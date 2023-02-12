@@ -6,7 +6,6 @@ defmodule LiveAdmin.Components.Container.Index do
     only: [
       repo: 0,
       associated_resource: 3,
-      associated_resource: 4,
       record_label: 2,
       get_config: 3,
       get_resource: 1
@@ -69,6 +68,7 @@ defmodule LiveAdmin.Components.Container.Index do
       <table class="resource__table">
         <thead>
           <tr>
+            <th class="resource__header" />
             <%= for {field, _, _} <- Resource.fields(@resource) do %>
               <th class="resource__header" title={field}>
                 <%= list_link(
@@ -96,14 +96,46 @@ defmodule LiveAdmin.Components.Container.Index do
         <tbody id="index-page" phx-hook="IndexPage">
           <%= for record <- @records |> elem(0) do %>
             <tr>
-              <%= for {field, type, _} <- Resource.fields(@resource), contents = cell_contents(record, field, @resource, @resources) do %>
-                <td class={"resource__cell--#{type_to_css_class(type)} resource__cell--drop"}>
-                  <a class="cell__contents" href="#">
-                    <%= contents %>
-                  </a>
-                  <nav>
-                    <ul>
-                      <%= if @resource.schema.__schema__(:primary_key) |> List.first() == field do %>
+              <td>
+                <div class="cell__contents">
+                  <div class="resource__menu--drop">
+                    <a href="#">
+                      <svg
+                        viewBox="0 0 24 24"
+                        version="1.1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        fill="#000000"
+                      >
+                        <g stroke-width="0"></g>
+                        <g stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g>
+                          <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <rect id="Container" x="0" y="0" width="24" height="24"></rect>
+
+                            <path
+                              d="M5,14 C6.1045695,14 7,13.1045695 7,12 C7,10.8954305 6.1045695,10 5,10 C3.8954305,10 3,10.8954305 3,12 C3,13.1045695 3.8954305,14 5,14 Z"
+                              fill="#030819"
+                            >
+                            </path>
+
+                            <path
+                              d="M12,14 C13.1045695,14 14,13.1045695 14,12 C14,10.8954305 13.1045695,10 12,10 C10.8954305,10 10,10.8954305 10,12 C10,13.1045695 10.8954305,14 12,14 Z"
+                              fill="#030819"
+                            >
+                            </path>
+
+                            <path
+                              d="M19,14 C20.1045695,14 21,13.1045695 21,12 C21,10.8954305 20.1045695,10 19,10 C17.8954305,10 17,10.8954305 17,12 C17,13.1045695 17.8954305,14 19,14 Z"
+                              fill="#030819"
+                            >
+                            </path>
+                          </g>
+                        </g>
+                      </svg>
+                    </a>
+                    <nav>
+                      <ul>
                         <li>
                           <%= live_redirect("Edit",
                             to: route_with_params(@socket, [:edit, @key, record], prefix: @prefix)
@@ -132,35 +164,23 @@ defmodule LiveAdmin.Components.Container.Index do
                             ) %>
                           </li>
                         <% end %>
-                      <% end %>
-                      <%= if associated_resource(@resource.schema, field, @resources) && associated_record(record, field) do %>
-                        <li>
-                          <%= live_redirect("Edit associated record",
-                            to:
-                              route_with_params(
-                                assigns.socket,
-                                [
-                                  :edit,
-                                  associated_resource(@resource.schema, field, @resources, :key),
-                                  associated_record(record, field)
-                                ],
-                                prefix: assigns.prefix
-                              )
-                          ) %>
-                        </li>
-                      <% end %>
-                      <li>
-                        <a
-                          href="#"
-                          class="cell__copy"
-                          data-message="Copied cell contents to clipboard"
-                          data-clipboard-text={print(contents)}
-                        >
-                          Copy
-                        </a>
-                      </li>
-                    </ul>
-                  </nav>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+              </td>
+              <%= for {field, type, _} <- Resource.fields(@resource), contents = cell_contents(record, field, @resource, @resources) do %>
+                <td class={"resource__cell--#{type_to_css_class(type)}"}>
+                  <%= contents %>
+                  <div
+                    class="cell__copy"
+                    data-message="Copied cell contents to clipboard"
+                    data-clipboard-text={contents}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M 4 2 C 2.895 2 2 2.895 2 4 L 2 18 L 4 18 L 4 4 L 18 4 L 18 2 L 4 2 z M 8 6 C 6.895 6 6 6.895 6 8 L 6 20 C 6 21.105 6.895 22 8 22 L 20 22 C 21.105 22 22 21.105 22 20 L 22 8 C 22 6.895 21.105 6 20 6 L 8 6 z M 8 8 L 20 8 L 20 20 L 8 20 L 8 8 z" />
+                    </svg>
+                  </div>
                 </td>
               <% end %>
             </tr>

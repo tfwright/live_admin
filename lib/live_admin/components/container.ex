@@ -105,8 +105,7 @@ defmodule LiveAdmin.Components.Container do
     {:noreply, socket}
   end
 
-  def render(assigns = %{loading: true}), do: ~H"
-"
+  def render(assigns = %{loading: true}), do: ~H""
 
   @impl true
   def render(assigns) do
