@@ -27,6 +27,15 @@ defmodule LiveAdmin.View do
   def render("app.css", _),
     do: @app_css <> Application.get_env(:live_admin, :css_overrides, @default_css_overrides)
 
+  def render_field(record, field, _) do
+    record
+    |> Map.fetch!(field)
+    |> case do
+      val when is_binary(val) -> val
+      val -> inspect(val)
+    end
+  end
+
   def render_nav_menu(resources_by_key, socket, base_path) do
     resources_by_key
     |> Enum.reduce(%{}, fn {key, resource}, groups ->

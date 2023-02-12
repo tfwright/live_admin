@@ -44,6 +44,21 @@ Application.put_env(:live_admin, DemoWeb.Endpoint,
 Application.put_env(:live_admin, :ecto_repo, Demo.Repo)
 Application.put_env(:live_admin, :prefix_options, ["public", "this-is-a-fake-schema-with-a-really-long-name", "alt"])
 Application.put_env(:live_admin, :immutable_fields, [:inserted_at])
+Application.put_env(:live_admin, :render_with, {DemoWeb.Renderer, :render, []})
+
+defmodule DemoWeb.Renderer do
+  use Phoenix.HTML
+
+  def render(record, field, session) do
+    record
+    |> Map.fetch!(field)
+    |> case do
+      bool when is_boolean(bool) -> if bool, do: "Yes", else: "No"
+      date = %Date{} -> Calendar.strftime(date, "%a, %B %d %Y")
+      _ -> LiveAdmin.View.render_field(record, field, session)
+    end
+  end
+end
 
 defmodule DemoWeb.PageController do
   import Plug.Conn
@@ -97,6 +112,14 @@ defmodule Demo.Accounts.User do
     has_many :posts, Demo.Posts.Post
 
     timestamps(updated_at: false)
+
+    def render_for_admin(user, :email, _) do
+      Phoenix.HTML.Link.link(user.email, to: "mailto:\"#{user.name}\"<#{user.email}>")
+    end
+
+    def render_for_admin(record, field, session) do
+      DemoWeb.Renderer.render(record, field, session)
+    end
   end
 
   def create(params, meta) do
@@ -356,7 +379,8 @@ defmodule DemoWeb.Router do
         components: [new: DemoWeb.CreateUserForm],
         label_with: :name,
         actions: [:deactivate],
-        tasks: [:regenerate_passwords]
+        tasks: [:regenerate_passwords],
+        render_with: :render_for_admin
       },
       {Demo.Posts.Post,
         immutable_fields: [:disabled_user_id],
