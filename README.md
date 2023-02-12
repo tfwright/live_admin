@@ -45,6 +45,7 @@ Resource specific options:
 * `update_with` - an atom or MFA that identifies the function that implements updating a record
 * `delete_with` - an atom or MFA that identifies the function that implements deleting a record
 * `validate_with` - an atom or MFA that identifies the function that implements validating a changed record
+* `render_with` - an atom or MFA that identifies the function that implements table field rendering logic
 * `hidden_fields` - a list of fields that should not be displayed in the UI
 * `immutable_fields` - a list of fields that should not be editable in forms
 * `actions` - list of atoms or MFAs that identify a function that operates on a record
