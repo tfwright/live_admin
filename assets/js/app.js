@@ -27,8 +27,8 @@ Hooks.IndexPage = {
     var clipboard = new ClipboardJS(
       this.el.querySelectorAll('.cell__copy'),
       {
-        text: function (trigger) {
-          return trigger.parentElement.textContent.trim()
+        target: function (trigger) {
+          return trigger.previousElementSibling
         },
       }
     );

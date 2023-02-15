@@ -309,9 +309,8 @@
     @apply relative;
   }
 
-  .resource__menu--drop svg {
-    @apply w-5;
-    @apply h-5;
+  .resource__cell:not(:first-child) .cell__contents {
+    @apply overflow-y-scroll;
   }
 
   .cell__contents {
@@ -320,6 +319,11 @@
     @apply w-full;
     @apply justify-center;
     align-items: safe center;
+  }
+
+  .resource__menu--drop svg {
+    @apply w-5;
+    @apply h-5;
   }
 
   .cell__copy {

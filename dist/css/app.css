@@ -863,9 +863,8 @@ select:focus {
   position: relative;
 }
 
-.resource__menu--drop svg {
-  width: 1.25rem;
-  height: 1.25rem;
+.resource__cell:not(:first-child) .cell__contents {
+  overflow-y: scroll;
 }
 
 .cell__contents {
@@ -874,6 +873,11 @@ select:focus {
   width: 100%;
   justify-content: center;
   align-items: safe center;
+}
+
+.resource__menu--drop svg {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .cell__copy {
