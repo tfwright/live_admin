@@ -110,10 +110,9 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
 
     test "creates user on form submit", %{view: view} do
-      {_, {:live_redirect, %{to: "/user"}}} =
-        view
-        |> element(".resource__form")
-        |> render_submit(%{name: "test", settings: %{some_option: "test"}})
+      view
+      |> form(".resource__form", %{params: %{name: "test"}})
+      |> render_submit()
 
       assert [%{}] = Repo.all(User)
     end
@@ -142,14 +141,15 @@ defmodule LiveAdmin.Components.ContainerTest do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
       {:ok, view, html} = live(conn, "/user/edit/#{user.id}")
-      %{response: html, view: view}
+      %{response: html, view: view, user: user}
     end
 
-    test "handles form submit", %{view: view} do
-      {_, {:live_redirect, %{to: "/user"}}} =
-        view
-        |> element(".resource__form")
-        |> render_submit(%{name: "test"})
+    test "updates record on submit", %{view: view, user: user} do
+      view
+      |> form(".resource__form", %{params: %{name: "test"}})
+      |> render_submit()
+
+      assert %{name: "test"} = Repo.get!(User, user.id)
     end
 
     test "disables immutable fields", %{response: response} do

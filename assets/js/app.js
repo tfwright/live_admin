@@ -22,6 +22,7 @@ window.addEventListener("phx:error", (e) => {
 })
 
 let Hooks = {}
+
 Hooks.IndexPage = {
   mounted() {
     var clipboard = new ClipboardJS(
@@ -39,6 +40,18 @@ Hooks.IndexPage = {
         className: "toast__container",
       }).showToast();
     });
+  }
+}
+
+Hooks.FormPage = {
+  mounted() {
+    this.handleEvent("create", payload => {
+      Toastify({
+        text: "Record successfully added",
+        className: "toast__container--success",
+        callback: () => { this.pushEventTo(this.el, "after_create") }
+      }).showToast();
+    })
   }
 }
 

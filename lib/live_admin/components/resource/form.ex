@@ -52,7 +52,7 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div id="form-page" phx-hook="FormPage">
       <.form
         :let={f}
         for={@changeset}
@@ -83,6 +83,11 @@ defmodule LiveAdmin.Components.Container.Form do
       </.form>
     </div>
     """
+  end
+
+  @impl true
+  def handle_event("after_create", _, socket) do
+    {:noreply, push_patch(socket, to: route_with_params(socket, [:list, socket.assigns.key]))}
   end
 
   @impl true
@@ -119,11 +124,11 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "create",
         %{"params" => params},
-        %{assigns: %{resource: resource, key: key, session_id: session_id}} = socket
+        %{assigns: %{resource: resource, session_id: session_id}} = socket
       ) do
     socket =
       case Resource.create(resource, params, SessionStore.lookup(session_id)) do
-        {:ok, _} -> push_redirect(socket, to: route_with_params(socket, [:list, key]))
+        {:ok, _} -> push_event(socket, "create", %{})
         {:error, changeset} -> assign(socket, changeset: changeset)
       end
 
@@ -134,18 +139,18 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "update",
         %{"params" => params},
-        %{assigns: %{resource: resource, key: key, session_id: session_id, record: record}} =
-          socket
+        %{assigns: %{resource: resource, session_id: session_id, record: record}} = socket
       ) do
     socket =
-      case Resource.update(
-             resource,
-             record,
-             params,
-             SessionStore.lookup(session_id)
-           ) do
-        {:ok, _} -> push_redirect(socket, to: route_with_params(socket, [:list, key]))
-        {:error, changeset} -> assign(socket, changeset: changeset)
+      Resource.update(resource, record, params, SessionStore.lookup(session_id))
+      |> case do
+        {:ok, _} ->
+          socket
+          |> push_event("success", %{msg: "Changes successfully saved"})
+          |> assign(:enabled, false)
+
+        {:error, changeset} ->
+          assign(socket, changeset: changeset)
       end
 
     {:noreply, socket}
