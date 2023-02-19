@@ -864,7 +864,7 @@ select:focus {
 }
 
 .resource__cell:not(:first-child) .cell__contents {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .cell__contents {

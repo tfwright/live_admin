@@ -310,7 +310,7 @@
   }
 
   .resource__cell:not(:first-child) .cell__contents {
-    @apply overflow-y-scroll;
+    @apply overflow-y-auto;
   }
 
   .cell__contents {
