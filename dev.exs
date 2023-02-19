@@ -180,7 +180,7 @@ defmodule Demo.Posts.Post do
     field :body, :string
     field :tags, {:array, :string}, default: []
 
-    embeds_one :previous_version, __MODULE__.Version, on_replace: :delete
+    embeds_many :previous_versions, __MODULE__.Version, on_replace: :delete
 
     belongs_to :user, Demo.Accounts.User, type: :binary_id
     belongs_to :disabled_user, Demo.Accounts.User, type: :binary_id

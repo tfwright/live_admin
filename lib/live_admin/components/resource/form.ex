@@ -151,6 +151,82 @@ defmodule LiveAdmin.Components.Container.Form do
     {:noreply, socket}
   end
 
+  def handle_event("add_embed", %{"field" => field}, socket = %{assigns: %{changeset: changeset}}) do
+    field_name = String.to_existing_atom(field)
+
+    socket =
+      update(socket, :changeset, fn changeset ->
+        existing =
+          Ecto.Changeset.get_change(changeset, field_name) ||
+            Ecto.Changeset.get_field(changeset, field_name)
+
+        new_value =
+          socket.assigns.resource.schema.__schema__(:embed, field_name).cardinality
+          |> case do
+            :many -> (existing || []) ++ [%{}]
+            :one -> %{}
+          end
+
+        Ecto.Changeset.put_embed(changeset, field_name, new_value)
+      end)
+
+    {:noreply,
+     assign(
+       socket,
+       :enabled,
+       enabled?(changeset, socket.assigns.action, socket.assigns.resource.config)
+     )}
+  end
+
+  def handle_event(
+        "remove_embed",
+        %{"field" => field, "idx" => idx},
+        socket = %{assigns: %{changeset: changeset}}
+      ) do
+    field_name = String.to_existing_atom(field)
+    index = String.to_integer(idx)
+
+    socket =
+      update(socket, :changeset, fn changeset ->
+        existing =
+          (Ecto.Changeset.get_change(changeset, field_name) ||
+             Ecto.Changeset.get_field(changeset, field_name, []))
+          |> Enum.filter(fn
+            %{action: action} when action != :insert -> false
+            _ -> true
+          end)
+
+        Ecto.Changeset.put_embed(changeset, field_name, List.delete_at(existing, index))
+      end)
+
+    {:noreply,
+     assign(
+       socket,
+       :enabled,
+       enabled?(changeset, socket.assigns.action, socket.assigns.resource.config)
+     )}
+  end
+
+  def handle_event(
+        "remove_embed",
+        %{"field" => field},
+        socket = %{assigns: %{changeset: changeset}}
+      ) do
+    field_name = String.to_existing_atom(field)
+
+    socket =
+      update(socket, :changeset, fn changeset ->
+        Ecto.Changeset.put_embed(changeset, field_name, nil)
+      end)
+
+    {:noreply,
+     assign(
+       socket,
+       :enabled,
+       enabled?(changeset, socket.assigns.action, socket.assigns.resource.config)
+     )}
+  end
+
   defp field(assigns = %{type: type}) when type in @supported_primitive_types,
     do: field_group(assigns)
 
@@ -160,25 +236,55 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp field(assigns = %{type: {:array, {_, Ecto.Enum, _}}}), do: field_group(assigns)
 
-  defp field(assigns = %{type: {_, Ecto.Embedded, _}}) do
+  defp field(assigns = %{type: {_, Ecto.Embedded, meta}}) do
+    assigns = assign(assigns, :meta, meta)
+
     ~H"""
     <div>
-      <h2 class="embed__title"><%= @field %></h2>
+      <h2 class="embed__title"><%= humanize(@field) %></h2>
       <div class="embed__group">
         <%= unless @immutable do %>
-          <%= for fp <- inputs_for(@form, @field) do %>
-            <%= for {field, type, _} <- fields_for_embed(@type) do %>
-              <.field
-                field={field}
-                type={type}
-                form={fp}
-                immutable={false}
-                resource={@resource}
-                resources={@resources}
-                form_ref={@form_ref}
-                session={@session}
-              />
+          <%= hidden_input(@form, @field, value: "delete") %>
+          <%= unless input_value(@form, @field) == nil do %>
+            <%= for fp <- inputs_for(@form, @field) do %>
+              <div class="embed__item">
+                <div>
+                  <a
+                    phx-click="remove_embed"
+                    phx-value-field={@field}
+                    phx-value-idx={fp.index}
+                    phx-target={@form_ref}
+                  />
+                </div>
+                <div>
+                  <%= for {field, type, _} <- fields_for_embed(@type) do %>
+                    <.field
+                      field={field}
+                      type={type}
+                      form={fp}
+                      immutable={false}
+                      resource={@resource}
+                      resources={@resources}
+                      form_ref={@form_ref}
+                      session={@session}
+                    />
+                  <% end %>
+                </div>
+              </div>
             <% end %>
+          <% end %>
+          <%= if @meta.cardinality == :many || input_value(@form, @field) == nil do %>
+            <div class="form__actions">
+              <a
+                href="#"
+                phx-click="add_embed"
+                phx-value-field={@field}
+                phx-target={@form_ref}
+                class="resource__action--btn"
+              >
+                New
+              </a>
+            </div>
           <% end %>
         <% else %>
           <pre><%= @form |> input_value(@field) |> inspect() %></pre>

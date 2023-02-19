@@ -91,12 +91,6 @@ defmodule LiveAdmin.Components.ContainerTest do
              |> Enum.any?()
     end
 
-    test "includes embed form field", %{response: response} do
-      assert response
-             |> Floki.find("textarea[name='params[settings][some_option]']")
-             |> Enum.any?()
-    end
-
     test "handles form change", %{view: view} do
       assert view
              |> element(".resource__form")
@@ -163,6 +157,20 @@ defmodule LiveAdmin.Components.ContainerTest do
                response
                |> Floki.find("textarea[name='params[encrypted_password]']")
                |> Floki.attribute("disabled")
+    end
+  end
+
+  describe "edit resource with embed" do
+    setup %{conn: conn} do
+      user = Repo.insert!(%User{settings: %{}})
+      {:ok, view, html} = live(conn, "/user/edit/#{user.id}")
+      %{response: html, view: view}
+    end
+
+    test "includes embed form field", %{response: response} do
+      assert response
+             |> Floki.find("textarea[name='params[settings][some_option]']")
+             |> Enum.any?()
     end
   end
 end

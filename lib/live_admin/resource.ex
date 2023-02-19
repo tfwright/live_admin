@@ -191,11 +191,20 @@ defmodule LiveAdmin.Resource do
 
     changeset = Changeset.cast(record, params, castable_fields)
 
-    Enum.reduce(embeds, changeset, fn {field, {_, Ecto.Embedded, _}, _}, changeset ->
-      Changeset.cast_embed(changeset, field,
-        with: fn embed, params ->
-          build_changeset(embed, %{}, params)
+    Enum.reduce(embeds, changeset, fn {field, {_, Ecto.Embedded, meta}, _}, changeset ->
+      changeset =
+        if Map.get(changeset.params, to_string(field)) == "delete" do
+          Map.update!(
+            changeset,
+            :params,
+            &Map.put(&1, to_string(field), if(meta.cardinality == :many, do: [], else: nil))
+          )
+        else
+          changeset
         end
+
+      Changeset.cast_embed(changeset, field,
+        with: fn embed, params -> build_changeset(embed, %{}, params) end
       )
     end)
   end
