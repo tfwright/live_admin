@@ -15,21 +15,7 @@
     <link rel="manifest" href="/manifest.json " />
   </head>
   <body>
-    <main class="main__content">
-      <div class="main__wrap">
-        <div class="nav">
-          <ul class="nav__list">
-            <li class="nav__item">
-              <%= live_redirect("Home", to: @socket.router.__live_admin_path__()) %>
-            </li>
-            <%= render_nav_menu(@resources, @socket, @base_path) %>
-          </ul>
-        </div>
-        <div class="content">
-          <%= @inner_content %>
-        </div>
-      </div>
-    </main>
+    <%= @inner_content %>
   </body>
   <script>
     <%= raw(render("app.js")) %>

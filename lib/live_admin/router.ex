@@ -29,6 +29,7 @@ defmodule LiveAdmin.Router do
             {unquote(__MODULE__), :build_session,
              [unquote(resources), unquote(title), unquote(components)]},
           root_layout: {LiveAdmin.View, :layout},
+          layout: {LiveAdmin.View, :app},
           on_mount: {unquote(__MODULE__), :assign_options} do
           live("/", LiveAdmin.Components.Home, :home, as: :__live_admin_home)
           live("/:resource_id", LiveAdmin.Components.Container, :list, as: :__live_admin_index__)

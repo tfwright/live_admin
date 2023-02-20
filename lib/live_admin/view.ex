@@ -36,7 +36,7 @@ defmodule LiveAdmin.View do
     end
   end
 
-  def render_nav_menu(resources_by_key, socket, base_path) do
+  def render_nav_menu(resources_by_key, socket, base_path, current_resource \\ nil) do
     resources_by_key
     |> Enum.reduce(%{}, fn {key, resource}, groups ->
       path =
@@ -48,17 +48,17 @@ defmodule LiveAdmin.View do
         end
         |> Enum.map(&Access.key(&1, %{}))
 
-      update_in(groups, path, &Map.put(&1, {key, resource}, %{}))
+      update_in(groups, path, fn subs -> Map.put(subs, {key, resource}, %{}) end)
     end)
-    |> render_nav_group(socket, base_path)
+    |> render_nav_group(socket, base_path, current_resource)
   end
 
-  defp render_nav_group(group = %{}, socket, base_path) do
+  defp render_nav_group(group = %{}, socket, base_path, current_resource) do
     group
     |> Enum.sort()
     |> Enum.map(fn
       {{key, resource}, %{}} ->
-        content_tag :li, class: "nav__item" do
+        content_tag :li, class: "nav__item#{if resource == current_resource, do: "--selected"}" do
           resource
           |> resource_title()
           |> live_redirect(to: Path.join(socket.router.__live_admin_path__(), key))
@@ -66,11 +66,22 @@ defmodule LiveAdmin.View do
 
       {item, subs} ->
         content_tag :li, class: "nav__item--drop" do
+          open =
+            if current_resource do
+              current_resource
+              |> Map.fetch!(:schema)
+              |> Module.split()
+              |> Enum.drop(-1)
+              |> Enum.member?(item)
+            else
+              true
+            end
+
           [
-            content_tag(:input, "", type: "checkbox", id: "menu-group-#{item}"),
+            content_tag(:input, "", type: "checkbox", id: "menu-group-#{item}", checked: open),
             content_tag(:label, item, for: "menu-group-#{item}"),
             content_tag :ul, class: "nav__group" do
-              render_nav_group(subs, socket, base_path)
+              render_nav_group(subs, socket, base_path, current_resource)
             end
           ]
         end

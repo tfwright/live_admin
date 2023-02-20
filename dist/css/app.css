@@ -574,6 +574,31 @@ select:focus {
   white-space: nowrap;
 }
 
+.nav__list > .nav__item--selected:first-of-type {
+  margin-bottom: 0.5rem;
+  border-bottom-width: 1px;
+  padding-bottom: 0.75rem;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.nav__item--selected {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav__item--selected a {
+  margin: 0.25rem;
+  margin-left: 0.75rem;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+}
+
+.nav__item--selected {
+  font-weight: 700;
+}
+
 .nav__item a {
   padding: 0.25rem;
   margin: 0.25rem;
