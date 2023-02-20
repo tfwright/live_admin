@@ -59,6 +59,14 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
+  describe "resource page with invalid resource" do
+    test "raises resource error", %{conn: conn} do
+      assert_raise LiveAdmin.InvalidResourceError, fn ->
+        live(conn, "/fake")
+      end
+    end
+  end
+
   describe "resource page with search param" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"})

@@ -1,12 +1,19 @@
 defmodule LiveAdmin do
   @moduledoc docout: [LiveAdmin.READMECompiler]
+
+  defmodule InvalidResourceError do
+    defexception message: "invalid resource", plug_status: 404
+  end
+
   def repo, do: Application.fetch_env!(:live_admin, :ecto_repo)
 
-  def get_resource(%{resources: resources, key: key}), do: get_resource(resources, key)
-  def get_resource(resources, key) when is_binary(key), do: Map.fetch!(resources, key)
+  def get_resource!(%{resources: resources, key: key}), do: get_resource!(resources, key)
 
-  def get_resource(resources, schema) when is_atom(schema),
-    do: Enum.find(resources, &(&1.schema == schema))
+  def get_resource!(resources, key) when is_binary(key),
+    do: Map.get(resources, key) || raise(InvalidResourceError)
+
+  def get_resource!(resources, schema) when is_atom(schema),
+    do: Enum.find(resources, &(&1.schema == schema)) || raise(InvalidResourceError)
 
   def associated_resource(schema, field_name, resources, elem \\ :resource) do
     with %{related: assoc_schema} <-

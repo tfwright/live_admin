@@ -3,7 +3,7 @@ defmodule LiveAdmin.Components.Container do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [resource_title: 2, get_config: 3, get_resource: 1]
+    only: [resource_title: 2, get_config: 3, get_resource!: 2]
 
   alias __MODULE__.{Form, Index}
   alias LiveAdmin.{Resource, SessionStore}
@@ -15,6 +15,7 @@ defmodule LiveAdmin.Components.Container do
     socket =
       assign(socket,
         key: key,
+        resource: get_resource!(socket.assigns.resources, key),
         session_id: session_id,
         loading: !connected?(socket)
       )
@@ -26,11 +27,11 @@ defmodule LiveAdmin.Components.Container do
   def handle_params(
         params = %{"record_id" => id},
         _uri,
-        socket = %{assigns: %{live_action: :edit, loading: false}}
+        socket = %{assigns: %{resource: resource, live_action: :edit, loading: false}}
       ) do
     socket = assign_prefix(socket, params["prefix"])
 
-    record = Resource.find!(id, get_resource(socket.assigns), socket.assigns.prefix)
+    record = Resource.find!(id, resource, socket.assigns.prefix)
 
     socket = assign(socket, record: record)
 
@@ -81,14 +82,12 @@ defmodule LiveAdmin.Components.Container do
 
     session = SessionStore.lookup(socket.assigns.session_id)
 
-    resource = get_resource(socket.assigns)
-
     {m, f, a} =
-      resource.config
+      socket.assigns.resource.config
       |> get_config(:tasks, [])
       |> Enum.find_value(fn
         {^task_name, mfa} -> mfa
-        ^task_name -> {resource.schema, task_name, []}
+        ^task_name -> {socket.assigns.resource.schema, task_name, []}
       end)
 
     socket =
@@ -110,8 +109,6 @@ defmodule LiveAdmin.Components.Container do
 
   @impl true
   def render(assigns) do
-    assigns = assign(assigns, :resource, get_resource(assigns))
-
     ~H"""
     <div class="resource__banner">
       <h1 class="resource__title">
@@ -191,6 +188,7 @@ defmodule LiveAdmin.Components.Container do
       socket={@socket}
       resources={@resources}
       key={@key}
+      resource={@resource}
       page={@page}
       sort={@sort}
       search={@search}
@@ -216,6 +214,7 @@ defmodule LiveAdmin.Components.Container do
       session_id={@session_id}
       key={@key}
       resources={@resources}
+      resource={@resource}
     />
     """
   end
@@ -237,6 +236,7 @@ defmodule LiveAdmin.Components.Container do
       key={@key}
       record={@record}
       resources={@resources}
+      resource={@resource}
     />
     """
   end

@@ -3,7 +3,7 @@ defmodule LiveAdmin.Components.Container.Form do
   use Phoenix.HTML
 
   import LiveAdmin.ErrorHelpers
-  import LiveAdmin, only: [associated_resource: 3, get_config: 3, get_resource: 1]
+  import LiveAdmin, only: [associated_resource: 3, get_config: 3]
   import LiveAdmin.Components.Container, only: [route_with_params: 2]
 
   alias __MODULE__.{ArrayInput, SearchSelect}
@@ -23,28 +23,22 @@ defmodule LiveAdmin.Components.Container.Form do
 
   @impl true
   def update(assigns = %{record: record}, socket) do
-    resource = get_resource(assigns)
-
     socket =
       socket
       |> assign(assigns)
-      |> assign(:resource, resource)
       |> assign(:enabled, false)
-      |> assign(:changeset, Resource.change(resource, record))
+      |> assign(:changeset, Resource.change(assigns.resource, record))
 
     {:ok, socket}
   end
 
   @impl true
   def update(assigns, socket) do
-    resource = get_resource(assigns)
-
     socket =
       socket
       |> assign(assigns)
-      |> assign(:resource, resource)
       |> assign(:enabled, false)
-      |> assign(:changeset, Resource.change(resource))
+      |> assign(:changeset, Resource.change(assigns.resource))
 
     {:ok, socket}
   end

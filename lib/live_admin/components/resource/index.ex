@@ -7,8 +7,7 @@ defmodule LiveAdmin.Components.Container.Index do
       repo: 0,
       associated_resource: 3,
       record_label: 2,
-      get_config: 3,
-      get_resource: 1
+      get_config: 3
     ]
 
   import LiveAdmin.Components.Container, only: [route_with_params: 3]
@@ -18,16 +17,13 @@ defmodule LiveAdmin.Components.Container.Index do
 
   @impl true
   def update(assigns, socket) do
-    resource = get_resource(assigns)
-
     socket =
       socket
       |> assign(assigns)
       |> assign(
-        resource: resource,
         records:
           Resource.list(
-            resource,
+            assigns.resource,
             Map.take(assigns, [:prefix, :sort, :page, :search]),
             SessionStore.lookup(assigns.session_id)
           ),
