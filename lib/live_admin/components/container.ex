@@ -31,7 +31,7 @@ defmodule LiveAdmin.Components.Container do
       ) do
     socket = assign_prefix(socket, params["prefix"])
 
-    record = Resource.find!(id, resource, socket.assigns.prefix)
+    record = Resource.find(id, resource, socket.assigns.prefix)
 
     socket = assign(socket, record: record)
 

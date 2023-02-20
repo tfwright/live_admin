@@ -7,6 +7,7 @@ defmodule LiveAdmin.Resource do
   alias Ecto.Changeset
 
   def find!(id, resource, prefix), do: repo().get!(resource.schema, id, prefix: prefix)
+  def find(id, resource, prefix), do: repo().get(resource.schema, id, prefix: prefix)
 
   def delete(record, config, session) do
     config

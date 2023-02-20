@@ -44,6 +44,13 @@ defmodule LiveAdmin.Components.Container.Form do
   end
 
   @impl true
+  def render(assigns = %{record: nil}) do
+    ~H"""
+    <div>No record found</div>
+    """
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <div id="form-page" phx-hook="FormPage">
