@@ -479,6 +479,8 @@
     @apply text-center;
     @apply border;
     @apply bottom-5;
+    @apply text-clip;
+    @apply overflow-hidden;
 
     left: 50%;
     top: auto !important;
