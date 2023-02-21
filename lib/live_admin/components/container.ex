@@ -17,7 +17,8 @@ defmodule LiveAdmin.Components.Container do
         key: key,
         resource: get_resource!(socket.assigns.resources, key),
         session_id: session_id,
-        loading: !connected?(socket)
+        loading: !connected?(socket),
+        prefix_options: get_prefix_options()
       )
 
     {:ok, socket}
@@ -144,7 +145,7 @@ defmodule LiveAdmin.Components.Container do
               </ul>
             </nav>
           </div>
-          <%= if Application.get_env(:live_admin, :prefix_options) do %>
+          <%= if @prefix_options do %>
             <div id="prefix-select" class="resource__action--drop">
               <button class="resource__action--btn">
                 <%= @prefix || "Set prefix" %>
@@ -156,7 +157,7 @@ defmodule LiveAdmin.Components.Container do
                       <a href="#" phx-click="set_prefix">clear</a>
                     </li>
                   <% end %>
-                  <%= for option <- get_prefix_options!(), to_string(option) != @prefix do %>
+                  <%= for option <- @prefix_options, to_string(option) != @prefix do %>
                     <li>
                       <a href="#" phx-click="set_prefix" phx-value-prefix={option}><%= option %></a>
                     </li>
@@ -251,35 +252,34 @@ defmodule LiveAdmin.Components.Container do
     apply(socket.router.__helpers__(), :resource_path, [socket] ++ segments ++ [params])
   end
 
-  def get_prefix_options!() do
-    Application.fetch_env!(:live_admin, :prefix_options)
+  def get_prefix_options() do
+    Application.get_env(:live_admin, :prefix_options)
     |> case do
       {mod, func, args} -> apply(mod, func, args)
       list when is_list(list) -> list
+      nil -> []
     end
     |> Enum.sort()
   end
 
-  def assign_prefix(_, prefix \\ nil)
-
-  def assign_prefix(socket, nil) do
-    case SessionStore.lookup(socket.assigns.session_id, :__prefix__) do
-      nil ->
-        assign(socket, :prefix, nil)
-
-      prefix ->
-        socket
-        |> assign(:prefix, prefix)
-        |> push_redirect(
-          to: route_with_params(socket, [:list, socket.assigns.key], prefix: prefix)
-        )
-    end
-  end
-
   def assign_prefix(socket, prefix) do
-    SessionStore.set(socket.assigns.session_id, :__prefix__, prefix)
+    socket.assigns.prefix_options
+    |> Enum.find(
+      &(to_string(&1) == (prefix || SessionStore.lookup(socket.assigns.session_id, :__prefix__)))
+    )
+    |> then(fn matching_prefix ->
+      SessionStore.set(socket.assigns.session_id, :__prefix__, matching_prefix)
 
-    assign(socket, :prefix, prefix)
+      socket = assign(socket, :prefix, matching_prefix)
+
+      if prefix == matching_prefix do
+        socket
+      else
+        push_redirect(socket,
+          to: route_with_params(socket, [:list, socket.assigns.key], prefix: matching_prefix)
+        )
+      end
+    end)
   end
 
   defp get_task_keys(config) do
