@@ -246,9 +246,9 @@ defmodule LiveAdmin.Components.Container.Index do
       |> Resource.find!(resource, socket.assigns.prefix)
       |> Resource.delete(resource.config, SessionStore.lookup(session_id))
       |> case do
-        {:ok, _} ->
+        {:ok, record} ->
           socket
-          |> push_event("success", %{msg: "Deleted #{resource.schema}"})
+          |> push_event("success", %{msg: "Deleted #{record_label(record, resource)}"})
           |> assign(
             :records,
             Resource.list(
@@ -259,7 +259,7 @@ defmodule LiveAdmin.Components.Container.Index do
           )
 
         {:error, _} ->
-          push_event(socket, "error", %{msg: "Could not delete #{resource.schema}"})
+          push_event(socket, "error", %{msg: "Delete failed!"})
       end
 
     {:noreply, socket}
