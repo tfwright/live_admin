@@ -44,7 +44,7 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "deletes record", %{view: view} do
       view
-      |> element("a[phx-click='delete']")
+      |> element("a", "Delete")
       |> render_click()
 
       assert_push_event(view, "success", %{})
@@ -52,7 +52,7 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "runs configured actions", %{view: view} do
       view
-      |> element("a[phx-value-action='run_action']")
+      |> element("a", "Run action")
       |> render_click()
 
       assert_push_event(view, "success", %{})

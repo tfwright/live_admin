@@ -7,6 +7,7 @@ defmodule LiveAdmin.Components.Container do
 
   alias __MODULE__.{Form, Index}
   alias LiveAdmin.{Resource, SessionStore}
+  alias Phoenix.LiveView.JS
 
   @impl true
   def mount(%{"resource_id" => key}, %{"id" => session_id}, socket) do
@@ -137,8 +138,7 @@ defmodule LiveAdmin.Components.Container do
                     <%= link(key |> to_string() |> humanize(),
                       to: "#",
                       "data-confirm": "Are you sure?",
-                      "phx-click": "task",
-                      "phx-value-task": key
+                      "phx-click": JS.push("task", value: %{task: key}, page_loading: true)
                     ) %>
                   </li>
                 <% end %>

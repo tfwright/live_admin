@@ -143,9 +143,12 @@ defmodule LiveAdmin.Components.Container.Index do
                             <%= link("Delete",
                               to: "#",
                               "data-confirm": "Are you sure?",
-                              "phx-click": "delete",
-                              "phx-value-id": record.id,
-                              "phx-target": @myself
+                              "phx-click":
+                                JS.push("delete",
+                                  value: %{id: record.id},
+                                  target: @myself,
+                                  page_loading: true
+                                )
                             ) %>
                           </li>
                         <% end %>
@@ -154,10 +157,12 @@ defmodule LiveAdmin.Components.Container.Index do
                             <%= link(action |> to_string() |> humanize(),
                               to: "#",
                               "data-confirm": "Are you sure?",
-                              "phx-click": "action",
-                              "phx-value-id": record.id,
-                              "phx-value-action": action,
-                              "phx-target": @myself
+                              "phx-click":
+                                JS.push("action",
+                                  value: %{id: record.id, action: action},
+                                  target: @myself,
+                                  page_loading: true
+                                )
                             ) %>
                           </li>
                         <% end %>
