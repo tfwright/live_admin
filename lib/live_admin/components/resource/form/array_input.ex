@@ -43,7 +43,7 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
     <div class="field__array">
       <%= for {item, idx} <- Enum.with_index(@values) do %>
         <div>
-          <a phx-click="remove" phx-value-idx={idx} phx-target={@myself} />
+          <a class="button__remove" phx-click="remove" phx-value-idx={idx} phx-target={@myself} />
           <%= text_input(:form, :array,
             id: input_id(@form, @field) <> "_#{idx}",
             name: input_name(@form, @field) <> "[]",

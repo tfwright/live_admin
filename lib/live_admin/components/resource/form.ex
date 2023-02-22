@@ -256,6 +256,7 @@ defmodule LiveAdmin.Components.Container.Form do
               <div class="embed__item">
                 <div>
                   <a
+                    class="button__remove"
                     phx-click="remove_embed"
                     phx-value-field={@field}
                     phx-value-idx={fp.index}
