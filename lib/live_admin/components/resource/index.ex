@@ -97,39 +97,9 @@ defmodule LiveAdmin.Components.Container.Index do
                 <div class="cell__contents">
                   <div class="resource__menu--drop">
                     <a href="#">
-                      <svg
-                        viewBox="0 0 24 24"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                        fill="#000000"
-                      >
-                        <g stroke-width="0"></g>
-                        <g stroke-linecap="round" stroke-linejoin="round"></g>
-                        <g>
-                          <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                            <rect x="0" y="0" width="24" height="24"></rect>
-
-                            <path
-                              d="M5,14 C6.1045695,14 7,13.1045695 7,12 C7,10.8954305 6.1045695,10 5,10 C3.8954305,10 3,10.8954305 3,12 C3,13.1045695 3.8954305,14 5,14 Z"
-                              fill="#030819"
-                            >
-                            </path>
-
-                            <path
-                              d="M12,14 C13.1045695,14 14,13.1045695 14,12 C14,10.8954305 13.1045695,10 12,10 C10.8954305,10 10,10.8954305 10,12 C10,13.1045695 10.8954305,14 12,14 Z"
-                              fill="#030819"
-                            >
-                            </path>
-
-                            <path
-                              d="M19,14 C20.1045695,14 21,13.1045695 21,12 C21,10.8954305 20.1045695,10 19,10 C17.8954305,10 17,10.8954305 17,12 C17,13.1045695 17.8954305,14 19,14 Z"
-                              fill="#030819"
-                            >
-                            </path>
-                          </g>
-                        </g>
-                      </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                    </svg>
                     </a>
                     <nav>
                       <ul>
