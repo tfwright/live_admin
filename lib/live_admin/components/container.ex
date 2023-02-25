@@ -3,7 +3,7 @@ defmodule LiveAdmin.Components.Container do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [resource_title: 2, get_config: 3, get_resource!: 2]
+    only: [resource_title: 1, get_config: 3, get_resource!: 2]
 
   alias __MODULE__.{Form, Index}
   alias LiveAdmin.{Resource, SessionStore}
@@ -114,7 +114,7 @@ defmodule LiveAdmin.Components.Container do
     ~H"""
     <div class="resource__banner">
       <h1 class="resource__title">
-        <%= resource_title(@resource, @base_path) %>
+        <%= resource_title(@resource) %>
       </h1>
 
       <div class="resource__actions">

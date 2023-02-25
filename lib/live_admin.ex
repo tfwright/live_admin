@@ -35,9 +35,9 @@ defmodule LiveAdmin do
     end)
   end
 
-  def resource_title(resource, base_path) do
+  def resource_title(resource) do
     case get_config(resource, :title_with) do
-      nil -> resource |> resource_path(base_path) |> Enum.join(".")
+      nil -> resource.schema |> Module.split() |> Enum.at(-1)
       {m, f, a} -> apply(m, f, a)
       title when is_binary(title) -> title
     end
