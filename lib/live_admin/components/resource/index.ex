@@ -170,7 +170,7 @@ defmodule LiveAdmin.Components.Container.Index do
         </tbody>
         <tfoot>
           <tr>
-            <td class="w-full" colspan={@resource |> Resource.fields() |> Enum.count() |> Kernel.-(1)}>
+            <td class="w-full" colspan={@resource |> Resource.fields() |> Enum.count()}>
               <%= if @page > 1,
                 do:
                   list_link(
