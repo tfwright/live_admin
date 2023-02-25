@@ -116,6 +116,10 @@
     @apply pl-1;
   }
 
+  .nav__group .nav__item--drop {
+    @apply ml-3;
+  }
+
   .nav__item--drop {
     @apply whitespace-nowrap;
   }

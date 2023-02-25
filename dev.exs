@@ -87,6 +87,14 @@ defmodule Demo.Accounts.User.Settings do
   end
 end
 
+defmodule Demo.Accounts.User.Profile do
+  use Ecto.Schema
+
+  schema "user_profiles" do
+    belongs_to :user, Demo.Accounts.User, type: :binary_id
+  end
+end
+
 defmodule Demo.Accounts.User do
   use Ecto.Schema
 
@@ -387,7 +395,8 @@ defmodule DemoWeb.Router do
         tasks: [:fail],
         validate_with: {Demo.Posts.Post, :validate, []},
         update_with: {Demo.Posts.Post, :update, []}
-      }
+      },
+      Demo.Accounts.User.Profile
     ]
   end
 end

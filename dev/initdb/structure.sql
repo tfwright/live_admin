@@ -17,6 +17,11 @@ create table users (
 
 CREATE UNIQUE INDEX users_email_index ON users USING btree (email);
 
+create table user_profiles (
+  id serial,
+  user_id uuid
+);
+
 create table posts (
   id serial,
   user_id uuid,
