@@ -55,7 +55,7 @@ defmodule LiveAdmin.Router do
         resource_params =
           case config do
             {mod, opts} -> [schema: mod, config: Map.new(opts)]
-            mod -> [schema: mod, config: %{}]
+            mod when is_atom(mod) -> [schema: mod, config: %{}]
           end
 
         resource_path =
