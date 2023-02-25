@@ -30,12 +30,13 @@ defmodule LiveAdmin.Router do
              [unquote(resources), unquote(title), unquote(components)]},
           root_layout: {LiveAdmin.View, :layout},
           on_mount: {unquote(__MODULE__), :assign_options} do
-          live("/", LiveAdmin.Components.Home, :home, as: :home)
-          live("/:resource_id", LiveAdmin.Components.Container, :list, as: :resource)
-          live("/:resource_id/new", LiveAdmin.Components.Container, :new, as: :resource)
+          live("/", LiveAdmin.Components.Home, :home, as: :live_admin_home)
+          live("/:resource_id", LiveAdmin.Components.Container, :list, as: :live_admin_resource)
+
+          live("/:resource_id/new", LiveAdmin.Components.Container, :new, as: :live_admin_resource)
 
           live("/:resource_id/edit/:record_id", LiveAdmin.Components.Container, :edit,
-            as: :resource
+            as: :live_admin_resource
           )
         end
       end

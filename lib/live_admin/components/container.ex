@@ -249,7 +249,11 @@ defmodule LiveAdmin.Components.Container do
         pair -> [pair]
       end)
 
-    apply(socket.router.__helpers__(), :resource_path, [socket] ++ segments ++ [params])
+    apply(
+      socket.router.__helpers__(),
+      :live_admin_resource_path,
+      [socket] ++ segments ++ [params]
+    )
   end
 
   def get_prefix_options() do

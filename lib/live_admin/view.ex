@@ -54,7 +54,7 @@ defmodule LiveAdmin.View do
   end
 
   def build_route(socket, args),
-    do: apply(socket.router.__helpers__(), :resource_path, [socket | args])
+    do: apply(socket.router.__helpers__(), :live_admin_resource_path, [socket | args])
 
   defp render_nav_group(group = %{}, socket, base_path) do
     group
