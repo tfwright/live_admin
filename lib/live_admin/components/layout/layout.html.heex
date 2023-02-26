@@ -9,7 +9,7 @@
     <link rel="icon" href="data:;base64,=" />
     <title><%= @title %></title>
     <style>
-      <%= raw(render("app.css")) %>
+      <%= raw(render_css()) %>
     </style>
     <%= csrf_meta_tag() %>
     <link rel="manifest" href="/manifest.json " />
@@ -18,6 +18,6 @@
     <%= @inner_content %>
   </body>
   <script>
-    <%= raw(render("app.js")) %>
+    <%= raw(render_js()) %>
   </script>
 </html>

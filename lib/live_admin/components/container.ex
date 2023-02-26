@@ -3,9 +3,7 @@ defmodule LiveAdmin.Components.Container do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [resource_title: 1, get_config: 3, get_resource!: 2]
-
-  import LiveAdmin.View, only: [route_with_params: 3]
+    only: [resource_title: 1, get_config: 3, get_resource!: 2, route_with_params: 3]
 
   alias __MODULE__.{Form, Index}
   alias LiveAdmin.{Resource, SessionStore}

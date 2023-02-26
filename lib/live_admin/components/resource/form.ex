@@ -3,8 +3,7 @@ defmodule LiveAdmin.Components.Container.Form do
   use Phoenix.HTML
 
   import LiveAdmin.ErrorHelpers
-  import LiveAdmin, only: [associated_resource: 3, get_config: 3]
-  import LiveAdmin.View, only: [route_with_params: 2]
+  import LiveAdmin, only: [associated_resource: 3, get_config: 3, route_with_params: 2]
 
   alias __MODULE__.{ArrayInput, SearchSelect}
   alias LiveAdmin.{Resource, SessionStore}

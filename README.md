@@ -50,7 +50,7 @@ Resource specific options:
 * `immutable_fields` - a list of fields that should not be editable in forms
 * `actions` - list of atoms or MFAs that identify a function that operates on a record
 * `tasks` - list atoms or MFAs that identify a function that operates on a resource
-* `components` - keyword list of component module overrides for specific views (`:list`, `:new`, `:edit`, `:home`)
+* `components` - keyword list of component module overrides for specific views (`:list`, `:new`, `:edit`, `:home`, `:nav`)
 
 ## App config
 

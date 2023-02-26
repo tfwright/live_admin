@@ -5,6 +5,33 @@ defmodule LiveAdmin do
     defexception message: "invalid resource", plug_status: 404
   end
 
+  def route_with_params(socket, segments, params \\ %{}) do
+    params =
+      Enum.flat_map(params, fn
+        {:prefix, nil} -> []
+        pair -> [pair]
+      end)
+
+    path =
+      segments
+      |> List.wrap()
+      |> Enum.map(&Phoenix.Param.to_param/1)
+      |> Path.join()
+
+    encoded_params =
+      params
+      |> Enum.into(%{})
+      |> Enum.empty?()
+      |> case do
+        true -> ""
+        false -> "?" <> Plug.Conn.Query.encode(params)
+      end
+
+    socket.router.__live_admin_path__()
+    |> Path.join(path)
+    |> Kernel.<>(encoded_params)
+  end
+
   def repo, do: Application.fetch_env!(:live_admin, :ecto_repo)
 
   def get_resource!(%{resources: resources, key: key}), do: get_resource!(resources, key)
