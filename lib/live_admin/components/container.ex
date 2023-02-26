@@ -130,6 +130,10 @@ defmodule LiveAdmin.Components.Container do
               to: route_with_params(@socket, [@key, "new"], prefix: @prefix),
               class: "resource__action--btn"
             ) %>
+          <% else %>
+            <button class="resource__action--disabled" disabled="disabled">
+              New
+            </button>
           <% end %>
           <div class="resource__action--drop">
             <button
