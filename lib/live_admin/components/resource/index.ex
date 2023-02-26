@@ -4,7 +4,6 @@ defmodule LiveAdmin.Components.Container.Index do
 
   import LiveAdmin,
     only: [
-      repo: 0,
       associated_resource: 3,
       record_label: 2,
       get_config: 3,
@@ -301,19 +300,10 @@ defmodule LiveAdmin.Components.Container.Index do
     {:noreply, socket}
   end
 
-  defp associated_record(record = %schema{}, field_name) do
-    with assoc_name when not is_nil(assoc_name) <- get_assoc_name!(schema, field_name),
-         %{^assoc_name => assoc_record} <- repo().preload(record, assoc_name) do
-      assoc_record
-    else
-      _ -> nil
-    end
-  end
-
   def cell_contents(record, field, record, assigns) do
     if associated_resource(assigns.resource.schema, field, assigns.resources) do
       record_label(
-        associated_record(record, field),
+        Map.fetch!(record, get_assoc_name!(assigns.resource.schema, field)),
         associated_resource(assigns.resource.schema, field, assigns.resources)
       )
     else
