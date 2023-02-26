@@ -268,7 +268,7 @@ defmodule DemoWeb.CreateUserForm do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import LiveAdmin.Components.Container, only: [route_with_params: 2]
+  import LiveAdmin.View, only: [route_with_params: 2]
   import LiveAdmin.ErrorHelpers
 
   @impl true

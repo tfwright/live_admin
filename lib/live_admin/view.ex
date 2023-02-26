@@ -27,6 +27,33 @@ defmodule LiveAdmin.View do
   def render("app.css", _),
     do: @app_css <> Application.get_env(:live_admin, :css_overrides, @default_css_overrides)
 
+  def route_with_params(socket, segments, params \\ %{}) do
+    params =
+      Enum.flat_map(params, fn
+        {:prefix, nil} -> []
+        pair -> [pair]
+      end)
+
+    path =
+      segments
+      |> List.wrap()
+      |> Enum.map(&Phoenix.Param.to_param/1)
+      |> Path.join()
+
+    encoded_params =
+      params
+      |> Enum.into(%{})
+      |> Enum.empty?()
+      |> case do
+        true -> ""
+        false -> "?" <> Plug.Conn.Query.encode(params)
+      end
+
+    socket.router.__live_admin_path__()
+    |> Path.join(path)
+    |> Kernel.<>(encoded_params)
+  end
+
   def render_field(record, field, _) do
     record
     |> Map.fetch!(field)
@@ -36,7 +63,7 @@ defmodule LiveAdmin.View do
     end
   end
 
-  def render_nav_menu(resources_by_key, socket, base_path, current_resource \\ nil) do
+  def render_nav_menu(resources_by_key, socket, base_path, assigns) do
     resources_by_key
     |> Enum.reduce(%{}, fn {key, resource}, groups ->
       path =
@@ -50,38 +77,41 @@ defmodule LiveAdmin.View do
 
       update_in(groups, path, fn subs -> Map.put(subs, {key, resource}, %{}) end)
     end)
-    |> render_nav_group(socket, base_path, current_resource)
+    |> render_nav_group(socket, base_path, assigns)
   end
 
-  defp render_nav_group(group = %{}, socket, base_path, current_resource) do
+  defp render_nav_group(group = %{}, socket, base_path, assigns) do
     group
     |> Enum.sort()
     |> Enum.map(fn
       {{key, resource}, %{}} ->
-        content_tag :li, class: "nav__item#{if resource == current_resource, do: "--selected"}" do
+        content_tag :li, class: "nav__item#{if resource == assigns[:resource], do: "--selected"}" do
           resource
           |> resource_title()
-          |> live_redirect(to: Path.join(socket.router.__live_admin_path__(), key))
+          |> live_redirect(to: route_with_params(socket, key, prefix: assigns["prefix"]))
         end
 
       {item, subs} ->
         content_tag :li, class: "nav__item--drop" do
           open =
-            if current_resource do
-              current_resource
-              |> Map.fetch!(:schema)
-              |> Module.split()
-              |> Enum.drop(-1)
-              |> Enum.member?(item)
-            else
-              true
+            assigns
+            |> Map.get(:resource)
+            |> case do
+              %{schema: schema} ->
+                schema
+                |> Module.split()
+                |> Enum.drop(-1)
+                |> Enum.member?(item)
+
+              _ ->
+                true
             end
 
           [
             content_tag(:input, "", type: "checkbox", id: "menu-group-#{item}", checked: open),
             content_tag(:label, item, for: "menu-group-#{item}"),
             content_tag :ul, class: "nav__group" do
-              render_nav_group(subs, socket, base_path, current_resource)
+              render_nav_group(subs, socket, base_path, assigns)
             end
           ]
         end

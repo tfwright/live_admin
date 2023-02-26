@@ -5,6 +5,8 @@ defmodule LiveAdmin.Components.Container do
   import LiveAdmin,
     only: [resource_title: 1, get_config: 3, get_resource!: 2]
 
+  import LiveAdmin.View, only: [route_with_params: 3]
+
   alias __MODULE__.{Form, Index}
   alias LiveAdmin.{Resource, SessionStore}
   alias Phoenix.LiveView.JS
@@ -240,33 +242,6 @@ defmodule LiveAdmin.Components.Container do
       resource={@resource}
     />
     """
-  end
-
-  def route_with_params(socket, segments, params \\ %{}) do
-    params =
-      Enum.flat_map(params, fn
-        {:prefix, nil} -> []
-        pair -> [pair]
-      end)
-
-    path =
-      segments
-      |> List.wrap()
-      |> Enum.map(&Phoenix.Param.to_param/1)
-      |> Path.join()
-
-    encoded_params =
-      params
-      |> Enum.into(%{})
-      |> Enum.empty?()
-      |> case do
-        true -> ""
-        false -> "?" <> Plug.Conn.Query.encode(params)
-      end
-
-    socket.router.__live_admin_path__()
-    |> Path.join(path)
-    |> Kernel.<>(encoded_params)
   end
 
   def get_prefix_options() do

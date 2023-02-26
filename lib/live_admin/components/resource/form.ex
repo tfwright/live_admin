@@ -4,7 +4,7 @@ defmodule LiveAdmin.Components.Container.Form do
 
   import LiveAdmin.ErrorHelpers
   import LiveAdmin, only: [associated_resource: 3, get_config: 3]
-  import LiveAdmin.Components.Container, only: [route_with_params: 2]
+  import LiveAdmin.View, only: [route_with_params: 2]
 
   alias __MODULE__.{ArrayInput, SearchSelect}
   alias LiveAdmin.{Resource, SessionStore}

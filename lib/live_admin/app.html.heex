@@ -5,7 +5,7 @@
         <li class="nav__item">
           <%= live_redirect("Home", to: @socket.router.__live_admin_path__()) %>
         </li>
-        <%= render_nav_menu(@resources, @socket, @base_path, assigns[:resource]) %>
+        <%= render_nav_menu(@resources, @socket, @base_path, assigns) %>
       </ul>
     </div>
     <div class="content">

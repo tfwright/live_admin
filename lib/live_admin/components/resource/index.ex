@@ -10,7 +10,7 @@ defmodule LiveAdmin.Components.Container.Index do
       get_config: 3
     ]
 
-  import LiveAdmin.Components.Container, only: [route_with_params: 3]
+  import LiveAdmin.View, only: [route_with_params: 3]
 
   alias LiveAdmin.{Resource, SessionStore}
   alias Phoenix.LiveView.JS
