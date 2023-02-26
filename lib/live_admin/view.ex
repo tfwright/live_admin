@@ -33,6 +33,7 @@ defmodule LiveAdmin.View do
       socket={@socket}
       title={@title}
       resources={@resources}
+      resource={assigns[:resource]}
       base_path={@base_path}
     />
     """
