@@ -13,7 +13,6 @@ defmodule LiveAdmin.Components.Home do
     assigns = assign(assigns, mod: Keyword.get(assigns.components, :home, Content), title: title)
 
     ~H"""
-    <h1 class="home__title"><%= @title %></h1>
     <.live_component module={@mod} id="content" />
     """
   end
