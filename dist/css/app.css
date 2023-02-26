@@ -561,23 +561,44 @@ select:focus {
 }
 
 .nav__list > .nav__item:first-of-type {
-  border-bottom-width: 1px;
-  padding-bottom: 0.75rem;
-  margin-bottom: 0.5rem;
+  padding-bottom: 1.25rem;
   font-size: 1.875rem;
   line-height: 2.25rem;
 }
 
 .nav__item {
+  padding: 0.25rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.nav__list > .nav__item--selected:first-of-type {
-  margin-bottom: 0.5rem;
+.nav__list > .nav__item--group:first-of-type {
+  padding-bottom: 1.25rem;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.nav__item--group {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0.25rem;
+}
+
+.nav__item--group a {
+  margin: 0.25rem;
+  margin-left: 0.75rem;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+}
+
+.nav__item--group {
   border-bottom-width: 1px;
-  padding-bottom: 0.75rem;
+}
+
+.nav__list > .nav__item--selected:first-of-type {
+  padding-bottom: 1.25rem;
   font-size: 1.875rem;
   line-height: 2.25rem;
 }
@@ -586,6 +607,7 @@ select:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding: 0.25rem;
 }
 
 .nav__item--selected a {

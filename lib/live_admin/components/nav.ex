@@ -9,10 +9,15 @@ defmodule LiveAdmin.Components.Nav do
     ~H"""
     <div class="nav">
       <ul class="nav__list">
-        <li class="nav__item">
+        <li class="nav__item--group"><%= @title %></li>
+        <li class="nav__item--group">
           <%= live_redirect("Home", to: @socket.router.__live_admin_path__()) %>
         </li>
-        <%= render_dropdowns(@resources, @socket, @base_path, assigns) %>
+        <li class="nav__item--group">
+          <ul>
+            <%= render_dropdowns(@resources, @socket, @base_path, assigns) %>
+          </ul>
+        </li>
       </ul>
     </div>
     """

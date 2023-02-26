@@ -31,6 +31,7 @@ defmodule LiveAdmin.View do
       id="nav"
       module={@mod}
       socket={@socket}
+      title={@title}
       resources={@resources}
       base_path={@base_path}
     />

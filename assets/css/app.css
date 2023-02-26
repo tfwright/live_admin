@@ -90,14 +90,18 @@
   }
 
   .nav__list > .nav__item:first-of-type {
-    @apply border-b;
-    @apply pb-3;
-    @apply mb-2;
+    @apply pb-5;
     @apply text-3xl;
   }
 
   .nav__item {
+    @apply p-1;
     @apply truncate;
+  }
+
+  .nav__item--group {
+    @apply nav__item;
+    @apply border-b;
   }
 
   .nav__item--selected {
