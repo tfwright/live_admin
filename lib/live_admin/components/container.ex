@@ -132,7 +132,12 @@ defmodule LiveAdmin.Components.Container do
             ) %>
           <% end %>
           <div class="resource__action--drop">
-            <button class="resource__action--btn">Run task</button>
+            <button
+              class={"resource__action#{if @resource.config |> get_task_keys() |> Enum.empty?, do: "--disabled", else: "--btn"}"}
+              disabled={if @resource.config |> get_task_keys() |> Enum.empty?(), do: "disabled"}
+            >
+              Run task
+            </button>
             <nav>
               <ul>
                 <%= for key <- get_task_keys(@resource.config) do %>
