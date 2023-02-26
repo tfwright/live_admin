@@ -120,7 +120,7 @@ defmodule LiveAdmin.Components.Container.Index do
                             to: route_with_params(@socket, [@key, :edit, record], prefix: @prefix)
                           ) %>
                         </li>
-                        <%= if get_config(@resource.config, :delete_with, true) do %>
+                        <%= if get_config(@resource, :delete_with, true) do %>
                           <li>
                             <%= link("Delete",
                               to: "#",
@@ -256,7 +256,7 @@ defmodule LiveAdmin.Components.Container.Index do
     session = SessionStore.lookup(socket.assigns.session_id)
 
     {m, f, a} =
-      socket.assigns.resource.config
+      socket.assigns.resource
       |> get_config(:actions, [])
       |> Enum.find_value(fn
         {^action_name, mfa} -> mfa
@@ -320,7 +320,7 @@ defmodule LiveAdmin.Components.Container.Index do
     else
       session = SessionStore.lookup(assigns.session_id)
 
-      assigns.resource.config
+      assigns.resource
       |> get_config(:render_with, {LiveAdmin.View, :render_field, []})
       |> case do
         {m, f, a} -> apply(m, f, [record, field, session] ++ a)

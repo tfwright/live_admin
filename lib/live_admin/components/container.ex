@@ -87,7 +87,7 @@ defmodule LiveAdmin.Components.Container do
     session = SessionStore.lookup(socket.assigns.session_id)
 
     {m, f, a} =
-      socket.assigns.resource.config
+      socket.assigns.resource
       |> get_config(:tasks, [])
       |> Enum.find_value(fn
         {^task_name, mfa} -> mfa
@@ -183,7 +183,7 @@ defmodule LiveAdmin.Components.Container do
 
   def render("list.html", assigns) do
     mod =
-      assigns.resource.config
+      assigns.resource
       |> get_config(:components, [])
       |> Keyword.get(:list, Index)
 
@@ -208,7 +208,7 @@ defmodule LiveAdmin.Components.Container do
 
   def render("new.html", assigns) do
     mod =
-      assigns.resource.config
+      assigns.resource
       |> get_config(:components, [])
       |> Keyword.get(:new, Form)
 
@@ -229,7 +229,7 @@ defmodule LiveAdmin.Components.Container do
 
   def render("edit.html", assigns) do
     mod =
-      assigns.resource.config
+      assigns.resource
       |> get_config(:components, [])
       |> Keyword.get(:edit, Form)
 

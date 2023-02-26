@@ -22,7 +22,7 @@ defmodule LiveAdmin.Resource do
   end
 
   def list(resource, opts, session) do
-    resource.config
+    resource
     |> get_config(:list_with, :default)
     |> case do
       :default ->
@@ -46,7 +46,7 @@ defmodule LiveAdmin.Resource do
   end
 
   def create(resource, params, session) do
-    resource.config
+    resource
     |> get_config(:create_with, :default)
     |> case do
       :default ->

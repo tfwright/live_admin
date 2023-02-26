@@ -46,7 +46,7 @@ defmodule LiveAdmin do
   def record_label(nil, _), do: nil
 
   def record_label(record, resource) do
-    case get_config(resource.config, :label_with, :id) do
+    case get_config(resource, :label_with, :id) do
       {m, f, a} -> apply(m, f, [record | a])
       label when is_atom(label) -> Map.fetch!(record, label)
     end
@@ -55,6 +55,9 @@ defmodule LiveAdmin do
   def resource_path(resource, base_path),
     do: resource.schema |> Module.split() |> Enum.drop(Enum.count(base_path))
 
-  def get_config(config, key, default \\ nil),
+  def get_config(resource_or_config, key, default \\ nil)
+  def get_config(%{config: config}, key, default), do: get_config(config, key, default)
+
+  def get_config(config, key, default),
     do: Map.get(config, key, Application.get_env(:live_admin, key, default))
 end
