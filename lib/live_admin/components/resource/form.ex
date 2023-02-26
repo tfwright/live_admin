@@ -88,7 +88,7 @@ defmodule LiveAdmin.Components.Container.Form do
 
   @impl true
   def handle_event("after_create", _, socket) do
-    {:noreply, push_patch(socket, to: route_with_params(socket, [:list, socket.assigns.key]))}
+    {:noreply, push_patch(socket, to: route_with_params(socket, socket.assigns.key))}
   end
 
   @impl true

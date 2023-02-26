@@ -53,9 +53,6 @@ defmodule LiveAdmin.View do
     |> render_nav_group(socket, base_path)
   end
 
-  def build_route(socket, args),
-    do: apply(socket.router.__helpers__(), :live_admin_resource_path, [socket | args])
-
   defp render_nav_group(group = %{}, socket, base_path) do
     group
     |> Enum.sort()
@@ -64,7 +61,7 @@ defmodule LiveAdmin.View do
         content_tag :li, class: "nav__item" do
           resource
           |> resource_title()
-          |> live_redirect(to: build_route(socket, [:list, key]))
+          |> live_redirect(to: Path.join(socket.router.__live_admin_path__(), key))
         end
 
       {item, subs} ->

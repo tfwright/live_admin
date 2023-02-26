@@ -30,16 +30,25 @@ defmodule LiveAdmin.Router do
              [unquote(resources), unquote(title), unquote(components)]},
           root_layout: {LiveAdmin.View, :layout},
           on_mount: {unquote(__MODULE__), :assign_options} do
-          live("/", LiveAdmin.Components.Home, :home, as: :live_admin_home)
-          live("/:resource_id", LiveAdmin.Components.Container, :list, as: :live_admin_resource)
-
-          live("/:resource_id/new", LiveAdmin.Components.Container, :new, as: :live_admin_resource)
+          live("/", LiveAdmin.Components.Home, :home, as: :__live_admin_home)
+          live("/:resource_id", LiveAdmin.Components.Container, :list, as: :__live_admin_index__)
+          live("/:resource_id/new", LiveAdmin.Components.Container, :new, as: :__live_admin_new__)
 
           live("/:resource_id/edit/:record_id", LiveAdmin.Components.Container, :edit,
-            as: :live_admin_resource
+            as: :__live_admin_edit__
           )
         end
       end
+
+      live_admin_path =
+        __MODULE__
+        |> Module.get_attribute(:phoenix_top_scopes)
+        |> Map.fetch!(:path)
+        |> Path.join(unquote(path))
+
+      @live_admin_path live_admin_path
+
+      def __live_admin_path__, do: "/#{@live_admin_path}"
     end
   end
 

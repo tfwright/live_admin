@@ -117,7 +117,7 @@ defmodule LiveAdmin.Components.Container.Index do
                       <ul>
                         <li>
                           <%= live_redirect("Edit",
-                            to: route_with_params(@socket, [:edit, @key, record], prefix: @prefix)
+                            to: route_with_params(@socket, [@key, :edit, record], prefix: @prefix)
                           ) %>
                         </li>
                         <%= if get_config(@resource.config, :delete_with, true) do %>
@@ -297,8 +297,7 @@ defmodule LiveAdmin.Components.Container.Index do
       prefix: socket.assigns.prefix
     }
 
-    socket =
-      push_patch(socket, to: route_with_params(socket, [:list, socket.assigns.key], params))
+    socket = push_patch(socket, to: route_with_params(socket, socket.assigns.key, params))
 
     {:noreply, socket}
   end
@@ -331,8 +330,7 @@ defmodule LiveAdmin.Components.Container.Index do
   end
 
   defp list_link(socket, content, key, params, opts),
-    do:
-      live_patch(content, Keyword.put(opts, :to, route_with_params(socket, [:list, key], params)))
+    do: live_patch(content, Keyword.put(opts, :to, route_with_params(socket, key, params)))
 
   defp get_assoc_name!(schema, fk) do
     Enum.find(schema.__schema__(:associations), fn assoc_name ->

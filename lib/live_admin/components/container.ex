@@ -73,7 +73,7 @@ defmodule LiveAdmin.Components.Container do
     {
       :noreply,
       push_redirect(socket,
-        to: route_with_params(socket, [:list, socket.assigns.key], prefix: params["prefix"])
+        to: route_with_params(socket, socket.assigns.key, prefix: params["prefix"])
       )
     }
   end
@@ -120,12 +120,12 @@ defmodule LiveAdmin.Components.Container do
       <div class="resource__actions">
         <div>
           <%= live_redirect("List",
-            to: route_with_params(@socket, [:list, @key], prefix: @prefix),
+            to: route_with_params(@socket, @key, prefix: @prefix),
             class: "resource__action--btn"
           ) %>
           <%= if get_config(@resource, :create_with, true) do %>
             <%= live_redirect("New",
-              to: route_with_params(@socket, [:new, @key], prefix: @prefix),
+              to: route_with_params(@socket, [@key, "new"], prefix: @prefix),
               class: "resource__action--btn"
             ) %>
           <% end %>
@@ -249,11 +249,24 @@ defmodule LiveAdmin.Components.Container do
         pair -> [pair]
       end)
 
-    apply(
-      socket.router.__helpers__(),
-      :live_admin_resource_path,
-      [socket] ++ segments ++ [params]
-    )
+    path =
+      segments
+      |> List.wrap()
+      |> Enum.map(&Phoenix.Param.to_param/1)
+      |> Path.join()
+
+    encoded_params =
+      params
+      |> Enum.into(%{})
+      |> Enum.empty?()
+      |> case do
+        true -> ""
+        false -> "?" <> Plug.Conn.Query.encode(params)
+      end
+
+    socket.router.__live_admin_path__()
+    |> Path.join(path)
+    |> Kernel.<>(encoded_params)
   end
 
   def get_prefix_options() do
@@ -280,7 +293,7 @@ defmodule LiveAdmin.Components.Container do
         socket
       else
         push_redirect(socket,
-          to: route_with_params(socket, [:list, socket.assigns.key], prefix: matching_prefix)
+          to: route_with_params(socket, socket.assigns.key, prefix: matching_prefix)
         )
       end
     end)
