@@ -550,12 +550,12 @@ select:focus {
 }
 
 .nav {
+  overflow-y: auto;
   width: 20%;
   padding: 1rem;
 }
 
 .nav__list {
-  overflow: hidden;
   align-content: center;
   justify-content: space-between;
 }

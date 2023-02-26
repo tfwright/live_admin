@@ -79,12 +79,12 @@
   }
 
   .nav {
+    @apply overflow-y-auto;
     @apply w-1/5;
     @apply p-4;
   }
 
   .nav__list {
-    @apply overflow-hidden;
     @apply content-center;
     @apply justify-between;
   }
