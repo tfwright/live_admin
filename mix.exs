@@ -38,8 +38,7 @@ defmodule LiveAdmin.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:phoenix_live_view, "~> 0.18"},
-      {:phoenix_view, "~> 2.0"},
+      {:phoenix_live_view, "~> 0.18.3"},
       {:ecto, "~> 3.8"},
       {:ecto_sql, "~> 3.8"},
       {:phoenix_ecto, "~> 4.4"},
