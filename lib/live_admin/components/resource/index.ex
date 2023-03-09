@@ -69,7 +69,7 @@ defmodule LiveAdmin.Components.Container.Index do
             <%= for {field, _, _} <- Resource.fields(@resource) do %>
               <th class="resource__header" title={field}>
                 <%= list_link(
-                  @socket,
+                  @__socket__,
                   humanize(field),
                   @key,
                   %{
@@ -117,7 +117,7 @@ defmodule LiveAdmin.Components.Container.Index do
                       <ul>
                         <li>
                           <%= live_redirect("Edit",
-                            to: route_with_params(@socket, [:edit, @key, record], prefix: @prefix)
+                            to: route_with_params(@__socket__, [:edit, @key, record], prefix: @prefix)
                           ) %>
                         </li>
                         <%= if get_config(@resource.config, :delete_with, true) do %>
@@ -174,7 +174,7 @@ defmodule LiveAdmin.Components.Container.Index do
               <%= if @page > 1,
                 do:
                   list_link(
-                    @socket,
+                    @__socket__,
                     "Prev",
                     @key,
                     %{
@@ -190,7 +190,7 @@ defmodule LiveAdmin.Components.Container.Index do
               <%= if @page < (@records |> elem(1)) / 10,
                 do:
                   list_link(
-                    @socket,
+                    @__socket__,
                     "Next",
                     @key,
                     %{

@@ -120,12 +120,12 @@ defmodule LiveAdmin.Components.Container do
       <div class="resource__actions">
         <div>
           <%= live_redirect("List",
-            to: route_with_params(@socket, [:list, @key], prefix: @prefix),
+            to: route_with_params(@__socket__, [:list, @key], prefix: @prefix),
             class: "resource__action--btn"
           ) %>
           <%= if get_config(@resource, :create_with, true) do %>
             <%= live_redirect("New",
-              to: route_with_params(@socket, [:new, @key], prefix: @prefix),
+              to: route_with_params(@__socket__, [:new, @key], prefix: @prefix),
               class: "resource__action--btn"
             ) %>
           <% end %>
@@ -186,7 +186,7 @@ defmodule LiveAdmin.Components.Container do
     <.live_component
       module={@mod}
       id="list"
-      socket={@socket}
+      __socket__={@__socket__}
       resources={@resources}
       key={@key}
       resource={@resource}

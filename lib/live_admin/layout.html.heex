@@ -21,10 +21,10 @@
           <ul class="nav__list">
             <li class="nav__item">
               <%= live_redirect("Home",
-                to: @socket.router.__helpers__().live_admin_home_path(@socket, :home)
+                to: @__socket__.router.__helpers__().live_admin_home_path(@__socket__, :home)
               ) %>
             </li>
-            <%= render_nav_menu(@resources, @socket, @base_path) %>
+            <%= render_nav_menu(@resources, @__socket__, @base_path) %>
           </ul>
         </div>
         <div class="content">
