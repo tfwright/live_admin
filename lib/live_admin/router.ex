@@ -86,7 +86,6 @@ defmodule LiveAdmin.Router do
      assign(socket,
        title: title,
        resources: resources_by_key,
-       socket: socket,
        base_path: base_path
      )}
   end

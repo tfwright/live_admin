@@ -195,7 +195,6 @@ defmodule LiveAdmin.Components.Container do
     <.live_component
       module={@mod}
       id="list"
-      socket={@socket}
       resources={@resources}
       key={@key}
       resource={@resource}

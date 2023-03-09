@@ -10,7 +10,11 @@ defmodule LiveAdmin.Components.Home do
 
   @impl true
   def render(assigns = %{title: title}) do
-    assigns = assign(assigns, mod: Application.get_env(:live_admin, :components, [])[:home] || Content, title: title)
+    assigns =
+      assign(assigns,
+        mod: Application.get_env(:live_admin, :components, [])[:home] || Content,
+        title: title
+      )
 
     ~H"""
     <.live_component module={@mod} id="content" />
