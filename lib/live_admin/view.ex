@@ -24,7 +24,7 @@ defmodule LiveAdmin.View do
   def render("layout.html", assigns), do: layout(assigns)
 
   def render("nav.html", assigns) do
-    assigns = assign(assigns, mod: Keyword.get(assigns.components, :nav, Nav))
+    assigns = assign(assigns, mod: Application.get_env(:live_admin, :components, [])[:nav] || Nav)
 
     ~H"""
     <.live_component

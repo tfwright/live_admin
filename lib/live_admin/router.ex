@@ -12,22 +12,17 @@ defmodule LiveAdmin.Router do
   * `:opts` - Opts for the Admin UI added at configured path
     * `:resources` - A list of Ecto schema modules to be exposed in the UI
     * `:title` - Title for the UI home view (Default: 'LiveAdmin')
-    * `:components` - A list of UI level component overrides
-      * `:home` - Override for the view loaded at the base path, before the user navigates to a specific resource
   """
   defmacro live_admin(path, opts) do
     resources = Keyword.get(opts, :resources, [])
     title = Keyword.get(opts, :title, "LiveAdmin")
-    components = Keyword.get(opts, :components, [])
 
     quote do
       scope unquote(path), alias: false, as: false do
         import Phoenix.LiveView.Router, only: [live: 4, live_session: 3]
 
         live_session :live_admin,
-          session:
-            {unquote(__MODULE__), :build_session,
-             [unquote(resources), unquote(title), unquote(components)]},
+          session: {unquote(__MODULE__), :build_session, [unquote(resources), unquote(title)]},
           root_layout: {LiveAdmin.View, :layout},
           layout: {LiveAdmin.View, :app},
           on_mount: {unquote(__MODULE__), :assign_options} do
@@ -56,7 +51,7 @@ defmodule LiveAdmin.Router do
   def on_mount(
         :assign_options,
         _params,
-        %{"resources" => resources, "title" => title, "components" => components},
+        %{"resources" => resources, "title" => title},
         socket
       ) do
     {resources, base_path} =
@@ -92,7 +87,6 @@ defmodule LiveAdmin.Router do
        title: title,
        resources: resources_by_key,
        socket: socket,
-       components: components,
        base_path: base_path
      )}
   end
@@ -104,12 +98,11 @@ defmodule LiveAdmin.Router do
     |> Enum.map_join("_", &Macro.underscore/1)
   end
 
-  def build_session(_conn, resources, title, components) do
+  def build_session(_conn, resources, title) do
     %{
       "resources" => resources,
       "id" => generate_uuid(),
-      "title" => title,
-      "components" => components
+      "title" => title
     }
   end
 
