@@ -95,13 +95,21 @@
   }
 
   .nav__item {
-    @apply p-1;
     @apply truncate;
+  }
+
+  .nav__item--drop {
+    @apply ml-1;
+  }
+
+  .nav__item--drop > ul {
+    @apply ml-4;
   }
 
   .nav__item--group {
     @apply nav__item;
     @apply border-b;
+    @apply py-1;
   }
 
   .nav__item--selected {
@@ -111,22 +119,12 @@
 
   .nav__item a {
     @apply p-1;
-    @apply m-1;
-    @apply ml-3;
     @apply rounded;
   }
 
   .nav__item--active {
     @apply p-2;
     @apply truncate;
-  }
-
-  .nav__group {
-    @apply pl-1;
-  }
-
-  .nav__group .nav__item--drop {
-    @apply ml-3;
   }
 
   .nav__item--drop {

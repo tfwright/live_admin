@@ -567,10 +567,17 @@ select:focus {
 }
 
 .nav__item {
-  padding: 0.25rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.nav__item--drop {
+  margin-left: 0.25rem;
+}
+
+.nav__item--drop > ul {
+  margin-left: 1rem;
 }
 
 .nav__list > .nav__item--group:first-of-type {
@@ -583,18 +590,17 @@ select:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 0.25rem;
 }
 
 .nav__item--group a {
-  margin: 0.25rem;
-  margin-left: 0.75rem;
   border-radius: 0.25rem;
   padding: 0.25rem;
 }
 
 .nav__item--group {
   border-bottom-width: 1px;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 .nav__list > .nav__item--selected:first-of-type {
@@ -607,12 +613,9 @@ select:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 0.25rem;
 }
 
 .nav__item--selected a {
-  margin: 0.25rem;
-  margin-left: 0.75rem;
   border-radius: 0.25rem;
   padding: 0.25rem;
 }
@@ -623,8 +626,6 @@ select:focus {
 
 .nav__item a {
   padding: 0.25rem;
-  margin: 0.25rem;
-  margin-left: 0.75rem;
   border-radius: 0.25rem;
 }
 
@@ -633,14 +634,6 @@ select:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.nav__group {
-  padding-left: 0.25rem;
-}
-
-.nav__group .nav__item--drop {
-  margin-left: 0.75rem;
 }
 
 .nav__item--drop {
@@ -1157,20 +1150,16 @@ a.button__remove {
   height: 100%;
 }
 
-.w-full {
-  width: 100%;
-}
-
 .w-1\/2 {
   width: 50%;
 }
 
-.transform {
-  transform: var(--tw-transform);
+.w-full {
+  width: 100%;
 }
 
-.content-center {
-  align-content: center;
+.transform {
+  transform: var(--tw-transform);
 }
 
 .items-center {
@@ -1179,10 +1168,6 @@ a.button__remove {
 
 .justify-center {
   justify-content: center;
-}
-
-.justify-items-center {
-  justify-items: center;
 }
 
 .rounded-lg {

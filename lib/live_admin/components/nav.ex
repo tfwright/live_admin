@@ -70,7 +70,7 @@ defmodule LiveAdmin.Components.Nav do
           [
             content_tag(:input, "", type: "checkbox", id: "menu-group-#{item}", checked: open),
             content_tag(:label, item, for: "menu-group-#{item}"),
-            content_tag :ul, class: "nav__group" do
+            content_tag :ul do
               render_resource_group(subs, socket, base_path, assigns)
             end
           ]
