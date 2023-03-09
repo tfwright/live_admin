@@ -74,12 +74,6 @@ config :live_admin,
 
 See [development app](/dev.exs) for more example configuration.
 
-## Troubleshooting
-
-For bug reports or feature requests, feel free to [open an issue](https://github.com/tfwright/live_admin/issues/new/choose), but please use the appropriate template. 
-
-If you're not sure, or if you have more general questions or suggestions please reply on the [Elixir Forum project thread](https://elixirforum.com/t/liveadmin-phoenix-admin-ui-built-on-liveview/46421).
-
 ---
 
 README generated with [docout](https://github.com/tfwright/docout)

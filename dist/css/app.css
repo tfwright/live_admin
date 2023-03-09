@@ -1153,12 +1153,24 @@ a.button__remove {
   display: contents;
 }
 
+.h-full {
+  height: 100%;
+}
+
 .w-full {
   width: 100%;
 }
 
+.w-1\/2 {
+  width: 50%;
+}
+
 .transform {
   transform: var(--tw-transform);
+}
+
+.content-center {
+  align-content: center;
 }
 
 .items-center {
@@ -1167,6 +1179,10 @@ a.button__remove {
 
 .justify-center {
   justify-content: center;
+}
+
+.justify-items-center {
+  justify-items: center;
 }
 
 .rounded-lg {

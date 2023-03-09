@@ -4,11 +4,13 @@ defmodule LiveAdmin.Components.Home.Content do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
-      This is the default LiveAdmin home page content.
+    <div class="flex h-full items-center justify-center">
+      <div class="w-1/2">
+        This is the default LiveAdmin home page content.
 
-      To use your own component, set the value of <code>:home</code>
-      in the components option to a module that uses LiveComponent. LiveAdmin will render that component instead of this one in your app.
+        To use your own component, set the value of <code>:home</code>
+        in the components option to a module that uses LiveComponent. LiveAdmin will render that component instead of this one in your app.
+      </div>
     </div>
     """
   end
