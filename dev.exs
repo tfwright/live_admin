@@ -352,11 +352,10 @@ defmodule DemoWeb.CreateUserForm do
   def handle_event(
         "create",
         %{"params" => params},
-        %{assigns: %{key: key, session_id: session_id}} =
-          socket
+        socket = %{assigns: %{key: key, session: session}}
       ) do
     socket =
-      case Demo.Accounts.User.create(params, LiveAdmin.SessionStore.lookup(session_id)) do
+      case Demo.Accounts.User.create(params, session) do
         {:ok, _} -> push_redirect(socket, to: route_with_params(socket, [:list, key]))
         {:error, changeset} -> assign(socket, changeset: changeset)
       end

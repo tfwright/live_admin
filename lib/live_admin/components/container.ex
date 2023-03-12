@@ -6,20 +6,18 @@ defmodule LiveAdmin.Components.Container do
     only: [resource_title: 1, get_config: 3, get_resource!: 2, route_with_params: 3]
 
   alias __MODULE__.{Form, Index}
-  alias LiveAdmin.{Resource, SessionStore}
+  alias LiveAdmin.{Resource, Session}
   alias Phoenix.LiveView.JS
 
   @impl true
-  def mount(%{"resource_id" => key}, %{"id" => session_id}, socket) do
-    SessionStore.get_or_init(session_id)
-
+  def mount(%{"resource_id" => key}, %{"session" => session}, socket) do
     socket =
       assign(socket,
         key: key,
         resource: get_resource!(socket.assigns.resources, key),
-        session_id: session_id,
         loading: !connected?(socket),
-        prefix_options: get_prefix_options()
+        prefix_options: get_prefix_options(),
+        session: session
       )
 
     {:ok, socket}
@@ -67,7 +65,10 @@ defmodule LiveAdmin.Components.Container do
     prefix = params["prefix"]
 
     if is_nil(prefix) do
-      SessionStore.set(socket.assigns.session_id, :__prefix__, prefix)
+      LiveAdmin.session_store().persist!(%LiveAdmin.Session{
+        socket.assigns.session
+        | __prefix__: nil
+      })
     end
 
     {
@@ -82,8 +83,6 @@ defmodule LiveAdmin.Components.Container do
   def handle_event("task", %{"task" => task}, socket) do
     task_name = String.to_existing_atom(task)
 
-    session = SessionStore.lookup(socket.assigns.session_id)
-
     {m, f, a} =
       socket.assigns.resource
       |> get_config(:tasks, [])
@@ -93,7 +92,7 @@ defmodule LiveAdmin.Components.Container do
       end)
 
     socket =
-      case apply(m, f, [session] ++ a) do
+      case apply(m, f, [socket.assigns.session] ++ a) do
         {:ok, result} ->
           push_event(socket, "success", %{
             msg: "Successfully completed #{task}: #{inspect(result)}"
@@ -202,7 +201,7 @@ defmodule LiveAdmin.Components.Container do
       sort={@sort}
       search={@search}
       prefix={@prefix}
-      session_id={@session_id}
+      session={@session}
     />
     """
   end
@@ -220,7 +219,7 @@ defmodule LiveAdmin.Components.Container do
       module={@mod}
       id="form"
       action="create"
-      session_id={@session_id}
+      session={@session}
       key={@key}
       resources={@resources}
       resource={@resource}
@@ -241,7 +240,7 @@ defmodule LiveAdmin.Components.Container do
       module={@mod}
       id="form"
       action="update"
-      session_id={@session_id}
+      session={@session}
       key={@key}
       record={@record}
       resources={@resources}
@@ -262,13 +261,16 @@ defmodule LiveAdmin.Components.Container do
 
   def assign_prefix(socket, prefix) do
     socket.assigns.prefix_options
-    |> Enum.find(
-      &(to_string(&1) == (prefix || SessionStore.lookup(socket.assigns.session_id, :__prefix__)))
-    )
+    |> Enum.find(fn option ->
+      to_string(option) == (prefix || socket.assigns.session.__prefix__)
+    end)
     |> then(fn matching_prefix ->
-      SessionStore.set(socket.assigns.session_id, :__prefix__, matching_prefix)
-
       socket = assign(socket, :prefix, matching_prefix)
+
+      LiveAdmin.session_store().persist!(%LiveAdmin.Session{
+        socket.assigns.session
+        | __prefix__: matching_prefix
+      })
 
       if prefix == matching_prefix do
         socket

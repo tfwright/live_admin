@@ -26,7 +26,7 @@ defmodule LiveAdmin.Resource do
     |> get_config(:list_with, :default)
     |> case do
       :default ->
-        build_list(resource, opts, session[:__prefix__])
+        build_list(resource, opts, session.__prefix__)
 
       {mod, func_name, args} ->
         apply(mod, func_name, [resource, opts, session] ++ args)
@@ -52,7 +52,7 @@ defmodule LiveAdmin.Resource do
       :default ->
         resource
         |> change(nil, params)
-        |> repo().insert(prefix: session[:__prefix__])
+        |> repo().insert(prefix: session.__prefix__)
 
       {mod, func_name, args} ->
         apply(mod, func_name, [params, session] ++ args)

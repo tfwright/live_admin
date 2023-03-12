@@ -97,17 +97,11 @@ defmodule LiveAdmin.Router do
     |> Enum.map_join("_", &Macro.underscore/1)
   end
 
-  def build_session(_conn, resources, title) do
+  def build_session(conn, resources, title) do
     %{
       "resources" => resources,
-      "id" => generate_uuid(),
+      "session" => LiveAdmin.session_store().load!(conn),
       "title" => title
     }
-  end
-
-  defp generate_uuid() do
-    make_ref()
-    |> :erlang.ref_to_list()
-    |> List.to_string()
   end
 end

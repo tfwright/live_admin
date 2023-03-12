@@ -10,7 +10,7 @@ defmodule LiveAdmin.Components.Container.Index do
       route_with_params: 3
     ]
 
-  alias LiveAdmin.{Resource, SessionStore}
+  alias LiveAdmin.{Resource, Session}
   alias Phoenix.LiveView.JS
 
   @impl true
@@ -23,7 +23,7 @@ defmodule LiveAdmin.Components.Container.Index do
           Resource.list(
             assigns.resource,
             Map.take(assigns, [:prefix, :sort, :page, :search]),
-            SessionStore.lookup(assigns.session_id)
+            assigns.session
           ),
         sort_attr: elem(assigns.sort, 1),
         sort_dir: elem(assigns.sort, 0)
@@ -217,14 +217,14 @@ defmodule LiveAdmin.Components.Container.Index do
         %{
           assigns: %{
             resource: resource,
-            session_id: session_id
+            session: session
           }
         } = socket
       ) do
     socket =
       id
       |> Resource.find!(resource, socket.assigns.prefix)
-      |> Resource.delete(resource.config, SessionStore.lookup(session_id))
+      |> Resource.delete(resource.config, session)
       |> case do
         {:ok, record} ->
           socket
@@ -234,7 +234,7 @@ defmodule LiveAdmin.Components.Container.Index do
             Resource.list(
               resource,
               Map.take(socket.assigns, [:prefix, :sort, :page, :search]),
-              SessionStore.lookup(session_id)
+              session
             )
           )
 
@@ -251,8 +251,6 @@ defmodule LiveAdmin.Components.Container.Index do
 
     action_name = String.to_existing_atom(action)
 
-    session = SessionStore.lookup(socket.assigns.session_id)
-
     {m, f, a} =
       socket.assigns.resource
       |> get_config(:actions, [])
@@ -263,7 +261,7 @@ defmodule LiveAdmin.Components.Container.Index do
       end)
 
     socket =
-      case apply(m, f, [record, session] ++ a) do
+      case apply(m, f, [record, socket.assigns.session] ++ a) do
         {:ok, result} ->
           socket
           |> push_event("success", %{
@@ -274,7 +272,7 @@ defmodule LiveAdmin.Components.Container.Index do
             Resource.list(
               socket.assigns.resource,
               Map.take(socket.assigns, [:prefix, :sort, :page, :search]),
-              SessionStore.lookup(socket.assigns.session_id)
+              socket.assigns.session
             )
           )
 
@@ -307,13 +305,11 @@ defmodule LiveAdmin.Components.Container.Index do
         associated_resource(assigns.resource.schema, field, assigns.resources)
       )
     else
-      session = SessionStore.lookup(assigns.session_id)
-
       assigns.resource
       |> get_config(:render_with, {LiveAdmin.View, :render_field, []})
       |> case do
-        {m, f, a} -> apply(m, f, [record, field, session] ++ a)
-        f when is_atom(f) -> apply(assigns.resource.schema, f, [record, field, session])
+        {m, f, a} -> apply(m, f, [record, field, assigns.session] ++ a)
+        f when is_atom(f) -> apply(assigns.resource.schema, f, [record, field, assigns.session])
       end
     end
   end

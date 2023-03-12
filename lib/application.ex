@@ -7,6 +7,6 @@ defmodule LiveAdmin.Application do
   end
 
   defp children do
-    [{LiveAdmin.SessionStore, %{}}]
+    [{LiveAdmin.Session.Agent, %{}}]
   end
 end
