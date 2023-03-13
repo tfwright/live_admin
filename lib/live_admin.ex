@@ -34,7 +34,8 @@ defmodule LiveAdmin do
 
   def repo, do: Application.fetch_env!(:live_admin, :ecto_repo)
 
-  def session_store, do: Application.get_env(:live_admin, :session_store, __MODULE__.Session.Agent)
+  def session_store,
+    do: Application.get_env(:live_admin, :session_store, __MODULE__.Session.Agent)
 
   def get_resource!(%{resources: resources, key: key}), do: get_resource!(resources, key)
 

@@ -1,6 +1,6 @@
 <main class="main__content">
   <div class="main__wrap">
-    <%= render("nav.html", assigns) %>
+    <.nav title={@title} socket={@socket} resources={@resources} base_path={@base_path} />
     <div class="content">
       <%= @inner_content %>
     </div>
