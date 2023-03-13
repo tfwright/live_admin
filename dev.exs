@@ -395,7 +395,7 @@ defmodule DemoWeb.Router do
         validate_with: {Demo.Posts.Post, :validate, []},
         update_with: {Demo.Posts.Post, :update, []}
       },
-      {Demo.Accounts.User.Profile, create_with: nil}
+      {Demo.Accounts.User.Profile, create_with: nil, slug_with: "profile"}
     ]
   end
 end

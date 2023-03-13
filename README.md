@@ -51,6 +51,7 @@ Resource specific options:
 * `actions` - list of atoms or MFAs that identify a function that operates on a record
 * `tasks` - list atoms or MFAs that identify a function that operates on a resource
 * `components` - keyword list of component module overrides for specific views (`:list`, `:new`, `:edit`, `:home`, `:nav`)
+* `slug_with` - a binary, atom, or MFA that returns a binary, used to generate url for resource
 
 ## App config
 

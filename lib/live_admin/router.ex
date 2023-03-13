@@ -54,47 +54,30 @@ defmodule LiveAdmin.Router do
         %{"resources" => resources, "title" => title},
         socket
       ) do
-    {resources, base_path} =
+    resources_by_key =
       resources
-      |> Enum.map_reduce(nil, fn config, base_path ->
+      |> Enum.map(fn config ->
         resource_params =
           case config do
             {mod, opts} -> [schema: mod, config: Map.new(opts)]
             mod when is_atom(mod) -> [schema: mod, config: %{}]
           end
 
-        resource_path =
-          resource_params
-          |> Keyword.fetch!(:schema)
-          |> Module.split()
+        resource = struct!(Resource, resource_params)
 
-        {
-          struct!(Resource, resource_params),
-          (base_path || Enum.drop(resource_path, -1))
-          |> Enum.zip(resource_path)
-          |> Enum.reduce_while([], fn
-            {a, a}, new_path -> {:cont, Enum.concat(new_path, [a])}
-            _, new_path -> {:halt, new_path}
-          end)
-        }
+        {generate_resource_key(resource), resource}
       end)
+      |> Enum.into(%{})
 
-    resources_by_key =
-      Map.new(resources, fn r -> {derive_resource_key(r.schema, base_path), r} end)
-
-    {:cont,
-     assign(socket,
-       title: title,
-       resources: resources_by_key,
-       base_path: base_path
-     )}
+    {:cont, assign(socket, title: title, resources: resources_by_key)}
   end
 
-  defp derive_resource_key(mod, base_path) do
-    mod
-    |> Module.split()
-    |> Enum.drop(Enum.count(base_path))
-    |> Enum.map_join("_", &Macro.underscore/1)
+  def generate_resource_key(resource) do
+    case LiveAdmin.get_config(resource, :slug_with) do
+      nil -> resource.schema |> Module.split() |> Enum.map_join("_", &Macro.underscore/1)
+      {m, f, a} -> apply(m, f, a)
+      slug when is_binary(slug) -> slug
+    end
   end
 
   def build_session(conn, resources, title) do

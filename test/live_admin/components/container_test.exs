@@ -128,7 +128,7 @@ defmodule LiveAdmin.Components.ContainerTest do
 
   describe "new child resource page" do
     setup %{conn: conn} do
-      {:ok, view, html} = live(conn, "/post/new")
+      {:ok, view, html} = live(conn, "/live_admin_test_post/new")
       %{response: html, view: view}
     end
 

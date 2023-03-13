@@ -82,9 +82,6 @@ defmodule LiveAdmin do
     end
   end
 
-  def resource_path(resource, base_path),
-    do: resource.schema |> Module.split() |> Enum.drop(Enum.count(base_path))
-
   def get_config(resource_or_config, key, default \\ nil)
   def get_config(%{config: config}, key, default), do: get_config(config, key, default)
 

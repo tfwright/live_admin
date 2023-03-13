@@ -34,7 +34,6 @@ defmodule LiveAdmin.View do
       title={@title}
       resources={@resources}
       resource={assigns[:resource]}
-      base_path={@base_path}
     />
     """
   end

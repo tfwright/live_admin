@@ -2,7 +2,7 @@ defmodule LiveAdmin.Components.Nav do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import LiveAdmin, only: [resource_title: 1, resource_path: 2, route_with_params: 3]
+  import LiveAdmin, only: [resource_title: 1, route_with_params: 3]
 
   @impl true
   def render(assigns) do
@@ -15,7 +15,7 @@ defmodule LiveAdmin.Components.Nav do
         </li>
         <li class="nav__item--group">
           <ul>
-            <%= render_dropdowns(@resources, @socket, @base_path, assigns) %>
+            <%= render_dropdowns(@resources, @socket, assigns) %>
           </ul>
         </li>
       </ul>
@@ -23,12 +23,12 @@ defmodule LiveAdmin.Components.Nav do
     """
   end
 
-  def render_dropdowns(resources_by_key, socket, base_path, assigns) do
+  def render_dropdowns(resources_by_key, socket, assigns) do
     resources_by_key
     |> Enum.reduce(%{}, fn {key, resource}, groups ->
       path =
-        resource
-        |> resource_path(base_path)
+        resource.schema
+        |> Module.split()
         |> case do
           list when length(list) == 1 -> list
           list -> Enum.drop(list, -1)
@@ -37,10 +37,10 @@ defmodule LiveAdmin.Components.Nav do
 
       update_in(groups, path, fn subs -> Map.put(subs, {key, resource}, %{}) end)
     end)
-    |> render_resource_group(socket, base_path, assigns)
+    |> render_resource_group(socket, assigns)
   end
 
-  defp render_resource_group(group = %{}, socket, base_path, assigns) do
+  defp render_resource_group(group = %{}, socket, assigns) do
     group
     |> Enum.sort()
     |> Enum.map(fn
@@ -71,7 +71,7 @@ defmodule LiveAdmin.Components.Nav do
             content_tag(:input, "", type: "checkbox", id: "menu-group-#{item}", checked: open),
             content_tag(:label, item, for: "menu-group-#{item}"),
             content_tag :ul do
-              render_resource_group(subs, socket, base_path, assigns)
+              render_resource_group(subs, socket, assigns)
             end
           ]
         end
