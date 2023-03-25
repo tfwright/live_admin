@@ -3,11 +3,13 @@ defmodule LiveAdmin.Session do
 
   @type t() :: %__MODULE__{
           id: String.t(),
-          __prefix__: String.t()
+          prefix: String.t(),
+          metadata: map()
         }
 
   @primary_key {:id, :string, autogenerate: false}
   embedded_schema do
-    field(:__prefix__, :string)
+    field(:prefix, :string)
+    field(:metadata, :map, default: %{})
   end
 end

@@ -135,7 +135,7 @@ defmodule Demo.Accounts.User do
     |> cast(params, [:name, :email, :stars_count, :roles])
     |> Ecto.Changeset.validate_required([:name, :email])
     |> Ecto.Changeset.unique_constraint(:email)
-    |> Demo.Repo.insert(prefix: session.__prefix__)
+    |> Demo.Repo.insert(prefix: session.prefix)
   end
 
   def validate(changeset, _meta) do
@@ -356,7 +356,7 @@ defmodule DemoWeb.CreateUserForm do
       ) do
     socket =
       case Demo.Accounts.User.create(params, session) do
-        {:ok, _} -> push_redirect(socket, to: route_with_params(socket, key, prefix: session.__prefix__))
+        {:ok, _} -> push_redirect(socket, to: route_with_params(socket, key, prefix: session.prefix))
         {:error, changeset} -> assign(socket, changeset: changeset)
       end
 

@@ -66,10 +66,7 @@ defmodule LiveAdmin.Components.Container do
 
     socket =
       if is_nil(prefix) do
-        new_session = %LiveAdmin.Session{
-          socket.assigns.session
-          | __prefix__: nil
-        }
+        new_session = %LiveAdmin.Session{socket.assigns.session | prefix: nil}
 
         LiveAdmin.session_store().persist!(new_session)
 
@@ -270,15 +267,12 @@ defmodule LiveAdmin.Components.Container do
     socket.assigns.prefix_options
     |> Enum.find(fn option ->
       to_string(option) ==
-        (prefix || socket.assigns.session.__prefix__)
+        (prefix || socket.assigns.session.prefix)
     end)
     |> then(fn matching_prefix ->
       socket = assign(socket, :prefix, matching_prefix)
 
-      new_session = %LiveAdmin.Session{
-        socket.assigns.session
-        | __prefix__: matching_prefix
-      }
+      new_session = %LiveAdmin.Session{socket.assigns.session | prefix: matching_prefix}
 
       LiveAdmin.session_store().persist!(new_session)
 
