@@ -33,3 +33,5 @@ live_admin-*.tar
 /assets/node_modules/
 
 .bash_history
+
+.DS_Store
