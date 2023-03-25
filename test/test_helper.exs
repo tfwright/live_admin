@@ -43,8 +43,7 @@ defmodule LiveAdminTest.Router do
       resources: [
         {
           LiveAdminTest.User,
-          immutable_fields: [:encrypted_password], actions: [:run_action],
-          slug_with: "user"
+          immutable_fields: [:encrypted_password], actions: [:run_action], slug_with: "user"
         },
         LiveAdminTest.Post
       ]

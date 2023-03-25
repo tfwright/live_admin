@@ -49,7 +49,8 @@ defmodule LiveAdmin.MixProject do
       {:faker, "~> 0.17", only: :dev},
       {:floki, ">= 0.30.0", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:docout, github: "tfwright/docout", branch: "main", runtime: false, only: [:dev, :test]}
+      {:docout, github: "tfwright/docout", branch: "main", runtime: false, only: [:dev, :test]},
+      {:dialyxir, "~> 1.2", runtime: false}
     ]
   end
 

@@ -1,7 +1,10 @@
 defmodule LiveAdmin.Session do
   use Ecto.Schema
 
-  alias __MODULE__.Store
+  @type t() :: %__MODULE__{
+          id: String.t(),
+          __prefix__: String.t()
+        }
 
   @primary_key {:id, :string, autogenerate: false}
   embedded_schema do

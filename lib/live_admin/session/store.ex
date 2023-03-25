@@ -1,7 +1,7 @@
 defmodule LiveAdmin.Session.Store do
-  @type id :: String.t()
+  @type session :: LiveAdmin.Session.t()
   @type conn :: Plug.Conn.t()
 
-  @callback load!(conn) :: LiveAdmin.Session.t()
-  @callback persist!(id) :: :ok
+  @callback load!(conn) :: session
+  @callback persist!(session) :: :ok
 end
