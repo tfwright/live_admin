@@ -83,7 +83,7 @@ defmodule LiveAdmin.Router do
   def build_session(conn, resources, title) do
     %{
       "resources" => resources,
-      "session" => LiveAdmin.session_store().load!(conn),
+      "session_id" => LiveAdmin.session_store().init!(conn),
       "title" => title
     }
   end

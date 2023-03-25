@@ -8,16 +8,21 @@ defmodule LiveAdmin.Session.Agent do
   end
 
   @impl LiveAdmin.Session.Store
-  def load!(_) do
+  def init!(_) do
     id = Ecto.UUID.generate()
 
     Agent.get_and_update(__MODULE__, fn state ->
-      new_state = Map.put_new(state, id, %LiveAdmin.Session{id: id})
+      new_state = Map.put(state, id, %LiveAdmin.Session{id: id})
 
       {state, new_state}
     end)
 
-    Agent.get(__MODULE__, &Map.fetch!(&1, id))
+    id
+  end
+
+  @impl LiveAdmin.Session.Store
+  def load!(id) do
+    Agent.get(__MODULE__, &Map.get(&1, id))
   end
 
   @impl LiveAdmin.Session.Store

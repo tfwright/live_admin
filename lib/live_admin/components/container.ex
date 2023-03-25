@@ -6,18 +6,18 @@ defmodule LiveAdmin.Components.Container do
     only: [resource_title: 1, get_config: 3, get_resource!: 2, route_with_params: 3]
 
   alias __MODULE__.{Form, Index}
-  alias LiveAdmin.{Resource, Session}
+  alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
 
   @impl true
-  def mount(%{"resource_id" => key}, %{"session" => session}, socket) do
+  def mount(%{"resource_id" => key}, %{"session_id" => session_id}, socket) do
     socket =
       assign(socket,
         key: key,
         resource: get_resource!(socket.assigns.resources, key),
         loading: !connected?(socket),
         prefix_options: get_prefix_options(),
-        session: session
+        session: LiveAdmin.session_store().load!(session_id)
       )
 
     {:ok, socket}
@@ -64,12 +64,19 @@ defmodule LiveAdmin.Components.Container do
   def handle_event("set_prefix", params, socket) do
     prefix = params["prefix"]
 
-    if is_nil(prefix) do
-      LiveAdmin.session_store().persist!(%LiveAdmin.Session{
-        socket.assigns.session
-        | __prefix__: nil
-      })
-    end
+    socket =
+      if is_nil(prefix) do
+        new_session = %LiveAdmin.Session{
+          socket.assigns.session
+          | __prefix__: nil
+        }
+
+        LiveAdmin.session_store().persist!(new_session)
+
+        assign(socket, :session, new_session)
+      else
+        socket
+      end
 
     {
       :noreply,
@@ -262,15 +269,18 @@ defmodule LiveAdmin.Components.Container do
   def assign_prefix(socket, prefix) do
     socket.assigns.prefix_options
     |> Enum.find(fn option ->
-      to_string(option) == (prefix || socket.assigns.session.__prefix__)
+      to_string(option) ==
+        (prefix || socket.assigns.session.__prefix__)
     end)
     |> then(fn matching_prefix ->
       socket = assign(socket, :prefix, matching_prefix)
 
-      LiveAdmin.session_store().persist!(%LiveAdmin.Session{
+      new_session = %LiveAdmin.Session{
         socket.assigns.session
         | __prefix__: matching_prefix
-      })
+      }
+
+      LiveAdmin.session_store().persist!(new_session)
 
       if prefix == matching_prefix do
         socket

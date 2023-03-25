@@ -10,7 +10,7 @@ defmodule LiveAdmin.Components.Container.Index do
       route_with_params: 3
     ]
 
-  alias LiveAdmin.{Resource, Session}
+  alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
 
   @impl true

@@ -130,12 +130,12 @@ defmodule Demo.Accounts.User do
     end
   end
 
-  def create(params, meta) do
+  def create(params, session) do
     %__MODULE__{}
     |> cast(params, [:name, :email, :stars_count, :roles])
     |> Ecto.Changeset.validate_required([:name, :email])
     |> Ecto.Changeset.unique_constraint(:email)
-    |> Demo.Repo.insert(prefix: meta[:__prefix__])
+    |> Demo.Repo.insert(prefix: session.__prefix__)
   end
 
   def validate(changeset, _meta) do
@@ -268,7 +268,7 @@ defmodule DemoWeb.CreateUserForm do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import LiveAdmin, only: [route_with_params: 2]
+  import LiveAdmin, only: [route_with_params: 3]
   import LiveAdmin.ErrorHelpers
 
   @impl true
@@ -356,7 +356,7 @@ defmodule DemoWeb.CreateUserForm do
       ) do
     socket =
       case Demo.Accounts.User.create(params, session) do
-        {:ok, _} -> push_redirect(socket, to: route_with_params(socket, [:list, key]))
+        {:ok, _} -> push_redirect(socket, to: route_with_params(socket, key, prefix: session.__prefix__))
         {:error, changeset} -> assign(socket, changeset: changeset)
       end
 
