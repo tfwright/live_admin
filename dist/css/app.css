@@ -1063,6 +1063,27 @@ a.button__remove {
   margin-bottom: 0px;
 }
 
+.field__map > div:not(.form__actions) {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.field__map > .form__actions {
+  text-align: left;
+}
+
+.field__map > div:not(.form__actions) > a {
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+}
+
+.field__map input {
+  margin-bottom: 0px;
+  margin-right: 0.5rem;
+}
+
 .field__number {
   border-width: 1px;
   padding: 0.25rem;

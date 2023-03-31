@@ -5,7 +5,7 @@ defmodule LiveAdmin.Components.Container.Form do
   import LiveAdmin.ErrorHelpers
   import LiveAdmin, only: [associated_resource: 3, get_config: 3, route_with_params: 2]
 
-  alias __MODULE__.{ArrayInput, SearchSelect}
+  alias __MODULE__.{ArrayInput, MapInput, SearchSelect}
   alias LiveAdmin.Resource
 
   @supported_primitive_types [
@@ -239,6 +239,8 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp field(assigns = %{type: {:array, :string}}), do: field_group(assigns)
 
+  defp field(assigns = %{type: :map}), do: field_group(assigns)
+
   defp field(assigns = %{type: {:array, {_, Ecto.Enum, _}}}), do: field_group(assigns)
 
   defp field(assigns = %{type: {_, Ecto.Embedded, meta}}) do
@@ -365,6 +367,19 @@ defmodule LiveAdmin.Components.Container.Form do
     ~H"""
     <.live_component
       module={ArrayInput}
+      id={assigns.field}
+      form={@form}
+      field={@field}
+      disabled={@disabled}
+      form_ref={@form_ref}
+    />
+    """
+  end
+
+  defp input(assigns = %{type: :map}) do
+    ~H"""
+    <.live_component
+      module={MapInput}
       id={assigns.field}
       form={@form}
       field={@field}

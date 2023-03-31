@@ -187,6 +187,7 @@ defmodule Demo.Posts.Post do
     field :title, :string
     field :body, :string
     field :tags, {:array, :string}, default: []
+    field :metadata, :map
 
     embeds_many :previous_versions, __MODULE__.Version, on_replace: :delete
 

@@ -457,6 +457,27 @@
     @apply mb-0;
   }
 
+  .field__map > div:not(.form__actions) {
+    @apply flex;
+    @apply items-center;
+    @apply mb-2;
+    @apply ml-2;
+  }
+
+  .field__map > .form__actions {
+    @apply text-left;
+  }
+
+  .field__map > div:not(.form__actions) > a {
+    @apply shrink-0;
+    @apply mr-2;
+  }
+
+  .field__map input {
+    @apply mb-0;
+    @apply mr-2;
+  }
+
   .field__number {
     @apply border;
     @apply p-1;

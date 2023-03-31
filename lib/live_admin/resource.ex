@@ -177,38 +177,44 @@ defmodule LiveAdmin.Resource do
   end
 
   defp build_changeset(record = %schema{}, config, params) do
-    fields = fields(schema, config)
-
-    {primitives, embeds} =
-      Enum.split_with(fields, fn
-        {_, {_, Ecto.Embedded, _}, _} -> false
-        _ -> true
-      end)
-
-    castable_fields =
-      Enum.flat_map(primitives, fn {field, _, opts} ->
-        if Keyword.get(opts, :immutable, false), do: [], else: [field]
-      end)
-
-    changeset = Changeset.cast(record, params, castable_fields)
-
-    Enum.reduce(embeds, changeset, fn {field, {_, Ecto.Embedded, meta}, _}, changeset ->
-      changeset =
-        if Map.get(changeset.params, to_string(field)) == "delete" do
-          Map.update!(
+    schema
+    |> fields(config)
+    |> Enum.reduce(Changeset.cast(record, params, []), fn
+      {field_name, {_, Ecto.Embedded, meta}, _}, changeset ->
+        if Map.get(params, to_string(field_name)) == "delete" do
+          Changeset.put_embed(
             changeset,
-            :params,
-            &Map.put(&1, to_string(field), if(meta.cardinality == :many, do: [], else: nil))
+            field_name,
+            if(meta.cardinality == :many, do: [], else: nil)
           )
+        else
+          Changeset.cast_embed(changeset, field_name,
+            with: fn embed, params -> build_changeset(embed, %{}, params) end
+          )
+        end
+
+      {field_name, type, opts}, changeset ->
+        unless Keyword.get(opts, :immutable, false) do
+          changeset = Changeset.cast(changeset, params, [field_name])
+
+          if type == :map do
+            Changeset.update_change(changeset, field_name, &parse_map_param/1)
+          else
+            changeset
+          end
         else
           changeset
         end
-
-      Changeset.cast_embed(changeset, field,
-        with: fn embed, params -> build_changeset(embed, %{}, params) end
-      )
     end)
   end
+
+  defp parse_map_param(param = %{}) do
+    param
+    |> Enum.sort_by(fn {idx, _} -> idx end)
+    |> Map.new(fn {_, %{"key" => key, "value" => value}} -> {key, value} end)
+  end
+
+  defp parse_map_param(param), do: param
 
   defp preloads(resource) do
     resource.config
