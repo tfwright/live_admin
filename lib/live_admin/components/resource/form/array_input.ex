@@ -2,6 +2,8 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
+  alias Phoenix.LiveView.JS
+
   @impl true
   def mount(socket) do
     {:ok, assign(socket, :values, [])}
@@ -43,7 +45,16 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
     <div class="field__array">
       <%= for {item, idx} <- Enum.with_index(@values) do %>
         <div>
-          <a class="button__remove" phx-click="remove" phx-value-idx={idx} phx-target={@myself} />
+          <a
+            class="button__remove"
+            phx-click={
+              JS.push("validate",
+                value: %{field: @field, value: List.delete_at(@values, idx)},
+                target: @form_ref,
+                page_loading: true
+              )
+            }
+          />
           <%= text_input(:form, :array,
             id: input_id(@form, @field) <> "_#{idx}",
             name: input_name(@form, @field) <> "[]",
@@ -62,15 +73,6 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
   @impl true
   def handle_event("add", _params, socket) do
     socket = assign(socket, values: socket.assigns.values ++ [""])
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_event("remove", %{"idx" => idx}, socket) do
-    new_values = List.delete_at(socket.assigns.values, String.to_integer(idx))
-
-    socket = assign(socket, :values, new_values)
 
     {:noreply, socket}
   end

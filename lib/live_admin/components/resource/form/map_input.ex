@@ -47,7 +47,13 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
       <%= for {idx, %{"key" => k, "value" => v}} <- Enum.sort(@values) do %>
         <div>
           <a
-            phx-click={JS.push("remove", value: %{idx: idx}, target: @myself)}
+            phx-click={
+              JS.push("validate",
+                value: %{field: @field, value: remove_at(@values, idx)},
+                target: @form_ref,
+                page_loading: true
+              )
+            }
             href="#"
             class="button__remove"
           />
@@ -72,11 +78,6 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
        :values,
        &Map.put(&1, &1 |> map_size() |> to_string(), %{"key" => nil, "value" => nil})
      )}
-  end
-
-  @impl true
-  def handle_event("remove", %{"idx" => idx}, socket) do
-    {:noreply, update(socket, :values, &remove_at(&1, idx))}
   end
 
   defp remove_at(values, idx) do
