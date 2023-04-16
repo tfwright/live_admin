@@ -27,6 +27,7 @@ defmodule LiveAdmin.Router do
           layout: {LiveAdmin.View, :app},
           on_mount: {unquote(__MODULE__), :assign_options} do
           live("/", LiveAdmin.Components.Home, :home, as: :__live_admin_home__)
+          live("/session", LiveAdmin.Components.Session, :session, as: :__live_admin_session__)
           live("/:resource_id", LiveAdmin.Components.Container, :list, as: :__live_admin_index__)
           live("/:resource_id/new", LiveAdmin.Components.Container, :new, as: :__live_admin_new__)
 

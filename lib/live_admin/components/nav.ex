@@ -18,6 +18,9 @@ defmodule LiveAdmin.Components.Nav do
             <%= render_dropdowns(@resources, @socket, assigns) %>
           </ul>
         </li>
+        <li class="nav__item--group">
+          <%= live_redirect("Session", to: Path.join(@socket.router.__live_admin_path__(), "session")) %>
+        </li>
       </ul>
     </div>
     """
