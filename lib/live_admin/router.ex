@@ -52,7 +52,7 @@ defmodule LiveAdmin.Router do
   def on_mount(
         :assign_options,
         _params,
-        %{"resources" => resources, "title" => title},
+        %{"resources" => resources, "title" => title, "session_id" => session_id},
         socket
       ) do
     resources_by_key =
@@ -70,7 +70,12 @@ defmodule LiveAdmin.Router do
       end)
       |> Enum.into(%{})
 
-    {:cont, assign(socket, title: title, resources: resources_by_key)}
+    {:cont,
+     assign(socket,
+       title: title,
+       resources: resources_by_key,
+       session: LiveAdmin.session_store().load!(session_id)
+     )}
   end
 
   def generate_resource_key(resource) do

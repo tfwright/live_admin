@@ -9,7 +9,7 @@
     <link rel="icon" href="data:;base64,=" />
     <title><%= @title %></title>
     <style>
-      <%= raw(render_css()) %>
+      <%= raw(render_css(@session)) %>
     </style>
     <%= csrf_meta_tag() %>
     <link rel="manifest" href="/manifest.json " />

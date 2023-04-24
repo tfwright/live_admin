@@ -40,8 +40,13 @@ defmodule LiveAdmin.View do
 
   def render_js, do: "var ENV = \"#{@env}\";" <> @app_js
 
-  def render_css,
-    do: @app_css <> Application.get_env(:live_admin, :css_overrides, @default_css_overrides)
+  def render_css(session) do
+    Application.get_env(:live_admin, :css_overrides, @default_css_overrides)
+    |> case do
+      {m, f, a} -> @app_css <> IO.inspect(apply(m, f, [session | a]))
+      override_css -> @app_css <> override_css
+    end
+  end
 
   def render_field(record, field, _) do
     record

@@ -44,12 +44,13 @@ Application.put_env(:live_admin, DemoWeb.Endpoint,
 Application.put_env(:live_admin, :ecto_repo, Demo.Repo)
 Application.put_env(:live_admin, :prefix_options, ["public", "this-is-a-fake-schema-with-a-really-long-name", "alt"])
 Application.put_env(:live_admin, :immutable_fields, [:inserted_at])
-Application.put_env(:live_admin, :render_with, {DemoWeb.Renderer, :render, []})
+Application.put_env(:live_admin, :render_with, {DemoWeb.Renderer, :render_field, []})
+Application.put_env(:live_admin, :css_overrides, {DemoWeb.Renderer, :render_css, []})
 
 defmodule DemoWeb.Renderer do
   use Phoenix.HTML
 
-  def render(record, field, session) do
+  def render_field(record, field, session) do
     record
     |> Map.fetch!(field)
     |> case do
@@ -57,6 +58,13 @@ defmodule DemoWeb.Renderer do
       date = %Date{} -> Calendar.strftime(date, "%a, %B %d %Y")
       _ -> LiveAdmin.View.render_field(record, field, session)
     end
+  end
+
+  def render_css(session) do
+    __DIR__
+    |> Path.join("dist/css/default_overrides.css")
+    |> File.read!()
+    |> Kernel.<>(Map.get(session.metadata, "css_overrides", ""))
   end
 end
 
@@ -126,7 +134,7 @@ defmodule Demo.Accounts.User do
     end
 
     def render_for_admin(record, field, session) do
-      DemoWeb.Renderer.render(record, field, session)
+      DemoWeb.Renderer.render_field(record, field, session)
     end
   end
 
@@ -372,6 +380,8 @@ defmodule DemoWeb.Router do
 
   pipeline :browser do
     plug :fetch_session
+
+    plug :user_id_stub
   end
 
   scope "/" do
@@ -398,6 +408,10 @@ defmodule DemoWeb.Router do
       },
       {Demo.Accounts.User.Profile, create_with: nil, slug_with: "profile"}
     ]
+  end
+
+  defp user_id_stub(conn, _) do
+    Plug.Conn.assign(conn, :user_id, 1)
   end
 end
 
