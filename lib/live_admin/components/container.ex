@@ -58,7 +58,11 @@ defmodule LiveAdmin.Components.Container do
   end
 
   @impl true
-  def handle_params(params, _uri, socket), do: {:noreply, assign_prefix(socket, params["prefix"])}
+  def handle_params(params, _, socket = %{assigns: %{live_action: :new}}),
+    do: {:noreply, assign_prefix(socket, params["prefix"])}
+
+  @impl true
+  def handle_params(_, _, socket), do: {:noreply, socket}
 
   @impl true
   def handle_event("set_prefix", params, socket) do
