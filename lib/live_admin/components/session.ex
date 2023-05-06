@@ -1,9 +1,8 @@
 defmodule LiveAdmin.Components.Session do
   use Phoenix.LiveView
-  use Phoenix.HTML
 
+  alias __MODULE__.Content
   alias Ecto.Changeset
-  alias LiveAdmin.Components.Container.Form.MapInput
 
   @impl true
   def mount(_params, %{"session_id" => session_id}, socket) do
@@ -17,32 +16,11 @@ defmodule LiveAdmin.Components.Session do
 
   @impl true
   def render(assigns) do
-    ~H"""
-    <div>
-      <div class="resource__banner">
-        <h1 class="resource__title">
-          Session
-        </h1>
-      </div>
+    assigns =
+      assign(assigns, mod: Application.get_env(:live_admin, :components, [])[:session] || Content)
 
-      <.form :let={f} for={@changeset} as="session" phx_submit={:save} class="resource__form">
-        <div class="field__group--disabled">
-          <%= label(f, :id, class: "field__label") %>
-          <%= textarea(f, :id, rows: 1, class: "field__text", disabled: true) %>
-        </div>
-        <div class="field__group--disabled">
-          <%= label(f, :prefix, class: "field__label") %>
-          <%= textarea(f, :prefix, rows: 1, class: "field__text", disabled: true) %>
-        </div>
-        <div class="field__group">
-          <%= label(f, :metadata, class: "field__label") %>
-          <.live_component module={MapInput} id="metadata" form={f} field={:metadata} form_ref={nil} />
-        </div>
-        <div class="form__actions">
-          <%= submit("Save", class: "resource__action--btn") %>
-        </div>
-      </.form>
-    </div>
+    ~H"""
+    <.live_component module={@mod} id="content" changeset={@changeset} />
     """
   end
 
