@@ -464,6 +464,7 @@ input:focus, textarea:focus {
 
 input, textarea {
   padding: 0.25rem;
+  overflow: hidden;
 }
 
 select {

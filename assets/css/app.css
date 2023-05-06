@@ -23,6 +23,7 @@
     @apply focus:outline-none;
     @apply focus:ring;
     @apply p-1;
+    @apply overflow-hidden;
   }
 
   select {
