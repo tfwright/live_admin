@@ -11,13 +11,15 @@ defmodule LiveAdmin.Components.Container do
 
   @impl true
   def mount(%{"resource_id" => key}, %{"session_id" => session_id}, socket) do
+    session = LiveAdmin.session_store().load!(session_id)
+
     socket =
       assign(socket,
         key: key,
         resource: get_resource!(socket.assigns.resources, key),
         loading: !connected?(socket),
-        prefix_options: get_prefix_options(),
-        session: LiveAdmin.session_store().load!(session_id)
+        prefix_options: get_prefix_options(session),
+        session: session
       )
 
     {:ok, socket}
@@ -257,10 +259,10 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def get_prefix_options() do
+  def get_prefix_options(session) do
     Application.get_env(:live_admin, :prefix_options)
     |> case do
-      {mod, func, args} -> apply(mod, func, args)
+      {mod, func, args} -> apply(mod, func, [session | args])
       list when is_list(list) -> list
       nil -> []
     end
