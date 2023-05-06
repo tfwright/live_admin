@@ -60,11 +60,57 @@ defmodule DemoWeb.Renderer do
     end
   end
 
-  def render_css(session) do
+  def render_css(session = %{metadata: %{"css_theme" => "dark"}}) do
+    """
+    body {
+      background-color: #444;
+      color: #fff;
+    }
+
+    .nav {
+      background-color: #444;
+    }
+
+    .resource__action--btn {
+      background-color: #aaa;
+      border-color: #fff;
+      color: #000;
+    }
+
+    .resource__action--btn:hover {
+      background-color: #ccc;
+      border-color: #iii;
+    }
+
+    .resource__menu--drop nav {
+      color: #000;
+      background-color: #ccc;
+      border-color: #iii;
+    }
+
+    .resource__header {
+      background-color: #bbb;
+      color: #000
+    }
+
+    .nav a:hover {
+      background-color: #ccc;
+    }
+
+    .toast__container--error {
+      border-color: violet;
+    }
+
+    .toast__container--success {
+      border-color: chartreuse;
+    }
+    """
+  end
+
+  def render_css(_) do
     __DIR__
     |> Path.join("dist/css/default_overrides.css")
     |> File.read!()
-    |> Kernel.<>(Map.get(session.metadata, "css_overrides", ""))
   end
 end
 
