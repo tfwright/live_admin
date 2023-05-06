@@ -38,6 +38,9 @@ defmodule LiveAdmin.Components.Session do
 
     LiveAdmin.session_store().persist!(session)
 
-    {:noreply, assign(socket, :changeset, Changeset.change(session))}
+    {:noreply,
+     socket
+     |> assign(:changeset, Changeset.change(session))
+     |> push_event("success", %{msg: "Changes successfully saved"})}
   end
 end
