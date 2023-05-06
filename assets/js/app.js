@@ -63,7 +63,7 @@ liveSocket.connect()
 
 if (ENV == "dev") {
   liveSocket.enableDebug()
-  liveSocket.enableLatencySim(1000)
+  liveSocket.enableLatencySim(200 + Math.floor(Math.random() * 1500))
 }
 
 window.liveSocket = liveSocket
