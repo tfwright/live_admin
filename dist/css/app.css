@@ -1079,9 +1079,10 @@ a.button__remove {
   margin-right: 0.5rem;
 }
 
-.field__map input {
+.field__map textarea {
   margin-bottom: 0px;
   margin-right: 0.5rem;
+  width: 25%;
 }
 
 .field__number {

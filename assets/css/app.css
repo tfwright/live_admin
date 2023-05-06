@@ -473,9 +473,10 @@
     @apply mr-2;
   }
 
-  .field__map input {
+  .field__map textarea {
     @apply mb-0;
     @apply mr-2;
+    @apply w-1/4;
   }
 
   .field__number {
