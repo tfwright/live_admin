@@ -15,7 +15,7 @@ defmodule LiveAdmin.Router do
   """
   defmacro live_admin(path, opts) do
     resources = Keyword.get(opts, :resources, [])
-    title = LiveAdmin.get_config(opts, :title, "Bonfire Data Admin")
+    title = LiveAdmin.get_config(opts, :title, "LiveAdmin")
 
     quote do
       LiveAdmin.put_config(unquote(opts))
