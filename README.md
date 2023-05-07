@@ -29,10 +29,10 @@ Add the following to your Phoenix router in any scope ready to serve a live rout
 ```
 import LiveAdmin.Router
 # ...
-live_admin "/admin", resources: [MyApp.SomeEctoSchema]
+live_admin "/admin", ecto_repo: MyApp.Repo, resources: [MyApp.SomeEctoSchema]
 ```
 
-See `LiveAdmin.Router.live_admin/2` for full list of options.
+See below as well as `LiveAdmin.Router.live_admin/2` for full list of options.
 
 To customize a resource, pass a two element tuple when the schema module as the first element, and a keyword list of options is the second: `{MyApp.SomeEctoSchema, opts}`
 
@@ -62,13 +62,23 @@ The following runtime config is supported:
 * `css_overrides` - a binary or MFA that returns CSS to be appended to app css
 * `session_store` - a module implementing the [LiveAdmin.Session.Store](/lib/live_admin/session/store.ex) behavior, used to persist session data
 
-In addition to these, most resource configuration can be set here in order to set a global default to apply to all resources unless overridden in their individual config.
+In addition to these, most resource configuration can be set at the top level in order to set a global default to apply to all resources unless overridden in their individual config.
 
 Example:
 
 ```
 config :live_admin,
   ecto_repo: MyApp.Repo,
+  prefix_options: {MyApp.Accounts, :list_tenant_prefixes, []},
+  immutable_fields: [:id, :inserted_at, :updated_at],
+  label_with: :name
+```
+
+Or directly in the router:
+```
+live_admin "/admin", 
+  resources: [MyApp.SomeEctoSchema],
+  ecto_repo: MyApp.Repo, 
   prefix_options: {MyApp.Accounts, :list_tenant_prefixes, []},
   immutable_fields: [:id, :inserted_at, :updated_at],
   label_with: :name

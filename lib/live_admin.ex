@@ -78,13 +78,31 @@ defmodule LiveAdmin do
   def record_label(record, resource) do
     case get_config(resource, :label_with, :id) do
       {m, f, a} -> apply(m, f, [record | a])
-      label when is_atom(label) -> Map.fetch!(record, label)
+      label when is_atom(label) -> Map.get(record, label) || Map.get(record, :id)
     end
   end
 
   def get_config(resource_or_config, key, default \\ nil)
   def get_config(%{config: config}, key, default), do: get_config(config, key, default)
+  def get_config(config, key, default) when is_map(config),
+    do: Map.get(config, key) || Application.get_env(:live_admin, key, default)
+  def get_config(config, key, default) when is_list(config),
+    do: Keyword.get(config, key) || Application.get_env(:live_admin, key, default)
 
-  def get_config(config, key, default),
-    do: Map.get(config, key, Application.get_env(:live_admin, key, default))
+  def put_config(tree) when is_list(tree) or is_map(tree) do
+    Enum.each(tree, fn {key, value} -> put_config(key, value) end)
+  end
+
+  def put_config([key], value), do: put_config(key, value)
+  def put_config([parent_key | keys], value) do
+    parent =
+      Application.get_env(:live_admin, parent_key, [])
+      |> put_in(keys, value)
+
+    Application.put_env(:live_admin, parent_key, parent)
+  end
+  def put_config(key, value) do
+    Application.put_env(:live_admin, key, value)
+  end
+
 end

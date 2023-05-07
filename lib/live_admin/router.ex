@@ -15,9 +15,11 @@ defmodule LiveAdmin.Router do
   """
   defmacro live_admin(path, opts) do
     resources = Keyword.get(opts, :resources, [])
-    title = Keyword.get(opts, :title, "LiveAdmin")
+    title = LiveAdmin.get_config(opts, :title, "Bonfire Data Admin")
 
     quote do
+      LiveAdmin.put_config(unquote(opts))
+
       scope unquote(path), alias: false, as: false do
         import Phoenix.LiveView.Router, only: [live: 4, live_session: 3]
 
@@ -26,14 +28,14 @@ defmodule LiveAdmin.Router do
           root_layout: {LiveAdmin.View, :layout},
           layout: {LiveAdmin.View, :app},
           on_mount: {unquote(__MODULE__), :assign_options} do
-          live("/", LiveAdmin.Components.Home, :home, as: :__live_admin_home__)
-          live("/session", LiveAdmin.Components.Session, :session, as: :__live_admin_session__)
-          live("/:resource_id", LiveAdmin.Components.Container, :list, as: :__live_admin_index__)
-          live("/:resource_id/new", LiveAdmin.Components.Container, :new, as: :__live_admin_new__)
+            live("/", LiveAdmin.Components.Home, :home, as: :__live_admin_home__)
+            live("/session", LiveAdmin.Components.Session, :session, as: :__live_admin_session__)
+            live("/:resource_id", LiveAdmin.Components.Container, :list, as: :__live_admin_index__)
+            live("/:resource_id/new", LiveAdmin.Components.Container, :new, as: :__live_admin_new__)
 
-          live("/:resource_id/edit/:record_id", LiveAdmin.Components.Container, :edit,
-            as: :__live_admin_edit__
-          )
+            live("/:resource_id/edit/:record_id", LiveAdmin.Components.Container, :edit,
+              as: :__live_admin_edit__
+            )
         end
       end
 
