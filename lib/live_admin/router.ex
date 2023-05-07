@@ -14,17 +14,12 @@ defmodule LiveAdmin.Router do
     * `:title` - Title for the UI home view (Default: 'LiveAdmin')
   """
   defmacro live_admin(path, opts) do
-    resources = Keyword.get(opts, :resources, [])
-    title = LiveAdmin.get_config(opts, :title, "LiveAdmin")
-
     quote do
-      LiveAdmin.put_config(unquote(opts))
-
       scope unquote(path), alias: false, as: false do
         import Phoenix.LiveView.Router, only: [live: 4, live_session: 3]
 
         live_session :live_admin,
-          session: {unquote(__MODULE__), :build_session, [unquote(resources), unquote(title)]},
+          session: {unquote(__MODULE__), :build_session, [unquote(opts)]},
           root_layout: {LiveAdmin.View, :layout},
           layout: {LiveAdmin.View, :app},
           on_mount: {unquote(__MODULE__), :assign_options} do
@@ -88,7 +83,12 @@ defmodule LiveAdmin.Router do
     end
   end
 
-  def build_session(conn, resources, title) do
+  def build_session(conn, opts) do
+    LiveAdmin.put_config(opts)
+
+    resources = Keyword.get(opts, :resources, [])
+    title = LiveAdmin.get_config(opts, :title, "LiveAdmin")
+
     %{
       "resources" => resources,
       "session_id" => LiveAdmin.session_store().init!(conn),
