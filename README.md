@@ -76,6 +76,14 @@ config :live_admin,
 
 See [development app](/dev.exs) for more example configuration.
 
+## Development environment
+
+This repo has been configured to run the application in Docker. Simply run `docker compose up` and navigate to http://localhost:4000
+
+The Phoenix app is running the `app` service, so all mix command should be run there. Examples:
+
+* `docker compose run web mix test`
+
 ---
 
 README generated with [docout](https://github.com/tfwright/docout)
