@@ -1,4 +1,4 @@
-FROM bitwalker/alpine-elixir-phoenix:latest
+FROM bitwalker/alpine-elixir-phoenix:1.13
 
 ADD mix.exs mix.lock ./
 RUN mix do deps.get, deps.compile
