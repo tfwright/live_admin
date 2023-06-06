@@ -14,7 +14,7 @@ defmodule LiveAdmin.Components.Session.Content do
         </h1>
       </div>
 
-      <.form :let={f} for={@changeset} as="session" phx_submit={:save} class="resource__form">
+      <.form :let={f} for={@changeset} as={:session} phx-submit={:save} class="resource__form">
         <div class="field__group--disabled">
           <%= label(f, :id, class: "field__label") %>
           <%= textarea(f, :id, rows: 1, class: "field__text", disabled: true) %>
