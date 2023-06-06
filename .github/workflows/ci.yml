@@ -23,7 +23,9 @@ jobs:
         otp-version: ${{ matrix.otp }}
     - uses: actions/cache@v2
       with:
-        path: deps
+        path: |
+          deps
+          _build
         key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
     - name: Build services
       run: docker-compose build
