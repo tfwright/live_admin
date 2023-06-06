@@ -56,10 +56,10 @@ defmodule LiveAdmin.Components.Container.Form do
       <.form
         :let={f}
         for={@changeset}
-        as="params"
-        phx_change="validate"
-        phx_submit={@action}
-        phx_target={@myself}
+        as={:params}
+        phx-change="validate"
+        phx-submit={@action}
+        phx-target={@myself}
         class="resource__form"
       >
         <%= for {field, type, opts} <- Resource.fields(@resource) do %>

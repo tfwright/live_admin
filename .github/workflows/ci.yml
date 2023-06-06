@@ -11,8 +11,8 @@ jobs:
 
     strategy:
       matrix:
-        elixir: ["1.13.x"]
-        otp: ["24.x"]
+        elixir: ["1.13.x", "1.14.x"]
+        otp: ["24.x", "25.x"]
 
     steps:
     - uses: actions/checkout@v2
@@ -23,11 +23,11 @@ jobs:
         otp-version: ${{ matrix.otp }}
     - uses: actions/cache@v2
       with:
-        path: deps
+        path: |
+          deps
+          _build
         key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-    - name: Build services
-      run: docker-compose build
     - name: Get deps
       run: docker-compose run web mix deps.get
     - name: Run tests
-      run: docker-compose run web mix test
+      run: docker-compose run -e MIX_ENV=test web mix do compile --warnings-as-errors, test
