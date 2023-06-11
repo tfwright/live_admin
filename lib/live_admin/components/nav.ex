@@ -2,7 +2,7 @@ defmodule LiveAdmin.Components.Nav do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import LiveAdmin, only: [resource_title: 1, route_with_params: 3]
+  import LiveAdmin, only: [resource_title: 1, route_with_params: 3, route_with_params: 4]
 
   @impl true
   def render(assigns) do
@@ -11,26 +11,26 @@ defmodule LiveAdmin.Components.Nav do
       <ul class="nav__list">
         <li class="nav__item--group"><%= @title %></li>
         <li class="nav__item--group">
-          <%= live_redirect("Home", to: @socket.router.__live_admin_path__()) %>
+          <%= live_redirect("Home", to: @base_path) %>
         </li>
         <li class="nav__item--group">
           <ul>
-            <%= render_dropdowns(@resources, @socket, assigns) %>
+            <%= render_dropdowns(assigns) %>
           </ul>
         </li>
         <li class="nav__item--group">
-          <%= live_redirect("Session", to: Path.join(@socket.router.__live_admin_path__(), "session")) %>
+          <%= live_redirect("Session", to: route_with_params(@base_path, "session", [])) %>
         </li>
       </ul>
     </div>
     """
   end
 
-  def render_dropdowns(resources_by_key, socket, assigns) do
-    resources_by_key
+  def render_dropdowns(assigns) do
+    assigns.resources
     |> Enum.reduce(%{}, fn {key, resource}, groups ->
       path =
-        resource.schema
+        resource.__live_admin_config__(:schema)
         |> Module.split()
         |> case do
           list when length(list) == 1 -> list
@@ -40,10 +40,10 @@ defmodule LiveAdmin.Components.Nav do
 
       update_in(groups, path, fn subs -> Map.put(subs, {key, resource}, %{}) end)
     end)
-    |> render_resource_group(socket, assigns)
+    |> render_resource_group(assigns)
   end
 
-  defp render_resource_group(group = %{}, socket, assigns) do
+  defp render_resource_group(group = %{}, assigns) do
     group
     |> Enum.sort()
     |> Enum.map(fn
@@ -51,7 +51,9 @@ defmodule LiveAdmin.Components.Nav do
         content_tag :li, class: "nav__item#{if resource == assigns[:resource], do: "--selected"}" do
           resource
           |> resource_title()
-          |> live_redirect(to: route_with_params(socket, key, prefix: assigns[:prefix]))
+          |> live_redirect(
+            to: route_with_params(assigns.base_path, key, [], prefix: assigns["prefix"])
+          )
         end
 
       {item, subs} ->
@@ -73,9 +75,7 @@ defmodule LiveAdmin.Components.Nav do
           [
             content_tag(:input, "", type: "checkbox", id: "menu-group-#{item}", checked: open),
             content_tag(:label, item, for: "menu-group-#{item}"),
-            content_tag :ul do
-              render_resource_group(subs, socket, assigns)
-            end
+            content_tag(:ul, do: render_resource_group(subs, assigns))
           ]
         end
     end)

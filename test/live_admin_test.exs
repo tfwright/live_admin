@@ -1,8 +1,6 @@
 defmodule LiveAdminTest do
   use ExUnit.Case, async: true
 
-  alias LiveAdmin.Resource
-
   setup do
     Ecto.Adapters.SQL.Sandbox.checkout(LiveAdminTest.Repo)
   end
@@ -15,15 +13,14 @@ defmodule LiveAdminTest do
 
   describe "associated_resource/3 when association schema is a configured resource" do
     test "returns the association schema" do
-      assert %Resource{schema: LiveAdminTest.User} =
+      assert LiveAdminTest.User =
                LiveAdmin.associated_resource(LiveAdminTest.Post, :user_id, [
-                 {nil, %Resource{schema: LiveAdminTest.User}}
+                 {nil, LiveAdminTest.User}
                ])
     end
   end
 
   describe "record_label/2 when config uses mfa" do
-    assert 1 =
-             LiveAdmin.record_label(%{id: 1}, %Resource{config: %{label_with: {Map, :get, [:id]}}})
+    assert 1 = LiveAdmin.record_label(%{id: 1}, LiveAdminTest.Post)
   end
 end

@@ -6,8 +6,7 @@ defmodule LiveAdmin.Components.Container.Index do
     only: [
       associated_resource: 3,
       record_label: 2,
-      get_config: 3,
-      route_with_params: 3
+      route_with_params: 4
     ]
 
   alias LiveAdmin.Resource
@@ -67,8 +66,8 @@ defmodule LiveAdmin.Components.Container.Index do
             <%= for {field, _, _} <- Resource.fields(@resource) do %>
               <th class="resource__header" title={field}>
                 <%= list_link(
-                  @socket,
                   humanize(field),
+                  @base_path,
                   @key,
                   %{
                     prefix: @prefix,
@@ -115,10 +114,10 @@ defmodule LiveAdmin.Components.Container.Index do
                       <ul>
                         <li>
                           <%= live_redirect("Edit",
-                            to: route_with_params(@socket, [@key, :edit, record], prefix: @prefix)
+                            to: route_with_params(@base_path, @key, [:edit, record], prefix: @prefix)
                           ) %>
                         </li>
-                        <%= if get_config(@resource, :delete_with, true) do %>
+                        <%= if @resource.__live_admin_config__(:delete_with) != false do %>
                           <li>
                             <%= link("Delete",
                               to: "#",
@@ -132,7 +131,7 @@ defmodule LiveAdmin.Components.Container.Index do
                             ) %>
                           </li>
                         <% end %>
-                        <%= for action <- Map.get(@resource.config, :actions, []) do %>
+                        <%= for action <- (@resource.__live_admin_config__(:actions) || []) do %>
                           <li>
                             <%= link(action |> to_string() |> humanize(),
                               to: "#",
@@ -172,8 +171,8 @@ defmodule LiveAdmin.Components.Container.Index do
               <%= if @page > 1,
                 do:
                   list_link(
-                    @socket,
                     "Prev",
+                    @base_path,
                     @key,
                     %{
                       prefix: @prefix,
@@ -188,8 +187,8 @@ defmodule LiveAdmin.Components.Container.Index do
               <%= if @page < (@records |> elem(1)) / 10,
                 do:
                   list_link(
-                    @socket,
                     "Next",
+                    @base_path,
                     @key,
                     %{
                       prefix: @prefix,
@@ -221,10 +220,12 @@ defmodule LiveAdmin.Components.Container.Index do
           }
         } = socket
       ) do
+    schema = resource.__live_admin_config__(:schema)
+
     socket =
       id
-      |> Resource.find!(resource, socket.assigns.prefix)
-      |> Resource.delete(resource.config, session)
+      |> Resource.find!(schema, socket.assigns.prefix)
+      |> Resource.delete(resource, session)
       |> case do
         {:ok, record} ->
           socket
@@ -252,11 +253,11 @@ defmodule LiveAdmin.Components.Container.Index do
     action_name = String.to_existing_atom(action)
 
     {m, f, a} =
-      socket.assigns.resource
-      |> get_config(:actions, [])
+      :actions
+      |> socket.assigns.resource.__live_admin_config__()
       |> Enum.find_value(fn
         {^action_name, mfa} -> mfa
-        ^action_name -> {socket.assigns.resource.schema, action_name, []}
+        ^action_name -> {socket.assigns.resource.__live_admin_config__(:schema), action_name, []}
         _ -> false
       end)
 
@@ -293,29 +294,41 @@ defmodule LiveAdmin.Components.Container.Index do
       prefix: socket.assigns.prefix
     }
 
-    socket = push_patch(socket, to: route_with_params(socket, socket.assigns.key, params))
+    socket =
+      push_patch(socket,
+        to: route_with_params(socket.assigns.base_path, socket.assigns.key, [], params)
+      )
 
     {:noreply, socket}
   end
 
   def cell_contents(record, field, record, assigns) do
-    if associated_resource(assigns.resource.schema, field, assigns.resources) do
+    schema = assigns.resource.__live_admin_config__(:schema)
+
+    if associated_resource(schema, field, assigns.resources) do
       record_label(
-        Map.fetch!(record, get_assoc_name!(assigns.resource.schema, field)),
-        associated_resource(assigns.resource.schema, field, assigns.resources)
+        Map.fetch!(record, get_assoc_name!(schema, field)),
+        associated_resource(schema, field, assigns.resources)
       )
     else
-      assigns.resource
-      |> get_config(:render_with, {LiveAdmin.View, :render_field, []})
+      :render_with
+      |> assigns.resource.__live_admin_config__()
       |> case do
-        {m, f, a} -> apply(m, f, [record, field, assigns.session] ++ a)
-        f when is_atom(f) -> apply(assigns.resource.schema, f, [record, field, assigns.session])
+        {m, f, a} ->
+          apply(m, f, [record, field, assigns.session] ++ a)
+
+        f when is_atom(f) ->
+          apply(assigns.resource, f, [
+            record,
+            field,
+            assigns.session
+          ])
       end
     end
   end
 
-  defp list_link(socket, content, key, params, opts),
-    do: live_patch(content, Keyword.put(opts, :to, route_with_params(socket, key, params)))
+  defp list_link(content, base_path, key, params, opts),
+    do: live_patch(content, Keyword.put(opts, :to, route_with_params(base_path, key, [], params)))
 
   defp get_assoc_name!(schema, fk) do
     Enum.find(schema.__schema__(:associations), fn assoc_name ->

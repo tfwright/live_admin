@@ -3,29 +3,18 @@ defmodule LiveAdmin.Components.Container do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [
-      resource_title: 1,
-      get_config: 3,
-      get_resource!: 2,
-      route_with_params: 2,
-      route_with_params: 3
-    ]
+    only: [resource_title: 1, route_with_params: 2, route_with_params: 4]
 
-  alias __MODULE__.{Form, Index}
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
 
   @impl true
-  def mount(%{"resource_id" => key}, %{"session_id" => session_id}, socket) do
-    session = LiveAdmin.session_store().load!(session_id)
-
+  def mount(_params, %{"components" => components}, socket) do
     socket =
       assign(socket,
-        key: key,
-        resource: get_resource!(socket.assigns.resources, key),
+        default_mod: Map.fetch!(components, socket.assigns.live_action),
         loading: !connected?(socket),
-        prefix_options: get_prefix_options(session),
-        session: session
+        prefix_options: get_prefix_options(socket.assigns.session)
       )
 
     {:ok, socket}
@@ -34,12 +23,21 @@ defmodule LiveAdmin.Components.Container do
   @impl true
   def handle_params(
         params = %{"record_id" => id},
-        _uri,
-        socket = %{assigns: %{resource: resource, live_action: :edit, loading: false}}
+        uri,
+        socket = %{assigns: %{live_action: :edit, loading: false}}
       ) do
-    socket = assign_prefix(socket, params)
+    socket =
+      socket
+      |> assign_resource_info(uri)
+      |> assign_prefix(params)
+      |> assign_mod()
 
-    record = Resource.find(id, resource, socket.assigns.prefix)
+    record =
+      Resource.find(
+        id,
+        socket.assigns.resource.__live_admin_config__(:schema),
+        socket.assigns.prefix
+      )
 
     socket = assign(socket, record: record)
 
@@ -47,7 +45,7 @@ defmodule LiveAdmin.Components.Container do
   end
 
   @impl true
-  def handle_params(params, _uri, socket = %{assigns: %{live_action: :list, loading: false}}) do
+  def handle_params(params, uri, socket = %{assigns: %{live_action: :list, loading: false}}) do
     page = String.to_integer(params["page"] || "1")
 
     sort = {
@@ -60,28 +58,27 @@ defmodule LiveAdmin.Components.Container do
       |> assign(page: page)
       |> assign(sort: sort)
       |> assign(search: params["s"])
+      |> assign_resource_info(uri)
       |> assign_prefix(params)
+      |> assign_mod()
 
     {:noreply, socket}
   end
 
   @impl true
-  def handle_params(params, _, socket = %{assigns: %{live_action: :new}}),
-    do: {:noreply, assign_prefix(socket, params)}
-
-  @impl true
-  def handle_params(_, _, socket), do: {:noreply, socket}
+  def handle_params(params, uri, socket),
+    do: {:noreply, socket |> assign_resource_info(uri) |> assign_prefix(params) |> assign_mod()}
 
   @impl true
   def handle_event("task", %{"task" => task}, socket) do
     task_name = String.to_existing_atom(task)
 
     {m, f, a} =
-      socket.assigns.resource
-      |> get_config(:tasks, [])
+      :tasks
+      |> socket.assigns.resource.__live_admin_config__()
       |> Enum.find_value(fn
         {^task_name, mfa} -> mfa
-        ^task_name -> {socket.assigns.resource.schema, task_name, []}
+        ^task_name -> {socket.assigns.resource.__live_admin_config__(:schema), task_name, []}
       end)
 
     socket =
@@ -112,12 +109,12 @@ defmodule LiveAdmin.Components.Container do
       <div class="resource__actions">
         <div>
           <%= live_redirect("List",
-            to: route_with_params(@socket, @key, prefix: @prefix),
+            to: route_with_params(@base_path, @key, [], prefix: @prefix),
             class: "resource__action--btn"
           ) %>
-          <%= if get_config(@resource, :create_with, true) do %>
+          <%= if @resource.__live_admin_config__(:create_with) != false do %>
             <%= live_redirect("New",
-              to: route_with_params(@socket, [@key, "new"], prefix: @prefix),
+              to: route_with_params(@base_path, @key, ["new"], prefix: @prefix),
               class: "resource__action--btn"
             ) %>
           <% else %>
@@ -127,14 +124,14 @@ defmodule LiveAdmin.Components.Container do
           <% end %>
           <div class="resource__action--drop">
             <button
-              class={"resource__action#{if @resource.config |> get_task_keys() |> Enum.empty?, do: "--disabled", else: "--btn"}"}
-              disabled={if @resource.config |> get_task_keys() |> Enum.empty?(), do: "disabled"}
+              class={"resource__action#{if @resource |> get_task_keys() |> Enum.empty?, do: "--disabled", else: "--btn"}"}
+              disabled={if @resource |> get_task_keys() |> Enum.empty?(), do: "disabled"}
             >
               Run task
             </button>
             <nav>
               <ul>
-                <%= for key <- get_task_keys(@resource.config) do %>
+                <%= for key <- get_task_keys(@resource) do %>
                   <li>
                     <%= link(key |> to_string() |> humanize(),
                       to: "#",
@@ -155,12 +152,12 @@ defmodule LiveAdmin.Components.Container do
                 <ul>
                   <%= if @prefix do %>
                     <li>
-                      <.link patch={route_with_params(@socket, @key, prefix: "")}>clear</.link>
+                      <.link patch={route_with_params(@base_path, @key, [], prefix: "")}>clear</.link>
                     </li>
                   <% end %>
                   <%= for option <- @prefix_options, to_string(option) != @prefix do %>
                     <li>
-                      <.link patch={route_with_params(@socket, @key, prefix: option)}>
+                      <.link patch={route_with_params(@base_path, @key, [], prefix: option)}>
                         <%= option %>
                       </.link>
                     </li>
@@ -178,18 +175,10 @@ defmodule LiveAdmin.Components.Container do
   end
 
   def render("list.html", assigns) do
-    mod =
-      assigns.resource
-      |> get_config(:components, [])
-      |> Keyword.get(:list, Index)
-
-    assigns = assign(assigns, :mod, mod)
-
     ~H"""
     <.live_component
       module={@mod}
       id="list"
-      resources={@resources}
       key={@key}
       resource={@resource}
       page={@page}
@@ -197,18 +186,13 @@ defmodule LiveAdmin.Components.Container do
       search={@search}
       prefix={@prefix}
       session={@session}
+      base_path={@base_path}
+      resources={@resources}
     />
     """
   end
 
   def render("new.html", assigns) do
-    mod =
-      assigns.resource
-      |> get_config(:components, [])
-      |> Keyword.get(:new, Form)
-
-    assigns = assign(assigns, :mod, mod)
-
     ~H"""
     <.live_component
       module={@mod}
@@ -219,18 +203,12 @@ defmodule LiveAdmin.Components.Container do
       resources={@resources}
       resource={@resource}
       prefix={@prefix}
+      base_path={@base_path}
     />
     """
   end
 
   def render("edit.html", assigns) do
-    mod =
-      assigns.resource
-      |> get_config(:components, [])
-      |> Keyword.get(:edit, Form)
-
-    assigns = assign(assigns, :mod, mod)
-
     ~H"""
     <.live_component
       module={@mod}
@@ -264,7 +242,7 @@ defmodule LiveAdmin.Components.Container do
     |> case do
       nil ->
         push_redirect(socket,
-          to: route_with_params(socket, socket.assigns.key)
+          to: route_with_params(socket.assigns.base_path, socket.assigns.key)
         )
 
       prefix ->
@@ -272,13 +250,13 @@ defmodule LiveAdmin.Components.Container do
     end
   end
 
-  defp assign_prefix(socket, _) do
-    case socket.assigns.session.prefix do
+  defp assign_prefix(socket = %{assigns: %{session: session, base_path: base_path, key: key}}, _) do
+    case session.prefix do
       nil ->
         assign_and_presist_session(socket, nil)
 
       prefix ->
-        push_patch(socket, to: route_with_params(socket, socket.assigns.key, prefix: prefix))
+        push_patch(socket, to: route_with_params(base_path, key, [], prefix: prefix))
     end
   end
 
@@ -290,12 +268,31 @@ defmodule LiveAdmin.Components.Container do
     assign(socket, prefix: prefix, session: new_session)
   end
 
-  defp get_task_keys(config) do
-    config
-    |> Map.get(:tasks, [])
+  defp get_task_keys(resource) do
+    :tasks
+    |> resource.__live_admin_config__()
     |> Enum.map(fn
       {key, _} -> key
       key -> key
     end)
+  end
+
+  defp assign_resource_info(socket, uri) do
+    %URI{host: host, path: path} = URI.parse(uri)
+
+    %{resource: {key, mod}} = Phoenix.Router.route_info(socket.router, "GET", path, host)
+
+    assign(socket, key: key, resource: mod)
+  end
+
+  defp assign_mod(
+         socket = %{assigns: %{resource: resource, live_action: action, default_mod: default}}
+       ) do
+    mod =
+      :components
+      |> resource.__live_admin_config__()
+      |> Keyword.get(action, default)
+
+    assign(socket, :mod, mod)
   end
 end

@@ -30,7 +30,7 @@ end
 
 defmodule LiveAdminTest.Router do
   use Phoenix.Router
-  import LiveAdmin.Router
+  use LiveAdmin.Router
 
   pipeline :browser do
     plug(:fetch_session)
@@ -39,15 +39,10 @@ defmodule LiveAdminTest.Router do
   scope "/" do
     pipe_through(:browser)
 
-    live_admin("/",
-      resources: [
-        {
-          LiveAdminTest.User,
-          immutable_fields: [:encrypted_password], actions: [:run_action], slug_with: "user"
-        },
-        LiveAdminTest.Post
-      ]
-    )
+    live_admin "/" do
+      admin_resource("/user", LiveAdminTest.User)
+      admin_resource("/live_admin_test_post", LiveAdminTest.Post)
+    end
   end
 end
 
@@ -66,6 +61,10 @@ end
 defmodule LiveAdminTest.User do
   use Ecto.Schema
 
+  use LiveAdmin.Resource,
+    immutable_fields: [:encrypted_password],
+    actions: [:run_action]
+
   @primary_key {:id, :binary_id, autogenerate: true}
   schema "users" do
     field(:name, :string)
@@ -81,6 +80,7 @@ end
 
 defmodule LiveAdminTest.Post do
   use Ecto.Schema
+  use LiveAdmin.Resource
 
   schema "posts" do
     field(:title, :string)

@@ -3,7 +3,7 @@ defmodule LiveAdmin.Components.Container.Form do
   use Phoenix.HTML
 
   import LiveAdmin.ErrorHelpers
-  import LiveAdmin, only: [associated_resource: 3, get_config: 3, route_with_params: 2]
+  import LiveAdmin, only: [associated_resource: 3, route_with_params: 4]
 
   alias __MODULE__.{ArrayInput, MapInput, SearchSelect}
   alias LiveAdmin.Resource
@@ -88,7 +88,13 @@ defmodule LiveAdmin.Components.Container.Form do
 
   @impl true
   def handle_event("after_create", _, socket) do
-    {:noreply, push_patch(socket, to: route_with_params(socket, socket.assigns.key))}
+    {:noreply,
+     push_redirect(socket,
+       to:
+         route_with_params(socket.assigns.base_path, socket.assigns.key, [],
+           prefix: socket.assigns.prefix
+         )
+     )}
   end
 
   @impl true
@@ -102,7 +108,7 @@ defmodule LiveAdmin.Components.Container.Form do
     {:noreply,
      assign(socket,
        changeset: changeset,
-       enabled: enabled?(changeset, socket.assigns.action, resource.config)
+       enabled: enabled?(changeset, socket.assigns.action, resource)
      )}
   end
 
@@ -117,7 +123,7 @@ defmodule LiveAdmin.Components.Container.Form do
     {:noreply,
      assign(socket,
        changeset: changeset,
-       enabled: enabled?(changeset, socket.assigns.action, resource.config)
+       enabled: enabled?(changeset, socket.assigns.action, resource)
      )}
   end
 
@@ -143,7 +149,7 @@ defmodule LiveAdmin.Components.Container.Form do
         %{assigns: %{resource: resource, session: session, record: record}} = socket
       ) do
     socket =
-      Resource.update(resource, record, params, session)
+      Resource.update(record, resource, params, session)
       |> case do
         {:ok, _} ->
           socket
@@ -167,7 +173,7 @@ defmodule LiveAdmin.Components.Container.Form do
             Ecto.Changeset.get_field(changeset, field_name)
 
         new_value =
-          socket.assigns.resource.schema.__schema__(:embed, field_name).cardinality
+          socket.assigns.resource.__live_admin_config__(:schema).__schema__(:embed, field_name).cardinality
           |> case do
             :many -> (existing || []) ++ [%{}]
             :one -> %{}
@@ -180,7 +186,7 @@ defmodule LiveAdmin.Components.Container.Form do
      assign(
        socket,
        :enabled,
-       enabled?(changeset, socket.assigns.action, socket.assigns.resource.config)
+       enabled?(changeset, socket.assigns.action, socket.assigns.resource)
      )}
   end
 
@@ -209,7 +215,7 @@ defmodule LiveAdmin.Components.Container.Form do
      assign(
        socket,
        :enabled,
-       enabled?(changeset, socket.assigns.action, socket.assigns.resource.config)
+       enabled?(changeset, socket.assigns.action, socket.assigns.resource)
      )}
   end
 
@@ -229,7 +235,7 @@ defmodule LiveAdmin.Components.Container.Form do
      assign(
        socket,
        :enabled,
-       enabled?(changeset, socket.assigns.action, socket.assigns.resource.config)
+       enabled?(changeset, socket.assigns.action, socket.assigns.resource)
      )}
   end
 
@@ -323,7 +329,11 @@ defmodule LiveAdmin.Components.Container.Form do
       assign(
         assigns,
         :associated_resource,
-        associated_resource(assigns.resource.schema, assigns.field, assigns.resources)
+        associated_resource(
+          assigns.resource.__live_admin_config__(:schema),
+          assigns.field,
+          assigns.resources
+        )
       )
 
     ~H"""
@@ -454,12 +464,13 @@ defmodule LiveAdmin.Components.Container.Form do
     """
   end
 
-  defp fields_for_embed({_, _, %{related: schema}}), do: Resource.fields(schema, %{})
+  defp fields_for_embed({_, _, %{related: schema}}),
+    do: Enum.map(schema.__schema__(:fields), &{&1, schema.__schema__(:type, &1), []})
 
   defp validate(resource, changeset, params, session) do
     resource
     |> Resource.change(changeset.data, params)
-    |> Resource.validate(resource.config, session)
+    |> Resource.validate(resource, session)
   end
 
   defp field_class(type) when type in @supported_primitive_types, do: to_string(type)
@@ -476,7 +487,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp supported_type?({_, Ecto.Enum, _}), do: true
   defp supported_type?(_), do: false
 
-  def enabled?(changeset, action, config) do
-    get_config(config, :"#{action}_with", true) && Enum.empty?(changeset.errors)
+  def enabled?(changeset, action, resource) do
+    resource.__live_admin_config__(:"#{action}_with") != false && Enum.empty?(changeset.errors)
   end
 end
