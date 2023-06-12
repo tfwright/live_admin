@@ -621,10 +621,6 @@ select:focus {
   padding: 0.25rem;
 }
 
-.nav__item--selected {
-  font-weight: 700;
-}
-
 .nav__item a {
   padding: 0.25rem;
   border-radius: 0.25rem;

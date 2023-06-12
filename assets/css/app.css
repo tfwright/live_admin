@@ -115,7 +115,6 @@
 
   .nav__item--selected {
     @apply nav__item;
-    @apply font-bold;
   }
 
   .nav__item a {
