@@ -1,6 +1,6 @@
 <main class="main__content">
   <div class="main__wrap">
-    <.nav title={@title} socket={@socket} resources={@resources} resource={@resource} />
+    <.nav title={@title} socket={@socket} resources={@resources} resource={assigns[:resource]} />
     <div class="content">
       <%= @inner_content %>
     </div>

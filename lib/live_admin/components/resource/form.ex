@@ -306,7 +306,11 @@ defmodule LiveAdmin.Components.Container.Form do
     ~H"""
     <div class="field__group--disabled">
       <%= label(@form, @field, class: "field__label") %>
-      <%= textarea(@form, @field, rows: 1, disabled: true, value: @form |> input_value(@field) |> inspect()) %>
+      <%= textarea(@form, @field,
+        rows: 1,
+        disabled: true,
+        value: @form |> input_value(@field) |> inspect()
+      ) %>
     </div>
     """
   end
