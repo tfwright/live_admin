@@ -26,7 +26,7 @@ defmodule LiveAdmin.Resource do
     |> get_config(:list_with, :default)
     |> case do
       :default ->
-        build_list(resource, opts, session.prefix)
+        build_list(resource, opts)
 
       {mod, func_name, args} ->
         apply(mod, func_name, [resource, opts, session] ++ args)
@@ -105,7 +105,7 @@ defmodule LiveAdmin.Resource do
     end)
   end
 
-  defp build_list(resource, opts, prefix) do
+  defp build_list(resource, opts) do
     opts =
       opts
       |> Enum.into(%{})
@@ -130,7 +130,7 @@ defmodule LiveAdmin.Resource do
       end)
 
     {
-      repo().all(query, prefix: prefix),
+      repo().all(query, prefix: opts[:prefix]),
       repo().aggregate(query |> exclude(:limit) |> exclude(:offset), :count, prefix: opts[:prefix])
     }
   end
