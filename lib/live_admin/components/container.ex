@@ -3,7 +3,13 @@ defmodule LiveAdmin.Components.Container do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [resource_title: 1, get_config: 3, get_resource!: 2, route_with_params: 3]
+    only: [
+      resource_title: 1,
+      get_config: 3,
+      get_resource!: 2,
+      route_with_params: 2,
+      route_with_params: 3
+    ]
 
   alias __MODULE__.{Form, Index}
   alias LiveAdmin.Resource
@@ -65,29 +71,6 @@ defmodule LiveAdmin.Components.Container do
 
   @impl true
   def handle_params(_, _, socket), do: {:noreply, socket}
-
-  @impl true
-  def handle_event("set_prefix", params, socket) do
-    prefix = params["prefix"]
-
-    socket =
-      if is_nil(prefix) do
-        new_session = %LiveAdmin.Session{socket.assigns.session | prefix: nil}
-
-        LiveAdmin.session_store().persist!(new_session)
-
-        assign(socket, :session, new_session)
-      else
-        socket
-      end
-
-    {
-      :noreply,
-      push_redirect(socket,
-        to: route_with_params(socket, socket.assigns.key, prefix: params["prefix"])
-      )
-    }
-  end
 
   @impl true
   def handle_event("task", %{"task" => task}, socket) do
@@ -172,12 +155,14 @@ defmodule LiveAdmin.Components.Container do
                 <ul>
                   <%= if @prefix do %>
                     <li>
-                      <a href="#" phx-click="set_prefix">clear</a>
+                      <.link patch={route_with_params(@socket, @key)}>clear</.link>
                     </li>
                   <% end %>
                   <%= for option <- @prefix_options, to_string(option) != @prefix do %>
                     <li>
-                      <a href="#" phx-click="set_prefix" phx-value-prefix={option}><%= option %></a>
+                      <.link patch={route_with_params(@socket, @key, prefix: option)}>
+                        <%= option %>
+                      </.link>
                     </li>
                   <% end %>
                 </ul>
@@ -282,12 +267,12 @@ defmodule LiveAdmin.Components.Container do
 
       LiveAdmin.session_store().persist!(new_session)
 
-      if prefix == matching_prefix do
-        socket
-      else
+      if prefix && is_nil(matching_prefix) do
         push_redirect(socket,
-          to: route_with_params(socket, socket.assigns.key, prefix: matching_prefix)
+          to: route_with_params(socket, socket.assigns.key)
         )
+      else
+        socket
       end
     end)
   end

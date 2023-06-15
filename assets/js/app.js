@@ -7,7 +7,10 @@ import topbar from "topbar"
 
 topbar.config({barColors: {0: "rgb(67, 56, 202)"}, shadowColor: "rgba(0, 0, 0, .3)", className: "topbar"})
 window.addEventListener("phx:page-loading-start", info => topbar.show())
-window.addEventListener("phx:page-loading-stop", info => topbar.hide())
+window.addEventListener("phx:page-loading-stop", () => {
+  document.activeElement.blur();
+  topbar.hide();
+})
 window.addEventListener("phx:success", (e) => {
   Toastify({
     text: e.detail.msg,
