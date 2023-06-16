@@ -37,7 +37,7 @@ defmodule LiveAdmin.Components.Container do
         _uri,
         socket = %{assigns: %{resource: resource, live_action: :edit, loading: false}}
       ) do
-    socket = assign_prefix(socket, params["prefix"])
+    socket = assign_prefix(socket, params)
 
     record = Resource.find(id, resource, socket.assigns.prefix)
 
@@ -60,14 +60,14 @@ defmodule LiveAdmin.Components.Container do
       |> assign(page: page)
       |> assign(sort: sort)
       |> assign(search: params["s"])
-      |> assign_prefix(params["prefix"])
+      |> assign_prefix(params)
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_params(params, _, socket = %{assigns: %{live_action: :new}}),
-    do: {:noreply, assign_prefix(socket, params["prefix"])}
+    do: {:noreply, assign_prefix(socket, params)}
 
   @impl true
   def handle_params(_, _, socket), do: {:noreply, socket}
@@ -256,27 +256,32 @@ defmodule LiveAdmin.Components.Container do
     |> Enum.sort()
   end
 
-  def assign_prefix(socket, prefix) do
+  def assign_prefix(socket, %{"prefix" => prefix}) do
     socket.assigns.prefix_options
-    |> Enum.find(fn option ->
-      to_string(option) ==
-        (prefix || socket.assigns.session.prefix)
-    end)
-    |> then(fn matching_prefix ->
-      socket = assign(socket, :prefix, matching_prefix)
-
-      new_session = %LiveAdmin.Session{socket.assigns.session | prefix: matching_prefix}
-
-      LiveAdmin.session_store().persist!(new_session)
-
-      if prefix && is_nil(matching_prefix) do
+    |> Enum.find(fn option -> to_string(option) == prefix end)
+    |> case do
+      nil ->
         push_redirect(socket,
           to: route_with_params(socket, socket.assigns.key)
         )
-      else
-        socket
-      end
-    end)
+
+      prefix ->
+        new_session = %LiveAdmin.Session{socket.assigns.session | prefix: prefix}
+
+        LiveAdmin.session_store().persist!(new_session)
+
+        assign(socket, prefix: prefix, session: new_session)
+    end
+  end
+
+  def assign_prefix(socket, _) do
+    case socket.assigns.session.prefix do
+      nil ->
+        assign(socket, :prefix, nil)
+
+      prefix ->
+        push_patch(socket, to: route_with_params(socket, socket.assigns.key, prefix: prefix))
+    end
   end
 
   defp get_task_keys(config) do
