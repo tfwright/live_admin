@@ -218,6 +218,7 @@ defmodule LiveAdmin.Components.Container do
       key={@key}
       resources={@resources}
       resource={@resource}
+      prefix={@prefix}
     />
     """
   end
@@ -240,6 +241,7 @@ defmodule LiveAdmin.Components.Container do
       record={@record}
       resources={@resources}
       resource={@resource}
+      prefix={@prefix}
     />
     """
   end

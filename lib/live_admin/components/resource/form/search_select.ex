@@ -113,7 +113,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
       ) do
     options =
       resource
-      |> Resource.list([search: q], session)
+      |> Resource.list([search: q, prefix: socket.assigns.prefix], session)
       |> elem(0)
 
     {:noreply, assign(socket, :options, options)}

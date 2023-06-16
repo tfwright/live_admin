@@ -72,6 +72,7 @@ defmodule LiveAdmin.Components.Container.Form do
             resources={@resources}
             form_ref={@myself}
             session={@session}
+            prefix={@prefix}
           />
         <% end %>
         <div class="form__actions">
@@ -275,6 +276,7 @@ defmodule LiveAdmin.Components.Container.Form do
                       resources={@resources}
                       form_ref={@form_ref}
                       session={@session}
+                      prefix={@prefix}
                     />
                   <% end %>
                 </div>
@@ -328,6 +330,7 @@ defmodule LiveAdmin.Components.Container.Form do
         resources={@resources}
         form_ref={@form_ref}
         session={@session}
+        prefix={@prefix}
       />
       <%= error_tag(@form, @field) %>
     </div>
@@ -355,6 +358,7 @@ defmodule LiveAdmin.Components.Container.Form do
           form_ref={@form_ref}
           session={@session}
           handle_select="validate"
+          prefix={@prefix}
         />
       <% else %>
         <div class="form__number">
