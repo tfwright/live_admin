@@ -60,7 +60,7 @@ defmodule DemoWeb.Renderer do
     end
   end
 
-  def render_css(session = %{metadata: %{"css_theme" => "dark"}}) do
+  def render_css(%{metadata: %{"css_theme" => "dark"}}) do
     """
     body {
       background-color: #444;
@@ -152,8 +152,6 @@ end
 defmodule Demo.Accounts.User do
   use Ecto.Schema
 
-  import Ecto.Changeset
-
   @primary_key {:id, :binary_id, autogenerate: true}
   schema "users" do
     field :name, :string
@@ -182,20 +180,6 @@ defmodule Demo.Accounts.User do
     def render_for_admin(record, field, session) do
       DemoWeb.Renderer.render_field(record, field, session)
     end
-  end
-
-  def create(params, session) do
-    %__MODULE__{}
-    |> cast(params, [:name, :email, :stars_count, :roles])
-    |> Ecto.Changeset.validate_required([:name, :email])
-    |> Ecto.Changeset.unique_constraint(:email)
-    |> Demo.Repo.insert(prefix: session.prefix)
-  end
-
-  def validate(changeset, _meta) do
-    changeset
-    |> Ecto.Changeset.validate_required([:name, :email])
-    |> Ecto.Changeset.validate_number(:stars_count, greater_than_or_equal_to: 0)
   end
 
   def deactivate(user, _) do
@@ -407,11 +391,16 @@ defmodule DemoWeb.CreateUserForm do
   def handle_event(
         "create",
         %{"params" => params},
-        socket = %{assigns: %{key: key, session: session}}
+        socket = %{assigns: %{key: key, prefix: prefix}}
       ) do
     socket =
-      case Demo.Accounts.User.create(params, session) do
-        {:ok, _} -> push_redirect(socket, to: route_with_params(socket, key, prefix: session.prefix))
+      %Demo.Accounts.User{}
+      |> Ecto.Changeset.cast(params, [:name, :email, :stars_count, :roles])
+      |> Ecto.Changeset.validate_required([:name, :email])
+      |> Ecto.Changeset.unique_constraint(:email)
+      |> Demo.Repo.insert(prefix: prefix)
+      |> case do
+        {:ok, _} -> push_redirect(socket, to: route_with_params(socket, key, prefix: prefix))
         {:error, changeset} -> assign(socket, changeset: changeset)
       end
 
@@ -438,8 +427,6 @@ defmodule DemoWeb.Router do
       {Demo.Accounts.User,
         hidden_fields: [:private_data],
         immutable_fields: [:encrypted_password, :inserted_at],
-        validate_with: {Demo.Accounts.User, :validate, []},
-        create_with: {Demo.Accounts.User, :create, []},
         components: [new: DemoWeb.CreateUserForm],
         label_with: :name,
         actions: [:deactivate],
