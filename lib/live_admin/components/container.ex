@@ -155,7 +155,7 @@ defmodule LiveAdmin.Components.Container do
                 <ul>
                   <%= if @prefix do %>
                     <li>
-                      <.link patch={route_with_params(@socket, @key)}>clear</.link>
+                      <.link patch={route_with_params(@socket, @key, prefix: "")}>clear</.link>
                     </li>
                   <% end %>
                   <%= for option <- @prefix_options, to_string(option) != @prefix do %>
@@ -256,7 +256,9 @@ defmodule LiveAdmin.Components.Container do
     |> Enum.sort()
   end
 
-  def assign_prefix(socket, %{"prefix" => prefix}) do
+  defp assign_prefix(socket, %{"prefix" => ""}), do: assign_and_presist_session(socket, nil)
+
+  defp assign_prefix(socket, %{"prefix" => prefix}) do
     socket.assigns.prefix_options
     |> Enum.find(fn option -> to_string(option) == prefix end)
     |> case do
@@ -266,22 +268,26 @@ defmodule LiveAdmin.Components.Container do
         )
 
       prefix ->
-        new_session = %LiveAdmin.Session{socket.assigns.session | prefix: prefix}
-
-        LiveAdmin.session_store().persist!(new_session)
-
-        assign(socket, prefix: prefix, session: new_session)
+        assign_and_presist_session(socket, prefix)
     end
   end
 
-  def assign_prefix(socket, _) do
+  defp assign_prefix(socket, _) do
     case socket.assigns.session.prefix do
       nil ->
-        assign(socket, :prefix, nil)
+        assign_and_presist_session(socket, nil)
 
       prefix ->
         push_patch(socket, to: route_with_params(socket, socket.assigns.key, prefix: prefix))
     end
+  end
+
+  defp assign_and_presist_session(socket, prefix) do
+    new_session = Map.put(socket.assigns.session, :prefix, prefix)
+
+    LiveAdmin.session_store().persist!(new_session)
+
+    assign(socket, prefix: prefix, session: new_session)
   end
 
   defp get_task_keys(config) do
