@@ -345,10 +345,10 @@ defmodule DemoWeb.CreateUserForm do
       <.form
         :let={f}
         for={@changeset}
-        as="params"
-        phx_change="validate"
-        phx_submit="create"
-        phx_target={@myself}
+        as={:params}
+        phx-change="validate"
+        phx-submit="create"
+        phx-target={@myself}
         class="resource__form"
       >
 
