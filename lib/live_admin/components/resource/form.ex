@@ -350,7 +350,7 @@ defmodule LiveAdmin.Components.Container.Form do
       <%= unless @form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(@field) do %>
         <.live_component
           module={SearchSelect}
-          id={assigns.field}
+          id={input_id(@form, @field)}
           form={@form}
           field={@field}
           disabled={@disabled}
@@ -375,7 +375,7 @@ defmodule LiveAdmin.Components.Container.Form do
     ~H"""
     <.live_component
       module={ArrayInput}
-      id={assigns.field}
+      id={input_id(@form, @field)}
       form={@form}
       field={@field}
       disabled={@disabled}
@@ -388,7 +388,7 @@ defmodule LiveAdmin.Components.Container.Form do
     ~H"""
     <.live_component
       module={MapInput}
-      id={assigns.field}
+      id={input_id(@form, @field)}
       form={@form}
       field={@field}
       disabled={@disabled}

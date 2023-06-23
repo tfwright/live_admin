@@ -4,7 +4,8 @@ defmodule LiveAdmin.Components.ContainerTest do
   import Phoenix.ConnTest
   import Phoenix.LiveViewTest
 
-  alias LiveAdminTest.{Repo, User}
+  alias LiveAdminTest.{Post, Repo, User}
+  alias LiveAdminTest.Post.Version
 
   @endpoint LiveAdminTest.Endpoint
 
@@ -178,6 +179,20 @@ defmodule LiveAdmin.Components.ContainerTest do
     test "includes embed form field", %{response: response} do
       assert response
              |> Floki.find("textarea[name='params[settings][some_option]']")
+             |> Enum.any?()
+    end
+  end
+
+  describe "edit resource with plural embed with multiple entries" do
+    setup %{conn: conn} do
+      post = Repo.insert!(%Post{title: "test", previous_versions: [%Version{}, %Version{}]})
+      {:ok, view, html} = live(conn, "/live_admin_test_post/edit/#{post.id}")
+      %{response: html, view: view}
+    end
+
+    test "includes multiple embed fields", %{response: response} do
+      assert response
+             |> Floki.find("input[name='params[previous_versions]']")
              |> Enum.any?()
     end
   end
