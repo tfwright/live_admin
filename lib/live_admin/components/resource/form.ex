@@ -233,25 +233,42 @@ defmodule LiveAdmin.Components.Container.Form do
      )}
   end
 
-  defp field(assigns = %{type: type}) when type in @supported_primitive_types,
-    do: field_group(assigns)
+  defp field(assigns) do
+    ~H"""
+    <div class={"field__group#{if @immutable, do: "--disabled"} field__#{field_class(@type)}"}>
+      <%= label(@form, @field, class: "field__label") %>
+      <%= if supported_type?(@type) do %>
+        <.input
+          form={@form}
+          type={@type}
+          field={@field}
+          disabled={@immutable}
+          resource={@resource}
+          resources={@resources}
+          form_ref={@form_ref}
+          session={@session}
+          prefix={@prefix}
+        />
+      <% else %>
+        <%= textarea(@form, @field,
+          rows: 1,
+          disabled: true,
+          value: @form |> input_value(@field) |> inspect()
+        ) %>
+      <% end %>
+      <%= error_tag(@form, @field) %>
+    </div>
+    """
+  end
 
-  defp field(assigns = %{type: {_, Ecto.Enum, _}}), do: field_group(assigns)
-
-  defp field(assigns = %{type: {:array, :string}}), do: field_group(assigns)
-
-  defp field(assigns = %{type: :map}), do: field_group(assigns)
-
-  defp field(assigns = %{type: {:array, {_, Ecto.Enum, _}}}), do: field_group(assigns)
-
-  defp field(assigns = %{type: {_, Ecto.Embedded, meta}}) do
+  defp input(assigns = %{type: {_, Ecto.Embedded, meta}}) do
     assigns = assign(assigns, :meta, meta)
 
     ~H"""
     <div>
       <h2 class="embed__title"><%= humanize(@field) %></h2>
       <div class="embed__group">
-        <%= unless @immutable do %>
+        <%= unless @disabled do %>
           <%= hidden_input(@form, @field, value: "delete") %>
           <%= unless input_value(@form, @field) == nil do %>
             <%= for fp <- inputs_for(@form, @field) do %>
@@ -304,39 +321,6 @@ defmodule LiveAdmin.Components.Container.Form do
     """
   end
 
-  defp field(assigns) do
-    ~H"""
-    <div class="field__group--disabled">
-      <%= label(@form, @field, class: "field__label") %>
-      <%= textarea(@form, @field,
-        rows: 1,
-        disabled: true,
-        value: @form |> input_value(@field) |> inspect()
-      ) %>
-    </div>
-    """
-  end
-
-  defp field_group(assigns) do
-    ~H"""
-    <div class={"field__group#{if @immutable, do: "--disabled"}"}>
-      <%= label(@form, @field, class: "field__label") %>
-      <.input
-        form={@form}
-        type={@type}
-        field={@field}
-        disabled={@immutable}
-        resource={@resource}
-        resources={@resources}
-        form_ref={@form_ref}
-        session={@session}
-        prefix={@prefix}
-      />
-      <%= error_tag(@form, @field) %>
-    </div>
-    """
-  end
-
   defp input(assigns = %{type: id}) when id in [:id, :binary_id] do
     assigns =
       assign(
@@ -350,7 +334,7 @@ defmodule LiveAdmin.Components.Container.Form do
       <%= unless @form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(@field) do %>
         <.live_component
           module={SearchSelect}
-          id={assigns.field}
+          id={input_id(@form, @field)}
           form={@form}
           field={@field}
           disabled={@disabled}
@@ -375,7 +359,7 @@ defmodule LiveAdmin.Components.Container.Form do
     ~H"""
     <.live_component
       module={ArrayInput}
-      id={assigns.field}
+      id={input_id(@form, @field)}
       form={@form}
       field={@field}
       disabled={@disabled}
@@ -388,7 +372,7 @@ defmodule LiveAdmin.Components.Container.Form do
     ~H"""
     <.live_component
       module={MapInput}
-      id={assigns.field}
+      id={input_id(@form, @field)}
       form={@form}
       field={@field}
       disabled={@disabled}
@@ -483,6 +467,17 @@ defmodule LiveAdmin.Components.Container.Form do
     |> Resource.change(changeset.data, params)
     |> Resource.validate(resource.config, session)
   end
+
+  defp field_class(type) when type in @supported_primitive_types, do: to_string(type)
+  defp field_class(:map), do: "map"
+  defp field_class({:array, _}), do: "array"
+  defp field_class({_, Ecto.Embedded, _}), do: "embed"
+
+  defp supported_type?(type) when type in @supported_primitive_types, do: true
+  defp supported_type?(:map), do: true
+  defp supported_type?({:array, _}), do: true
+  defp supported_type?({_, Ecto.Embedded, _}), do: true
+  defp supported_type?(_), do: false
 
   def enabled?(changeset, action, config) do
     get_config(config, :"#{action}_with", true) && Enum.empty?(changeset.errors)
