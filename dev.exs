@@ -227,6 +227,7 @@ defmodule Demo.Posts.Post.Version do
   @primary_key false
   embedded_schema do
     field :body, :string
+    field :status, {:array, Ecto.Enum}, values: [:draft, :archived, :live]
 
     timestamps(updated_at: false)
   end
