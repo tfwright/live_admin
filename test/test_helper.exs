@@ -83,10 +83,10 @@ defmodule LiveAdminTest.Post do
   use Ecto.Schema
 
   schema "posts" do
-    field :title, :string
+    field(:title, :string)
     belongs_to(:user, LiveAdminTest.User, type: :binary_id)
 
-    embeds_many :previous_versions, __MODULE__.Version, on_replace: :delete
+    embeds_many(:previous_versions, __MODULE__.Version, on_replace: :delete)
   end
 end
 
@@ -103,8 +103,8 @@ defmodule LiveAdminTest.Post.Version do
 
   @primary_key false
   embedded_schema do
-    field :body, :string
-    field :tags, {:array, :string}
+    field(:body, :string)
+    field(:tags, {:array, :string})
 
     timestamps(updated_at: false)
   end
