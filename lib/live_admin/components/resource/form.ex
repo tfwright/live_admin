@@ -472,6 +472,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp field_class(:map), do: "map"
   defp field_class({:array, _}), do: "array"
   defp field_class({_, Ecto.Embedded, _}), do: "embed"
+  defp field_class({_, Ecto.Enum, _}), do: "enum"
 
   defp supported_type?(type) when type in @supported_primitive_types, do: true
   defp supported_type?(:map), do: true
