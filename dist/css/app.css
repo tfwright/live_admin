@@ -1209,6 +1209,10 @@ a.button__remove {
   transition-duration: 150ms;
 }
 
+input[type="date"], input[type="number"] {
+  width: 8rem;
+}
+
 .cell__copy {
   display: none;
   position: absolute;

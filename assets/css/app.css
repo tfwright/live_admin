@@ -41,6 +41,10 @@
   }
 }
 
+input[type="date"], input[type="number"] {
+  @apply w-32;
+}
+
 @layer components {
   .topbar {
     @apply bg-transparent;
