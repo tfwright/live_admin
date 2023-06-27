@@ -265,58 +265,55 @@ defmodule LiveAdmin.Components.Container.Form do
     assigns = assign(assigns, :meta, meta)
 
     ~H"""
-    <div>
-      <h2 class="embed__title"><%= humanize(@field) %></h2>
-      <div class="embed__group">
-        <%= unless @disabled do %>
-          <%= hidden_input(@form, @field, value: "delete") %>
-          <%= unless input_value(@form, @field) == nil do %>
-            <%= for fp <- inputs_for(@form, @field) do %>
-              <div class="embed__item">
-                <div>
-                  <a
-                    class="button__remove"
-                    phx-click="remove_embed"
-                    phx-value-field={@field}
-                    phx-value-idx={fp.index}
-                    phx-target={@form_ref}
-                  />
-                </div>
-                <div>
-                  <%= for {field, type, _} <- fields_for_embed(@type) do %>
-                    <.field
-                      field={field}
-                      type={type}
-                      form={fp}
-                      immutable={false}
-                      resource={@resource}
-                      resources={@resources}
-                      form_ref={@form_ref}
-                      session={@session}
-                      prefix={@prefix}
-                    />
-                  <% end %>
-                </div>
+    <div class="embed__group">
+      <%= unless @disabled do %>
+        <%= hidden_input(@form, @field, value: "delete") %>
+        <%= unless input_value(@form, @field) == nil do %>
+          <%= for fp <- inputs_for(@form, @field) do %>
+            <div class="embed__item">
+              <div>
+                <a
+                  class="button__remove"
+                  phx-click="remove_embed"
+                  phx-value-field={@field}
+                  phx-value-idx={fp.index}
+                  phx-target={@form_ref}
+                />
               </div>
-            <% end %>
-          <% end %>
-          <%= if @meta.cardinality == :many || input_value(@form, @field) == nil do %>
-            <div class="form__actions">
-              <a
-                href="#"
-                phx-click="add_embed"
-                phx-value-field={@field}
-                phx-target={@form_ref}
-                class="resource__action--btn"
-              >
-                New
-              </a>
+              <div>
+                <%= for {field, type, _} <- fields_for_embed(@type) do %>
+                  <.field
+                    field={field}
+                    type={type}
+                    form={fp}
+                    immutable={false}
+                    resource={@resource}
+                    resources={@resources}
+                    form_ref={@form_ref}
+                    session={@session}
+                    prefix={@prefix}
+                  />
+                <% end %>
+              </div>
             </div>
           <% end %>
-        <% else %>
-          <pre><%= @form |> input_value(@field) |> inspect() %></pre>
         <% end %>
-      </div>
+        <%= if @meta.cardinality == :many || input_value(@form, @field) == nil do %>
+          <div class="form__actions">
+            <a
+              href="#"
+              phx-click="add_embed"
+              phx-value-field={@field}
+              phx-target={@form_ref}
+              class="resource__action--btn"
+            >
+              New
+            </a>
+          </div>
+        <% end %>
+      <% else %>
+        <pre><%= @form |> input_value(@field) |> inspect() %></pre>
+      <% end %>
     </div>
     """
   end
