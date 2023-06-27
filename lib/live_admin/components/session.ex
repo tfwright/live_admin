@@ -23,24 +23,4 @@ defmodule LiveAdmin.Components.Session do
     <.live_component module={@mod} id="content" changeset={@changeset} />
     """
   end
-
-  @impl true
-  def handle_event("save", %{"session" => session_params}, socket) do
-    session =
-      socket.assigns.changeset
-      |> Changeset.cast(session_params, [:metadata])
-      |> Changeset.update_change(:metadata, fn indexed_metadata ->
-        indexed_metadata
-        |> Enum.sort_by(fn {idx, _} -> idx end)
-        |> Map.new(fn {_, %{"key" => key, "value" => value}} -> {key, value} end)
-      end)
-      |> Changeset.apply_action!(:insert)
-
-    LiveAdmin.session_store().persist!(session)
-
-    {:noreply,
-     socket
-     |> assign(:changeset, Changeset.change(session))
-     |> push_event("success", %{msg: "Changes successfully saved"})}
-  end
 end
