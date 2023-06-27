@@ -476,6 +476,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp supported_type?(:map), do: true
   defp supported_type?({:array, _}), do: true
   defp supported_type?({_, Ecto.Embedded, _}), do: true
+  defp supported_type?({_, Ecto.Enum, _}), do: true
   defp supported_type?(_), do: false
 
   def enabled?(changeset, action, config) do
