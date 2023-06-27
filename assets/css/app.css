@@ -36,6 +36,8 @@
     @apply transition;
     @apply ease-in-out;
     @apply focus:outline-none;
+    @apply w-32;
+    @apply p-1;
   }
 }
 
@@ -419,17 +421,15 @@
     @apply text-lg;
   }
 
-  .field__text {
-    @apply mb-2;
-    @apply font-bold;
-    @apply text-lg;
-  }
-
-  .field__checkbox {
+  .checkbox__group input {
     @apply scale-150;
   }
 
-  .field__checkbox--group {
+  .checkbox__group label {
+    @apply ml-1;
+  }
+
+  .checkbox__group {
     @apply grid;
     grid-template-columns: auto minmax(0, 1fr);
     @apply gap-1;
@@ -437,66 +437,48 @@
     @apply ml-3;
   }
 
-  .field__array > div:not(.form__actions) {
+  .field__array--group > div:not(.form__actions) {
     @apply flex;
     @apply items-center;
     @apply mb-2;
     @apply ml-2;
   }
 
-  .field__array > .form__actions {
+  .field__array--group > .form__actions {
     @apply text-left;
   }
 
-  .field__array > div:not(.form__actions) > a {
+  .field__array--group > div:not(.form__actions) > a {
     @apply shrink-0;
     @apply mr-2;
   }
 
-  .field__array input {
+  .field__array--group input {
     @apply mb-0;
   }
 
-  .field__map > div:not(.form__actions) {
+  .field__map--group > div:not(.form__actions) {
     @apply flex;
     @apply items-center;
     @apply mb-2;
     @apply ml-2;
   }
 
-  .field__map > .form__actions {
+  .field__map--group > .form__actions {
     @apply text-left;
   }
 
-  .field__map > div:not(.form__actions) > a {
+  .field__map--group > div:not(.form__actions) > a {
     @apply shrink-0;
     @apply mr-2;
   }
 
-  .field__map textarea {
+  .field__map--group textarea {
     @apply mb-0;
     @apply mr-2;
     @apply w-1/4;
   }
 
-  .field__number {
-    @apply border;
-    @apply p-1;
-    @apply w-20;
-  }
-
-  .field__date {
-    @apply w-32;
-  }
-
-  .field__select {
-    @apply w-32;
-  }
-
-  .form__checkbox, .form__number, .form__time {
-    @apply flex-none;
-    @apply ml-1;
-  }
 
   .toast__container {
     @apply fixed;

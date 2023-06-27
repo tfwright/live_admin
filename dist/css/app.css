@@ -488,6 +488,11 @@ select:focus {
   outline-offset: 2px;
 }
 
+select {
+  width: 8rem;
+  padding: 0.25rem;
+}
+
 *, ::before, ::after {
   --tw-translate-x: 0;
   --tw-translate-y: 0;
@@ -1019,20 +1024,17 @@ a.button__remove {
   line-height: 1.75rem;
 }
 
-.field__text {
-  margin-bottom: 0.5rem;
-  font-weight: 700;
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-}
-
-.field__checkbox {
+.checkbox__group input {
   --tw-scale-x: 1.5;
   --tw-scale-y: 1.5;
   transform: var(--tw-transform);
 }
 
-.field__checkbox--group {
+.checkbox__group label {
+  margin-left: 0.25rem;
+}
+
+.checkbox__group {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: 0.25rem;
@@ -1040,65 +1042,46 @@ a.button__remove {
   margin-left: 0.75rem;
 }
 
-.field__array > div:not(.form__actions) {
+.field__array--group > div:not(.form__actions) {
   display: flex;
   align-items: center;
   margin-bottom: 0.5rem;
   margin-left: 0.5rem;
 }
 
-.field__array > .form__actions {
+.field__array--group > .form__actions {
   text-align: left;
 }
 
-.field__array > div:not(.form__actions) > a {
+.field__array--group > div:not(.form__actions) > a {
   flex-shrink: 0;
   margin-right: 0.5rem;
 }
 
-.field__array input {
+.field__array--group input {
   margin-bottom: 0px;
 }
 
-.field__map > div:not(.form__actions) {
+.field__map--group > div:not(.form__actions) {
   display: flex;
   align-items: center;
   margin-bottom: 0.5rem;
   margin-left: 0.5rem;
 }
 
-.field__map > .form__actions {
+.field__map--group > .form__actions {
   text-align: left;
 }
 
-.field__map > div:not(.form__actions) > a {
+.field__map--group > div:not(.form__actions) > a {
   flex-shrink: 0;
   margin-right: 0.5rem;
 }
 
-.field__map textarea {
+.field__map--group textarea {
   margin-bottom: 0px;
   margin-right: 0.5rem;
   width: 25%;
-}
-
-.field__number {
-  border-width: 1px;
-  padding: 0.25rem;
-  width: 5rem;
-}
-
-.field__date {
-  width: 8rem;
-}
-
-.field__select {
-  width: 8rem;
-}
-
-.form__checkbox, .form__number, .form__time {
-  flex: none;
-  margin-left: 0.25rem;
 }
 
 .toast__container {

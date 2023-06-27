@@ -43,7 +43,7 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="field__map">
+    <div class="field__map--group">
       <%= for {idx, %{"key" => k, "value" => v}} <- Enum.sort(@values) do %>
         <div>
           <a

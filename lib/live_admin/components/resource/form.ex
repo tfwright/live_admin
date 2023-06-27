@@ -346,11 +346,11 @@ defmodule LiveAdmin.Components.Container.Form do
         />
       <% else %>
         <div class="form__number">
-          <%= number_input(@form, @field, class: "field__number", disabled: @disabled) %>
+          <%= number_input(@form, @field, disabled: @disabled) %>
         </div>
       <% end %>
     <% else %>
-      <%= textarea(@form, @field, rows: 1, class: "field__text", disabled: @disabled) %>
+      <%= textarea(@form, @field, rows: 1, disabled: @disabled) %>
     <% end %>
     """
   end
@@ -383,28 +383,28 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp input(assigns = %{type: :string}) do
     ~H"""
-    <%= textarea(@form, @field, rows: 1, class: "field__text", disabled: @disabled) %>
+    <%= textarea(@form, @field, rows: 1, disabled: @disabled) %>
     """
   end
 
   defp input(assigns = %{type: :boolean}) do
     ~H"""
     <div class="form__checkbox">
-      <%= checkbox(@form, @field, class: "field__checkbox", disabled: @disabled) %>
+      <%= checkbox(@form, @field, disabled: @disabled) %>
     </div>
     """
   end
 
   defp input(assigns = %{type: :date}) do
     ~H"""
-    <%= date_input(@form, @field, class: "field__date", disabled: @disabled) %>
+    <%= date_input(@form, @field, disabled: @disabled) %>
     """
   end
 
   defp input(assigns = %{type: number}) when number in [:integer, :id] do
     ~H"""
     <div class="form__number">
-      <%= number_input(@form, @field, class: "field__number", disabled: @disabled) %>
+      <%= number_input(@form, @field, disabled: @disabled) %>
     </div>
     """
   end
@@ -412,7 +412,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp input(assigns = %{type: :float}) do
     ~H"""
     <div class="form__number">
-      <%= number_input(@form, @field, class: "field__number", disabled: @disabled, step: "any") %>
+      <%= number_input(@form, @field, disabled: @disabled, step: "any") %>
     </div>
     """
   end
@@ -420,7 +420,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp input(assigns = %{type: type}) when type in [:naive_datetime, :utc_datetime] do
     ~H"""
     <div class="form__time">
-      <%= datetime_local_input(@form, @field, class: "field__time", disabled: @disabled) %>
+      <%= datetime_local_input(@form, @field, disabled: @disabled) %>
     </div>
     """
   end
@@ -429,10 +429,7 @@ defmodule LiveAdmin.Components.Container.Form do
     assigns = assign(assigns, :mappings, mappings)
 
     ~H"""
-    <%= select(@form, @field, [nil | Keyword.keys(@mappings)],
-      disabled: @disabled,
-      class: "field__select"
-    ) %>
+    <%= select(@form, @field, [nil | Keyword.keys(@mappings)], disabled: @disabled) %>
     """
   end
 
@@ -440,7 +437,7 @@ defmodule LiveAdmin.Components.Container.Form do
     assigns = assign(assigns, :mappings, mappings)
 
     ~H"""
-    <div class="field__checkbox--group">
+    <div class="checkbox__group">
       <%= hidden_input(@form, @field, name: input_name(@form, @field) <> "[]", value: nil) %>
       <%= for option <- Keyword.keys(@mappings) do %>
         <%= checkbox(@form, @field,

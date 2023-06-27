@@ -42,7 +42,7 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="field__array">
+    <div class="field__array--group">
       <%= for {item, idx} <- Enum.with_index(@values) do %>
         <div>
           <a
