@@ -2,8 +2,6 @@ defmodule LiveAdmin.View do
   use Phoenix.Component
   use Phoenix.HTML
 
-  alias LiveAdmin.Components.Nav
-
   js_path = Path.join(__DIR__, "../../dist/js/app.js")
   css_path = Path.join(__DIR__, "../../dist/css/app.css")
   default_css_overrides_path = Path.join(__DIR__, "../../dist/css/default_overrides.css")
@@ -22,22 +20,6 @@ defmodule LiveAdmin.View do
 
   def render("app.html", assigns), do: app(assigns)
   def render("layout.html", assigns), do: layout(assigns)
-
-  def nav(assigns) do
-    assigns = assign(assigns, mod: Application.get_env(:live_admin, :components, [])[:nav] || Nav)
-
-    ~H"""
-    <.live_component
-      id="nav"
-      module={@mod}
-      socket={@socket}
-      title={@title}
-      resources={@resources}
-      resource={@resource}
-      prefix={@prefix}
-    />
-    """
-  end
 
   def render_js, do: "var ENV = \"#{@env}\";" <> @app_js
 

@@ -74,7 +74,11 @@ defmodule LiveAdmin.Router do
      assign(socket,
        title: title,
        resources: resources_by_key,
-       session: LiveAdmin.session_store().load!(session_id)
+       session: LiveAdmin.session_store().load!(session_id),
+       nav_mod:
+         :live_admin
+         |> Application.get_env(:components, [])
+         |> Keyword.get(:nav, LiveAdmin.Components.Nav)
      )}
   end
 
