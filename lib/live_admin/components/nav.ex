@@ -51,7 +51,7 @@ defmodule LiveAdmin.Components.Nav do
         content_tag :li, class: "nav__item#{if resource == assigns[:resource], do: "--selected"}" do
           resource
           |> resource_title()
-          |> live_redirect(to: route_with_params(socket, key, prefix: assigns["prefix"]))
+          |> live_redirect(to: route_with_params(socket, key, prefix: assigns[:prefix]))
         end
 
       {item, subs} ->

@@ -34,6 +34,7 @@ defmodule LiveAdmin.View do
       title={@title}
       resources={@resources}
       resource={@resource}
+      prefix={@prefix}
     />
     """
   end
