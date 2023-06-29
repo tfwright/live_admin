@@ -76,8 +76,7 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
      update(
        socket,
        :values,
-       &(Map.put(&1, &1 |> map_size() |> to_string(), %{"key" => nil, "value" => nil})
-         |> IO.inspect(label: "map"))
+       &Map.put(&1, &1 |> map_size() |> to_string(), %{"key" => nil, "value" => nil})
      )}
   end
 
