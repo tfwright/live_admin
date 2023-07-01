@@ -1,21 +1,17 @@
 defmodule LiveAdmin.Components.Home do
   use Phoenix.LiveView
 
-  alias __MODULE__.Content
-
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, socket}
+  def mount(_params, %{"components" => %{home: mod}, "title" => title}, socket) do
+    {:ok,
+     assign(socket,
+       mod: mod,
+       title: title
+     )}
   end
 
   @impl true
-  def render(assigns = %{title: title}) do
-    assigns =
-      assign(assigns,
-        mod: Application.get_env(:live_admin, :components, [])[:home] || Content,
-        title: title
-      )
-
+  def render(assigns) do
     ~H"""
     <.live_component module={@mod} id="content" />
     """

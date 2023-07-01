@@ -29,14 +29,22 @@ Add the following to your Phoenix router in any scope ready to serve a live rout
 ```
 import LiveAdmin.Router
 # ...
-live_admin "/admin", resources: [MyApp.SomeEctoSchema]
+live_admin "/admin" do
+  admin_resource "/my_schemas", MyApp.SomeEctoSchema
+end
 ```
 
-See `LiveAdmin.Router.live_admin/2` for full list of options.
+The module passed as the second argument to `admin_resource` must `use LiveAdmin.Resource`.
+If the module is an Ecto schema, no configuration is required, and LiveAdmin will use the module in all queries.
+If the module is not an Ecto schema, you must identify the schema that should be used:
 
-To customize a resource, pass a two element tuple when the schema module as the first element, and a keyword list of options is the second: `{MyApp.SomeEctoSchema, opts}`
+```
+defmodule MyApp.SomeResource do
+  use LiveAdmin.Resource, schema: MyApp.SomeEctoSchema
+end
+```
 
-Resource specific options:
+To customize the behavior for that resource, the following options may also be used:
 
 * `title_with` - a binary, or MFA that returns a binary, used to identify the resource
 * `label_with` - a binary, or MFA that returns a binary, used to identify individual records
@@ -51,7 +59,6 @@ Resource specific options:
 * `actions` - list of atoms or MFAs that identify a function that operates on a record
 * `tasks` - list atoms or MFAs that identify a function that operates on a resource
 * `components` - keyword list of component module overrides for specific views (`:list`, `:new`, `:edit`, `:home`, `:nav`, `:session`)
-* `slug_with` - a binary, atom, or MFA that returns a binary, used to generate url for resource
 
 ## App config
 

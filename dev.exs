@@ -143,6 +143,7 @@ end
 
 defmodule Demo.Accounts.User.Profile do
   use Ecto.Schema
+  use LiveAdmin.Resource, create_with: nil
 
   schema "user_profiles" do
     belongs_to :user, Demo.Accounts.User, type: :binary_id
@@ -172,36 +173,6 @@ defmodule Demo.Accounts.User do
     has_many :posts, Demo.Posts.Post
 
     timestamps(updated_at: false)
-
-    def render_for_admin(user, :email, _) do
-      Phoenix.HTML.Link.link(user.email, to: "mailto:\"#{user.name}\"<#{user.email}>")
-    end
-
-    def render_for_admin(record, field, session) do
-      DemoWeb.Renderer.render_field(record, field, session)
-    end
-  end
-
-  def deactivate(user, _) do
-    user
-    |> Ecto.Changeset.change(active: false)
-    |> Demo.Repo.update()
-    |> case do
-      {:ok, _} -> {:ok, "deactivated!"}
-      error -> error
-    end
-  end
-
-  def regenerate_passwords(_) do
-    __MODULE__
-    |> Demo.Repo.all()
-    |> Enum.each(fn user ->
-      user
-      |> Ecto.Changeset.change(encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16())
-      |> Demo.Repo.update()
-    end)
-
-    {:ok, "updated"}
   end
 end
 
@@ -219,6 +190,11 @@ end
 
 defmodule Demo.Posts.Post do
   use Ecto.Schema
+  use LiveAdmin.Resource,
+    immutable_fields: [:disabled_user_id],
+    tasks: [:fail],
+    validate_with: :validate,
+    update_with: :update
 
   import Ecto.Changeset
 
@@ -240,13 +216,13 @@ defmodule Demo.Posts.Post do
     {:error, "failed"}
   end
 
-  def validate(changeset, _meta) do
+  def validate(changeset, _) do
     changeset
     |> Ecto.Changeset.validate_required([:title, :body, :user_id])
     |> Ecto.Changeset.validate_length(:title, max: 10, message: "cannot be longer than 10 characters")
   end
 
-  def update(record, params, _meta) do
+  def update(record, params, _) do
     record
     |> Ecto.Changeset.cast(params, [:title, :body, :user_id, :inserted_at])
     |> Ecto.Changeset.validate_required([:title, :body, :user_id, :inserted_at])
@@ -308,7 +284,7 @@ defmodule DemoWeb.CreateUserForm do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import LiveAdmin, only: [route_with_params: 3]
+  import LiveAdmin, only: [route_with_params: 4]
   import LiveAdmin.ErrorHelpers
 
   @impl true
@@ -392,7 +368,7 @@ defmodule DemoWeb.CreateUserForm do
   def handle_event(
         "create",
         %{"params" => params},
-        socket = %{assigns: %{key: key, prefix: prefix}}
+        socket = %{assigns: %{prefix: prefix, base_path: base_path, key: key}}
       ) do
     socket =
       %Demo.Accounts.User{}
@@ -401,7 +377,7 @@ defmodule DemoWeb.CreateUserForm do
       |> Ecto.Changeset.unique_constraint(:email)
       |> Demo.Repo.insert(prefix: prefix)
       |> case do
-        {:ok, _} -> push_redirect(socket, to: route_with_params(socket, key, prefix: prefix))
+        {:ok, _} -> push_redirect(socket, to: route_with_params(base_path, key, [], prefix: prefix))
         {:error, changeset} -> assign(socket, changeset: changeset)
       end
 
@@ -409,9 +385,68 @@ defmodule DemoWeb.CreateUserForm do
   end
 end
 
+defmodule DemoWeb.UserAdmin do
+  use LiveAdmin.Resource,
+      schema: Demo.Accounts.User,
+      hidden_fields: [:private_data],
+      immutable_fields: [:encrypted_password, :inserted_at],
+      components: [new: DemoWeb.CreateUserForm],
+      label_with: :name,
+      actions: [:deactivate],
+      tasks: [:regenerate_passwords],
+      render_with: :render_field
+
+  def deactivate(user, _) do
+    user
+    |> Ecto.Changeset.change(active: false)
+    |> Demo.Repo.update()
+    |> case do
+      {:ok, _} -> {:ok, "deactivated!"}
+      error -> error
+    end
+  end
+
+  def render_field(user, :email, _) do
+    Phoenix.HTML.Link.link(user.email, to: "mailto:\"#{user.name}\"<#{user.email}>")
+  end
+
+  def render_field(record, field, session) do
+    DemoWeb.Renderer.render_field(record, field, session)
+  end
+
+  def regenerate_passwords(_) do
+    Demo.Accounts.User
+    |> Demo.Repo.all()
+    |> Enum.each(fn user ->
+      user
+      |> Ecto.Changeset.change(encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16())
+      |> Demo.Repo.update()
+    end)
+
+    {:ok, "updated"}
+  end
+end
+
+defmodule DemoWeb.PostsAdmin.Home do
+  use Phoenix.LiveComponent
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div class="flex h-full items-center justify-center">
+      <div class="w-1/2">
+        This is only for managing posts
+      </div>
+    </div>
+    """
+  end
+end
+
+
 defmodule DemoWeb.Router do
   use Phoenix.Router
-  import LiveAdmin.Router
+  use LiveAdmin.Router
+
   import Phoenix.LiveView.Router
 
   pipeline :browser do
@@ -419,29 +454,18 @@ defmodule DemoWeb.Router do
 
     plug :user_id_stub
   end
-
   scope "/" do
     pipe_through :browser
     get "/", DemoWeb.PageController, :index
 
-    live_admin "/admin", resources: [
-      {Demo.Accounts.User,
-        hidden_fields: [:private_data],
-        immutable_fields: [:encrypted_password, :inserted_at],
-        components: [new: DemoWeb.CreateUserForm],
-        label_with: :name,
-        actions: [:deactivate],
-        tasks: [:regenerate_passwords],
-        render_with: :render_for_admin
-      },
-      {Demo.Posts.Post,
-        immutable_fields: [:disabled_user_id],
-        tasks: [:fail],
-        validate_with: {Demo.Posts.Post, :validate, []},
-        update_with: {Demo.Posts.Post, :update, []}
-      },
-      {Demo.Accounts.User.Profile, create_with: nil, slug_with: "profile"}
-    ]
+    live_admin "/admin", title: "DevAdmin" do
+      admin_resource "/users", DemoWeb.UserAdmin
+      admin_resource "/users/profiles", Demo.Accounts.User.Profile
+    end
+
+    live_admin "/posts-admin", components: [home: DemoWeb.PostsAdmin.Home] do
+      admin_resource "/posts", Demo.Posts.Post
+    end
   end
 
   defp user_id_stub(conn, _) do

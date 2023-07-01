@@ -18,7 +18,6 @@ defmodule LiveAdmin.View do
 
   embed_templates("components/layout/*")
 
-  def render("app.html", assigns), do: app(assigns)
   def render("layout.html", assigns), do: layout(assigns)
 
   def render_js, do: "var ENV = \"#{@env}\";" <> @app_js

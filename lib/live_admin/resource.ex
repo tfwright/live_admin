@@ -1,19 +1,31 @@
 defmodule LiveAdmin.Resource do
-  defstruct [:schema, :config]
-
   import Ecto.Query
-  import LiveAdmin, only: [get_config: 2, get_config: 3, repo: 0, parent_associations: 1]
+  import LiveAdmin, only: [repo: 0, parent_associations: 1]
 
   alias Ecto.Changeset
 
-  def find!(id, resource, prefix), do: repo().get!(resource.schema, id, prefix: prefix)
-  def find(id, resource, prefix), do: repo().get(resource.schema, id, prefix: prefix)
+  @doc false
+  defmacro __using__(opts) do
+    quote bind_quoted: [opts: opts] do
+      @__live_admin_config__ Keyword.put_new(opts, :schema, __MODULE__)
 
-  def delete(record, config, session) do
-    config
-    |> get_config(:delete_with, :default)
+      def __live_admin_config__, do: @__live_admin_config__
+
+      def __live_admin_config__(key),
+        do:
+          Keyword.get(@__live_admin_config__, key, Application.get_env(:live_admin, key)) ||
+            LiveAdmin.Resource.default_config_value(key)
+    end
+  end
+
+  def find!(id, schema, prefix), do: repo().get!(schema, id, prefix: prefix)
+  def find(id, schema, prefix), do: repo().get(schema, id, prefix: prefix)
+
+  def delete(record, resource, session) do
+    :delete_with
+    |> resource.__live_admin_config__()
     |> case do
-      :default ->
+      nil ->
         repo().delete(record)
 
       {mod, func_name, args} ->
@@ -22,10 +34,10 @@ defmodule LiveAdmin.Resource do
   end
 
   def list(resource, opts, session) do
-    resource
-    |> get_config(:list_with, :default)
+    :list_with
+    |> resource.__live_admin_config__()
     |> case do
-      :default ->
+      nil ->
         build_list(resource, opts)
 
       {mod, func_name, args} ->
@@ -36,20 +48,21 @@ defmodule LiveAdmin.Resource do
   def change(resource, record \\ nil, params \\ %{})
 
   def change(resource, record, params) when is_struct(record) do
-    build_changeset(record, resource.config, params)
+    build_changeset(record, resource, params)
   end
 
   def change(resource, nil, params) do
-    resource.schema
+    :schema
+    |> resource.__live_admin_config__()
     |> struct(%{})
-    |> build_changeset(resource.config, params)
+    |> build_changeset(resource, params)
   end
 
   def create(resource, params, session) do
-    resource
-    |> get_config(:create_with, :default)
+    :create_with
+    |> resource.__live_admin_config__()
     |> case do
-      :default ->
+      nil ->
         resource
         |> change(nil, params)
         |> repo().insert(prefix: session.prefix)
@@ -59,13 +72,13 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def update(record, config, params, session) do
-    config
-    |> get_config(:update_with, :default)
+  def update(record, resource, params, session) do
+    :update_with
+    |> resource.__live_admin_config__()
     |> case do
-      :default ->
-        record
-        |> change(config, params)
+      nil ->
+        resource
+        |> change(record, params)
         |> repo().update()
 
       {mod, func_name, args} ->
@@ -73,9 +86,9 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def validate(changeset, config, session) do
-    config
-    |> get_config(:validate_with)
+  def validate(changeset, resource, session) do
+    :validate_with
+    |> resource.__live_admin_config__()
     |> case do
       nil -> changeset
       {mod, func_name, args} -> apply(mod, func_name, [changeset, session] ++ args)
@@ -83,20 +96,21 @@ defmodule LiveAdmin.Resource do
     |> Map.put(:action, :validate)
   end
 
-  def fields(schema_or_resource, config \\ %{})
+  def fields(resource) do
+    schema = resource.__live_admin_config__(:schema)
 
-  def fields(%{schema: schema, config: config}, _), do: fields(schema, config)
-
-  def fields(schema, config) do
     Enum.flat_map(schema.__schema__(:fields), fn field_name ->
-      config
-      |> get_config(:hidden_fields, [])
+      :hidden_fields
+      |> resource.__live_admin_config__()
       |> Enum.member?(field_name)
       |> case do
         false ->
           [
             {field_name, schema.__schema__(:type, field_name),
-             [immutable: get_config(config, :immutable_fields, []) |> Enum.member?(field_name)]}
+             [
+               immutable:
+                 Enum.member?(resource.__live_admin_config__(:immutable_fields) || [], field_name)
+             ]}
           ]
 
         true ->
@@ -104,6 +118,15 @@ defmodule LiveAdmin.Resource do
       end
     end)
   end
+
+  def default_config_value(key) when key in [:actions, :tasks, :components, :hidden_fields],
+    do: []
+
+  def default_config_value(:render_with), do: {LiveAdmin.View, :render_field, []}
+
+  def default_config_value(:label_with), do: :id
+
+  def default_config_value(_), do: nil
 
   defp build_list(resource, opts) do
     opts =
@@ -113,7 +136,8 @@ defmodule LiveAdmin.Resource do
       |> Map.put_new(:sort, {:asc, :id})
 
     query =
-      resource.schema
+      :schema
+      |> resource.__live_admin_config__()
       |> limit(10)
       |> offset(^((opts[:page] - 1) * 10))
       |> order_by(^[opts[:sort]])
@@ -176,9 +200,17 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  defp build_changeset(record = %schema{}, config, params) do
-    schema
-    |> fields(config)
+  defp build_changeset(record = %schema{}, resource, params) do
+    resource
+    |> case do
+      :embed ->
+        Enum.map(schema.__schema__(:fields), fn field_name ->
+          {field_name, schema.__schema__(:type, field_name), []}
+        end)
+
+      resource ->
+        fields(resource)
+    end
     |> Enum.reduce(Changeset.cast(record, params, []), fn
       {field_name, {_, Ecto.Embedded, meta}, _}, changeset ->
         if Map.get(params, to_string(field_name)) == "delete" do
@@ -189,7 +221,7 @@ defmodule LiveAdmin.Resource do
           )
         else
           Changeset.cast_embed(changeset, field_name,
-            with: fn embed, params -> build_changeset(embed, %{}, params) end
+            with: fn embed, params -> build_changeset(embed, :embed, params) end
           )
         end
 
@@ -217,12 +249,19 @@ defmodule LiveAdmin.Resource do
   defp parse_map_param(param), do: param
 
   defp preloads(resource) do
-    resource.config
-    |> Map.get(:preload)
+    :preload
+    |> resource.__live_admin_config__()
     |> case do
-      nil -> resource.schema |> parent_associations() |> Enum.map(& &1.field)
-      {m, f, a} -> apply(m, f, [resource | a])
-      preloads when is_list(preloads) -> preloads
+      nil ->
+        resource.__live_admin_config__(:schema)
+        |> parent_associations()
+        |> Enum.map(& &1.field)
+
+      {m, f, a} ->
+        apply(m, f, [resource | a])
+
+      preloads when is_list(preloads) ->
+        preloads
     end
   end
 end
