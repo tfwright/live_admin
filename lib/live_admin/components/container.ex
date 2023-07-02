@@ -78,7 +78,7 @@ defmodule LiveAdmin.Components.Container do
       |> socket.assigns.resource.__live_admin_config__()
       |> Enum.find_value(fn
         {^task_name, mfa} -> mfa
-        ^task_name -> {socket.assigns.resource.__live_admin_config__(:schema), task_name, []}
+        ^task_name -> {socket.assigns.resource, task_name, []}
       end)
 
     socket =

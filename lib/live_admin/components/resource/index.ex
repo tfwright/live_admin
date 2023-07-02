@@ -263,7 +263,7 @@ defmodule LiveAdmin.Components.Container.Index do
       |> resource.__live_admin_config__()
       |> Enum.find_value(fn
         {^action_name, mfa} -> mfa
-        ^action_name -> {schema, action_name, []}
+        ^action_name -> {resource, action_name, []}
         _ -> false
       end)
 
