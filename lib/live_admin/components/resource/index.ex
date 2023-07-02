@@ -247,17 +247,23 @@ defmodule LiveAdmin.Components.Container.Index do
   end
 
   @impl true
-  def handle_event("action", %{"action" => action, "id" => id}, socket) do
-    record = Resource.find!(id, socket.assigns.resource, socket.assigns.prefix)
+  def handle_event(
+        "action",
+        %{"action" => action, "id" => id},
+        socket = %{assigns: %{resource: resource}}
+      ) do
+    schema = resource.__live_admin_config__(:schema)
+
+    record = Resource.find!(id, schema, socket.assigns.prefix)
 
     action_name = String.to_existing_atom(action)
 
     {m, f, a} =
       :actions
-      |> socket.assigns.resource.__live_admin_config__()
+      |> resource.__live_admin_config__()
       |> Enum.find_value(fn
         {^action_name, mfa} -> mfa
-        ^action_name -> {socket.assigns.resource.__live_admin_config__(:schema), action_name, []}
+        ^action_name -> {schema, action_name, []}
         _ -> false
       end)
 
@@ -271,7 +277,7 @@ defmodule LiveAdmin.Components.Container.Index do
           |> assign(
             :records,
             Resource.list(
-              socket.assigns.resource,
+              resource,
               Map.take(socket.assigns, [:prefix, :sort, :page, :search]),
               socket.assigns.session
             )
