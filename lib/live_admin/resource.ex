@@ -2,6 +2,14 @@ defmodule LiveAdmin.Resource do
   @moduledoc """
   API for managing Ecto schemas and their individual record instances used internally by LiveAdmin.
 
+  > #### `use LiveAdmin.Resource` {: .info}
+  > This is required in any module that should act as a LiveAdmin Resource.
+  > If the module is not an Ecto schema, then the `:schema` option must be passed.
+  > Using this module will create a __live_admin_config__ module variable and 2 functions
+  > to query it, __live_admin_config__/0 and __live_admin_config__/1. The former returns the entire
+  > config while the latter will return a key if it exists, otherwise it will fallback
+  > to either a global config for that key, or the key's default value.
+
   To customize UI behavior, the following options may also be used:
 
   * `title_with` - a binary, or MFA that returns a binary, used to identify the resource
@@ -17,14 +25,7 @@ defmodule LiveAdmin.Resource do
   * `actions` - list of atoms or MFAs that identify a function that operates on a record
   * `tasks` - list atoms or MFAs that identify a function that operates on a resource
   * `components` - keyword list of component module overrides for specific views (`:list`, `:new`, `:edit`, `:home`, `:nav`, `:session`)
-
-  > #### `use LiveAdmin.Resource` {: .info}
-  > This is required in any module that should act as a LiveAdmin Resource.
-  > If the module is not an Ecto schema, then the `:schema` option must be passed.
-  > Using this module will create a __live_admin_config__ module variable and 2 functions
-  > to query it, __live_admin_config__/0 and __live_admin_config__/1. The former returns the entire
-  > config while the latter will return a key if it exists, otherwise it will fallback
-  > to either a global config for that key, or the key's default value.
+  * `ecto_repo` - Ecto repo to use when building queries for this resource
   """
 
   import Ecto.Query
