@@ -10,13 +10,15 @@ defmodule LiveAdmin.Router do
   end
 
   @doc """
-  Defines a route that can be used to access the Admin UI for all configured resources.
+  Defines a group of LiveAdmin resources that share a common prefix, and optionally, configuration.
 
   ## Arguments
 
   * `path` - Defines a scope to be added to the router under which the resources will be grouped in a single live session
   * `opts` - Opts for the Admin UI added at configured path
     * `:title` - Title for the UI home view (Default: 'LiveAdmin')
+    * `:components` - Component overrides that will be used for every resource in the group
+      unless a resource is configurated to use its own overrides.
   """
   defmacro live_admin(path, opts \\ [], do: context) do
     title = Keyword.get(opts, :title, "LiveAdmin")
@@ -50,6 +52,15 @@ defmodule LiveAdmin.Router do
     end
   end
 
+  @doc """
+  Defines a resource to be included in a LiveAdmin UI.
+
+  For each configured resource at path `/foo`, the following routes will be added:
+
+  * `/foo` - List view
+  * `/foo/new` - New record form
+  * `/foo/:id/edit` - Update record form
+  """
   defmacro admin_resource(path, resource_mod) do
     quote bind_quoted: [path: path, resource_mod: resource_mod] do
       full_path = Path.join(@base_path, path)

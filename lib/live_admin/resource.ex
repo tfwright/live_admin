@@ -1,4 +1,32 @@
 defmodule LiveAdmin.Resource do
+  @moduledoc """
+  API for managing Ecto schemas and their individual record instances used internally by LiveAdmin.
+
+  To customize UI behavior, the following options may also be used:
+
+  * `title_with` - a binary, or MFA that returns a binary, used to identify the resource
+  * `label_with` - a binary, or MFA that returns a binary, used to identify records
+  * `list_with` - an atom or MFA that identifies the function that implements listing the resource
+  * `create_with` - an atom or MFA that identifies the function that implements creating the resource
+  * `update_with` - an atom or MFA that identifies the function that implements updating a record
+  * `delete_with` - an atom or MFA that identifies the function that implements deleting a record
+  * `validate_with` - an atom or MFA that identifies the function that implements validating a changed record
+  * `render_with` - an atom or MFA that identifies the function that implements table field rendering logic
+  * `hidden_fields` - a list of fields that should not be displayed in the UI
+  * `immutable_fields` - a list of fields that should not be editable in forms
+  * `actions` - list of atoms or MFAs that identify a function that operates on a record
+  * `tasks` - list atoms or MFAs that identify a function that operates on a resource
+  * `components` - keyword list of component module overrides for specific views (`:list`, `:new`, `:edit`, `:home`, `:nav`, `:session`)
+
+  > #### `use LiveAdmin.Resource` {: .info}
+  > This is required in any module that should act as a LiveAdmin Resource.
+  > If the module is not an Ecto schema, then the `:schema` option must be passed.
+  > Using this module will create a __live_admin_config__ module variable and 2 functions
+  > to query it, __live_admin_config__/0 and __live_admin_config__/1. The former returns the entire
+  > config while the latter will return a key if it exists, otherwise it will fallback
+  > to either a global config for that key, or the key's default value.
+  """
+
   import Ecto.Query
   import LiveAdmin, only: [repo: 0, parent_associations: 1]
 

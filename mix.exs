@@ -1,12 +1,14 @@
 defmodule LiveAdmin.MixProject do
   use Mix.Project
 
+  @version "0.8.2"
+
   def project do
     [
       app: :live_admin,
       name: "LiveAdmin",
       description: "A admin UI for Phoenix applications built with LiveView",
-      version: "0.8.2",
+      version: @version,
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -18,7 +20,7 @@ defmodule LiveAdmin.MixProject do
         links: %{"GitHub" => "https://github.com/tfwright/live_admin"},
         files: ~w(lib .formatter.exs mix.exs README* dist)
       ],
-      source_url: "https://github.com/tfwright/live_admin",
+      source_url: "https://github.com/tfwright/live_admin/blob/v#{@version}",
       docs: [
         main: "readme",
         extras: ["README.md"]

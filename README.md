@@ -24,62 +24,43 @@ Add to your app's `deps`:
 {:live_admin, "~> 0.8.2"}
 ```
 
-Add the following to your Phoenix router in any scope ready to serve a live route:
+To use LiveAdmin in a Phoenix router, first `import LiveAdmin.Router`
+
+Then configure a group of resources to serve at desired path:
 
 ```
-import LiveAdmin.Router
-# ...
-live_admin "/admin" do
-  admin_resource "/my_schemas", MyApp.SomeEctoSchema
+live_admin "/my_admin" do
+  admin_resource "/my_schemas", MyApp.MyResource
 end
 ```
 
-The module passed as the second argument to `admin_resource` must `use LiveAdmin.Resource`.
-If the module is an Ecto schema, no configuration is required, and LiveAdmin will use the module in all queries.
-If the module is not an Ecto schema, you must identify the schema that should be used:
+In this example, a single resource will be accessible at `/my_admin/my_schemas`.
 
-```
-defmodule MyApp.SomeResource do
-  use LiveAdmin.Resource, schema: MyApp.SomeEctoSchema
-end
-```
+`LiveAdmin.Router.live_admin/2` may also be used to set configuration that applies to all resources in the group.
 
-To customize the behavior for that resource, the following options may also be used:
+The module passed as the second argument to `LiveAdmin.Router.admin_resource/2` must use the `LiveAdmin.Resource` API.
+See that module's docs for a full list of options that can be used to configure the behavior of the resource.
 
-* `title_with` - a binary, or MFA that returns a binary, used to identify the resource
-* `label_with` - a binary, or MFA that returns a binary, used to identify individual records
-* `list_with` - an atom or MFA that identifies the function that implements listing a resource
-* `create_with` - an atom or MFA that identifies the function that implements creating a resource
-* `update_with` - an atom or MFA that identifies the function that implements updating a record
-* `delete_with` - an atom or MFA that identifies the function that implements deleting a record
-* `validate_with` - an atom or MFA that identifies the function that implements validating a changed record
-* `render_with` - an atom or MFA that identifies the function that implements table field rendering logic
-* `hidden_fields` - a list of fields that should not be displayed in the UI
-* `immutable_fields` - a list of fields that should not be editable in forms
-* `actions` - list of atoms or MFAs that identify a function that operates on a record
-* `tasks` - list atoms or MFAs that identify a function that operates on a resource
-* `components` - keyword list of component module overrides for specific views (`:list`, `:new`, `:edit`, `:home`, `:nav`, `:session`)
+* Note: It is possible to run multiple UIs each with their own prefix and independent configuration. Only global (app)
+config will be shared.
 
 ## App config
 
-The following runtime config is supported:
+The following is an example of minimal runtime configuration:
 
-* `ecto_repo` - the Ecto repo to use for db operations
+```
+config :live_admin, ecto_repo: MyApp.Repo
+```
+
+Full list of supported options:
+
+* `ecto_repo` (required) - the Ecto repo to use for db operations
 * `prefix_options` - a list or MFA specifying `prefix` options to be passed to Ecto functions
-* `css_overrides` - a binary or MFA that returns CSS to be appended to app css
-* `session_store` - a module implementing the [LiveAdmin.Session.Store](/lib/live_admin/session/store.ex) behavior, used to persist session data
+* `css_overrides` - a binary or MFA identifying a function that returns CSS to be appended to app css
+* `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data
 
-In addition to these, most resource configuration can be set here in order to set a global default to apply to all resources unless overridden in their individual config.
 
-Example:
-
-```
-config :live_admin,
-  ecto_repo: MyApp.Repo,
-  prefix_options: {MyApp.Accounts, :list_tenant_prefixes, []},
-  immutable_fields: [:id, :inserted_at, :updated_at],
-  label_with: :name
-```
+Note: Resource configuration options can also be set here in order to define a global default to apply to all resources unless overridden in their individual config.
 
 See [development app](/dev.exs) for more example configuration.
 
