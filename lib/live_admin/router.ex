@@ -1,14 +1,6 @@
 defmodule LiveAdmin.Router do
   import Phoenix.Component, only: [assign: 2]
 
-  @doc false
-  defmacro __using__(_opts) do
-    quote do
-      import Phoenix.LiveView.Router, only: [live: 4, live_session: 3]
-      import LiveAdmin.Router, only: [live_admin: 2, live_admin: 3, admin_resource: 2]
-    end
-  end
-
   @doc """
   Defines a group of LiveAdmin resources that share a common prefix, and optionally, configuration.
 
@@ -21,6 +13,8 @@ defmodule LiveAdmin.Router do
       unless a resource is configurated to use its own overrides.
   """
   defmacro live_admin(path, opts \\ [], do: context) do
+    import Phoenix.LiveView.Router, only: [live: 4, live_session: 3]
+
     title = Keyword.get(opts, :title, "LiveAdmin")
     components = Keyword.get(opts, :components, Application.get_env(:live_admin, :components, []))
 
@@ -62,6 +56,8 @@ defmodule LiveAdmin.Router do
   * `/foo/:id/edit` - Update record form
   """
   defmacro admin_resource(path, resource_mod) do
+    import Phoenix.LiveView.Router, only: [live: 4]
+
     quote bind_quoted: [path: path, resource_mod: resource_mod] do
       full_path = Path.join(@base_path, path)
 

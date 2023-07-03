@@ -30,7 +30,8 @@ end
 
 defmodule LiveAdminTest.Router do
   use Phoenix.Router
-  use LiveAdmin.Router
+
+  import LiveAdmin.Router
 
   pipeline :browser do
     plug(:fetch_session)

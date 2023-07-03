@@ -445,8 +445,8 @@ end
 
 defmodule DemoWeb.Router do
   use Phoenix.Router
-  use LiveAdmin.Router
 
+  import LiveAdmin.Router
   import Phoenix.LiveView.Router
 
   pipeline :browser do
