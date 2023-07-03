@@ -1,10 +1,6 @@
 defmodule LiveAdmin do
   @moduledoc docout: [LiveAdmin.READMECompiler]
 
-  defmodule InvalidResourceError do
-    defexception message: "invalid resource", plug_status: 404
-  end
-
   def route_with_params(base_path, resource_path, segments \\ [], params \\ []) do
     encoded_params =
       params
