@@ -20,10 +20,11 @@ defmodule LiveAdmin.MixProject do
         links: %{"GitHub" => "https://github.com/tfwright/live_admin"},
         files: ~w(lib .formatter.exs mix.exs README* dist)
       ],
-      source_url: "https://github.com/tfwright/live_admin/blob/v#{@version}",
+      source_url: "https://github.com/tfwright/live_admin",
       docs: [
         main: "readme",
-        extras: ["README.md"]
+        extras: ["README.md"],
+        source_ref: "v#{@version}"
       ],
       compilers: Mix.compilers() ++ compilers(Mix.env())
     ]
