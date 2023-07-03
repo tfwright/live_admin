@@ -39,7 +39,8 @@ In this example, a single resource will be accessible at `/my_admin/my_schemas`.
 `LiveAdmin.Router.live_admin/2` may also be used to set configuration that applies to all resources in the group.
 
 The module passed as the second argument to `LiveAdmin.Router.admin_resource/2` must use the `LiveAdmin.Resource` API.
-See that module's docs for a full list of options that can be used to configure the behavior of the resource.
+If it is not an Ecto schema, the `:schema` option must be passed. For a full list of options that can be used to
+configure the behavior of the resource, see the `LiveAdmin.Router` docs.
 
 * Note: It is possible to run multiple UIs each with their own prefix and independent configuration. Only global (app)
 config will be shared.
