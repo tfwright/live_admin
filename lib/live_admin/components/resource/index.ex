@@ -220,11 +220,9 @@ defmodule LiveAdmin.Components.Container.Index do
           }
         } = socket
       ) do
-    schema = resource.__live_admin_config__(:schema)
-
     socket =
       id
-      |> Resource.find!(schema, socket.assigns.prefix)
+      |> Resource.find!(resource, socket.assigns.prefix)
       |> Resource.delete(resource, session)
       |> case do
         {:ok, record} ->
@@ -252,9 +250,7 @@ defmodule LiveAdmin.Components.Container.Index do
         %{"action" => action, "id" => id},
         socket = %{assigns: %{resource: resource}}
       ) do
-    schema = resource.__live_admin_config__(:schema)
-
-    record = Resource.find!(id, schema, socket.assigns.prefix)
+    record = Resource.find!(id, resource.__live_admin_config__(:schema), socket.assigns.prefix)
 
     action_name = String.to_existing_atom(action)
 

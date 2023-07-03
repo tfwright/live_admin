@@ -32,12 +32,7 @@ defmodule LiveAdmin.Components.Container do
       |> assign_prefix(params)
       |> assign_mod()
 
-    record =
-      Resource.find(
-        id,
-        socket.assigns.resource.__live_admin_config__(:schema),
-        socket.assigns.prefix
-      )
+    record = Resource.find(id, socket.assigns.resource, socket.assigns.prefix)
 
     socket = assign(socket, record: record)
 

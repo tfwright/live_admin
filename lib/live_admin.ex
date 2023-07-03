@@ -18,8 +18,6 @@ defmodule LiveAdmin do
       encoded_params
   end
 
-  def repo, do: Application.fetch_env!(:live_admin, :ecto_repo)
-
   def session_store,
     do: Application.get_env(:live_admin, :session_store, __MODULE__.Session.Agent)
 

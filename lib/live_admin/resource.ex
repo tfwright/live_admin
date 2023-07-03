@@ -28,7 +28,7 @@ defmodule LiveAdmin.Resource do
   """
 
   import Ecto.Query
-  import LiveAdmin, only: [repo: 0, parent_associations: 1]
+  import LiveAdmin, only: [parent_associations: 1]
 
   alias Ecto.Changeset
 
@@ -46,15 +46,24 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def find!(id, schema, prefix), do: repo().get!(schema, id, prefix: prefix)
-  def find(id, schema, prefix), do: repo().get(schema, id, prefix: prefix)
+  def find!(id, resource, prefix),
+    do:
+      resource.__live_admin_config__(:ecto_repo).get!(resource.__live_admin_config__(:schema), id,
+        prefix: prefix
+      )
+
+  def find(id, resource, prefix),
+    do:
+      resource.__live_admin_config__(:ecto_repo).get(resource.__live_admin_config__(:schema), id,
+        prefix: prefix
+      )
 
   def delete(record, resource, session) do
     :delete_with
     |> resource.__live_admin_config__()
     |> case do
       nil ->
-        repo().delete(record)
+        resource.__live_admin_config__(:ecto_repo).delete(record)
 
       {mod, func_name, args} ->
         apply(mod, func_name, [record, session] ++ args)
@@ -93,7 +102,7 @@ defmodule LiveAdmin.Resource do
       nil ->
         resource
         |> change(nil, params)
-        |> repo().insert(prefix: session.prefix)
+        |> resource.__live_admin_config__(:ecto_repo).insert(prefix: session.prefix)
 
       {mod, func_name, args} ->
         apply(mod, func_name, [params, session] ++ args)
@@ -107,7 +116,7 @@ defmodule LiveAdmin.Resource do
       nil ->
         resource
         |> change(record, params)
-        |> repo().update()
+        |> resource.__live_admin_config__(:ecto_repo).update()
 
       {mod, func_name, args} ->
         apply(mod, func_name, [record, params, session] ++ args)
@@ -182,8 +191,12 @@ defmodule LiveAdmin.Resource do
       end)
 
     {
-      repo().all(query, prefix: opts[:prefix]),
-      repo().aggregate(query |> exclude(:limit) |> exclude(:offset), :count, prefix: opts[:prefix])
+      resource.__live_admin_config__(:ecto_repo).all(query, prefix: opts[:prefix]),
+      resource.__live_admin_config__(:ecto_repo).aggregate(
+        query |> exclude(:limit) |> exclude(:offset),
+        :count,
+        prefix: opts[:prefix]
+      )
     }
   end
 

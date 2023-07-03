@@ -17,6 +17,7 @@ defmodule LiveAdmin.Router do
 
     title = Keyword.get(opts, :title, "LiveAdmin")
     components = Keyword.get(opts, :components, Application.get_env(:live_admin, :components, []))
+    repo = Keyword.get(opts, :ecto_repo, Application.get_env(:live_admin, :ecto_repo))
 
     quote do
       current_path =
@@ -30,7 +31,7 @@ defmodule LiveAdmin.Router do
         live_session :"live_admin_#{@base_path}",
           session:
             {unquote(__MODULE__), :build_session,
-             [@base_path, unquote(title), unquote(components)]},
+             [@base_path, unquote(title), unquote(components), unquote(repo)]},
           root_layout: {LiveAdmin.View, :layout},
           layout: {LiveAdmin.View, :app},
           on_mount: {unquote(__MODULE__), :assign_options} do
@@ -78,12 +79,13 @@ defmodule LiveAdmin.Router do
     end
   end
 
-  def build_session(conn, base_path, title, components) do
+  def build_session(conn, base_path, title, components, repo) do
     %{
       "session_id" => LiveAdmin.session_store().init!(conn),
       "base_path" => base_path,
       "title" => title,
-      "components" => components |> add_default_components() |> Enum.into(%{})
+      "components" => components |> add_default_components() |> Enum.into(%{}),
+      "repo" => repo
     }
   end
 
@@ -94,7 +96,8 @@ defmodule LiveAdmin.Router do
           "title" => title,
           "base_path" => base_path,
           "components" => components,
-          "session_id" => session_id
+          "session_id" => session_id,
+          "repo" => repo
         },
         socket
       ) do
@@ -104,7 +107,8 @@ defmodule LiveAdmin.Router do
        base_path: base_path,
        title: title,
        nav_mod: Map.fetch!(components, :nav),
-       resources: socket.router |> Phoenix.Router.routes() |> collect_resources(base_path)
+       resources: socket.router |> Phoenix.Router.routes() |> collect_resources(base_path),
+       default_repo: repo
      )}
   end
 

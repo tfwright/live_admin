@@ -194,7 +194,8 @@ defmodule Demo.Posts.Post do
     immutable_fields: [:disabled_user_id],
     tasks: [:fail],
     validate_with: :validate,
-    update_with: :update
+    update_with: :update,
+    ecto_repo: Demo.Repo
 
   import Ecto.Changeset
 
