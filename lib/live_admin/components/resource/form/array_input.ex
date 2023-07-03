@@ -2,6 +2,8 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
+  import LiveAdmin, only: [trans: 1]
+
   alias Phoenix.LiveView.JS
 
   @impl true
@@ -64,7 +66,9 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
       <% end %>
 
       <div class="form__actions">
-        <a href="#" phx-click="add" phx-target={@myself} class="resource__action--btn">New</a>
+        <a href="#" phx-click="add" phx-target={@myself} class="resource__action--btn">
+          <%= trans("New") %>
+        </a>
       </div>
     </div>
     """

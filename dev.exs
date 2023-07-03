@@ -46,6 +46,7 @@ Application.put_env(:live_admin, :prefix_options, ["public", "this-is-a-fake-sch
 Application.put_env(:live_admin, :immutable_fields, [:inserted_at])
 Application.put_env(:live_admin, :render_with, {DemoWeb.Renderer, :render_field, []})
 Application.put_env(:live_admin, :css_overrides, {DemoWeb.Renderer, :render_css, []})
+Application.put_env(:live_admin, :gettext_backend, Demo.Gettext)
 
 defmodule DemoWeb.Renderer do
   use Phoenix.HTML
@@ -490,6 +491,12 @@ defmodule DemoWeb.Endpoint do
     signing_salt: "/VEDsdfsffMnp5"
 
   plug DemoWeb.Router
+end
+
+defmodule Demo.Gettext do
+  use Gettext, otp_app: :demo, priv: "priv/demo/gettext"
+
+  def locales, do: ["en", "tr"]
 end
 
 Application.put_env(:phoenix, :serve_endpoints, true)

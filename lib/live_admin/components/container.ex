@@ -3,7 +3,12 @@ defmodule LiveAdmin.Components.Container do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [resource_title: 1, route_with_params: 2, route_with_params: 4]
+    only: [
+      resource_title: 1,
+      route_with_params: 2,
+      route_with_params: 4,
+      trans: 1
+    ]
 
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
@@ -74,6 +79,15 @@ defmodule LiveAdmin.Components.Container do
        |> assign_repo()}
 
   @impl true
+  def handle_event("set_locale", %{"locale" => locale}, socket) do
+    new_session = Map.put(socket.assigns.session, :locale, locale)
+
+    LiveAdmin.session_store().persist!(new_session)
+
+    {:no_reply, assign(socket, :session, new_session)}
+  end
+
+  @impl true
   def handle_event("task", %{"task" => task}, socket) do
     task_name = String.to_existing_atom(task)
 
@@ -112,18 +126,18 @@ defmodule LiveAdmin.Components.Container do
 
       <div class="resource__actions">
         <div>
-          <%= live_redirect("List",
+          <%= live_redirect(trans("List"),
             to: route_with_params(@base_path, @key, [], prefix: @prefix),
             class: "resource__action--btn"
           ) %>
           <%= if @resource.__live_admin_config__(:create_with) != false do %>
-            <%= live_redirect("New",
+            <%= live_redirect(trans("New"),
               to: route_with_params(@base_path, @key, ["new"], prefix: @prefix),
               class: "resource__action--btn"
             ) %>
           <% else %>
             <button class="resource__action--disabled" disabled="disabled">
-              New
+              <%= trans("New") %>
             </button>
           <% end %>
           <div class="resource__action--drop">
@@ -131,7 +145,7 @@ defmodule LiveAdmin.Components.Container do
               class={"resource__action#{if @resource |> get_task_keys() |> Enum.empty?, do: "--disabled", else: "--btn"}"}
               disabled={if @resource |> get_task_keys() |> Enum.empty?(), do: "disabled"}
             >
-              Run task
+              <%= trans("Run task") %>
             </button>
             <nav>
               <ul>
@@ -150,13 +164,15 @@ defmodule LiveAdmin.Components.Container do
           <%= if @prefix_options do %>
             <div id="prefix-select" class="resource__action--drop">
               <button class="resource__action--btn">
-                <%= @prefix || "Set prefix" %>
+                <%= @prefix || trans("Set prefix") %>
               </button>
               <nav>
                 <ul>
                   <%= if @prefix do %>
                     <li>
-                      <.link patch={route_with_params(@base_path, @key, [], prefix: "")}>clear</.link>
+                      <.link patch={route_with_params(@base_path, @key, [], prefix: "")}>
+                        <%= trans("clear") %>
+                      </.link>
                     </li>
                   <% end %>
                   <%= for option <- @prefix_options, to_string(option) != @prefix do %>
@@ -164,6 +180,26 @@ defmodule LiveAdmin.Components.Container do
                       <.link patch={route_with_params(@base_path, @key, [], prefix: option)}>
                         <%= option %>
                       </.link>
+                    </li>
+                  <% end %>
+                </ul>
+              </nav>
+            </div>
+          <% end %>
+          <%= if LiveAdmin.use_i18n? do %>
+            <div id="locale-select" class="resource__action--drop">
+              <button class="resource__action--btn">
+                <%= @session.locale || "Set locale" %>
+              </button>
+              <nav>
+                <ul>
+                  <%= for option <- LiveAdmin.gettext_backend().locales(), to_string(option) != @session.locale do %>
+                    <li>
+                      <%= link(option,
+                        to: "#",
+                        "phx-click":
+                          JS.push("set_locale", value: %{locale: option}, page_loading: true)
+                      ) %>
                     </li>
                   <% end %>
                 </ul>

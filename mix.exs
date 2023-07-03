@@ -46,6 +46,7 @@ defmodule LiveAdmin.MixProject do
       {:ecto, "~> 3.8"},
       {:ecto_sql, "~> 3.8"},
       {:phoenix_ecto, "~> 4.4"},
+      {:gettext, "~> 0.22"},
       {:plug_cowboy, "~> 2.0", only: :dev},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:jason, "~> 1.3", only: [:dev, :test]},

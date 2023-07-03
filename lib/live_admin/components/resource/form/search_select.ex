@@ -2,7 +2,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import LiveAdmin, only: [record_label: 2]
+  import LiveAdmin, only: [record_label: 2, trans: 1]
   alias LiveAdmin.Resource
 
   @impl true
@@ -42,7 +42,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
         <%= if @selected_option do %>
           <%= record_label(@selected_option, @resource) %>
         <% else %>
-          None
+          <%= trans("None") %>
         <% end %>
       </span>
     </div>
@@ -70,7 +70,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
           <%= text_input(:search, :select,
             id: input_id(@form, @field) <> "search_select",
             disabled: @disabled,
-            placeholder: "Search",
+            placeholder: trans("Search"),
             phx_focus: "load_options",
             phx_keyup: "load_options",
             phx_target: @myself,
@@ -82,7 +82,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
           <nav>
             <ul>
               <%= if Enum.empty?(@options) do %>
-                <li>No options</li>
+                <li><%= trans("No options") %></li>
               <% end %>
               <%= for option <- @options, option.id != input_value(@form, @field) do %>
                 <li>
