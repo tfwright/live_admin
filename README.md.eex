@@ -24,11 +24,11 @@ Add to your app's `deps`:
 {:live_admin, "~> <%= app_version %>"}
 ```
 
-To use LiveAdmin in a Phoenix router, first `import LiveAdmin.Router`
-
-Then configure a group of resources to serve at desired path:
+Add to a Phoenix router:
 
 ```
+import LiveAdmin.Router
+
 live_admin "/my_admin" do
   admin_resource "/my_schemas", MyApp.MyResource
 end
@@ -45,7 +45,7 @@ configure the behavior of the resource, see the `LiveAdmin.Router` docs.
 * Note: It is possible to run multiple UIs each with their own prefix and independent configuration. Only global (app)
 config will be shared.
 
-## App config
+## Configuration
 
 The following options can be set as global runtime config:
 
