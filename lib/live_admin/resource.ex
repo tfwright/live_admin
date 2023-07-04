@@ -46,36 +46,30 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def find!(id, resource, prefix),
-    do:
-      resource.__live_admin_config__(:ecto_repo).get!(resource.__live_admin_config__(:schema), id,
-        prefix: prefix
-      )
+  def find!(id, resource, prefix, repo),
+    do: repo.get!(resource.__live_admin_config__(:schema), id, prefix: prefix)
 
-  def find(id, resource, prefix),
-    do:
-      resource.__live_admin_config__(:ecto_repo).get(resource.__live_admin_config__(:schema), id,
-        prefix: prefix
-      )
+  def find(id, resource, prefix, repo),
+    do: repo.get(resource.__live_admin_config__(:schema), id, prefix: prefix)
 
-  def delete(record, resource, session) do
+  def delete(record, resource, session, repo) do
     :delete_with
     |> resource.__live_admin_config__()
     |> case do
       nil ->
-        resource.__live_admin_config__(:ecto_repo).delete(record)
+        repo.delete(record)
 
       {mod, func_name, args} ->
         apply(mod, func_name, [record, session] ++ args)
     end
   end
 
-  def list(resource, opts, session) do
+  def list(resource, opts, session, repo) do
     :list_with
     |> resource.__live_admin_config__()
     |> case do
       nil ->
-        build_list(resource, opts)
+        build_list(resource, opts, repo)
 
       {mod, func_name, args} ->
         apply(mod, func_name, [resource, opts, session] ++ args)
@@ -95,14 +89,14 @@ defmodule LiveAdmin.Resource do
     |> build_changeset(resource, params)
   end
 
-  def create(resource, params, session) do
+  def create(resource, params, session, repo) do
     :create_with
     |> resource.__live_admin_config__()
     |> case do
       nil ->
         resource
         |> change(nil, params)
-        |> resource.__live_admin_config__(:ecto_repo).insert(prefix: session.prefix)
+        |> repo.insert(prefix: session.prefix)
 
       {mod, func_name, args} ->
         apply(mod, func_name, [params, session] ++ args)
@@ -165,7 +159,7 @@ defmodule LiveAdmin.Resource do
 
   def default_config_value(_), do: nil
 
-  defp build_list(resource, opts) do
+  defp build_list(resource, opts, repo) do
     opts =
       opts
       |> Enum.into(%{})
@@ -191,8 +185,8 @@ defmodule LiveAdmin.Resource do
       end)
 
     {
-      resource.__live_admin_config__(:ecto_repo).all(query, prefix: opts[:prefix]),
-      resource.__live_admin_config__(:ecto_repo).aggregate(
+      repo.all(query, prefix: opts[:prefix]),
+      repo.aggregate(
         query |> exclude(:limit) |> exclude(:offset),
         :count,
         prefix: opts[:prefix]

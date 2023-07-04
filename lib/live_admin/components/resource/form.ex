@@ -73,6 +73,7 @@ defmodule LiveAdmin.Components.Container.Form do
             form_ref={@myself}
             session={@session}
             prefix={@prefix}
+            repo={@repo}
           />
         <% end %>
         <div class="form__actions">
@@ -131,10 +132,10 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "create",
         %{"params" => params},
-        %{assigns: %{resource: resource, session: session}} = socket
+        %{assigns: %{resource: resource, session: session, repo: repo}} = socket
       ) do
     socket =
-      case Resource.create(resource, params, session) do
+      case Resource.create(resource, params, session, repo) do
         {:ok, _} -> push_event(socket, "create", %{})
         {:error, changeset} -> assign(socket, changeset: changeset)
       end
@@ -254,6 +255,7 @@ defmodule LiveAdmin.Components.Container.Form do
           form_ref={@form_ref}
           session={@session}
           prefix={@prefix}
+          repo={@repo}
         />
       <% else %>
         <%= textarea(@form, @field,
@@ -298,6 +300,7 @@ defmodule LiveAdmin.Components.Container.Form do
                     form_ref={@form_ref}
                     session={@session}
                     prefix={@prefix}
+                    repo={@repo}
                   />
                 <% end %>
               </div>
@@ -350,6 +353,7 @@ defmodule LiveAdmin.Components.Container.Form do
           session={@session}
           handle_select="validate"
           prefix={@prefix}
+          repo={@repo}
         />
       <% else %>
         <div class="form__number">

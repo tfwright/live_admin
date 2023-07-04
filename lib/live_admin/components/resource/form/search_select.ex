@@ -18,7 +18,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
       |> case do
         nil -> nil
         "" -> nil
-        id -> Resource.find!(id, resource, assigns.session.prefix)
+        id -> Resource.find!(id, resource, assigns.session.prefix, socket.assigns.repo)
       end
 
     socket =
@@ -113,7 +113,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
       ) do
     options =
       resource
-      |> Resource.list([search: q, prefix: socket.assigns.prefix], session)
+      |> Resource.list([search: q, prefix: socket.assigns.prefix], session, socket.assigns.repo)
       |> elem(0)
 
     {:noreply, assign(socket, :options, options)}
