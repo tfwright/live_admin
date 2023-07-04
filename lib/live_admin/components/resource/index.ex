@@ -22,7 +22,8 @@ defmodule LiveAdmin.Components.Container.Index do
           Resource.list(
             assigns.resource,
             Map.take(assigns, [:prefix, :sort, :page, :search]),
-            assigns.session
+            assigns.session,
+            assigns.repo
           ),
         sort_attr: elem(assigns.sort, 1),
         sort_dir: elem(assigns.sort, 0)
@@ -222,8 +223,8 @@ defmodule LiveAdmin.Components.Container.Index do
       ) do
     socket =
       id
-      |> Resource.find!(resource, socket.assigns.prefix)
-      |> Resource.delete(resource, session)
+      |> Resource.find!(resource, socket.assigns.prefix, socket.assigns.repo)
+      |> Resource.delete(resource, session, socket.assigns.repo)
       |> case do
         {:ok, record} ->
           socket
@@ -233,7 +234,8 @@ defmodule LiveAdmin.Components.Container.Index do
             Resource.list(
               resource,
               Map.take(socket.assigns, [:prefix, :sort, :page, :search]),
-              session
+              session,
+              socket.assigns.repo
             )
           )
 
@@ -250,7 +252,13 @@ defmodule LiveAdmin.Components.Container.Index do
         %{"action" => action, "id" => id},
         socket = %{assigns: %{resource: resource}}
       ) do
-    record = Resource.find!(id, resource.__live_admin_config__(:schema), socket.assigns.prefix)
+    record =
+      Resource.find!(
+        id,
+        resource.__live_admin_config__(:schema),
+        socket.assigns.prefix,
+        socket.assigns.repo
+      )
 
     action_name = String.to_existing_atom(action)
 
@@ -275,7 +283,8 @@ defmodule LiveAdmin.Components.Container.Index do
             Resource.list(
               resource,
               Map.take(socket.assigns, [:prefix, :sort, :page, :search]),
-              socket.assigns.session
+              socket.assigns.session,
+              socket.assigns.repo
             )
           )
 

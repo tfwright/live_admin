@@ -31,8 +31,10 @@ defmodule LiveAdmin.Components.Container do
       |> assign_resource_info(uri)
       |> assign_prefix(params)
       |> assign_mod()
+      |> assign_repo()
 
-    record = Resource.find(id, socket.assigns.resource, socket.assigns.prefix)
+    record =
+      Resource.find(id, socket.assigns.resource, socket.assigns.prefix, socket.assigns.repo)
 
     socket = assign(socket, record: record)
 
@@ -56,13 +58,20 @@ defmodule LiveAdmin.Components.Container do
       |> assign_resource_info(uri)
       |> assign_prefix(params)
       |> assign_mod()
+      |> assign_repo()
 
     {:noreply, socket}
   end
 
   @impl true
   def handle_params(params, uri, socket),
-    do: {:noreply, socket |> assign_resource_info(uri) |> assign_prefix(params) |> assign_mod()}
+    do:
+      {:noreply,
+       socket
+       |> assign_resource_info(uri)
+       |> assign_prefix(params)
+       |> assign_mod()
+       |> assign_repo()}
 
   @impl true
   def handle_event("task", %{"task" => task}, socket) do
@@ -183,6 +192,7 @@ defmodule LiveAdmin.Components.Container do
       session={@session}
       base_path={@base_path}
       resources={@resources}
+      repo={@repo}
     />
     """
   end
@@ -199,6 +209,7 @@ defmodule LiveAdmin.Components.Container do
       resource={@resource}
       prefix={@prefix}
       base_path={@base_path}
+      repo={@repo}
     />
     """
   end
@@ -215,6 +226,7 @@ defmodule LiveAdmin.Components.Container do
       resources={@resources}
       resource={@resource}
       prefix={@prefix}
+      repo={@repo}
     />
     """
   end
@@ -289,5 +301,14 @@ defmodule LiveAdmin.Components.Container do
       |> Keyword.get(action, default)
 
     assign(socket, :mod, mod)
+  end
+
+  defp assign_repo(socket = %{assigns: %{resource: resource, default_repo: default}}) do
+    repo =
+      :ecto_repo
+      |> resource.__live_admin_config__()
+      |> Kernel.||(default)
+
+    assign(socket, :repo, repo)
   end
 end
