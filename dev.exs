@@ -466,6 +466,7 @@ defmodule DemoWeb.Router do
 
     live_admin "/posts-admin", components: [home: DemoWeb.PostsAdmin.Home] do
       admin_resource "/posts", Demo.Posts.Post
+      admin_resource "/users", DemoWeb.UserAdmin
     end
   end
 
