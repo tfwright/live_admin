@@ -24,7 +24,15 @@ Add to your app's `deps`:
 {:live_admin, "~> 0.9.0"}
 ```
 
-Add to a Phoenix router:
+Configure a module to act as a LiveAdmin resource:
+
+```
+defmodule MyApp.MyResource do
+  use LiveAdmin.Resource, schema: MyApp.Schema
+end
+```
+
+In your Phoenix router, add the resource to a LiveAdmin instance:
 
 ```
 import LiveAdmin.Router
@@ -34,29 +42,46 @@ live_admin "/my_admin" do
 end
 ```
 
-In this example, a single resource will be accessible at `/my_admin/my_schemas`.
-
-`LiveAdmin.Router.live_admin/2` may also be used to set configuration that applies to all resources in the group.
-
-The module passed as the second argument to `LiveAdmin.Router.admin_resource/2` must use the `LiveAdmin.Resource` API.
-If it is not an Ecto schema, the `:schema` option must be passed. For a full list of options that can be used to
-configure the behavior of the resource, see the `LiveAdmin.Router` docs.
-
-* Note: It is possible to run multiple UIs each with their own prefix and independent configuration. Only global (app)
-config will be shared.
+That's it, now an admin UI for `MyApp.Schema` will be available at `/my_admin/my_schemas`.
 
 ## Configuration
 
-The following options can be set as global runtime config:
+One of the main goals of LiveAdmin is to require as little config as possible.
+It should work out of the box, with only the above, for the vast majority of common
+app admin needs.
+
+However, if you want to customize the behavior of one or more resources, including how records
+are rendered or changes are validated, or to add custom behaviors, there are a variety of configuration options
+available. This includes component overrides if you would like to completely control
+every aspect of a particular resource view, like the edit form. For a complete list of options, see the `LiveAdmin.Resource` docs.
+
+For additional convenience and control, configuration in LiveAdmin can be set at 3 different levels.
+From most specific to most general, they are resource, admin instance, and global.
+
+### Resource
+
+The second argument passed to `use LiveAdmin.Resource` will configure only that specific resource,
+in any LiveView it is used. If the module is not an Ecto schema, the `:schema` option must be passed.
+If you would like the same schema to behave differently in different LiveAdmin instances, or different
+routes in the same instance, you must create multiple resource modules to contain that configuration.
+
+### Admin instance
+
+The second argument passed to `live_admin` will configure defaults for all resources in the group
+that do not specify the same configuration.
+
+### Global
+
+All resource configuration options can also be set in the LiveAdmin app runtime config. This will set a global
+default to apply to all resources unless overridden in their individual config, or the LiveAdmin instance.
+
+Additionally, the following options can only be set at the global level:
 
 * `prefix_options` - a list or MFA specifying `prefix` options to be passed to Ecto functions
 * `css_overrides` - a binary or MFA identifying a function that returns CSS to be appended to app css
 * `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data
 
-In addition, all resource configuration options can also be set here in order to define a global default to
-apply to all resources unless overridden in their individual config.
-
-See [development app](/dev.exs) for more example configuration.
+See [development app](/dev.exs) for a more detailed example of how to use various configuration options.
 
 ## Development environment
 
