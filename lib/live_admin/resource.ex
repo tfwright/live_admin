@@ -123,6 +123,7 @@ defmodule LiveAdmin.Resource do
     |> case do
       nil -> changeset
       {mod, func_name, args} -> apply(mod, func_name, [changeset, session] ++ args)
+      atom -> apply(resource, atom, [changeset, session])
     end
     |> Map.put(:action, :validate)
   end
