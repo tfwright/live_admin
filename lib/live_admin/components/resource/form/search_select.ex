@@ -18,7 +18,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
       |> case do
         nil -> nil
         "" -> nil
-        id -> Resource.find!(id, resource, assigns.session.prefix, socket.assigns.repo)
+        id -> Resource.find!(id, resource, assigns.session.prefix, assigns.repo)
       end
 
     socket =
