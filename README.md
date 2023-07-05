@@ -42,6 +42,8 @@ live_admin "/my_admin" do
 end
 ```
 
+Finally, tell LiveAdmin what Ecto repo to use to run queries in your `runtime.ex`:
+
 That's it, now an admin UI for `MyApp.Schema` will be available at `/my_admin/my_schemas`.
 
 ## Configuration
@@ -68,8 +70,7 @@ routes in the same instance, you must create multiple resource modules to contai
 ### Admin instance
 
 The second argument passed to `live_admin` will configure defaults for all resources in the group
-that do not specify the same configuration. Currently only the `:components` and `:ecto_repo` options 
-can be configured at this level.
+that do not specify the same configuration. Currently only component overrides can be configured at this level.
 
 ### Global
 
