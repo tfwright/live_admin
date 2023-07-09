@@ -277,7 +277,7 @@ defmodule LiveAdmin.Components.Container do
     |> Enum.sort()
   end
 
-  defp assign_prefix(socket, %{"prefix" => ""}), do: assign_and_presist_session(socket, nil)
+  defp assign_prefix(socket, %{"prefix" => ""}), do: assign_and_presist_prefix(socket, nil)
 
   defp assign_prefix(socket, %{"prefix" => prefix}) do
     socket.assigns.prefix_options
@@ -289,21 +289,21 @@ defmodule LiveAdmin.Components.Container do
         )
 
       prefix ->
-        assign_and_presist_session(socket, prefix)
+        assign_and_presist_prefix(socket, prefix)
     end
   end
 
   defp assign_prefix(socket = %{assigns: %{session: session, base_path: base_path, key: key}}, _) do
     case session.prefix do
       nil ->
-        assign_and_presist_session(socket, nil)
+        assign_and_presist_prefix(socket, nil)
 
       prefix ->
         push_patch(socket, to: route_with_params(base_path, key, [], prefix: prefix))
     end
   end
 
-  defp assign_and_presist_session(socket, prefix) do
+  defp assign_and_presist_prefix(socket, prefix) do
     new_session = Map.put(socket.assigns.session, :prefix, prefix)
 
     LiveAdmin.session_store().persist!(new_session)
