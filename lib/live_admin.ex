@@ -63,4 +63,18 @@ defmodule LiveAdmin do
       label when is_atom(label) -> Map.fetch!(record, label)
     end
   end
+
+  def use_i18n?, do: gettext_backend() != LiveAdmin.Gettext
+
+  def trans(string, opts \\ []) do
+    args =
+      [gettext_backend(), string]
+      |> then(fn base_args ->
+        if opts[:inter], do: base_args ++ [opts[:inter]], else: base_args
+      end)
+
+    apply(Gettext, :gettext, args)
+  end
+
+  def gettext_backend, do: Application.get_env(:live_admin, :gettext_backend, LiveAdmin.Gettext)
 end

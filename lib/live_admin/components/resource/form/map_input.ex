@@ -2,6 +2,8 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
+  import LiveAdmin, only: [trans: 1]
+
   alias Phoenix.LiveView.JS
 
   @impl true
@@ -63,7 +65,7 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
       <% end %>
       <div class="form__actions">
         <a phx-click={JS.push("add", target: @myself)} href="#" class="resource__action--btn">
-          New
+          <%= trans("New") %>
         </a>
       </div>
     </div>

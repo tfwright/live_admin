@@ -101,9 +101,13 @@ defmodule LiveAdmin.Router do
         },
         socket
       ) do
+    session = LiveAdmin.session_store().load!(session_id)
+
+    Gettext.put_locale(LiveAdmin.gettext_backend(), session.locale)
+
     {:cont,
      assign(socket,
-       session: LiveAdmin.session_store().load!(session_id),
+       session: session,
        base_path: base_path,
        title: title,
        nav_mod: Map.fetch!(components, :nav),

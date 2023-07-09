@@ -3,7 +3,7 @@ defmodule LiveAdmin.Components.Container.Form do
   use Phoenix.HTML
 
   import LiveAdmin.ErrorHelpers
-  import LiveAdmin, only: [associated_resource: 3, route_with_params: 4]
+  import LiveAdmin, only: [associated_resource: 3, route_with_params: 4, trans: 1]
 
   alias __MODULE__.{ArrayInput, MapInput, SearchSelect}
   alias LiveAdmin.Resource
@@ -45,7 +45,7 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def render(assigns = %{record: nil}) do
     ~H"""
-    <div>No record found</div>
+    <div><%= trans("No record found") %></div>
     """
   end
 
@@ -77,7 +77,7 @@ defmodule LiveAdmin.Components.Container.Form do
           />
         <% end %>
         <div class="form__actions">
-          <%= submit("Save",
+          <%= submit(trans("Save"),
             class: "resource__action#{if !@enabled, do: "--disabled", else: "--btn"}",
             disabled: !@enabled
           ) %>
@@ -243,7 +243,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp field(assigns) do
     ~H"""
     <div class={"field__group#{if @immutable, do: "--disabled"} field__#{field_class(@type)}"}>
-      <%= label(@form, @field, class: "field__label") %>
+      <%= label(@form, @field, trans(to_string(@field)), class: "field__label") %>
       <%= if supported_type?(@type) do %>
         <.input
           form={@form}
@@ -316,7 +316,7 @@ defmodule LiveAdmin.Components.Container.Form do
               phx-target={@form_ref}
               class="resource__action--btn"
             >
-              New
+              <%= trans("New") %>
             </a>
           </div>
         <% end %>
@@ -461,7 +461,7 @@ defmodule LiveAdmin.Components.Container.Form do
           id: input_id(@form, @field) <> to_string(option)
         ) %>
         <label for={input_id(@form, @field) <> to_string(option)}>
-          <%= option %>
+          <%= trans(option) %>
         </label>
       <% end %>
     </div>

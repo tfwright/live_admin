@@ -13,6 +13,7 @@ Significant features:
 * Overridable views and API
 * Easily add custom actions at the schema and record level
 * Ability to edit (nested) embedded schemas
+* i18n via [Gettext](elixir-gettext/gettext)
 
 ## Installation
 
@@ -60,6 +61,8 @@ every aspect of a particular resource view, like the edit form. For a complete l
 For additional convenience and control, configuration in LiveAdmin can be set at 3 different levels.
 From most specific to most general, they are resource, admin instance, and global.
 
+For concrete examples of the various config options and to see them in action, consult the [development app](#development-environment).
+
 ### Resource
 
 The second argument passed to `use LiveAdmin.Resource` will configure only that specific resource,
@@ -82,8 +85,14 @@ Additionally, the following options can only be set at the global level:
 * `prefix_options` - a list or MFA specifying `prefix` options to be passed to Ecto functions
 * `css_overrides` - a binary or MFA identifying a function that returns CSS to be appended to app css
 * `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data
+* `gettext_backend` - a module implementing the [Gettext API](https://hexdocs.pm/gettext/Gettext.html#module-gettext-api). It is expected to implement `locales/0` returning a list of binary locale names
 
-See [development app](/dev.exs) for a more detailed example of how to use various configuration options.
+## i18n
+
+LiveAdmin wraps all static strings in the UI with Gettext calls, but currently it does *not* provide any locales by default, so you will need
+to make sure they have been set up correctly for a custom backend. Unfortunately it is not currently possible to use
+Gettext's utilities to automatically extract the pot files so you will need to do this manually.
+To avoid conflicts with your own app's translations, it is recommended to create separate Gettext backends for LiveAdmin.
 
 ## Development environment
 

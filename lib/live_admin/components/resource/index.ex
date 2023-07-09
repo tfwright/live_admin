@@ -6,7 +6,9 @@ defmodule LiveAdmin.Components.Container.Index do
     only: [
       associated_resource: 3,
       record_label: 2,
-      route_with_params: 4
+      route_with_params: 4,
+      trans: 1,
+      trans: 2
     ]
 
   alias LiveAdmin.Resource
@@ -41,7 +43,7 @@ defmodule LiveAdmin.Components.Container.Index do
           <form phx-change={JS.push("search", target: @myself, page_loading: true)}>
             <input
               type="text"
-              placeholder="Search..."
+              placeholder={"#{trans("Search")}..."}
               name="query"
               onkeydown="return event.key != 'Enter'"
               value={@search}
@@ -67,7 +69,7 @@ defmodule LiveAdmin.Components.Container.Index do
             <%= for {field, _, _} <- Resource.fields(@resource) do %>
               <th class="resource__header" title={field}>
                 <%= list_link(
-                  humanize(field),
+                  trans(humanize(field)),
                   @base_path,
                   @key,
                   %{
@@ -114,13 +116,13 @@ defmodule LiveAdmin.Components.Container.Index do
                     <nav>
                       <ul>
                         <li>
-                          <%= live_redirect("Edit",
+                          <%= live_redirect(trans("Edit"),
                             to: route_with_params(@base_path, @key, [:edit, record], prefix: @prefix)
                           ) %>
                         </li>
                         <%= if @resource.__live_admin_config__(:delete_with) != false do %>
                           <li>
-                            <%= link("Delete",
+                            <%= link(trans("Delete"),
                               to: "#",
                               "data-confirm": "Are you sure?",
                               "phx-click":
@@ -172,7 +174,7 @@ defmodule LiveAdmin.Components.Container.Index do
               <%= if @page > 1,
                 do:
                   list_link(
-                    "Prev",
+                    trans("Prev"),
                     @base_path,
                     @key,
                     %{
@@ -184,11 +186,11 @@ defmodule LiveAdmin.Components.Container.Index do
                     },
                     class: "resource__action--btn"
                   ),
-                else: content_tag(:span, "Prev", class: "resource__action--disabled") %>
+                else: content_tag(:span, trans("Prev"), class: "resource__action--disabled") %>
               <%= if @page < (@records |> elem(1)) / 10,
                 do:
                   list_link(
-                    "Next",
+                    trans("Next"),
                     @base_path,
                     @key,
                     %{
@@ -200,9 +202,11 @@ defmodule LiveAdmin.Components.Container.Index do
                     },
                     class: "resource__action--btn"
                   ),
-                else: content_tag(:span, "Next", class: "resource__action--disabled") %>
+                else: content_tag(:span, trans("Next"), class: "resource__action--disabled") %>
             </td>
-            <td class="text-right p-2"><%= @records |> elem(1) %> total rows</td>
+            <td class="text-right p-2">
+              <%= trans("%{count} total rows", inter: [count: elem(@records, 1)]) %>
+            </td>
           </tr>
         </tfoot>
       </table>
@@ -228,7 +232,9 @@ defmodule LiveAdmin.Components.Container.Index do
       |> case do
         {:ok, record} ->
           socket
-          |> push_event("success", %{msg: "Deleted #{record_label(record, resource)}"})
+          |> push_event("success", %{
+            msg: trans("Deleted %{label}", inter: [label: record_label(record, resource)])
+          })
           |> assign(
             :records,
             Resource.list(
@@ -240,7 +246,9 @@ defmodule LiveAdmin.Components.Container.Index do
           )
 
         {:error, _} ->
-          push_event(socket, "error", %{msg: "Delete failed!"})
+          push_event(socket, "error", %{
+            msg: trans("Delete failed!")
+          })
       end
 
     {:noreply, socket}
@@ -276,7 +284,11 @@ defmodule LiveAdmin.Components.Container.Index do
         {:ok, result} ->
           socket
           |> push_event("success", %{
-            msg: "Successfully completed #{action}: #{inspect(result)}"
+            msg:
+              trans(
+                "Successfully completed %{action}: %{result}",
+                inter: [action: action, result: inspect(result)]
+              )
           })
           |> assign(
             :records,
@@ -289,7 +301,16 @@ defmodule LiveAdmin.Components.Container.Index do
           )
 
         {:error, error} ->
-          push_event(socket, "error", %{msg: "#{action} failed: #{error}"})
+          push_event(
+            socket,
+            "error",
+            trans("%{action} failed: %{error}",
+              inter: [
+                action: action,
+                error: error
+              ]
+            )
+          )
       end
 
     {:noreply, socket}
@@ -339,7 +360,11 @@ defmodule LiveAdmin.Components.Container.Index do
   end
 
   defp list_link(content, base_path, key, params, opts),
-    do: live_patch(content, Keyword.put(opts, :to, route_with_params(base_path, key, [], params)))
+    do:
+      live_patch(
+        content,
+        Keyword.put(opts, :to, route_with_params(base_path, key, [], params))
+      )
 
   defp get_assoc_name!(schema, fk) do
     Enum.find(schema.__schema__(:associations), fn assoc_name ->

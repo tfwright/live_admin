@@ -2,6 +2,8 @@ defmodule LiveAdmin.Components.Session.Content do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
+  import LiveAdmin, only: [trans: 1]
+
   alias Ecto.Changeset
   alias LiveAdmin.Components.Container.Form.MapInput
 
@@ -11,7 +13,7 @@ defmodule LiveAdmin.Components.Session.Content do
     <div id="session-page" phx-hook="FormPage">
       <div class="resource__banner">
         <h1 class="resource__title">
-          Session
+          <%= trans("Session") %>
         </h1>
       </div>
 
@@ -25,15 +27,19 @@ defmodule LiveAdmin.Components.Session.Content do
         class="resource__form"
       >
         <div class="field__group--disabled">
-          <%= label(f, :id, class: "field__label") %>
+          <%= label(f, :id, trans("id"), class: "field__label") %>
           <%= textarea(f, :id, rows: 1, class: "field__text", disabled: true) %>
         </div>
         <div class="field__group--disabled">
-          <%= label(f, :prefix, class: "field__label") %>
+          <%= label(f, :prefix, trans("prefix"), class: "field__label") %>
           <%= textarea(f, :prefix, rows: 1, class: "field__text", disabled: true) %>
         </div>
+        <div class="field__group--disabled">
+          <%= label(f, :locale, trans("locale"), class: "field__label") %>
+          <%= textarea(f, :locale, rows: 1, class: "field__text", disabled: true) %>
+        </div>
         <div class="field__group">
-          <%= label(f, :metadata, class: "field__label") %>
+          <%= label(f, :metadata, trans("metadata"), class: "field__label") %>
           <.live_component
             module={MapInput}
             id="metadata"
@@ -43,7 +49,7 @@ defmodule LiveAdmin.Components.Session.Content do
           />
         </div>
         <div class="form__actions">
-          <%= submit("Save", class: "resource__action--btn") %>
+          <%= submit(trans("Save"), class: "resource__action--btn") %>
         </div>
       </.form>
     </div>
@@ -74,7 +80,7 @@ defmodule LiveAdmin.Components.Session.Content do
   def handle_event("save", params, socket) do
     session =
       socket.assigns.changeset
-      |> Changeset.cast(params["session"] || %{}, [:metadata])
+      |> Changeset.cast(params["session"] || %{}, [:metadata, :locale])
       |> Changeset.update_change(:metadata, &parse_map_param/1)
       |> Changeset.apply_action!(:insert)
 
