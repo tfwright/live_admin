@@ -286,7 +286,7 @@ defmodule DemoWeb.CreateUserForm do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import LiveAdmin, only: [route_with_params: 4]
+  import LiveAdmin, only: [route_with_params: 2]
   import LiveAdmin.ErrorHelpers
 
   @impl true
@@ -367,19 +367,15 @@ defmodule DemoWeb.CreateUserForm do
   end
 
   @impl true
-  def handle_event(
-        "create",
-        %{"params" => params},
-        socket = %{assigns: %{prefix: prefix, base_path: base_path, key: key}}
-      ) do
+  def handle_event("create", %{"params" => params}, socket = %{assigns: assigns}) do
     socket =
       %Demo.Accounts.User{}
       |> Ecto.Changeset.cast(params, [:name, :email, :stars_count, :roles])
       |> Ecto.Changeset.validate_required([:name, :email])
       |> Ecto.Changeset.unique_constraint(:email)
-      |> Demo.Repo.insert(prefix: prefix)
+      |> Demo.Repo.insert(prefix: assigns.prefix)
       |> case do
-        {:ok, _} -> push_redirect(socket, to: route_with_params(base_path, key, [], prefix: prefix))
+        {:ok, _} -> push_redirect(socket, to: route_with_params(assigns, params: [prefix: assigns.prefix]))
         {:error, changeset} -> assign(socket, changeset: changeset)
       end
 

@@ -1,11 +1,18 @@
 defmodule LiveAdmin do
   @moduledoc docout: [LiveAdmin.READMECompiler]
 
-  def route_with_params(base_path, resource_path, segments \\ [], params \\ []) do
+  def route_with_params(assigns, parts \\ []) do
+    resource_path = parts[:resource_path] || assigns.key
+
     encoded_params =
-      params
+      parts
+      |> Keyword.get(:params, [])
+      |> Enum.into(%{})
       |> Enum.flat_map(fn
-        {:prefix, nil} -> []
+        {_, nil} -> []
+        {:sort_attr, val} -> [{:"sort-attr", val}]
+        {:sort_dir, val} -> [{:"sort-dir", val}]
+        {:search, val} -> [{:s, val}]
         pair -> [pair]
       end)
       |> Enum.into(%{})
@@ -14,7 +21,10 @@ defmodule LiveAdmin do
         _ -> ""
       end
 
-    Path.join([base_path, resource_path] ++ Enum.map(segments, &Phoenix.Param.to_param/1)) <>
+    Path.join(
+      [assigns.base_path, resource_path] ++
+        Enum.map(parts[:segments] || [], &Phoenix.Param.to_param/1)
+    ) <>
       encoded_params
   end
 

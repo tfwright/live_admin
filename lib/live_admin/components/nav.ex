@@ -3,7 +3,7 @@ defmodule LiveAdmin.Components.Nav do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [resource_title: 1, route_with_params: 3, route_with_params: 4, trans: 1]
+    only: [resource_title: 1, route_with_params: 2, trans: 1]
 
   @impl true
   def render(assigns) do
@@ -20,7 +20,9 @@ defmodule LiveAdmin.Components.Nav do
           </ul>
         </li>
         <li class="nav__item--group">
-          <%= live_redirect(trans("Session"), to: route_with_params(@base_path, "session", [])) %>
+          <%= live_redirect(trans("Session"),
+            to: route_with_params(assigns, resource_path: "session")
+          ) %>
         </li>
       </ul>
     </div>
@@ -53,7 +55,7 @@ defmodule LiveAdmin.Components.Nav do
           resource
           |> resource_title()
           |> live_redirect(
-            to: route_with_params(assigns.base_path, key, [], prefix: assigns["prefix"])
+            to: route_with_params(assigns, resource_path: key, prefix: assigns[:prefix])
           )
         end
 

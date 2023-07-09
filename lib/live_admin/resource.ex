@@ -166,14 +166,15 @@ defmodule LiveAdmin.Resource do
       opts
       |> Enum.into(%{})
       |> Map.put_new(:page, 1)
-      |> Map.put_new(:sort, {:asc, :id})
+      |> Map.put_new(:sort_dir, :asc)
+      |> Map.put_new(:sort_attr, :id)
 
     query =
       :schema
       |> resource.__live_admin_config__()
       |> limit(10)
       |> offset(^((opts[:page] - 1) * 10))
-      |> order_by(^[opts[:sort]])
+      |> order_by(^[{opts[:sort_dir], opts[:sort_attr]}])
       |> preload(^preloads(resource))
 
     query =
