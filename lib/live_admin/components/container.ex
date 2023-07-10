@@ -69,7 +69,7 @@ defmodule LiveAdmin.Components.Container do
   end
 
   @impl true
-  def handle_params(params, uri, socket),
+  def handle_params(params, uri, socket = %{assigns: %{live_action: :new}}),
     do:
       {:noreply,
        socket
@@ -77,6 +77,8 @@ defmodule LiveAdmin.Components.Container do
        |> assign_prefix(params)
        |> assign_mod()
        |> assign_repo()}
+
+  def handle_params(_, _, socket), do: {:noreply, socket}
 
   @impl true
   def handle_event("set_locale", %{"locale" => locale}, socket) do

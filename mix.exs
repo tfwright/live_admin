@@ -1,7 +1,7 @@
 defmodule LiveAdmin.MixProject do
   use Mix.Project
 
-  @version "0.9.2"
+  @version "0.9.3"
 
   def project do
     [
@@ -55,7 +55,8 @@ defmodule LiveAdmin.MixProject do
       {:floki, ">= 0.30.0", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:docout, github: "tfwright/docout", branch: "main", runtime: false, only: [:dev, :test]},
-      {:dialyxir, "~> 1.2", only: :dev, runtime: false}
+      {:dialyxir, "~> 1.2", only: :dev, runtime: false},
+      {:mox, "~> 1.0", only: :test}
     ]
   end
 

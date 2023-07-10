@@ -3,6 +3,7 @@ defmodule LiveAdmin.Components.ContainerTest do
 
   import Phoenix.ConnTest
   import Phoenix.LiveViewTest
+  import Mox
 
   alias LiveAdminTest.{Post, Repo, User}
   alias LiveAdminTest.Post.Version
@@ -11,6 +12,8 @@ defmodule LiveAdmin.Components.ContainerTest do
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(LiveAdminTest.Repo)
+
+    Mox.stub_with(LiveAdminTest.MockSession, LiveAdminTest.StubSession)
 
     %{conn: build_conn()}
   end
@@ -76,6 +79,37 @@ defmodule LiveAdmin.Components.ContainerTest do
       |> element("button[phx-click='search']")
       |> render_click()
 
+      assert render(view) =~ "1 total"
+    end
+  end
+
+  describe "resource page with prefix param" do
+    setup %{conn: conn} do
+      Repo.insert!(%User{name: "Tom"}, prefix: "alt")
+      {:ok, view, _} = live(conn, "/user?prefix=alt")
+      %{view: view}
+    end
+
+    test "renders result from prefix", %{view: view} do
+      assert render(view) =~ "1 total"
+    end
+  end
+
+  describe "resource page with prefix in session" do
+    setup %{conn: conn} do
+      Repo.insert!(%User{name: "Tom"}, prefix: "alt")
+
+      stub(LiveAdminTest.MockSession, :load!, fn _customer_id ->
+        %LiveAdmin.Session{prefix: "alt"}
+      end)
+
+      {:ok, view, _} = live(conn, "/user")
+      %{view: view}
+
+      %{view: view}
+    end
+
+    test "renders results from prefix", %{view: view} do
       assert render(view) =~ "1 total"
     end
   end
