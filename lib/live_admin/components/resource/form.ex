@@ -461,7 +461,7 @@ defmodule LiveAdmin.Components.Container.Form do
           id: input_id(@form, @field) <> to_string(option)
         ) %>
         <label for={input_id(@form, @field) <> to_string(option)}>
-          <%= trans(option) %>
+          <%= trans(to_string(option)) %>
         </label>
       <% end %>
     </div>
