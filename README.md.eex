@@ -21,13 +21,13 @@ First, ensure your Phoenix app has been configured to use [LiveView](https://hex
 
 Add to your app's `deps`:
 
-```
+```elixir
 {:live_admin, "~> <%= app_version %>"}
 ```
 
 Configure a module to act as a LiveAdmin resource:
 
-```
+```elixir
 defmodule MyApp.MyResource do
   use LiveAdmin.Resource, schema: MyApp.Schema
 end
@@ -35,7 +35,7 @@ end
 
 In your Phoenix router, add the resource to a LiveAdmin instance:
 
-```
+```elixir
 import LiveAdmin.Router
 
 live_admin "/my_admin" do
