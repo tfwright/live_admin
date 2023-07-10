@@ -111,9 +111,21 @@ defmodule LiveAdminTest.Post.Version do
   end
 end
 
+defmodule LiveAdminTest.StubSession do
+  @behaviour LiveAdmin.Session.Store
+
+  def init!(_), do: "fake"
+  def load!(_), do: %LiveAdmin.Session{}
+  def persist!(_), do: :ok
+end
+
+Mox.defmock(LiveAdminTest.MockSession, for: LiveAdmin.Session.Store)
+
 Application.ensure_all_started(:os_mon)
 
 Application.put_env(:live_admin, :ecto_repo, LiveAdminTest.Repo)
+Application.put_env(:live_admin, :prefix_options, ["alt"])
+Application.put_env(:live_admin, :session_store, LiveAdminTest.MockSession)
 
 Supervisor.start_link(
   [
