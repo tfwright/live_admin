@@ -5,8 +5,8 @@ defmodule LiveAdmin.Components.Container do
   import LiveAdmin,
     only: [
       resource_title: 1,
+      route_with_params: 1,
       route_with_params: 2,
-      route_with_params: 4,
       trans: 1
     ]
 
@@ -48,17 +48,11 @@ defmodule LiveAdmin.Components.Container do
 
   @impl true
   def handle_params(params, uri, socket = %{assigns: %{live_action: :list, loading: false}}) do
-    page = String.to_integer(params["page"] || "1")
-
-    sort = {
-      String.to_existing_atom(params["sort-dir"] || "asc"),
-      String.to_existing_atom(params["sort-attr"] || "id")
-    }
-
     socket =
       socket
-      |> assign(page: page)
-      |> assign(sort: sort)
+      |> assign(page: String.to_integer(params["page"] || "1"))
+      |> assign(sort_attr: String.to_existing_atom(params["sort-attr"] || "id"))
+      |> assign(sort_dir: String.to_existing_atom(params["sort-dir"] || "asc"))
       |> assign(search: params["s"])
       |> assign_resource_info(uri)
       |> assign_prefix(params)
@@ -129,12 +123,12 @@ defmodule LiveAdmin.Components.Container do
       <div class="resource__actions">
         <div>
           <%= live_redirect(trans("List"),
-            to: route_with_params(@base_path, @key, [], prefix: @prefix),
+            to: route_with_params(assigns, params: [prefix: @prefix]),
             class: "resource__action--btn"
           ) %>
           <%= if @resource.__live_admin_config__(:create_with) != false do %>
             <%= live_redirect(trans("New"),
-              to: route_with_params(@base_path, @key, ["new"], prefix: @prefix),
+              to: route_with_params(assigns, segments: ["new"], params: [prefix: @prefix]),
               class: "resource__action--btn"
             ) %>
           <% else %>
@@ -172,14 +166,14 @@ defmodule LiveAdmin.Components.Container do
                 <ul>
                   <%= if @prefix do %>
                     <li>
-                      <.link patch={route_with_params(@base_path, @key, [], prefix: "")}>
+                      <.link patch={route_with_params(assigns, params: [prefix: ""])}>
                         <%= trans("clear") %>
                       </.link>
                     </li>
                   <% end %>
                   <%= for option <- @prefix_options, to_string(option) != @prefix do %>
                     <li>
-                      <.link patch={route_with_params(@base_path, @key, [], prefix: option)}>
+                      <.link patch={route_with_params(assigns, params: [prefix: option])}>
                         <%= option %>
                       </.link>
                     </li>
@@ -224,7 +218,8 @@ defmodule LiveAdmin.Components.Container do
       key={@key}
       resource={@resource}
       page={@page}
-      sort={@sort}
+      sort_attr={@sort_attr}
+      sort_dir={@sort_dir}
       search={@search}
       prefix={@prefix}
       session={@session}
@@ -280,11 +275,9 @@ defmodule LiveAdmin.Components.Container do
   end
 
   defp assign_prefix(socket, %{"prefix" => ""}) do
-    assign_and_presist_prefix(socket, nil)
-
-    push_redirect(socket,
-      to: route_with_params(socket.assigns.base_path, socket.assigns.key)
-    )
+    socket
+    |> assign_and_presist_prefix(nil)
+    |> push_redirect(to: route_with_params(socket.assigns))
   end
 
   defp assign_prefix(socket, %{"prefix" => prefix}) do
@@ -292,22 +285,20 @@ defmodule LiveAdmin.Components.Container do
     |> Enum.find(fn option -> to_string(option) == prefix end)
     |> case do
       nil ->
-        push_redirect(socket,
-          to: route_with_params(socket.assigns.base_path, socket.assigns.key)
-        )
+        push_redirect(socket, to: route_with_params(socket.assigns))
 
       prefix ->
         assign_and_presist_prefix(socket, prefix)
     end
   end
 
-  defp assign_prefix(socket = %{assigns: %{session: session, base_path: base_path, key: key}}, _) do
+  defp assign_prefix(socket = %{assigns: %{session: session}}, _) do
     case session.prefix do
       nil ->
         assign_and_presist_prefix(socket, nil)
 
       prefix ->
-        push_patch(socket, to: route_with_params(base_path, key, [], prefix: prefix))
+        push_patch(socket, to: route_with_params(socket.assigns, params: [prefix: prefix]))
     end
   end
 

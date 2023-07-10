@@ -3,12 +3,12 @@
     <.live_component
       id="nav"
       module={@nav_mod}
-      socket={@socket}
       title={@title}
       base_path={@base_path}
       resources={@resources}
       resource={assigns[:resource]}
       prefix={assigns[:prefix]}
+      key={assigns[:key]}
     />
     <div class="content">
       <%= @inner_content %>

@@ -3,7 +3,7 @@ defmodule LiveAdmin.Components.Container.Form do
   use Phoenix.HTML
 
   import LiveAdmin.ErrorHelpers
-  import LiveAdmin, only: [associated_resource: 3, route_with_params: 4, trans: 1]
+  import LiveAdmin, only: [associated_resource: 3, route_with_params: 2, trans: 1]
 
   alias __MODULE__.{ArrayInput, MapInput, SearchSelect}
   alias LiveAdmin.Resource
@@ -91,10 +91,7 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event("after_create", _, socket) do
     {:noreply,
      push_redirect(socket,
-       to:
-         route_with_params(socket.assigns.base_path, socket.assigns.key, [],
-           prefix: socket.assigns.prefix
-         )
+       to: route_with_params(socket.assigns, params: [prefix: socket.assigns.prefix])
      )}
   end
 

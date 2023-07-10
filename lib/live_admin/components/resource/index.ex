@@ -6,7 +6,7 @@ defmodule LiveAdmin.Components.Container.Index do
     only: [
       associated_resource: 3,
       record_label: 2,
-      route_with_params: 4,
+      route_with_params: 2,
       trans: 1,
       trans: 2
     ]
@@ -23,12 +23,10 @@ defmodule LiveAdmin.Components.Container.Index do
         records:
           Resource.list(
             assigns.resource,
-            Map.take(assigns, [:prefix, :sort, :page, :search]),
+            Map.take(assigns, [:prefix, :sort_attr, :sort_dir, :page, :search]),
             assigns.session,
             assigns.repo
-          ),
-        sort_attr: elem(assigns.sort, 1),
-        sort_dir: elem(assigns.sort, 0)
+          )
       )
 
     {:ok, socket}
@@ -70,19 +68,15 @@ defmodule LiveAdmin.Components.Container.Index do
               <th class="resource__header" title={field}>
                 <%= list_link(
                   trans(humanize(field)),
-                  @base_path,
-                  @key,
-                  %{
-                    prefix: @prefix,
-                    page: @page,
-                    "sort-attr": field,
-                    "sort-dir":
+                  assigns,
+                  [
+                    sort_attr: field,
+                    sort_dir:
                       if(field == @sort_attr,
                         do: Enum.find([:asc, :desc], &(&1 != @sort_dir)),
                         else: @sort_dir
-                      ),
-                    s: @search
-                  },
+                      )
+                  ],
                   class:
                     "header__link#{if field == @sort_attr, do: "--#{[asc: :up, desc: :down][@sort_dir]}"}"
                 ) %>
@@ -117,7 +111,7 @@ defmodule LiveAdmin.Components.Container.Index do
                       <ul>
                         <li>
                           <%= live_redirect(trans("Edit"),
-                            to: route_with_params(@base_path, @key, [:edit, record], prefix: @prefix)
+                            to: route_with_params(assigns, segments: [:edit, record])
                           ) %>
                         </li>
                         <%= if @resource.__live_admin_config__(:delete_with) != false do %>
@@ -175,15 +169,8 @@ defmodule LiveAdmin.Components.Container.Index do
                 do:
                   list_link(
                     trans("Prev"),
-                    @base_path,
-                    @key,
-                    %{
-                      prefix: @prefix,
-                      page: @page - 1,
-                      "sort-attr": @sort_attr,
-                      "sort-dir": @sort_dir,
-                      s: @search
-                    },
+                    assigns,
+                    [page: @page - 1],
                     class: "resource__action--btn"
                   ),
                 else: content_tag(:span, trans("Prev"), class: "resource__action--disabled") %>
@@ -191,15 +178,8 @@ defmodule LiveAdmin.Components.Container.Index do
                 do:
                   list_link(
                     trans("Next"),
-                    @base_path,
-                    @key,
-                    %{
-                      prefix: @prefix,
-                      page: @page + 1,
-                      "sort-attr": @sort_attr,
-                      "sort-dir": @sort_dir,
-                      s: @search
-                    },
+                    assigns,
+                    [page: @page + 1],
                     class: "resource__action--btn"
                   ),
                 else: content_tag(:span, trans("Next"), class: "resource__action--disabled") %>
@@ -239,7 +219,7 @@ defmodule LiveAdmin.Components.Container.Index do
             :records,
             Resource.list(
               resource,
-              Map.take(socket.assigns, [:prefix, :sort, :page, :search]),
+              Map.take(socket.assigns, [:prefix, :sort_attr, :sort_dir, :page, :search]),
               session,
               socket.assigns.repo
             )
@@ -294,7 +274,7 @@ defmodule LiveAdmin.Components.Container.Index do
             :records,
             Resource.list(
               resource,
-              Map.take(socket.assigns, [:prefix, :sort, :page, :search]),
+              Map.take(socket.assigns, [:prefix, :sort_attr, :sort_dir, :page, :search]),
               socket.assigns.session,
               socket.assigns.repo
             )
@@ -317,21 +297,17 @@ defmodule LiveAdmin.Components.Container.Index do
   end
 
   @impl true
-  def handle_event("search", %{"query" => query}, socket) do
-    params = %{
-      page: socket.assigns.page,
-      "sort-attr": elem(socket.assigns.sort, 1),
-      "sort-dir": elem(socket.assigns.sort, 0),
-      s: query,
-      prefix: socket.assigns.prefix
-    }
-
-    socket =
-      push_patch(socket,
-        to: route_with_params(socket.assigns.base_path, socket.assigns.key, [], params)
-      )
-
-    {:noreply, socket}
+  def handle_event("search", %{"query" => query}, socket = %{assigns: assigns}) do
+    {:noreply,
+     push_patch(socket,
+       to:
+         route_with_params(socket.assigns,
+           params:
+             assigns
+             |> Map.take([:prefix, :sort_dir, :sort_attr, :page])
+             |> Map.put(:search, query)
+         )
+     )}
   end
 
   def cell_contents(record, field, record, assigns) do
@@ -359,12 +335,22 @@ defmodule LiveAdmin.Components.Container.Index do
     end
   end
 
-  defp list_link(content, base_path, key, params, opts),
-    do:
-      live_patch(
-        content,
-        Keyword.put(opts, :to, route_with_params(base_path, key, [], params))
+  defp list_link(content, assigns, params, opts) do
+    new_params =
+      assigns
+      |> Map.take([:search, :page, :sort_attr, :sort_dir, :prefix])
+      |> Enum.into([])
+      |> Keyword.merge(params)
+
+    live_patch(
+      content,
+      Keyword.put(
+        opts,
+        :to,
+        route_with_params(assigns, params: new_params)
       )
+    )
+  end
 
   defp get_assoc_name!(schema, fk) do
     Enum.find(schema.__schema__(:associations), fn assoc_name ->
