@@ -277,7 +277,13 @@ defmodule LiveAdmin.Components.Container do
     |> Enum.sort()
   end
 
-  defp assign_prefix(socket, %{"prefix" => ""}), do: assign_and_presist_prefix(socket, nil)
+  defp assign_prefix(socket, %{"prefix" => ""}) do
+    assign_and_presist_prefix(socket, nil)
+
+    push_redirect(socket,
+      to: route_with_params(socket.assigns.base_path, socket.assigns.key)
+    )
+  end
 
   defp assign_prefix(socket, %{"prefix" => prefix}) do
     socket.assigns.prefix_options
