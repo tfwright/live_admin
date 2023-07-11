@@ -29,5 +29,9 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
     - name: Get deps
       run: docker-compose run web mix deps.get
+    - name: Check for uncommitted changes
+      run: exit $( git status --porcelain | head -255 | wc -l )
     - name: Run tests
       run: docker-compose run -e MIX_ENV=test web mix do compile --warnings-as-errors, test
+    - name: Check dev
+      run: docker-compose up --wait
