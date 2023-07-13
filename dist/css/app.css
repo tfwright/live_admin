@@ -792,6 +792,25 @@ select {
   opacity: 0.3;
 }
 
+.resource__action--danger {
+  display: inline-flex;
+  height: 2rem;
+  align-items: center;
+  position: relative;
+  white-space: nowrap;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .resource__action--drop {
   display: inline-flex;
   height: 2rem;
@@ -836,6 +855,10 @@ select {
 [class$="--drop"] nav a:hover {
   -webkit-text-decoration-line: underline;
           text-decoration-line: underline;
+}
+
+.resource__view dd {
+  margin-bottom: 0.75rem;
 }
 
 .resource__list {

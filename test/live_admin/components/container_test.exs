@@ -51,7 +51,7 @@ defmodule LiveAdmin.Components.ContainerTest do
       |> element("a", "Delete")
       |> render_click()
 
-      assert_push_event(view, "success", %{})
+      assert_redirected(view, "/user")
     end
 
     test "runs configured actions", %{view: view} do
@@ -75,7 +75,7 @@ defmodule LiveAdmin.Components.ContainerTest do
       |> element("a", "Delete")
       |> render_click()
 
-      assert_push_event(view, "success", %{})
+      assert_redirected(view, "/live_admin_test_post")
     end
 
     test "runs configured actions", %{view: view} do

@@ -12,6 +12,12 @@ body {
   color: rgb(243 244 246);
 }
 
+.resource__action--danger {
+  background-color: rgb(250, 20, 58);
+  border-color: rgb(250, 20, 58);
+  color: rgb(243 244 246);
+}
+
 .resource__action--btn:hover {
   background-color: rgb(55 48 163);
   border-color: rgb(67, 56, 202);

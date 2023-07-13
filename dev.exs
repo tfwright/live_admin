@@ -400,7 +400,7 @@ defmodule DemoWeb.UserAdmin do
     |> Ecto.Changeset.change(active: false)
     |> Demo.Repo.update()
     |> case do
-      {:ok, _} -> {:ok, "deactivated!"}
+      {:ok, user} -> {:ok, user}
       error -> error
     end
   end

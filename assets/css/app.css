@@ -232,6 +232,10 @@ input[type="date"], input[type="number"] {
     @apply disabled;
   }
 
+  .resource__action--danger {
+    @apply resource__action--btn;
+  }
+
   .resource__action--drop {
     @apply resource__action;
   }
@@ -267,6 +271,10 @@ input[type="date"], input[type="number"] {
 
   [class$="--drop"] nav a:hover {
     @apply underline;
+  }
+
+  .resource__view dd {
+    @apply mb-3;
   }
 
   .resource__list {
