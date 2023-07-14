@@ -21,7 +21,7 @@ First, ensure your Phoenix app has been configured to use [LiveView](https://hex
 Add to your app's `deps`:
 
 ```
-{:live_admin, "~> 0.9.3"}
+{:live_admin, "~> 0.9.4"}
 ```
 
 To use LiveAdmin in a Phoenix router, first `import LiveAdmin.Router`
