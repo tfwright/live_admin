@@ -63,6 +63,31 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
+  describe "resource page with non-schema resource" do
+    setup %{conn: conn} do
+      Repo.insert!(%Post{title: "test"})
+      {:ok, view, _html} = live(conn, "/live_admin_test_post")
+      %{view: view}
+    end
+
+
+    test "deletes record", %{view: view} do
+      view
+      |> element("a", "Delete")
+      |> render_click()
+
+      assert_push_event(view, "success", %{})
+    end
+
+    test "runs configured actions", %{view: view} do
+      view
+      |> element("a", "Run action")
+      |> render_click()
+
+      assert_push_event(view, "success", %{})
+    end
+  end
+
   describe "resource page with search param" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"})

@@ -42,7 +42,7 @@ defmodule LiveAdminTest.Router do
 
     live_admin "/" do
       admin_resource("/user", LiveAdminTest.User)
-      admin_resource("/live_admin_test_post", LiveAdminTest.Post)
+      admin_resource("/live_admin_test_post", LiveAdminTest.PostResource)
     end
   end
 end
@@ -79,9 +79,17 @@ defmodule LiveAdminTest.User do
   def run_action(%__MODULE__{}, %{}), do: {:ok, "worked"}
 end
 
+defmodule LiveAdminTest.PostResource do
+  use LiveAdmin.Resource,
+    schema: LiveAdminTest.Post,
+    actions: [:run_action]
+
+
+  def run_action(_, _), do: {:ok, "worked"}
+end
+
 defmodule LiveAdminTest.Post do
   use Ecto.Schema
-  use LiveAdmin.Resource
 
   schema "posts" do
     field(:title, :string)

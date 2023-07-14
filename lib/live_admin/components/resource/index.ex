@@ -243,7 +243,7 @@ defmodule LiveAdmin.Components.Container.Index do
     record =
       Resource.find!(
         id,
-        resource.__live_admin_config__(:schema),
+        resource,
         socket.assigns.prefix,
         socket.assigns.repo
       )
