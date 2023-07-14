@@ -137,6 +137,9 @@ Supervisor.start_link(
 )
 
 LiveAdminTest.Repo.delete_all(LiveAdminTest.User)
+LiveAdminTest.Repo.delete_all(LiveAdminTest.Post)
+LiveAdminTest.Repo.delete_all(LiveAdminTest.User, prefix: "alt")
+LiveAdminTest.Repo.delete_all(LiveAdminTest.Post, prefix: "alt")
 
 ExUnit.start()
 
