@@ -276,6 +276,7 @@ defmodule Demo.Populator do
   defp teardown do
     Repo.delete_all(Demo.Accounts.User)
     Repo.delete_all(Demo.Posts.Post)
+    Repo.delete_all(Demo.Accounts.User.Profile)
   end
 
   defp get_user_if(true), do: from(Demo.Accounts.User, order_by: fragment("RANDOM()"), limit: 1) |> Demo.Repo.one()
