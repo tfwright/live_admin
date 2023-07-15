@@ -84,7 +84,6 @@ defmodule LiveAdminTest.PostResource do
     schema: LiveAdminTest.Post,
     actions: [:run_action]
 
-
   def run_action(_, _), do: {:ok, "worked"}
 end
 

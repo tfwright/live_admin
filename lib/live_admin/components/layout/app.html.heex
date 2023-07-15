@@ -1,4 +1,5 @@
 <main class="main__content">
+  <div class="toast__container--success"><%= Phoenix.Flash.get(@flash, :info) %></div>
   <div class="main__wrap">
     <.live_component
       id="nav"

@@ -501,6 +501,10 @@ input[type="date"], input[type="number"] {
     transform: translate(-50%, -50%) !important;
   }
 
+  [class^="toast__container"]:empty {
+    display: none;
+  }
+
   .toast__container--error {
     @apply toast__container;
     top: auto !important;

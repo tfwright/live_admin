@@ -1100,6 +1100,10 @@ a.button__remove {
   transform: translate(-50%, -50%) !important;
 }
 
+[class^="toast__container"]:empty {
+  display: none;
+}
+
 .toast__container--error {
   left: 50%;
   position: fixed;

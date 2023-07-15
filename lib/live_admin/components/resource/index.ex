@@ -111,7 +111,11 @@ defmodule LiveAdmin.Components.Container.Index do
                       <ul>
                         <li>
                           <%= live_redirect(trans("Edit"),
-                            to: route_with_params(assigns, segments: [:edit, record], params: [prefix: @prefix])
+                            to:
+                              route_with_params(assigns,
+                                segments: [:edit, record],
+                                params: [prefix: @prefix]
+                              )
                           ) %>
                         </li>
                         <%= if @resource.__live_admin_config__(:delete_with) != false do %>

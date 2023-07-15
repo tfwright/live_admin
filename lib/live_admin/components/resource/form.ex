@@ -52,7 +52,7 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="form-page" phx-hook="FormPage">
+    <div id="form-page">
       <.form
         :let={f}
         for={@changeset}
@@ -85,14 +85,6 @@ defmodule LiveAdmin.Components.Container.Form do
       </.form>
     </div>
     """
-  end
-
-  @impl true
-  def handle_event("after_create", _, socket) do
-    {:noreply,
-     push_redirect(socket,
-       to: route_with_params(socket.assigns, params: [prefix: socket.assigns.prefix])
-     )}
   end
 
   @impl true
@@ -133,8 +125,15 @@ defmodule LiveAdmin.Components.Container.Form do
       ) do
     socket =
       case Resource.create(resource, params, session, repo) do
-        {:ok, _} -> push_event(socket, "create", %{})
-        {:error, changeset} -> assign(socket, changeset: changeset)
+        {:ok, _} ->
+          socket
+          |> put_flash(:info, trans("Record successfully added"))
+          |> push_redirect(
+            to: route_with_params(socket.assigns, params: [prefix: socket.assigns.prefix])
+          )
+
+        {:error, changeset} ->
+          assign(socket, changeset: changeset)
       end
 
     {:noreply, socket}

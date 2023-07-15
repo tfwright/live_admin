@@ -22,7 +22,14 @@ defmodule LiveAdmin.Components.Container do
         prefix_options: get_prefix_options(socket.assigns.session)
       )
 
+    Process.send_after(self(), :clear_flash, 2000)
+
     {:ok, socket}
+  end
+
+  @impl true
+  def handle_info(:clear_flash, socket) do
+    {:noreply, clear_flash(socket)}
   end
 
   @impl true

@@ -70,7 +70,6 @@ defmodule LiveAdmin.Components.ContainerTest do
       %{view: view}
     end
 
-
     test "deletes record", %{view: view} do
       view
       |> element("a", "Delete")
