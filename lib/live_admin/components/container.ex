@@ -277,7 +277,7 @@ defmodule LiveAdmin.Components.Container do
                   <% end %>
                   <%= for option <- @prefix_options, to_string(option) != @prefix do %>
                     <li>
-                      <.link patch={route_with_params(assigns, params: [prefix: option])}>
+                      <.link navigate={route_with_params(assigns, params: [prefix: option])}>
                         <%= option %>
                       </.link>
                     </li>
