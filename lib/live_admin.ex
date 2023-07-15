@@ -7,6 +7,13 @@ defmodule LiveAdmin do
     encoded_params =
       parts
       |> Keyword.get(:params, [])
+      |> then(fn params ->
+        if assigns[:prefix] do
+          Keyword.put_new(params, :prefix, assigns[:prefix])
+        else
+          params
+        end
+      end)
       |> Enum.into(%{})
       |> Enum.flat_map(fn
         {_, nil} -> []

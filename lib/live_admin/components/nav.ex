@@ -55,7 +55,7 @@ defmodule LiveAdmin.Components.Nav do
           resource
           |> resource_title()
           |> live_redirect(
-            to: route_with_params(assigns, resource_path: key, prefix: assigns[:prefix])
+            to: route_with_params(assigns, resource_path: key)
           )
         end
 
