@@ -214,6 +214,10 @@ input[type="date"], input[type="number"] {
     @apply h-8;
   }
 
+  .resource__action--link:hover {
+    @apply underline;
+  }
+
   .resource__action--btn {
     @apply resource__action;
     @apply px-4;

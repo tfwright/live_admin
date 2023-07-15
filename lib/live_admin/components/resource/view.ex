@@ -31,12 +31,13 @@ defmodule LiveAdmin.Components.Container.View do
             class: "resource__action--btn"
           ) %>
           <%= if @resource.__live_admin_config__(:delete_with) != false do %>
-            <%= link(trans("Delete"),
-              to: "#",
-              class: "resource__action--danger",
-              "data-confirm": "Are you sure?",
-              "phx-click": JS.push("delete", value: %{id: @record.id}, page_loading: true)
-            ) %>
+            <button
+              class="resource__action--danger"
+              data-confirm="Are you sure?"
+              phx-click={JS.push("delete", value: %{id: @record.id}, page_loading: true)}
+            >
+              <%= trans("Delete") %>
+            </button>
           <% end %>
           <div class="resource__action--drop">
             <button
@@ -49,15 +50,18 @@ defmodule LiveAdmin.Components.Container.View do
               <ul>
                 <%= for action <- @resource.__live_admin_config__(:actions) do %>
                   <li>
-                    <%= link(action |> to_string() |> humanize(),
-                      to: "#",
-                      "data-confirm": "Are you sure?",
-                      "phx-click":
+                    <button
+                      class="resource__action--link"
+                      data-confirm="Are you sure?"
+                      phx-click={
                         JS.push("action",
                           value: %{id: @record.id, action: action},
                           page_loading: true
                         )
-                    ) %>
+                      }
+                    >
+                      <%= action |> to_string() |> humanize() %>
+                    </button>
                   </li>
                 <% end %>
               </ul>

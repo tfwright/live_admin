@@ -127,6 +127,17 @@ defmodule LiveAdmin.Components.Container do
   end
 
   @impl true
+  def handle_event("clear_prefix", _, socket) do
+    new_session = Map.put(socket.assigns.session, :prefix, nil)
+
+    LiveAdmin.session_store().persist!(new_session)
+
+    socket = assign(socket, prefix: nil, session: new_session)
+
+    {:noreply, push_redirect(socket, to: route_with_params(socket.assigns))}
+  end
+
+  @impl true
   def handle_event(
         "action",
         params = %{"action" => action},
@@ -234,11 +245,14 @@ defmodule LiveAdmin.Components.Container do
               <ul>
                 <%= for key <- get_task_keys(@resource) do %>
                   <li>
-                    <%= link(key |> to_string() |> humanize(),
-                      to: "#",
-                      "data-confirm": "Are you sure?",
-                      "phx-click": JS.push("task", value: %{task: key}, page_loading: true)
-                    ) %>
+                    <button
+                      class="resource__action--link"
+                      phx-click={JS.push("task", value: %{task: key}, page_loading: true)}
+                      ,
+                      data-confirm="Are you sure?"
+                    >
+                      <%= key |> to_string() |> humanize() %>
+                    </button>
                   </li>
                 <% end %>
               </ul>
@@ -253,9 +267,12 @@ defmodule LiveAdmin.Components.Container do
                 <ul>
                   <%= if @prefix do %>
                     <li>
-                      <.link patch={route_with_params(assigns, params: [prefix: ""])}>
+                      <button
+                        class="resource__action--link"
+                        phx-click={JS.push("clear_prefix", page_loading: true)}
+                      >
                         <%= trans("clear") %>
-                      </.link>
+                      </button>
                     </li>
                   <% end %>
                   <%= for option <- @prefix_options, to_string(option) != @prefix do %>
@@ -278,11 +295,14 @@ defmodule LiveAdmin.Components.Container do
                 <ul>
                   <%= for option <- LiveAdmin.gettext_backend().locales(), to_string(option) != @session.locale do %>
                     <li>
-                      <%= link(option,
-                        to: "#",
-                        "phx-click":
+                      <button
+                        class="resource__action--link"
+                        phx-click={
                           JS.push("set_locale", value: %{locale: option}, page_loading: true)
-                      ) %>
+                        }
+                      >
+                        <%= option %>
+                      </button>
                     </li>
                   <% end %>
                 </ul>
@@ -373,12 +393,6 @@ defmodule LiveAdmin.Components.Container do
       nil -> []
     end
     |> Enum.sort()
-  end
-
-  defp assign_prefix(socket, %{"prefix" => ""}) do
-    socket
-    |> assign_and_presist_prefix(nil)
-    |> push_redirect(to: route_with_params(socket.assigns))
   end
 
   defp assign_prefix(socket, %{"prefix" => prefix}) do

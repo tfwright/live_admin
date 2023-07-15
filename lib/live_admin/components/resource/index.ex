@@ -125,28 +125,34 @@ defmodule LiveAdmin.Components.Container.Index do
                         </li>
                         <%= if @resource.__live_admin_config__(:delete_with) != false do %>
                           <li>
-                            <%= link(trans("Delete"),
-                              to: "#",
-                              "data-confirm": "Are you sure?",
-                              "phx-click":
+                            <button
+                              class="resource__action--link"
+                              data-confirm="Are you sure?"
+                              phx-click={
                                 JS.push("delete",
                                   value: %{id: record.id},
                                   page_loading: true
                                 )
-                            ) %>
+                              }
+                            >
+                              <%= trans("Delete") %>
+                            </button>
                           </li>
                         <% end %>
                         <%= for action <- (@resource.__live_admin_config__(:actions) || []) do %>
                           <li>
-                            <%= link(action |> to_string() |> humanize(),
-                              to: "#",
-                              "data-confirm": "Are you sure?",
-                              "phx-click":
+                            <button
+                              class="resource__action--link"
+                              data-confirm="Are you sure?"
+                              phx-click={
                                 JS.push("action",
                                   value: %{id: record.id, action: action},
                                   page_loading: true
                                 )
-                            ) %>
+                              }
+                            >
+                              <%= action |> to_string() |> humanize() %>
+                            </button>
                           </li>
                         <% end %>
                       </ul>

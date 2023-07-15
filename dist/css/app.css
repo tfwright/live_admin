@@ -753,6 +753,11 @@ select {
   height: 2rem;
 }
 
+.resource__action--link:hover {
+  -webkit-text-decoration-line: underline;
+          text-decoration-line: underline;
+}
+
 .resource__action--btn {
   display: inline-flex;
   height: 2rem;

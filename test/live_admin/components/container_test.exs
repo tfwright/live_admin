@@ -48,7 +48,7 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "deletes record", %{view: view} do
       view
-      |> element("a", "Delete")
+      |> element("button", "Delete")
       |> render_click()
 
       assert_redirected(view, "/user")
@@ -56,7 +56,7 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "runs configured actions", %{view: view} do
       view
-      |> element("a", "Run action")
+      |> element("button", "Run action")
       |> render_click()
 
       assert_push_event(view, "success", %{})
@@ -72,7 +72,7 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "deletes record", %{view: view} do
       view
-      |> element("a", "Delete")
+      |> element("button", "Delete")
       |> render_click()
 
       assert_redirected(view, "/live_admin_test_post")
@@ -80,7 +80,7 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "runs configured actions", %{view: view} do
       view
-      |> element("a", "Run action")
+      |> element("button", "Run action")
       |> render_click()
 
       assert_push_event(view, "success", %{})
