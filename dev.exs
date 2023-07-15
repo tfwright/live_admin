@@ -458,8 +458,8 @@ defmodule DemoWeb.Router do
     get "/", DemoWeb.PageController, :index
 
     live_admin "/admin", title: "DevAdmin" do
-      admin_resource "/users", DemoWeb.UserAdmin
       admin_resource "/users/profiles", Demo.Accounts.User.Profile
+      admin_resource "/users", DemoWeb.UserAdmin
     end
 
     live_admin "/posts-admin", components: [home: DemoWeb.PostsAdmin.Home] do
