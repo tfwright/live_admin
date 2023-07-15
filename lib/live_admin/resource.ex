@@ -24,7 +24,7 @@ defmodule LiveAdmin.Resource do
   * `immutable_fields` - a list of fields that should not be editable in forms
   * `actions` - list of atoms or MFAs that identify a function that operates on a record
   * `tasks` - list atoms or MFAs that identify a function that operates on a resource
-  * `components` - keyword list of component module overrides for specific views (`:list`, `:new`, `:edit`, `:home`, `:nav`, `:session`)
+  * `components` - keyword list of component module overrides for specific views (`:list`, `:new`, `:edit`, `:home`, `:nav`, `:session`, `:view`)
   * `ecto_repo` - Ecto repo to use when building queries for this resource
   """
 
@@ -44,6 +44,15 @@ defmodule LiveAdmin.Resource do
         do:
           Keyword.get(@__live_admin_config__, key, Application.get_env(:live_admin, key)) ||
             LiveAdmin.Resource.default_config_value(key)
+    end
+  end
+
+  def render(record, field, resource, session) do
+    :render_with
+    |> resource.__live_admin_config__()
+    |> case do
+      {m, f, a} -> apply(m, f, [record, field, session] ++ a)
+      f when is_atom(f) -> apply(resource, f, [record, field, session])
     end
   end
 

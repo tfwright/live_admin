@@ -110,6 +110,11 @@ defmodule LiveAdmin.Components.Container.Index do
                     <nav>
                       <ul>
                         <li>
+                          <%= live_redirect(trans("View"),
+                            to: route_with_params(assigns, segments: [record])
+                          ) %>
+                        </li>
+                        <li>
                           <%= live_redirect(trans("Edit"),
                             to:
                               route_with_params(assigns,
@@ -126,7 +131,6 @@ defmodule LiveAdmin.Components.Container.Index do
                               "phx-click":
                                 JS.push("delete",
                                   value: %{id: record.id},
-                                  target: @myself,
                                   page_loading: true
                                 )
                             ) %>
@@ -140,7 +144,6 @@ defmodule LiveAdmin.Components.Container.Index do
                               "phx-click":
                                 JS.push("action",
                                   value: %{id: record.id, action: action},
-                                  target: @myself,
                                   page_loading: true
                                 )
                             ) %>
@@ -154,7 +157,7 @@ defmodule LiveAdmin.Components.Container.Index do
               <%= for {field, type, _} <- Resource.fields(@resource) do %>
                 <td class={"resource__cell resource__cell--#{type_to_css_class(type)}"}>
                   <div class="cell__contents">
-                    <%= cell_contents(record, field, record, assigns) %>
+                    <%= cell_contents(record, field, @resource, @resources, @session) %>
                   </div>
                   <div class="cell__copy" data-message="Copied cell contents to clipboard">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -199,108 +202,6 @@ defmodule LiveAdmin.Components.Container.Index do
   end
 
   @impl true
-  def handle_event(
-        "delete",
-        %{"id" => id},
-        %{
-          assigns: %{
-            resource: resource,
-            session: session
-          }
-        } = socket
-      ) do
-    socket =
-      id
-      |> Resource.find!(resource, socket.assigns.prefix, socket.assigns.repo)
-      |> Resource.delete(resource, session, socket.assigns.repo)
-      |> case do
-        {:ok, record} ->
-          socket
-          |> push_event("success", %{
-            msg: trans("Deleted %{label}", inter: [label: record_label(record, resource)])
-          })
-          |> assign(
-            :records,
-            Resource.list(
-              resource,
-              Map.take(socket.assigns, [:prefix, :sort_attr, :sort_dir, :page, :search]),
-              session,
-              socket.assigns.repo
-            )
-          )
-
-        {:error, _} ->
-          push_event(socket, "error", %{
-            msg: trans("Delete failed!")
-          })
-      end
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_event(
-        "action",
-        %{"action" => action, "id" => id},
-        socket = %{assigns: %{resource: resource}}
-      ) do
-    record =
-      Resource.find!(
-        id,
-        resource,
-        socket.assigns.prefix,
-        socket.assigns.repo
-      )
-
-    action_name = String.to_existing_atom(action)
-
-    {m, f, a} =
-      :actions
-      |> resource.__live_admin_config__()
-      |> Enum.find_value(fn
-        {^action_name, mfa} -> mfa
-        ^action_name -> {resource, action_name, []}
-        _ -> false
-      end)
-
-    socket =
-      case apply(m, f, [record, socket.assigns.session] ++ a) do
-        {:ok, result} ->
-          socket
-          |> push_event("success", %{
-            msg:
-              trans(
-                "Successfully completed %{action}: %{result}",
-                inter: [action: action, result: inspect(result)]
-              )
-          })
-          |> assign(
-            :records,
-            Resource.list(
-              resource,
-              Map.take(socket.assigns, [:prefix, :sort_attr, :sort_dir, :page, :search]),
-              socket.assigns.session,
-              socket.assigns.repo
-            )
-          )
-
-        {:error, error} ->
-          push_event(
-            socket,
-            "error",
-            trans("%{action} failed: %{error}",
-              inter: [
-                action: action,
-                error: error
-              ]
-            )
-          )
-      end
-
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_event("search", %{"query" => query}, socket = %{assigns: assigns}) do
     {:noreply,
      push_patch(socket,
@@ -314,28 +215,16 @@ defmodule LiveAdmin.Components.Container.Index do
      )}
   end
 
-  def cell_contents(record, field, record, assigns) do
-    schema = assigns.resource.__live_admin_config__(:schema)
+  def cell_contents(record, field, resource, resources, session) do
+    schema = resource.__live_admin_config__(:schema)
 
-    if associated_resource(schema, field, assigns.resources) do
+    if associated_resource(schema, field, resources) do
       record_label(
         Map.fetch!(record, get_assoc_name!(schema, field)),
-        associated_resource(schema, field, assigns.resources)
+        associated_resource(schema, field, resources)
       )
     else
-      :render_with
-      |> assigns.resource.__live_admin_config__()
-      |> case do
-        {m, f, a} ->
-          apply(m, f, [record, field, assigns.session] ++ a)
-
-        f when is_atom(f) ->
-          apply(assigns.resource, f, [
-            record,
-            field,
-            assigns.session
-          ])
-      end
+      Resource.render(record, field, resource, session)
     end
   end
 

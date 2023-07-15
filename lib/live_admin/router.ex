@@ -72,6 +72,11 @@ defmodule LiveAdmin.Router do
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
 
+      live("#{path}/:record_id", LiveAdmin.Components.Container, :view,
+        as: :"view_#{full_path}",
+        metadata: %{base_path: @base_path, resource: {path, resource_mod}}
+      )
+
       live("#{path}/edit/:record_id", LiveAdmin.Components.Container, :edit,
         as: :"edit_#{full_path}",
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
@@ -124,6 +129,7 @@ defmodule LiveAdmin.Router do
     |> Keyword.put_new(:new, LiveAdmin.Components.Container.Form)
     |> Keyword.put_new(:edit, LiveAdmin.Components.Container.Form)
     |> Keyword.put_new(:list, LiveAdmin.Components.Container.Index)
+    |> Keyword.put_new(:view, LiveAdmin.Components.Container.View)
   end
 
   defp collect_resources(routes, base_path) do
