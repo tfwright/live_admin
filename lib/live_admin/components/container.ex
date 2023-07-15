@@ -123,7 +123,7 @@ defmodule LiveAdmin.Components.Container do
 
     LiveAdmin.session_store().persist!(new_session)
 
-    {:no_reply, assign(socket, :session, new_session)}
+    {:noreply, assign(socket, :session, new_session)}
   end
 
   @impl true
