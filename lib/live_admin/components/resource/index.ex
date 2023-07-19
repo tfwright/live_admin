@@ -4,8 +4,6 @@ defmodule LiveAdmin.Components.Container.Index do
 
   import LiveAdmin,
     only: [
-      associated_resource: 3,
-      record_label: 2,
       route_with_params: 2,
       trans: 1,
       trans: 2
@@ -163,7 +161,7 @@ defmodule LiveAdmin.Components.Container.Index do
               <%= for {field, type, _} <- Resource.fields(@resource) do %>
                 <td class={"resource__cell resource__cell--#{type_to_css_class(type)}"}>
                   <div class="cell__contents">
-                    <%= cell_contents(record, field, @resource, @resources, @session) %>
+                    <%= Resource.render(record, field, @resource, @resources, @session) %>
                   </div>
                   <div class="cell__copy" data-message="Copied cell contents to clipboard">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -221,19 +219,6 @@ defmodule LiveAdmin.Components.Container.Index do
      )}
   end
 
-  def cell_contents(record, field, resource, resources, session) do
-    schema = resource.__live_admin_config__(:schema)
-
-    if associated_resource(schema, field, resources) do
-      record_label(
-        Map.fetch!(record, get_assoc_name!(schema, field)),
-        associated_resource(schema, field, resources)
-      )
-    else
-      Resource.render(record, field, resource, session)
-    end
-  end
-
   defp list_link(content, assigns, params, opts) do
     new_params =
       assigns
@@ -249,12 +234,6 @@ defmodule LiveAdmin.Components.Container.Index do
         route_with_params(assigns, params: new_params)
       )
     )
-  end
-
-  defp get_assoc_name!(schema, fk) do
-    Enum.find(schema.__schema__(:associations), fn assoc_name ->
-      fk == schema.__schema__(:association, assoc_name).owner_key
-    end)
   end
 
   defp type_to_css_class({_, type, _}), do: type_to_css_class(type)

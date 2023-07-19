@@ -29,7 +29,7 @@ defmodule LiveAdmin.Resource do
   """
 
   import Ecto.Query
-  import LiveAdmin, only: [parent_associations: 1]
+  import LiveAdmin, only: [record_label: 2, parent_associations: 1, associated_resource: 3]
 
   alias Ecto.Changeset
 
@@ -47,12 +47,32 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def render(record, field, resource, session) do
+  def render(record, field, resource, resources, session) do
     :render_with
     |> resource.__live_admin_config__()
     |> case do
-      {m, f, a} -> apply(m, f, [record, field, session] ++ a)
-      f when is_atom(f) -> apply(resource, f, [record, field, session])
+      nil ->
+        schema = resource.__live_admin_config__(:schema)
+
+        if associated_resource(schema, field, resources) do
+          record_label(
+            Map.fetch!(record, get_assoc_name!(schema, field)),
+            associated_resource(schema, field, resources)
+          )
+        else
+          record
+          |> Map.fetch!(field)
+          |> case do
+            val when is_binary(val) -> val
+            val -> inspect(val)
+          end
+        end
+
+      {m, f, a} ->
+        apply(m, f, [record, field, session] ++ a)
+
+      f when is_atom(f) ->
+        apply(resource, f, [record, field, session])
     end
   end
 
@@ -175,8 +195,6 @@ defmodule LiveAdmin.Resource do
 
   def default_config_value(key) when key in [:actions, :tasks, :components, :hidden_fields],
     do: []
-
-  def default_config_value(:render_with), do: {LiveAdmin.View, :render_field, []}
 
   def default_config_value(:label_with), do: :id
 
@@ -322,5 +340,11 @@ defmodule LiveAdmin.Resource do
       preloads when is_list(preloads) ->
         preloads
     end
+  end
+
+  defp get_assoc_name!(schema, fk) do
+    Enum.find(schema.__schema__(:associations), fn assoc_name ->
+      fk == schema.__schema__(:association, assoc_name).owner_key
+    end)
   end
 end

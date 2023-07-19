@@ -57,7 +57,7 @@ defmodule DemoWeb.Renderer do
     |> case do
       bool when is_boolean(bool) -> if bool, do: "Yes", else: "No"
       date = %Date{} -> Calendar.strftime(date, "%a, %B %d %Y")
-      _ -> LiveAdmin.View.render_field(record, field, session)
+      _ -> record |> Map.fetch!(field) |> inspect()
     end
   end
 

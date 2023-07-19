@@ -22,7 +22,7 @@ defmodule LiveAdmin.Components.Container.View do
         <dl>
           <%= for {field, _, _} <- Resource.fields(@resource) do %>
             <dt class="field__label"><%= trans(humanize(field)) %></dt>
-            <dd><%= Resource.render(@record, field, @resource, @session) %></dd>
+            <dd><%= Resource.render(@record, field, @resource, @resources, @session) %></dd>
           <% end %>
         </dl>
         <div class="form__actions">

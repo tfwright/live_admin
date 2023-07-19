@@ -29,13 +29,4 @@ defmodule LiveAdmin.View do
       override_css -> @app_css <> override_css
     end
   end
-
-  def render_field(record, field, _) do
-    record
-    |> Map.fetch!(field)
-    |> case do
-      val when is_binary(val) -> val
-      val -> inspect(val)
-    end
-  end
 end
