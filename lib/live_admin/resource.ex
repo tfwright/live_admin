@@ -71,6 +71,9 @@ defmodule LiveAdmin.Resource do
 
       {mod, func_name, args} ->
         apply(mod, func_name, [record, session] ++ args)
+
+      name when is_atom(name) ->
+        apply(resource, name, [record, session])
     end
   end
 
@@ -83,6 +86,9 @@ defmodule LiveAdmin.Resource do
 
       {mod, func_name, args} ->
         apply(mod, func_name, [resource, opts, session] ++ args)
+
+      name when is_atom(name) ->
+        apply(resource, name, [opts, session])
     end
   end
 
@@ -110,6 +116,9 @@ defmodule LiveAdmin.Resource do
 
       {mod, func_name, args} ->
         apply(mod, func_name, [params, session] ++ args)
+
+      name when is_atom(name) ->
+        apply(resource, name, [params, session])
     end
   end
 
@@ -124,6 +133,9 @@ defmodule LiveAdmin.Resource do
 
       {mod, func_name, args} ->
         apply(mod, func_name, [record, params, session] ++ args)
+
+      name when is_atom(name) ->
+        apply(resource, name, [record, params, session])
     end
   end
 
@@ -133,7 +145,7 @@ defmodule LiveAdmin.Resource do
     |> case do
       nil -> changeset
       {mod, func_name, args} -> apply(mod, func_name, [changeset, session] ++ args)
-      atom -> apply(resource, atom, [changeset, session])
+      name when is_atom(name) -> apply(resource, name, [changeset, session])
     end
     |> Map.put(:action, :validate)
   end
