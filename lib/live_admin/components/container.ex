@@ -161,7 +161,7 @@ defmodule LiveAdmin.Components.Container do
         {:ok, record} ->
           socket
           |> push_event("success", %{
-            msg: trans("Successfully completed %{action}", inter: [action: action])
+            msg: trans("%{action} succeeded", inter: [action: action])
           })
           |> assign(:record, record)
 
@@ -197,11 +197,25 @@ defmodule LiveAdmin.Components.Container do
       case apply(m, f, [socket.assigns.session] ++ a) do
         {:ok, result} ->
           push_event(socket, "success", %{
-            msg: "Successfully completed #{task}: #{inspect(result)}"
+            msg:
+              trans("%{task} succeeded: %{result}",
+                inter: [
+                  action: task,
+                  result: result
+                ]
+              )
           })
 
         {:error, error} ->
-          push_event(socket, "error", %{msg: "#{task} failed: #{error}"})
+          push_event(socket, "error", %{
+            msg:
+              trans("%{task} failed: %{error}",
+                inter: [
+                  action: task,
+                  error: error
+                ]
+              )
+          })
       end
 
     {:noreply, socket}
