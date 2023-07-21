@@ -50,7 +50,7 @@ Application.put_env(:live_admin, :gettext_backend, Demo.Gettext)
 defmodule DemoWeb.Renderer do
   use Phoenix.HTML
 
-  def render_field(record, field, session) do
+  def render_field(record, field, _session) do
     record
     |> Map.fetch!(field)
     |> case do
