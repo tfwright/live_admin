@@ -126,7 +126,7 @@ defmodule LiveAdminTest.StubSession do
   def persist!(_), do: :ok
 end
 
-Mox.defmock(LiveAdminTest.MockSession, for: LiveAdmin.Session.Store)
+Mox.defmock(LiveAdminTest.MockSession, for: LiveAdmin.Session.Store, skip_optional_callbacks: true)
 
 Application.ensure_all_started(:os_mon)
 

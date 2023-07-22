@@ -97,7 +97,7 @@ defmodule LiveAdmin.Router do
   def on_mount(
         :assign_options,
         _params,
-        %{
+        live_session = %{
           "title" => title,
           "base_path" => base_path,
           "components" => components,
@@ -109,6 +109,13 @@ defmodule LiveAdmin.Router do
     session = LiveAdmin.session_store().load!(session_id)
 
     Gettext.put_locale(LiveAdmin.gettext_backend(), session.locale)
+
+    session =
+      if function_exported?(LiveAdmin.session_store(), :on_mount, 2) do
+        LiveAdmin.session_store().on_mount(session, live_session)
+      else
+        session
+      end
 
     {:cont,
      assign(socket,
