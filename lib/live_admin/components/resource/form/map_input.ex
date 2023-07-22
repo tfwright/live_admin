@@ -60,7 +60,7 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
             class="button__remove"
           />
           <textarea rows="1" name={input_name(@form, @field) <> "[#{idx}][key]"}><%= k %></textarea>
-          <textarea rows="1" name={input_name(@form, @field) <> "[#{idx}][value]"}><%= inspect(v) %></textarea>
+          <textarea rows="1" name={input_name(@form, @field) <> "[#{idx}][value]"}><%= v %></textarea>
         </div>
       <% end %>
       <div class="form__actions">
