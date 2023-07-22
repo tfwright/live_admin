@@ -11,6 +11,7 @@ defmodule LiveAdmin.Router do
     * `:title` - Title for the UI home view (Default: 'LiveAdmin')
     * `:components` - Component overrides that will be used for every resource in the group
       unless a resource is configurated to use its own overrides.
+    * `on_mount` - A Tuple identifying a function with arity 1, that will be passed the socket and should return it
   """
   defmacro live_admin(path, opts \\ [], do: context) do
     import Phoenix.LiveView.Router, only: [live: 4, live_session: 3]
@@ -18,6 +19,7 @@ defmodule LiveAdmin.Router do
     title = Keyword.get(opts, :title, "LiveAdmin")
     components = Keyword.get(opts, :components, Application.get_env(:live_admin, :components, []))
     repo = Keyword.get(opts, :ecto_repo, Application.get_env(:live_admin, :ecto_repo))
+    on_mount = Keyword.get(opts, :on_mount)
 
     quote do
       current_path =
@@ -31,7 +33,7 @@ defmodule LiveAdmin.Router do
         live_session :"live_admin_#{@base_path}",
           session:
             {unquote(__MODULE__), :build_session,
-             [@base_path, unquote(title), unquote(components), unquote(repo)]},
+             [@base_path, unquote(title), unquote(components), unquote(repo), unquote(on_mount)]},
           root_layout: {LiveAdmin.View, :layout},
           layout: {LiveAdmin.View, :app},
           on_mount: {unquote(__MODULE__), :assign_options} do
@@ -84,25 +86,27 @@ defmodule LiveAdmin.Router do
     end
   end
 
-  def build_session(conn, base_path, title, components, repo) do
+  def build_session(conn, base_path, title, components, repo, on_mount) do
     %{
       "session_id" => LiveAdmin.session_store().init!(conn),
       "base_path" => base_path,
       "title" => title,
       "components" => components |> add_default_components() |> Enum.into(%{}),
-      "repo" => repo
+      "repo" => repo,
+      "on_mount" => on_mount
     }
   end
 
   def on_mount(
         :assign_options,
         _params,
-        live_session = %{
+        %{
           "title" => title,
           "base_path" => base_path,
           "components" => components,
           "session_id" => session_id,
-          "repo" => repo
+          "repo" => repo,
+          "on_mount" => on_mount
         },
         socket
       ) do
@@ -110,22 +114,23 @@ defmodule LiveAdmin.Router do
 
     Gettext.put_locale(LiveAdmin.gettext_backend(), session.locale)
 
-    session =
-      if function_exported?(LiveAdmin.session_store(), :on_mount, 2) do
-        LiveAdmin.session_store().on_mount(session, live_session)
-      else
-        session
+    socket =
+      assign(socket,
+        session: session,
+        base_path: base_path,
+        title: title,
+        nav_mod: Map.fetch!(components, :nav),
+        resources: LiveAdmin.resources(socket.router, base_path),
+        default_repo: repo
+      )
+
+    socket =
+      case on_mount do
+        {m, f} -> apply(m, f, [socket])
+        _ -> socket
       end
 
-    {:cont,
-     assign(socket,
-       session: session,
-       base_path: base_path,
-       title: title,
-       nav_mod: Map.fetch!(components, :nav),
-       resources: LiveAdmin.resources(socket.router, base_path),
-       default_repo: repo
-     )}
+    {:cont, socket}
   end
 
   defp add_default_components(components) do

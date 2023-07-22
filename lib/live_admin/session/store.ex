@@ -7,7 +7,4 @@ defmodule LiveAdmin.Session.Store do
   @callback init!(conn) :: id
   @callback load!(id) :: session
   @callback persist!(session) :: :ok
-  @callback on_mount(session, live_session) :: session
-
-  @optional_callbacks on_mount: 2
 end
