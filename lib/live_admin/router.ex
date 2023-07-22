@@ -123,7 +123,7 @@ defmodule LiveAdmin.Router do
        base_path: base_path,
        title: title,
        nav_mod: Map.fetch!(components, :nav),
-       resources: socket.router |> Phoenix.Router.routes() |> collect_resources(base_path),
+       resources: LiveAdmin.resources(socket.router, base_path),
        default_repo: repo
      )}
   end
@@ -137,12 +137,5 @@ defmodule LiveAdmin.Router do
     |> Keyword.put_new(:edit, LiveAdmin.Components.Container.Form)
     |> Keyword.put_new(:list, LiveAdmin.Components.Container.Index)
     |> Keyword.put_new(:view, LiveAdmin.Components.Container.View)
-  end
-
-  defp collect_resources(routes, base_path) do
-    Enum.flat_map(routes, fn
-      %{metadata: %{base_path: ^base_path, resource: resource}} -> [resource]
-      _ -> []
-    end)
   end
 end

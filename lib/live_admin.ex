@@ -95,4 +95,13 @@ defmodule LiveAdmin do
   end
 
   def gettext_backend, do: Application.get_env(:live_admin, :gettext_backend, LiveAdmin.Gettext)
+
+  def resources(router, base_path) do
+    router
+    |> Phoenix.Router.routes()
+    |> Enum.flat_map(fn
+      %{metadata: %{base_path: ^base_path, resource: resource}} -> [resource]
+      _ -> []
+    end)
+  end
 end
