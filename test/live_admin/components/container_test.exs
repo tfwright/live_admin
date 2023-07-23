@@ -262,4 +262,19 @@ defmodule LiveAdmin.Components.ContainerTest do
       assert_redirected(view, "/user")
     end
   end
+
+  describe "view resource with associated resource" do
+    setup %{conn: conn} do
+      user = Repo.insert!(%User{})
+      post = Repo.insert!(%Post{title: "test", user: user})
+      {:ok, _, html} = live(conn, "/live_admin_test_post/#{post.id}")
+      %{response: html, user: user}
+    end
+
+    test "links to user", %{response: response, user: user} do
+      assert response
+             |> Floki.find("a[href='/user/#{user.id}']")
+             |> Enum.any?()
+    end
+  end
 end

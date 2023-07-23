@@ -395,6 +395,7 @@ defmodule LiveAdmin.Components.Container do
       session={@session}
       key={@key}
       base_path={@base_path}
+      prefix={@prefix}
     />
     """
   end

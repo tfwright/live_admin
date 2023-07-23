@@ -159,14 +159,49 @@ defmodule LiveAdmin.Components.Container.Index do
                 </div>
               </td>
               <%= for {field, type, _} <- Resource.fields(@resource) do %>
+                <% assoc_resource =
+                  LiveAdmin.associated_resource(
+                    @resource.__live_admin_config__(:schema),
+                    field,
+                    @resources
+                  ) %>
                 <td class={"resource__cell resource__cell--#{type_to_css_class(type)}"}>
                   <div class="cell__contents">
-                    <%= Resource.render(record, field, @resource, @resources, @session) %>
+                    <%= Resource.render(record, field, @resource, assoc_resource, @session) %>
                   </div>
-                  <div class="cell__copy" data-message="Copied cell contents to clipboard">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M 4 2 C 2.895 2 2 2.895 2 4 L 2 18 L 4 18 L 4 4 L 18 4 L 18 2 L 4 2 z M 8 6 C 6.895 6 6 6.895 6 8 L 6 20 C 6 21.105 6.895 22 8 22 L 20 22 C 21.105 22 22 21.105 22 20 L 22 8 C 22 6.895 21.105 6 20 6 L 8 6 z M 8 8 L 20 8 L 20 20 L 8 20 L 8 8 z" />
-                    </svg>
+                  <div class="cell__icons">
+                    <div class="cell__copy" data-message="Copied cell contents to clipboard">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M 4 2 C 2.895 2 2 2.895 2 4 L 2 18 L 4 18 L 4 4 L 18 4 L 18 2 L 4 2 z M 8 6 C 6.895 6 6 6.895 6 8 L 6 20 C 6 21.105 6.895 22 8 22 L 20 22 C 21.105 22 22 21.105 22 20 L 22 8 C 22 6.895 21.105 6 20 6 L 8 6 z M 8 8 L 20 8 L 20 20 L 8 20 L 8 8 z" />
+                      </svg>
+                    </div>
+                    <%= if assoc_resource && Map.fetch!(record, field) do %>
+                      <a
+                        class="cell__link"
+                        href={
+                          route_with_params(assigns,
+                            resource_path: elem(assoc_resource, 0),
+                            segments: [Map.fetch!(record, field)]
+                          )
+                        }
+                        target="_blank"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke-width="1.5"
+                          stroke="currentColor"
+                          class="w-6 h-6"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                          />
+                        </svg>
+                      </a>
+                    <% end %>
                   </div>
                 </td>
               <% end %>

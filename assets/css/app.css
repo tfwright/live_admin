@@ -535,20 +535,24 @@ input[type="date"], input[type="number"] {
   }
 }
 
-.cell__copy {
+.cell__icons {
   display: none;
   position: absolute;
   bottom: 0px;
   right: 0px;
   margin: 0.25rem;
+}
+
+.cell__icons div {
   cursor: pointer;
+  @apply mx-1;
 }
 
-[class^="resource__cell"]:hover .cell__copy {
-  @apply block;
+[class^="resource__cell"]:hover .cell__icons {
+  @apply flex;
 }
 
-.cell__copy svg {
-  width: 1.25rem;
-  height: 1.25rem;
+.resource__cell svg {
+  @apply w-6;
+  @apply h-6;
 }

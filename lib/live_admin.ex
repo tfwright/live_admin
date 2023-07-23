@@ -39,14 +39,18 @@ defmodule LiveAdmin do
   def session_store,
     do: Application.get_env(:live_admin, :session_store, __MODULE__.Session.Agent)
 
-  def associated_resource(schema, field_name, resources, elem \\ :resource) do
+  def associated_resource(schema, field_name, resources, part \\ nil) do
     with %{related: assoc_schema} <-
            schema |> parent_associations() |> Enum.find(&(&1.owner_key == field_name)),
          config when not is_nil(config) <-
            Enum.find(resources, fn {_, resource} ->
              resource.__live_admin_config__(:schema) == assoc_schema
            end) do
-      elem(config, if(elem == :key, do: 0, else: 1))
+      case part do
+        nil -> config
+        :key -> elem(config, 0)
+        :resource -> elem(config, 1)
+      end
     else
       _ -> nil
     end

@@ -29,7 +29,7 @@ defmodule LiveAdmin.Resource do
   """
 
   import Ecto.Query
-  import LiveAdmin, only: [record_label: 2, parent_associations: 1, associated_resource: 3]
+  import LiveAdmin, only: [record_label: 2, parent_associations: 1]
 
   alias Ecto.Changeset
 
@@ -47,17 +47,15 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def render(record, field, resource, resources, session) do
+  def render(record, field, resource, assoc_resource, session) do
     :render_with
     |> resource.__live_admin_config__()
     |> case do
       nil ->
-        schema = resource.__live_admin_config__(:schema)
-
-        if associated_resource(schema, field, resources) do
+        if assoc_resource do
           record_label(
-            Map.fetch!(record, get_assoc_name!(schema, field)),
-            associated_resource(schema, field, resources)
+            Map.fetch!(record, get_assoc_name!(resource.__live_admin_config__(:schema), field)),
+            elem(assoc_resource, 1)
           )
         else
           record
@@ -76,11 +74,16 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def find!(id, resource, prefix, repo),
-    do: repo.get!(resource.__live_admin_config__(:schema), id, prefix: prefix)
+  def find!(id, resource, prefix, repo) do
+    find(id, resource, prefix, repo) ||
+      raise(Ecto.NoResultsError, queryable: resource.__live_admin_config__(:schema))
+  end
 
-  def find(id, resource, prefix, repo),
-    do: repo.get(resource.__live_admin_config__(:schema), id, prefix: prefix)
+  def find(id, resource, prefix, repo) do
+    resource.__live_admin_config__(:schema)
+    |> preload(^preloads(resource))
+    |> repo.get(id, prefix: prefix)
+  end
 
   def delete(record, resource, session, repo) do
     :delete_with

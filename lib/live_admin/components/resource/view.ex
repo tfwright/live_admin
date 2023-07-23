@@ -21,8 +21,28 @@ defmodule LiveAdmin.Components.Container.View do
       <div class="resource__table">
         <dl>
           <%= for {field, _, _} <- Resource.fields(@resource) do %>
+            <% assoc_resource =
+              LiveAdmin.associated_resource(
+                @resource.__live_admin_config__(:schema),
+                field,
+                @resources
+              ) %>
+            <% label = Resource.render(@record, field, @resource, assoc_resource, @session) %>
             <dt class="field__label"><%= trans(humanize(field)) %></dt>
-            <dd><%= Resource.render(@record, field, @resource, @resources, @session) %></dd>
+            <dd>
+              <%= if assoc_resource && Map.fetch!(@record, field) do %>
+                <%= live_redirect(label,
+                  to:
+                    route_with_params(assigns,
+                      resource_path: elem(assoc_resource, 0),
+                      segments: [Map.fetch!(@record, field)]
+                    ),
+                  class: "resource__action--btn"
+                ) %>
+              <% else %>
+                <%= label %>
+              <% end %>
+            </dd>
           <% end %>
         </dl>
         <div class="form__actions">
