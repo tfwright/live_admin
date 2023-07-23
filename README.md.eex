@@ -73,7 +73,8 @@ routes in the same instance, you must create multiple resource modules to contai
 ### Admin instance
 
 The second argument passed to `live_admin` will configure defaults for all resources in the group
-that do not specify the same configuration. Currently only component overrides can be configured at this level.
+that do not specify the same configuration. Currently only component overrides and the repo can be
+configured at this level.
 
 ### Global
 
