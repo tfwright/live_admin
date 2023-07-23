@@ -2,7 +2,7 @@ defmodule LiveAdmin.Router do
   import Phoenix.Component, only: [assign: 2]
 
   @doc """
-  Defines a group of LiveAdmin resources that share a common prefix, and optionally, configuration.
+  Defines a group of LiveAdmin resources that share a common path prefix, and optionally, configuration.
 
   ## Arguments
 
@@ -11,6 +11,8 @@ defmodule LiveAdmin.Router do
     * `:title` - Title for the UI home view (Default: 'LiveAdmin')
     * `:components` - Component overrides that will be used for every resource in the group
       unless a resource is configurated to use its own overrides.
+    * `:repo` - An Ecto repo to use for queries within this group of admin resources, unless
+      overriden by an individual resource
     * `on_mount` - A Tuple identifying a function with arity 1, that will be passed the socket and should return it
   """
   defmacro live_admin(path, opts \\ [], do: context) do
