@@ -32,7 +32,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
-  describe "resource page" do
+  describe "list resource" do
     setup %{conn: conn} do
       Repo.insert!(%User{})
       {:ok, view, _html} = live(conn, "/user")
@@ -63,7 +63,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
-  describe "resource page with non-schema resource" do
+  describe "list resource with non-schema resource" do
     setup %{conn: conn} do
       Repo.insert!(%Post{title: "test"})
       {:ok, view, _html} = live(conn, "/live_admin_test_post")
@@ -87,7 +87,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
-  describe "resource page with search param" do
+  describe "list resource with search param" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"})
       {:ok, view, html} = live(conn, "/user?s=fred")
@@ -107,7 +107,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
-  describe "resource page with prefix param" do
+  describe "list resource with prefix param" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"}, prefix: "alt")
       {:ok, view, _} = live(conn, "/user?prefix=alt")
@@ -119,7 +119,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
-  describe "resource page with prefix in session" do
+  describe "list resource with prefix in session" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"}, prefix: "alt")
 
@@ -138,7 +138,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
-  describe "new parent resource page" do
+  describe "new parent resource" do
     setup %{conn: conn} do
       {:ok, view, html} = live(conn, "/user/new")
       %{response: html, view: view}
@@ -177,7 +177,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
-  describe "new child resource page" do
+  describe "new child resource" do
     setup %{conn: conn} do
       {:ok, view, html} = live(conn, "/live_admin_test_post/new")
       %{response: html, view: view}
@@ -196,7 +196,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
-  describe "edit resource page" do
+  describe "edit resource" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
       {:ok, view, html} = live(conn, "/user/edit/#{user.id}")
@@ -244,6 +244,22 @@ defmodule LiveAdmin.Components.ContainerTest do
       assert response
              |> Floki.find("input[name='params[previous_versions]']")
              |> Enum.any?()
+    end
+  end
+
+  describe "view resource" do
+    setup %{conn: conn} do
+      user = Repo.insert!(%User{})
+      {:ok, view, html} = live(conn, "/user/#{user.id}")
+      %{response: html, view: view, user: user}
+    end
+
+    test "deletes record", %{view: view} do
+      view
+      |> element("button", "Delete")
+      |> render_click()
+
+      assert_redirected(view, "/user")
     end
   end
 end

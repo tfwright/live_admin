@@ -391,6 +391,7 @@ defmodule LiveAdmin.Components.Container do
       id="view"
       record={@record}
       resource={@resource}
+      resources={@resources}
       session={@session}
       key={@key}
       base_path={@base_path}
