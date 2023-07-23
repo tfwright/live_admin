@@ -850,7 +850,7 @@ select {
 }
 
 #prefix-select nav {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 [class$="--drop"]:focus-within nav {

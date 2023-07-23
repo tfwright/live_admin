@@ -269,7 +269,7 @@ input[type="date"], input[type="number"] {
   }
 
   #prefix-select nav {
-    @apply overflow-y-scroll;
+    @apply overflow-y-auto;
   }
 
   [class$="--drop"]:focus-within nav {
