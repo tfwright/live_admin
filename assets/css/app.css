@@ -123,6 +123,11 @@ input[type="date"], input[type="number"] {
     @apply nav__item;
   }
 
+  .nav__item--selected a {
+    @apply underline;
+    @apply decoration-dotted;
+  }
+
   .nav__item a {
     @apply p-1;
     @apply rounded;

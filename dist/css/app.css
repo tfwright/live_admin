@@ -624,6 +624,10 @@ select {
 .nav__item--selected a {
   border-radius: 0.25rem;
   padding: 0.25rem;
+  -webkit-text-decoration-line: underline;
+          text-decoration-line: underline;
+  -webkit-text-decoration-style: dotted;
+          text-decoration-style: dotted;
 }
 
 .nav__item a {
