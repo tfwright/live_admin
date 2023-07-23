@@ -63,14 +63,14 @@ defmodule LiveAdmin.Components.Nav do
             assigns
             |> Map.get(:resource)
             |> case do
-              %{schema: schema} ->
-                schema
+              nil ->
+                true
+
+              resource ->
+                resource.__live_admin_config__(:schema)
                 |> Module.split()
                 |> Enum.drop(-1)
                 |> Enum.member?(item)
-
-              _ ->
-                true
             end
 
           [
