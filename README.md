@@ -83,7 +83,6 @@ default to apply to all resources unless overridden in their individual config, 
 
 Additionally, the following options can only be set at the global level:
 
-* `prefix_options` - a list or MFA specifying `prefix` options to be passed to Ecto functions
 * `css_overrides` - a binary or MFA identifying a function that returns CSS to be appended to app css
 * `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data
 * `gettext_backend` - a module implementing the [Gettext API](https://hexdocs.pm/gettext/Gettext.html#module-gettext-api). It is expected to implement `locales/0` returning a list of binary locale names

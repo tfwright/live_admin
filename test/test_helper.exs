@@ -7,6 +7,8 @@ Application.put_env(:live_admin, LiveAdminTest.Repo,
 
 defmodule LiveAdminTest.Repo do
   use Ecto.Repo, otp_app: :live_admin, adapter: Ecto.Adapters.Postgres
+
+  def prefixes, do: ["alt"]
 end
 
 _ = Ecto.Adapters.Postgres.storage_up(LiveAdminTest.Repo.config())
@@ -131,7 +133,6 @@ Mox.defmock(LiveAdminTest.MockSession, for: LiveAdmin.Session.Store, skip_option
 Application.ensure_all_started(:os_mon)
 
 Application.put_env(:live_admin, :ecto_repo, LiveAdminTest.Repo)
-Application.put_env(:live_admin, :prefix_options, ["alt"])
 Application.put_env(:live_admin, :session_store, LiveAdminTest.MockSession)
 
 Supervisor.start_link(

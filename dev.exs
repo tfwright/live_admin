@@ -8,6 +8,8 @@ Application.put_env(:live_admin, Demo.Repo,
 
 defmodule Demo.Repo do
   use Ecto.Repo, otp_app: :live_admin, adapter: Ecto.Adapters.Postgres
+
+  def prefixes, do: ["public", "alt"]
 end
 
 _ = Ecto.Adapters.Postgres.storage_up(Demo.Repo.config())
@@ -42,7 +44,6 @@ Application.put_env(:live_admin, DemoWeb.Endpoint,
 )
 
 Application.put_env(:live_admin, :ecto_repo, Demo.Repo)
-Application.put_env(:live_admin, :prefix_options, ["public", "this-is-a-fake-schema-with-a-really-long-name", "alt"])
 Application.put_env(:live_admin, :immutable_fields, [:inserted_at])
 Application.put_env(:live_admin, :css_overrides, {DemoWeb.Renderer, :render_css, []})
 Application.put_env(:live_admin, :gettext_backend, Demo.Gettext)

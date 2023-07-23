@@ -20,8 +20,7 @@ defmodule LiveAdmin.Components.Container do
     socket =
       assign(socket,
         default_mod: Map.fetch!(components, socket.assigns.live_action),
-        loading: !connected?(socket),
-        prefix_options: get_prefix_options(socket.assigns.session)
+        loading: !connected?(socket)
       )
 
     Process.send_after(self(), :clear_flash, 2000)
@@ -44,9 +43,9 @@ defmodule LiveAdmin.Components.Container do
     socket =
       socket
       |> assign_resource_info(uri)
-      |> assign_prefix(params)
       |> assign_mod()
       |> assign_repo()
+      |> assign_prefix(params)
 
     record =
       Resource.find(id, socket.assigns.resource, socket.assigns.prefix, socket.assigns.repo)
@@ -65,9 +64,9 @@ defmodule LiveAdmin.Components.Container do
       |> assign(sort_dir: String.to_existing_atom(params["sort-dir"] || "asc"))
       |> assign(search: params["s"])
       |> assign_resource_info(uri)
-      |> assign_prefix(params)
       |> assign_mod()
       |> assign_repo()
+      |> assign_prefix(params)
 
     {:noreply, socket}
   end
@@ -78,9 +77,9 @@ defmodule LiveAdmin.Components.Container do
       {:noreply,
        socket
        |> assign_resource_info(uri)
-       |> assign_prefix(params)
        |> assign_mod()
-       |> assign_repo()}
+       |> assign_repo()
+       |> assign_prefix(params)}
 
   def handle_params(_, _, socket), do: {:noreply, socket}
 
@@ -272,7 +271,7 @@ defmodule LiveAdmin.Components.Container do
               </ul>
             </nav>
           </div>
-          <%= if @prefix_options do %>
+          <%= if Enum.any?(@prefix_options) do %>
             <div id="prefix-select" class="resource__action--drop">
               <button class="resource__action--btn">
                 <%= @prefix || trans("Set prefix") %>
@@ -399,16 +398,6 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def get_prefix_options(session) do
-    Application.get_env(:live_admin, :prefix_options)
-    |> case do
-      {mod, func, args} -> apply(mod, func, [session | args])
-      list when is_list(list) -> list
-      nil -> []
-    end
-    |> Enum.sort()
-  end
-
   defp assign_prefix(socket, %{"prefix" => prefix}) do
     socket.assigns.prefix_options
     |> Enum.find(fn option -> to_string(option) == prefix end)
@@ -473,6 +462,13 @@ defmodule LiveAdmin.Components.Container do
       |> resource.__live_admin_config__()
       |> Kernel.||(default)
 
-    assign(socket, :repo, repo)
+    prefix_options =
+      if function_exported?(repo, :prefixes, 0) do
+        repo.prefixes()
+      else
+        []
+      end
+
+    assign(socket, repo: repo, prefix_options: prefix_options)
   end
 end

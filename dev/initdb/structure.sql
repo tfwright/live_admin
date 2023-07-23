@@ -55,6 +55,11 @@ create table alt.users (
 
 CREATE UNIQUE INDEX users_email_index ON alt.users USING btree (email);
 
+create table alt.user_profiles (
+  id serial,
+  user_id uuid
+);
+
 create table alt.posts (
   id serial,
   user_id uuid,
