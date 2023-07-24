@@ -32,7 +32,7 @@ Hooks.IndexPage = {
       this.el.querySelectorAll('.cell__copy'),
       {
         target: function (trigger) {
-          return trigger.previousElementSibling
+          return trigger.closest('.resource__cell').firstElementChild
         },
       }
     );
