@@ -1,0 +1,49 @@
+msgid "Home"
+msgstr "Evim"
+
+msgid "New"
+msgstr "Yeni"
+
+msgid "Run task"
+msgstr "Programı çalıştır"
+
+msgid "Set prefix"
+msgstr "Önek seç"
+
+msgid "Prev"
+msgstr "Önceki"
+
+msgid "Next"
+msgstr "Sonraki"
+
+msgid "Name"
+msgstr "Isim"
+
+msgid "Email"
+msgstr "E-posta"
+
+msgid "Active"
+msgstr "Işleyen"
+
+msgid "Birth date"
+msgstr "Doğum tarihi"
+
+msgid "Stars count"
+msgstr "Yıldızlar"
+
+msgid "Encrypted password"
+msgstr "Şifre"
+
+msgid "Status"
+msgstr "Durum"
+
+msgid "Yes"
+msgstr "Evet"
+
+msgid "No"
+msgstr "Yok"
+
+msgid "Inserted at"
+msgstr "Kaydedilen zaman"
+
+
