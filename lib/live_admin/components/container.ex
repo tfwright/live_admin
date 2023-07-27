@@ -199,7 +199,7 @@ defmodule LiveAdmin.Components.Container do
             msg:
               trans("%{task} succeeded: %{result}",
                 inter: [
-                  action: task,
+                  task: task,
                   result: result
                 ]
               )
@@ -210,7 +210,7 @@ defmodule LiveAdmin.Components.Container do
             msg:
               trans("%{task} failed: %{error}",
                 inter: [
-                  action: task,
+                  task: task,
                   error: error
                 ]
               )
