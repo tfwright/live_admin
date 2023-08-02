@@ -239,7 +239,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp field(assigns) do
     ~H"""
     <div class={"field__group#{if @immutable, do: "--disabled"} field__#{field_class(@type)}"}>
-      <%= label(@form, @field, trans(to_string(@field)), class: "field__label") %>
+      <%= label(@form, @field, @field |> humanize() |> trans(), class: "field__label") %>
       <%= if supported_type?(@type) do %>
         <.input
           form={@form}
