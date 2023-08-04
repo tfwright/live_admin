@@ -134,11 +134,23 @@ defmodule DemoWeb.PageController do
   end
 end
 
+defmodule Demo.Accounts.User.Settings.Config do
+  use Ecto.Schema
+
+  @primary_key false
+  embedded_schema do
+    field :key, :string
+    field :val, :string
+  end
+end
+
 defmodule Demo.Accounts.User.Settings do
   use Ecto.Schema
 
   embedded_schema do
     field :some_option, :string
+
+    embeds_many :configs, __MODULE__.Config, on_replace: :delete
   end
 end
 

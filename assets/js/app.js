@@ -26,6 +26,14 @@ window.addEventListener("phx:error", (e) => {
 
 let Hooks = {}
 
+Hooks.FormPage = {
+  mounted(){
+    this.handleEvent("change", () => {
+      this.el.querySelector('input').dispatchEvent(new Event("input", {bubbles: true, cancelable: true}))
+    })
+  }
+}
+
 Hooks.IndexPage = {
   mounted() {
     var clipboard = new ClipboardJS(

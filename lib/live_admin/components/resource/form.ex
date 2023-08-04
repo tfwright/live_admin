@@ -5,7 +5,7 @@ defmodule LiveAdmin.Components.Container.Form do
   import LiveAdmin.ErrorHelpers
   import LiveAdmin, only: [associated_resource: 4, route_with_params: 2, trans: 1]
 
-  alias __MODULE__.{ArrayInput, MapInput, SearchSelect}
+  alias __MODULE__.{ArrayInput, Embed, MapInput, SearchSelect}
   alias LiveAdmin.Resource
 
   @supported_primitive_types [
@@ -52,7 +52,7 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="form-page">
+    <div id="form-page" phx-hook="FormPage">
       <.form
         :let={f}
         for={@changeset}
@@ -160,83 +160,7 @@ defmodule LiveAdmin.Components.Container.Form do
     {:noreply, socket}
   end
 
-  def handle_event("add_embed", %{"field" => field}, socket = %{assigns: %{changeset: changeset}}) do
-    field_name = String.to_existing_atom(field)
-
-    socket =
-      update(socket, :changeset, fn changeset ->
-        existing =
-          Ecto.Changeset.get_change(changeset, field_name) ||
-            Ecto.Changeset.get_field(changeset, field_name)
-
-        new_value =
-          socket.assigns.resource.__live_admin_config__(:schema).__schema__(:embed, field_name).cardinality
-          |> case do
-            :many -> (existing || []) ++ [%{}]
-            :one -> %{}
-          end
-
-        Ecto.Changeset.put_embed(changeset, field_name, new_value)
-      end)
-
-    {:noreply,
-     assign(
-       socket,
-       :enabled,
-       enabled?(changeset, socket.assigns.action, socket.assigns.resource)
-     )}
-  end
-
-  def handle_event(
-        "remove_embed",
-        %{"field" => field, "idx" => idx},
-        socket = %{assigns: %{changeset: changeset}}
-      ) do
-    field_name = String.to_existing_atom(field)
-    index = String.to_integer(idx)
-
-    socket =
-      update(socket, :changeset, fn changeset ->
-        existing =
-          (Ecto.Changeset.get_change(changeset, field_name) ||
-             Ecto.Changeset.get_field(changeset, field_name, []))
-          |> Enum.filter(fn
-            %{action: action} when action != :insert -> false
-            _ -> true
-          end)
-
-        Ecto.Changeset.put_embed(changeset, field_name, List.delete_at(existing, index))
-      end)
-
-    {:noreply,
-     assign(
-       socket,
-       :enabled,
-       enabled?(changeset, socket.assigns.action, socket.assigns.resource)
-     )}
-  end
-
-  def handle_event(
-        "remove_embed",
-        %{"field" => field},
-        socket = %{assigns: %{changeset: changeset}}
-      ) do
-    field_name = String.to_existing_atom(field)
-
-    socket =
-      update(socket, :changeset, fn changeset ->
-        Ecto.Changeset.put_embed(changeset, field_name, nil)
-      end)
-
-    {:noreply,
-     assign(
-       socket,
-       :enabled,
-       enabled?(changeset, socket.assigns.action, socket.assigns.resource)
-     )}
-  end
-
-  defp field(assigns) do
+  def field(assigns) do
     ~H"""
     <div class={"field__group#{if @immutable, do: "--disabled"} field__#{field_class(@type)}"}>
       <%= label(@form, @field, @field |> humanize() |> trans(), class: "field__label") %>
@@ -265,61 +189,22 @@ defmodule LiveAdmin.Components.Container.Form do
     """
   end
 
-  defp input(assigns = %{type: {_, Ecto.Embedded, meta}}) do
-    assigns = assign(assigns, :meta, meta)
-
+  defp input(assigns = %{type: {_, Ecto.Embedded, _}}) do
     ~H"""
-    <div class="embed__group">
-      <%= unless @disabled do %>
-        <%= hidden_input(@form, @field, value: "delete") %>
-        <%= unless input_value(@form, @field) == nil do %>
-          <%= for fp <- inputs_for(@form, @field) do %>
-            <div class="embed__item">
-              <div>
-                <a
-                  class="button__remove"
-                  phx-click="remove_embed"
-                  phx-value-field={@field}
-                  phx-value-idx={fp.index}
-                  phx-target={@form_ref}
-                />
-              </div>
-              <div>
-                <%= for {field, type, _} <- fields_for_embed(@type) do %>
-                  <.field
-                    field={field}
-                    type={type}
-                    form={fp}
-                    immutable={false}
-                    resource={@resource}
-                    resources={@resources}
-                    form_ref={@form_ref}
-                    session={@session}
-                    prefix={@prefix}
-                    repo={@repo}
-                  />
-                <% end %>
-              </div>
-            </div>
-          <% end %>
-        <% end %>
-        <%= if @meta.cardinality == :many || input_value(@form, @field) == nil do %>
-          <div class="form__actions">
-            <a
-              href="#"
-              phx-click="add_embed"
-              phx-value-field={@field}
-              phx-target={@form_ref}
-              class="resource__action--btn"
-            >
-              <%= trans("New") %>
-            </a>
-          </div>
-        <% end %>
-      <% else %>
-        <pre><%= @form |> input_value(@field) |> inspect() %></pre>
-      <% end %>
-    </div>
+    <.live_component
+      module={Embed}
+      id={input_id(@form, @field)}
+      type={@type}
+      disabled={@disabled}
+      form={@form}
+      field={@field}
+      resource={@resource}
+      resources={@resource}
+      form_ref={@form_ref}
+      session={@session}
+      prefix={@prefix}
+      repo={@repo}
+    />
     """
   end
 
@@ -464,9 +349,6 @@ defmodule LiveAdmin.Components.Container.Form do
     </div>
     """
   end
-
-  defp fields_for_embed({_, _, %{related: schema}}),
-    do: Enum.map(schema.__schema__(:fields), &{&1, schema.__schema__(:type, &1), []})
 
   defp validate(resource, changeset, params, session) do
     resource
