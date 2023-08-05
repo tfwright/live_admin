@@ -123,6 +123,13 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   defp assign_selected_option(socket, id) when id in [nil, ""],
     do: assign(socket, :selected_option, nil)
 
+  defp assign_selected_option(
+         socket = %{assigns: %{selected_option: %{id: selected_option_id}}},
+         id
+       )
+       when selected_option_id == id,
+       do: socket
+
   defp assign_selected_option(socket, id),
     do:
       assign(
