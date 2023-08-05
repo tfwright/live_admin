@@ -120,7 +120,8 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     {:noreply, socket}
   end
 
-  defp assign_selected_option(socket, nil), do: assign(socket, :selected_option, nil)
+  defp assign_selected_option(socket, id) when id in [nil, ""],
+    do: assign(socket, :selected_option, nil)
 
   defp assign_selected_option(socket, id),
     do:
