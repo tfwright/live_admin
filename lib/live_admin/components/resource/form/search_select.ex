@@ -47,7 +47,10 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     ~H"""
     <div>
       <div class="resource__action--drop">
-        <%= hidden_input(@form, @field, disabled: @disabled, value: (if @selected_option, do: @selected_option.id)) %>
+        <%= hidden_input(@form, @field,
+          disabled: @disabled,
+          value: if(@selected_option, do: @selected_option.id)
+        ) %>
         <%= if @selected_option do %>
           <a
             href="#"
@@ -78,7 +81,9 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
                 <li>
                   <a
                     href="#"
-                    phx-click={JS.push("select", value: %{id: option.id}, target: @myself, page_loading: true)}
+                    phx-click={
+                      JS.push("select", value: %{id: option.id}, target: @myself, page_loading: true)
+                    }
                   >
                     <%= record_label(option, @resource) %>
                   </a>
@@ -116,5 +121,12 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   end
 
   defp assign_selected_option(socket, nil), do: assign(socket, :selected_option, nil)
-  defp assign_selected_option(socket, id), do: assign(socket, :selected_option, Resource.find!(id, socket.assigns.resource, socket.assigns.prefix, socket.assigns.repo))
+
+  defp assign_selected_option(socket, id),
+    do:
+      assign(
+        socket,
+        :selected_option,
+        Resource.find!(id, socket.assigns.resource, socket.assigns.prefix, socket.assigns.repo)
+      )
 end

@@ -59,12 +59,16 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
             href="#"
             class="button__remove"
           />
-          <textarea rows="1" name={input_name(@form, @field) <> "[#{idx}][key]"}><%= k %></textarea>
-          <textarea rows="1" name={input_name(@form, @field) <> "[#{idx}][value]"}><%= v %></textarea>
+          <textarea rows="1" name={input_name(@form, @field) <> "[#{idx}][key]"} phx-debounce={200}><%= k %></textarea>
+          <textarea rows="1" name={input_name(@form, @field) <> "[#{idx}][value]"} phx-debounce={200}><%= v %></textarea>
         </div>
       <% end %>
       <div class="form__actions">
-        <a phx-click={JS.push("add", target: @myself, page_loading: true)} href="#" class="resource__action--btn">
+        <a
+          phx-click={JS.push("add", target: @myself, page_loading: true)}
+          href="#"
+          class="resource__action--btn"
+        >
           <%= trans("New") %>
         </a>
       </div>
@@ -76,7 +80,10 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
   def handle_event("add", _, socket) do
     socket =
       socket
-      |> update(:values, &Map.put(&1, &1 |> map_size() |> to_string(), %{"key" => nil, "value" => nil}))
+      |> update(
+        :values,
+        &Map.put(&1, &1 |> map_size() |> to_string(), %{"key" => nil, "value" => nil})
+      )
       |> push_event("change", %{})
 
     {:noreply, socket}

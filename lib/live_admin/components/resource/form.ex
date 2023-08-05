@@ -149,8 +149,8 @@ defmodule LiveAdmin.Components.Container.Form do
       |> case do
         {:ok, _} ->
           socket
-          |> push_event("success", %{msg: "Changes successfully saved"})
-          |> assign(:enabled, false)
+          |> put_flash(:info, trans("Record successfully updated"))
+          |> push_redirect(to: route_with_params(socket.assigns, segments: [record]))
 
         {:error, changeset} ->
           assign(socket, changeset: changeset)
@@ -269,7 +269,7 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp input(assigns = %{type: :string}) do
     ~H"""
-    <%= textarea(@form, @field, rows: 1, disabled: @disabled) %>
+    <%= textarea(@form, @field, rows: 1, disabled: @disabled, phx_debounce: 200) %>
     """
   end
 
@@ -290,7 +290,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp input(assigns = %{type: number}) when number in [:integer, :id] do
     ~H"""
     <div class="form__number">
-      <%= number_input(@form, @field, disabled: @disabled) %>
+      <%= number_input(@form, @field, disabled: @disabled, phx_debounce: 200) %>
     </div>
     """
   end
@@ -298,7 +298,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp input(assigns = %{type: :float}) do
     ~H"""
     <div class="form__number">
-      <%= number_input(@form, @field, disabled: @disabled, step: "any") %>
+      <%= number_input(@form, @field, disabled: @disabled, step: "any", phx_debounce: 200) %>
     </div>
     """
   end

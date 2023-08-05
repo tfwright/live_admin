@@ -40,12 +40,7 @@ defmodule LiveAdmin.Components.Session.Content do
         </div>
         <div class="field__group">
           <%= label(f, :metadata, trans("metadata"), class: "field__label") %>
-          <.live_component
-            module={MapInput}
-            id="metadata"
-            form={f}
-            field={:metadata}
-          />
+          <.live_component module={MapInput} id="metadata" form={f} field={:metadata} />
         </div>
         <div class="form__actions">
           <%= submit(trans("Save"), class: "resource__action--btn") %>

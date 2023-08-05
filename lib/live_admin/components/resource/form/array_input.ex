@@ -60,13 +60,18 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
           <%= text_input(:form, :array,
             id: input_id(@form, @field) <> "_#{idx}",
             name: input_name(@form, @field) <> "[]",
-            value: item
+            value: item,
+            phx_debounce: 200
           ) %>
         </div>
       <% end %>
 
       <div class="form__actions">
-        <a href="#" phx-click={JS.push("add", target: @myself, page_loading: true)} class="resource__action--btn">
+        <a
+          href="#"
+          phx-click={JS.push("add", target: @myself, page_loading: true)}
+          class="resource__action--btn"
+        >
           <%= trans("New") %>
         </a>
       </div>

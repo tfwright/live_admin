@@ -380,6 +380,7 @@ defmodule LiveAdmin.Components.Container do
       resource={@resource}
       prefix={@prefix}
       repo={@repo}
+      base_path={@base_path}
     />
     """
   end
