@@ -3,6 +3,8 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   use Phoenix.HTML
 
   import LiveAdmin, only: [record_label: 2, trans: 1]
+
+  alias Phoenix.LiveView.JS
   alias LiveAdmin.Resource
 
   @impl true
@@ -11,20 +13,11 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   end
 
   @impl true
-  def update(assigns = %{resource: resource, form: form, field: field}, socket) do
-    selected_option =
-      form
-      |> input_value(field)
-      |> case do
-        nil -> nil
-        "" -> nil
-        id -> Resource.find!(id, resource, assigns.session.prefix, assigns.repo)
-      end
-
+  def update(assigns = %{form: form, field: field}, socket) do
     socket =
       socket
       |> assign(assigns)
-      |> assign(:selected_option, selected_option)
+      |> assign_selected_option(input_value(form, field))
 
     {:ok, socket}
   end
@@ -54,14 +47,11 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     ~H"""
     <div>
       <div class="resource__action--drop">
-        <%= hidden_input(@form, @field, disabled: @disabled) %>
+        <%= hidden_input(@form, @field, disabled: @disabled, value: (if @selected_option, do: @selected_option.id)) %>
         <%= if @selected_option do %>
           <a
             href="#"
-            phx-click={@handle_select}
-            phx-value-field={@field}
-            phx-value-value=""
-            phx-target={@form_ref}
+            phx-click={JS.push("select", value: %{id: nil}, target: @myself, page_loading: true)}
             class="resource__action--btn"
           >
             <%= record_label(@selected_option, @resource) %>
@@ -88,10 +78,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
                 <li>
                   <a
                     href="#"
-                    phx-click={@handle_select}
-                    phx-value-field={@field}
-                    phx-value-value={option.id}
-                    phx-target={@form_ref}
+                    phx-click={JS.push("select", value: %{id: option.id}, target: @myself, page_loading: true)}
                   >
                     <%= record_label(option, @resource) %>
                   </a>
@@ -118,4 +105,16 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
 
     {:noreply, assign(socket, :options, options)}
   end
+
+  def handle_event("select", %{"id" => id}, socket) do
+    socket =
+      socket
+      |> assign_selected_option(id)
+      |> push_event("change", %{})
+
+    {:noreply, socket}
+  end
+
+  defp assign_selected_option(socket, nil), do: assign(socket, :selected_option, nil)
+  defp assign_selected_option(socket, id), do: assign(socket, :selected_option, Resource.find!(id, socket.assigns.resource, socket.assigns.prefix, socket.assigns.repo))
 end

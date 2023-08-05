@@ -51,7 +51,6 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
                   immutable={false}
                   resource={@resource}
                   resources={@resources}
-                  form_ref={@form_ref}
                   session={@session}
                   prefix={@prefix}
                   repo={@repo}

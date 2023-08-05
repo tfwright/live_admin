@@ -50,9 +50,9 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
           <a
             class="button__remove"
             phx-click={
-              JS.push("validate",
-                value: %{field: @field, value: List.delete_at(@values, idx)},
-                target: @form_ref,
+              JS.push("remove",
+                value: %{idx: idx},
+                target: @myself,
                 page_loading: true
               )
             }
@@ -66,7 +66,7 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
       <% end %>
 
       <div class="form__actions">
-        <a href="#" phx-click="add" phx-target={@myself} class="resource__action--btn">
+        <a href="#" phx-click={JS.push("add", target: @myself, page_loading: true)} class="resource__action--btn">
           <%= trans("New") %>
         </a>
       </div>
@@ -76,7 +76,21 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
 
   @impl true
   def handle_event("add", _params, socket) do
-    socket = assign(socket, values: socket.assigns.values ++ [""])
+    socket =
+      socket
+      |> assign(values: socket.assigns.values ++ [""])
+      |> push_event("change", %{})
+
+    {:noreply, socket}
+  end
+
+  def handle_event("remove", params, socket) do
+    idx = params |> Map.fetch!("idx")
+
+    socket =
+      socket
+      |> assign(values: List.delete_at(socket.assigns.values, idx))
+      |> push_event("change", %{})
 
     {:noreply, socket}
   end

@@ -50,9 +50,9 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
         <div>
           <a
             phx-click={
-              JS.push("validate",
-                value: %{field: @field, value: remove_at(@values, idx)},
-                target: @form_ref,
+              JS.push("remove",
+                value: %{idx: idx},
+                target: @myself,
                 page_loading: true
               )
             }
@@ -64,7 +64,7 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
         </div>
       <% end %>
       <div class="form__actions">
-        <a phx-click={JS.push("add", target: @myself)} href="#" class="resource__action--btn">
+        <a phx-click={JS.push("add", target: @myself, page_loading: true)} href="#" class="resource__action--btn">
           <%= trans("New") %>
         </a>
       </div>
@@ -74,12 +74,22 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
 
   @impl true
   def handle_event("add", _, socket) do
-    {:noreply,
-     update(
-       socket,
-       :values,
-       &Map.put(&1, &1 |> map_size() |> to_string(), %{"key" => nil, "value" => nil})
-     )}
+    socket =
+      socket
+      |> update(:values, &Map.put(&1, &1 |> map_size() |> to_string(), %{"key" => nil, "value" => nil}))
+      |> push_event("change", %{})
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("remove", %{"idx" => idx}, socket) do
+    socket =
+      socket
+      |> update(:values, &remove_at(&1, idx))
+      |> push_event("change", %{})
+
+    {:noreply, socket}
   end
 
   defp remove_at(values, idx) do

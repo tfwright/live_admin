@@ -45,7 +45,6 @@ defmodule LiveAdmin.Components.Session.Content do
             id="metadata"
             form={f}
             field={:metadata}
-            form_ref={@myself}
           />
         </div>
         <div class="form__actions">
@@ -54,16 +53,6 @@ defmodule LiveAdmin.Components.Session.Content do
       </.form>
     </div>
     """
-  end
-
-  @impl true
-  def handle_event("validate", %{"value" => value}, socket = %{assigns: %{changeset: changeset}}) do
-    changeset =
-      changeset
-      |> Changeset.cast(Map.put(changeset.params || %{}, "metadata", value), [:metadata])
-      |> Changeset.update_change(:metadata, &parse_map_param/1)
-
-    {:noreply, assign(socket, changeset: changeset)}
   end
 
   @impl true

@@ -70,7 +70,6 @@ defmodule LiveAdmin.Components.Container.Form do
             immutable={Keyword.get(opts, :immutable, false)}
             resource={@resource}
             resources={@resources}
-            form_ref={@myself}
             session={@session}
             prefix={@prefix}
             repo={@repo}
@@ -172,7 +171,6 @@ defmodule LiveAdmin.Components.Container.Form do
           disabled={@immutable}
           resource={@resource}
           resources={@resources}
-          form_ref={@form_ref}
           session={@session}
           prefix={@prefix}
           repo={@repo}
@@ -200,7 +198,6 @@ defmodule LiveAdmin.Components.Container.Form do
       field={@field}
       resource={@resource}
       resources={@resource}
-      form_ref={@form_ref}
       session={@session}
       prefix={@prefix}
       repo={@repo}
@@ -231,9 +228,7 @@ defmodule LiveAdmin.Components.Container.Form do
           field={@field}
           disabled={@disabled}
           resource={@associated_resource}
-          form_ref={@form_ref}
           session={@session}
-          handle_select="validate"
           prefix={@prefix}
           repo={@repo}
         />
@@ -256,7 +251,6 @@ defmodule LiveAdmin.Components.Container.Form do
       form={@form}
       field={@field}
       disabled={@disabled}
-      form_ref={@form_ref}
     />
     """
   end
@@ -269,7 +263,6 @@ defmodule LiveAdmin.Components.Container.Form do
       form={@form}
       field={@field}
       disabled={@disabled}
-      form_ref={@form_ref}
     />
     """
   end
