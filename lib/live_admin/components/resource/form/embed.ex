@@ -3,6 +3,7 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
   use Phoenix.HTML
 
   alias LiveAdmin.Components.Container.Form
+  alias Phoenix.LiveView.JS
 
   import LiveAdmin, only: [trans: 1]
 
@@ -32,9 +33,13 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
             <div>
               <a
                 class="button__remove"
-                phx-click="remove"
-                phx-value-idx={embed_form.index}
-                phx-target={@myself}
+                phx-click={
+                  JS.push("remove",
+                    value: %{idx: embed_form.index},
+                    target: @myself,
+                    page_loading: true
+                  )
+                }
               />
             </div>
             <div>
@@ -57,7 +62,16 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
         <% end %>
         <%= if match?({_, _, %{cardinality: :many}}, @type) || input_value(@form, @field) == nil do %>
           <div class="form__actions">
-            <a href="#" phx-click="add" phx-target={@myself} class="resource__action--btn">
+            <a
+              href="#"
+              phx-click={
+                JS.push("add",
+                  target: @myself,
+                  page_loading: true
+                )
+              }
+              class="resource__action--btn"
+            >
               <%= trans("New") %>
             </a>
           </div>
@@ -71,7 +85,7 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
 
   @impl true
   def handle_event("remove", params, socket) do
-    idx = params |> Map.get("idx", "0") |> String.to_integer()
+    idx = params |> Map.fetch!("idx") |> Kernel.||(0)
 
     socket =
       socket
