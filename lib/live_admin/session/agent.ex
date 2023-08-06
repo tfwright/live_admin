@@ -11,10 +11,8 @@ defmodule LiveAdmin.Session.Agent do
   def init!(conn) do
     id = Map.get(conn.assigns, :user_id, Ecto.UUID.generate())
 
-    Agent.get_and_update(__MODULE__, fn state ->
-      new_state = Map.put_new(state, id, %LiveAdmin.Session{id: id})
-
-      {state, new_state}
+    Agent.update(__MODULE__, fn state ->
+      Map.put_new(state, id, %LiveAdmin.Session{id: id})
     end)
 
     id
