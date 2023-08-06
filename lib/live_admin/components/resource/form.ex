@@ -4,21 +4,10 @@ defmodule LiveAdmin.Components.Container.Form do
 
   import LiveAdmin.ErrorHelpers
   import LiveAdmin, only: [associated_resource: 4, route_with_params: 2, trans: 1]
+  import LiveAdmin.View, only: [supported_type?: 1, field_class: 1]
 
   alias __MODULE__.{ArrayInput, Embed, MapInput, SearchSelect}
   alias LiveAdmin.Resource
-
-  @supported_primitive_types [
-    :string,
-    :boolean,
-    :date,
-    :integer,
-    :naive_datetime,
-    :utc_datetime,
-    :id,
-    :binary_id,
-    :float
-  ]
 
   @impl true
   def update(assigns = %{record: record}, socket) do
@@ -348,20 +337,6 @@ defmodule LiveAdmin.Components.Container.Form do
     |> Resource.change(changeset.data, params)
     |> Resource.validate(resource, session)
   end
-
-  defp field_class(type) when type in @supported_primitive_types, do: to_string(type)
-  defp field_class(:map), do: "map"
-  defp field_class({:array, _}), do: "array"
-  defp field_class({_, Ecto.Embedded, _}), do: "embed"
-  defp field_class({_, Ecto.Enum, _}), do: "enum"
-  defp field_class(_), do: "other"
-
-  defp supported_type?(type) when type in @supported_primitive_types, do: true
-  defp supported_type?(:map), do: true
-  defp supported_type?({:array, _}), do: true
-  defp supported_type?({_, Ecto.Embedded, _}), do: true
-  defp supported_type?({_, Ecto.Enum, _}), do: true
-  defp supported_type?(_), do: false
 
   def enabled?(changeset, action, resource) do
     resource.__live_admin_config__(:"#{action}_with") != false && Enum.empty?(changeset.errors)

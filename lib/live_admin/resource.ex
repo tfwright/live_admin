@@ -62,7 +62,7 @@ defmodule LiveAdmin.Resource do
           |> Map.fetch!(field)
           |> case do
             val when is_binary(val) -> val
-            val -> inspect(val)
+            val -> inspect(val, pretty: true)
           end
         end
 

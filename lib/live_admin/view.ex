@@ -16,6 +16,18 @@ defmodule LiveAdmin.View do
 
   @env Mix.env()
 
+  @supported_primitive_types [
+    :string,
+    :boolean,
+    :date,
+    :integer,
+    :naive_datetime,
+    :utc_datetime,
+    :id,
+    :binary_id,
+    :float
+  ]
+
   embed_templates("components/layout/*")
 
   def render("layout.html", assigns), do: layout(assigns)
@@ -29,4 +41,18 @@ defmodule LiveAdmin.View do
       override_css -> @app_css <> override_css
     end
   end
+
+  def field_class(type) when type in @supported_primitive_types, do: to_string(type)
+  def field_class(:map), do: "map"
+  def field_class({:array, _}), do: "array"
+  def field_class({_, Ecto.Embedded, _}), do: "embed"
+  def field_class({_, Ecto.Enum, _}), do: "enum"
+  def field_class(_), do: "other"
+
+  def supported_type?(type) when type in @supported_primitive_types, do: true
+  def supported_type?(:map), do: true
+  def supported_type?({:array, _}), do: true
+  def supported_type?({_, Ecto.Embedded, _}), do: true
+  def supported_type?({_, Ecto.Enum, _}), do: true
+  def supported_type?(_), do: false
 end

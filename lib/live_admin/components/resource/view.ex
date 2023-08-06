@@ -3,6 +3,7 @@ defmodule LiveAdmin.Components.Container.View do
   use Phoenix.HTML
 
   import LiveAdmin, only: [route_with_params: 2, trans: 1]
+  import LiveAdmin.View, only: [field_class: 1]
 
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
@@ -20,7 +21,7 @@ defmodule LiveAdmin.Components.Container.View do
     <div class="resource__view">
       <div class="resource__table">
         <dl>
-          <%= for {field, _, _} <- Resource.fields(@resource) do %>
+          <%= for {field, type, _} <- Resource.fields(@resource) do %>
             <% assoc_resource =
               LiveAdmin.associated_resource(
                 @resource.__live_admin_config__(:schema),
@@ -29,7 +30,7 @@ defmodule LiveAdmin.Components.Container.View do
               ) %>
             <% label = Resource.render(@record, field, @resource, assoc_resource, @session) %>
             <dt class="field__label"><%= trans(humanize(field)) %></dt>
-            <dd>
+            <dd class={"field__#{field_class(type)}"}>
               <%= if assoc_resource && Map.fetch!(@record, field) do %>
                 <%= live_redirect(label,
                   to:
