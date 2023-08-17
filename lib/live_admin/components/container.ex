@@ -464,6 +464,7 @@ defmodule LiveAdmin.Components.Container do
       :ecto_repo
       |> resource.__live_admin_config__()
       |> Kernel.||(default)
+      |> Kernel.||(raise "no repo configured")
 
     prefix_options =
       if function_exported?(repo, :prefixes, 0) do
