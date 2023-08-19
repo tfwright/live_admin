@@ -166,9 +166,7 @@ defmodule LiveAdmin.Components.Container.Index do
                     @resources
                   ) %>
                 <td class={"resource__cell resource__cell--#{type_to_css_class(type)}"}>
-                  <div class="cell__contents">
-                    <%= Resource.render(record, field, @resource, assoc_resource, @session) %>
-                  </div>
+                  <div class="cell__contents"><%= Resource.render(record, field, @resource, assoc_resource, @session) %></div>
                   <div class="cell__icons">
                     <div class="cell__copy" data-message="Copied cell contents to clipboard">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
