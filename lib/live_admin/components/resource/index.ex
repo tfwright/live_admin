@@ -108,11 +108,6 @@ defmodule LiveAdmin.Components.Container.Index do
                     <nav>
                       <ul>
                         <li>
-                          <%= live_redirect(trans("View"),
-                            to: route_with_params(assigns, segments: [record])
-                          ) %>
-                        </li>
-                        <li>
                           <%= live_redirect(trans("Edit"),
                             to:
                               route_with_params(assigns,
@@ -166,21 +161,26 @@ defmodule LiveAdmin.Components.Container.Index do
                     @resources
                   ) %>
                 <td class={"resource__cell resource__cell--#{type_to_css_class(type)}"}>
-                  <div class="cell__contents"><%= Resource.render(record, field, @resource, assoc_resource, @session) %></div>
+                  <div class="cell__contents">
+                    <%= Resource.render(record, field, @resource, assoc_resource, @session) %>
+                  </div>
                   <div class="cell__icons">
                     <div class="cell__copy" data-message="Copied cell contents to clipboard">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M 4 2 C 2.895 2 2 2.895 2 4 L 2 18 L 4 18 L 4 4 L 18 4 L 18 2 L 4 2 z M 8 6 C 6.895 6 6 6.895 6 8 L 6 20 C 6 21.105 6.895 22 8 22 L 20 22 C 21.105 22 22 21.105 22 20 L 22 8 C 22 6.895 21.105 6 20 6 L 8 6 z M 8 8 L 20 8 L 20 20 L 8 20 L 8 8 z" />
                       </svg>
                     </div>
-                    <%= if assoc_resource && Map.fetch!(record, field) do %>
+                    <%= if record |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) || (assoc_resource && Map.fetch!(record, field)) do %>
                       <a
                         class="cell__link"
                         href={
-                          route_with_params(assigns,
-                            resource_path: elem(assoc_resource, 0),
-                            segments: [Map.fetch!(record, field)]
-                          )
+                          if assoc_resource,
+                            do:
+                              route_with_params(assigns,
+                                resource_path: elem(assoc_resource, 0),
+                                segments: [Map.fetch!(record, field)]
+                              ),
+                            else: route_with_params(assigns, segments: [record])
                         }
                         target="_blank"
                       >
