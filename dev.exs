@@ -55,9 +55,17 @@ defmodule DemoWeb.Renderer do
     record
     |> Map.fetch!(field)
     |> case do
-      bool when is_boolean(bool) -> if bool, do: "Yes", else: "No"
-      date = %Date{} -> Calendar.strftime(date, "%a, %B %d %Y")
-      _ -> record |> Map.fetch!(field) |> inspect()
+      bool when is_boolean(bool) ->
+        if bool, do: "Yes", else: "No"
+      date = %Date{} ->
+        Calendar.strftime(date, "%a, %B %d %Y")
+      _ ->
+        record
+        |> Map.fetch!(field)
+        |> case do
+          map = %{} -> inspect(map)
+          val -> to_string(val)
+        end
     end
   end
 
