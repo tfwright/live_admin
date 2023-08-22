@@ -63,8 +63,8 @@ defmodule DemoWeb.Renderer do
         record
         |> Map.fetch!(field)
         |> case do
-          map = %{} -> inspect(map)
-          val -> to_string(val)
+          val when is_binary(val) -> val
+          val -> inspect(val, pretty: true)
         end
     end
   end
