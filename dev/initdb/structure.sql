@@ -30,6 +30,8 @@ create table posts (
   body text,
   inserted_at timestamp without time zone,
   tags jsonb,
+  categories jsonb,
+  status varchar(100),
   previous_versions jsonb DEFAULT '[]'::jsonb,
   metadata jsonb DEFAULT '{}'::jsonb
 );
@@ -68,6 +70,8 @@ create table alt.posts (
   body text,
   inserted_at timestamp without time zone,
   tags jsonb,
+  categories jsonb,
+  status varchar(100),
   previous_versions jsonb DEFAULT '[]'::jsonb,
   metadata jsonb DEFAULT '{}'::jsonb
 );

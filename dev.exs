@@ -203,7 +203,6 @@ defmodule Demo.Posts.Post.Version do
   @primary_key false
   embedded_schema do
     field :body, :string
-    field :status, {:array, Ecto.Enum}, values: [:draft, :archived, :live]
 
     timestamps(updated_at: false)
   end
@@ -224,6 +223,8 @@ defmodule Demo.Posts.Post do
     field :title, :string
     field :body, :string
     field :tags, {:array, :string}, default: []
+    field :categories, {:array, Ecto.Enum}, values: [:personal, :work]
+    field :status, Ecto.Enum, values: [:draft, :archived, :live]
     field :metadata, :map
 
     embeds_many :previous_versions, __MODULE__.Version, on_replace: :delete
