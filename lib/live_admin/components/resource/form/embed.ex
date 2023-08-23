@@ -12,7 +12,7 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
     socket =
       socket
       |> assign(assigns)
-      |> assign(:embed_forms, inputs_for(form, field))
+      |> assign(:embed_forms, form.impl.to_form(form.source, form, field, []))
 
     {:ok, socket}
   end
