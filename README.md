@@ -96,7 +96,7 @@ To avoid conflicts with your own app's translations, it is recommended to create
 
 ## Development environment
 
-This repo has been configured to run the application in Docker. Simply run `docker compose up` and navigate to http://localhost:4000
+This repo has been configured to run the application in [Docker](https://www.docker.com/) using [Compose](https://docs.docker.com/compose/).
 
 The Phoenix app is running the `app` service, so all mix command should be run there. Examples:
 
