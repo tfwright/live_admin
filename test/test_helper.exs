@@ -66,7 +66,7 @@ defmodule LiveAdminTest.User do
 
   use LiveAdmin.Resource,
     immutable_fields: [:encrypted_password],
-    actions: [:run_action]
+    actions: [:user_action]
 
   @primary_key {:id, :binary_id, autogenerate: true}
   schema "users" do
@@ -78,7 +78,7 @@ defmodule LiveAdminTest.User do
     embeds_one(:settings, LiveAdminTest.Settings)
   end
 
-  def run_action(%__MODULE__{}, %{}), do: {:ok, "worked"}
+  def user_action(%__MODULE__{}, %{}), do: {:ok, "worked"}
 end
 
 defmodule LiveAdminTest.PostResource do

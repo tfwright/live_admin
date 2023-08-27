@@ -286,8 +286,18 @@ input[type="date"], input[type="number"] {
     @apply mb-3;
   }
 
-  .resource__list {
+  #index-page {
     @apply overflow-x-auto;
+  }
+
+  tfoot td {
+    @apply p-1;
+  }
+
+  tfoot tr {
+    @apply p-1;
+    @apply bottom-0;
+    @apply sticky;
   }
 
   .list__search {
@@ -520,6 +530,12 @@ input[type="date"], input[type="number"] {
 
   [class^="toast__container"]:empty {
     display: none;
+  }
+
+  .toast__container--info {
+    @apply toast__container;
+    top: auto !important;
+    transform: translate(-50%, -50%) !important;
   }
 
   .toast__container--error {

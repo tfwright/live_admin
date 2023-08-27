@@ -74,6 +74,12 @@ defmodule LiveAdmin.Resource do
     end
   end
 
+  def all(ids, resource, prefix, repo) do
+    resource.__live_admin_config__(:schema)
+    |> where([s], s.id in ^ids)
+    |> repo.all(prefix: prefix)
+  end
+
   def find!(id, resource, prefix, repo) do
     find(id, resource, prefix, repo) ||
       raise(Ecto.NoResultsError, queryable: resource.__live_admin_config__(:schema))
