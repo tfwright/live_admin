@@ -59,7 +59,7 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
             </div>
           </div>
         <% end %>
-        <%= if match?({_, _, %{cardinality: :many}}, @type) || input_value(@form, @field) == nil do %>
+        <%= if match?({_, _, %{cardinality: :many}}, @type) || Enum.empty?(@embed_forms) do %>
           <div class="form__actions">
             <a
               href="#"
