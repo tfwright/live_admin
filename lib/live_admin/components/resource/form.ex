@@ -318,7 +318,11 @@ defmodule LiveAdmin.Components.Container.Form do
         <%= checkbox(@form, @field,
           name: input_name(@form, @field) <> "[]",
           checked_value: option,
-          value: @form |> input_value(@field) |> Kernel.||([]) |> Enum.find(&(&1 == option)),
+          value:
+            @form
+            |> input_value(@field)
+            |> Kernel.||([])
+            |> Enum.find(&(to_string(&1) == to_string(option))),
           unchecked_value: "",
           hidden_input: false,
           disabled: @disabled,
