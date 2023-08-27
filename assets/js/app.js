@@ -36,6 +36,34 @@ Hooks.FormPage = {
 
 Hooks.IndexPage = {
   mounted() {
+    this.selected = [];
+
+    this.el.addEventListener("live_admin:action", e => {
+      if (e.target.dataset.action === "delete") {
+        this.pushEventTo(this.el, "delete", {ids: this.selected});
+      } else {
+        this.pushEventTo(this.el, "action", {action: e.target.dataset.action, ids: this.selected});
+      }
+    })
+
+    this.el.addEventListener("live_admin:toggle_select", e => {
+      if (e.target.id === "select-all") {
+        this.el.querySelectorAll('.resource__select').forEach(box => box.checked = e.target.checked);
+      } else {
+        this.el.querySelector('#select-all').checked = false;
+      }
+
+      this.selected = Array.from(this.el.querySelectorAll('input[data-record-id]:checked'), e => e.dataset.recordId);
+
+      if (this.selected.length > 0) {
+        document.getElementById("footer-select").classList.remove("hidden");
+        document.getElementById("footer-nav").classList.add("hidden");
+      } else {
+        document.getElementById("footer-nav").classList.remove("hidden");
+        document.getElementById("footer-select").classList.add("hidden");
+      }
+    });
+
     var clipboard = new ClipboardJS(
       this.el.querySelectorAll('.cell__copy'),
       {
@@ -51,6 +79,9 @@ Hooks.IndexPage = {
         className: "toast__container",
       }).showToast();
     });
+  },
+  updated() {
+    this.selected = [];
   }
 }
 

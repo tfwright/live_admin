@@ -7,7 +7,6 @@ defmodule LiveAdmin.Components.Container do
       resource_title: 1,
       route_with_params: 1,
       route_with_params: 2,
-      record_label: 2,
       trans: 1,
       trans: 2
     ]
@@ -84,39 +83,6 @@ defmodule LiveAdmin.Components.Container do
   def handle_params(_, _, socket), do: {:noreply, socket}
 
   @impl true
-  def handle_event(
-        "delete",
-        %{"id" => id},
-        %{
-          assigns: %{
-            resource: resource,
-            session: session
-          }
-        } = socket
-      ) do
-    socket =
-      id
-      |> Resource.find!(resource, socket.assigns.prefix, socket.assigns.repo)
-      |> Resource.delete(resource, session, socket.assigns.repo)
-      |> case do
-        {:ok, record} ->
-          socket
-          |> put_flash(
-            :info,
-            trans("Deleted %{label}", inter: [label: record_label(record, resource)])
-          )
-          |> push_navigate(to: route_with_params(socket.assigns))
-
-        {:error, _} ->
-          push_event(socket, "error", %{
-            msg: trans("Delete failed!")
-          })
-      end
-
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_event("set_locale", %{"locale" => locale}, socket) do
     new_session = Map.put(socket.assigns.session, :locale, locale)
 
@@ -134,50 +100,6 @@ defmodule LiveAdmin.Components.Container do
     socket = assign(socket, prefix: nil, session: new_session)
 
     {:noreply, push_redirect(socket, to: route_with_params(socket.assigns))}
-  end
-
-  @impl true
-  def handle_event(
-        "action",
-        params = %{"action" => action},
-        socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo}}
-      ) do
-    record = socket.assigns[:record] || Resource.find!(params["id"], resource, prefix, repo)
-
-    action_name = String.to_existing_atom(action)
-
-    {m, f, a} =
-      :actions
-      |> resource.__live_admin_config__()
-      |> Enum.find_value(fn
-        {^action_name, mfa} -> mfa
-        ^action_name -> {resource, action_name, []}
-        _ -> false
-      end)
-
-    socket =
-      case apply(m, f, [record, socket.assigns.session] ++ a) do
-        {:ok, record} ->
-          socket
-          |> push_event("success", %{
-            msg: trans("%{action} succeeded", inter: [action: action])
-          })
-          |> assign(:record, record)
-
-        {:error, error} ->
-          push_event(
-            socket,
-            "error",
-            trans("%{action} failed: %{error}",
-              inter: [
-                action: action,
-                error: error
-              ]
-            )
-          )
-      end
-
-    {:noreply, socket}
   end
 
   @impl true
@@ -254,49 +176,53 @@ defmodule LiveAdmin.Components.Container do
             >
               <%= trans("Run task") %>
             </button>
-            <nav>
-              <ul>
-                <%= for key <- get_task_keys(@resource) do %>
-                  <li>
-                    <button
-                      class="resource__action--link"
-                      phx-click={JS.push("task", value: %{task: key}, page_loading: true)}
-                      ,
-                      data-confirm="Are you sure?"
-                    >
-                      <%= key |> to_string() |> humanize() %>
-                    </button>
-                  </li>
-                <% end %>
-              </ul>
-            </nav>
+            <div>
+              <nav>
+                <ul>
+                  <%= for key <- get_task_keys(@resource) do %>
+                    <li>
+                      <button
+                        class="resource__action--link"
+                        phx-click={JS.push("task", value: %{task: key}, page_loading: true)}
+                        ,
+                        data-confirm="Are you sure?"
+                      >
+                        <%= key |> to_string() |> humanize() %>
+                      </button>
+                    </li>
+                  <% end %>
+                </ul>
+              </nav>
+            </div>
           </div>
           <%= if Enum.any?(@prefix_options) do %>
             <div id="prefix-select" class="resource__action--drop">
               <button class="resource__action--btn">
                 <%= @prefix || trans("Set prefix") %>
               </button>
-              <nav>
-                <ul>
-                  <%= if @prefix do %>
-                    <li>
-                      <button
-                        class="resource__action--link"
-                        phx-click={JS.push("clear_prefix", page_loading: true)}
-                      >
-                        <%= trans("clear") %>
-                      </button>
-                    </li>
-                  <% end %>
-                  <%= for option <- @prefix_options, to_string(option) != @prefix do %>
-                    <li>
-                      <.link navigate={route_with_params(assigns, params: [prefix: option])}>
-                        <%= option %>
-                      </.link>
-                    </li>
-                  <% end %>
-                </ul>
-              </nav>
+              <div>
+                <nav>
+                  <ul>
+                    <%= if @prefix do %>
+                      <li>
+                        <button
+                          class="resource__action--link"
+                          phx-click={JS.push("clear_prefix", page_loading: true)}
+                        >
+                          <%= trans("clear") %>
+                        </button>
+                      </li>
+                    <% end %>
+                    <%= for option <- @prefix_options, to_string(option) != @prefix do %>
+                      <li>
+                        <.link navigate={route_with_params(assigns, params: [prefix: option])}>
+                          <%= option %>
+                        </.link>
+                      </li>
+                    <% end %>
+                  </ul>
+                </nav>
+              </div>
             </div>
           <% end %>
           <%= if LiveAdmin.use_i18n? do %>
@@ -304,22 +230,24 @@ defmodule LiveAdmin.Components.Container do
               <button class="resource__action--btn">
                 <%= @session.locale || "Set locale" %>
               </button>
-              <nav>
-                <ul>
-                  <%= for option <- LiveAdmin.gettext_backend().locales(), to_string(option) != @session.locale do %>
-                    <li>
-                      <button
-                        class="resource__action--link"
-                        phx-click={
-                          JS.push("set_locale", value: %{locale: option}, page_loading: true)
-                        }
-                      >
-                        <%= option %>
-                      </button>
-                    </li>
-                  <% end %>
-                </ul>
-              </nav>
+              <div>
+                <nav>
+                  <ul>
+                    <%= for option <- LiveAdmin.gettext_backend().locales(), to_string(option) != @session.locale do %>
+                      <li>
+                        <button
+                          class="resource__action--link"
+                          phx-click={
+                            JS.push("set_locale", value: %{locale: option}, page_loading: true)
+                          }
+                        >
+                          <%= option %>
+                        </button>
+                      </li>
+                    <% end %>
+                  </ul>
+                </nav>
+              </div>
             </div>
           <% end %>
         </div>
@@ -397,6 +325,7 @@ defmodule LiveAdmin.Components.Container do
       key={@key}
       base_path={@base_path}
       prefix={@prefix}
+      repo={@repo}
     />
     """
   end

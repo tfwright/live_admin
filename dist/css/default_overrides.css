@@ -27,6 +27,10 @@ body {
   background-color: rgb(224 231 255);
 }
 
+.resource__row--selected {
+  background-color: rgb(224, 231, 255);
+}
+
 .nav a:hover {
   background-color: rgb(165 180 252);
 }
@@ -39,4 +43,9 @@ body {
 .toast__container--success {
   border-color: rgb(102, 153, 0);
   color: rgb(102, 153, 0);
+}
+
+.toast__container--info {
+  border-color: rgb(67, 56, 202);
+  color: rgb(67, 56, 202);
 }

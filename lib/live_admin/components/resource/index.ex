@@ -4,6 +4,7 @@ defmodule LiveAdmin.Components.Container.Index do
 
   import LiveAdmin,
     only: [
+      route_with_params: 1,
       route_with_params: 2,
       trans: 1,
       trans: 2
@@ -33,7 +34,7 @@ defmodule LiveAdmin.Components.Container.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="resource__list">
+    <div id="index-page" phx-hook="IndexPage" phx-target={@myself}>
       <div class="list__search">
         <div class="flex border-2 rounded-lg">
           <form phx-change={JS.push("search", target: @myself, page_loading: true)}>
@@ -61,7 +62,14 @@ defmodule LiveAdmin.Components.Container.Index do
       <table class="resource__table">
         <thead>
           <tr>
-            <th class="resource__header" />
+            <th class="resource__header">
+              <input
+                type="checkbox"
+                id="select-all"
+                class="resource__select"
+                phx-click={JS.dispatch("live_admin:toggle_select")}
+              />
+            </th>
             <%= for {field, _, _} <- Resource.fields(@resource) do %>
               <th class="resource__header" title={field}>
                 <%= list_link(
@@ -82,75 +90,17 @@ defmodule LiveAdmin.Components.Container.Index do
             <% end %>
           </tr>
         </thead>
-        <tbody id="index-page" phx-hook="IndexPage">
+        <tbody>
           <%= for record <- @records |> elem(0) do %>
-            <tr>
+            <tr class="resource__row">
               <td>
                 <div class="cell__contents">
-                  <div class="resource__menu--drop">
-                    <a href="#">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        width="24"
-                        height="24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-                        />
-                      </svg>
-                    </a>
-                    <nav>
-                      <ul>
-                        <li>
-                          <%= live_redirect(trans("Edit"),
-                            to:
-                              route_with_params(assigns,
-                                segments: [:edit, record],
-                                params: [prefix: @prefix]
-                              )
-                          ) %>
-                        </li>
-                        <%= if @resource.__live_admin_config__(:delete_with) != false do %>
-                          <li>
-                            <button
-                              class="resource__action--link"
-                              data-confirm="Are you sure?"
-                              phx-click={
-                                JS.push("delete",
-                                  value: %{id: record.id},
-                                  page_loading: true
-                                )
-                              }
-                            >
-                              <%= trans("Delete") %>
-                            </button>
-                          </li>
-                        <% end %>
-                        <%= for action <- (@resource.__live_admin_config__(:actions) || []) do %>
-                          <li>
-                            <button
-                              class="resource__action--link"
-                              data-confirm="Are you sure?"
-                              phx-click={
-                                JS.push("action",
-                                  value: %{id: record.id, action: action},
-                                  page_loading: true
-                                )
-                              }
-                            >
-                              <%= action |> to_string() |> humanize() %>
-                            </button>
-                          </li>
-                        <% end %>
-                      </ul>
-                    </nav>
-                  </div>
+                  <input
+                    type="checkbox"
+                    class="resource__select"
+                    data-record-id={record.id}
+                    phx-click={JS.dispatch("live_admin:toggle_select")}
+                  />
                 </div>
               </td>
               <%= for {field, type, _} <- Resource.fields(@resource) do %>
@@ -207,7 +157,7 @@ defmodule LiveAdmin.Components.Container.Index do
           <% end %>
         </tbody>
         <tfoot>
-          <tr>
+          <tr id="footer-nav">
             <td class="w-full" colspan={@resource |> Resource.fields() |> Enum.count()}>
               <%= if @page > 1,
                 do:
@@ -232,6 +182,48 @@ defmodule LiveAdmin.Components.Container.Index do
               <%= trans("%{count} total rows", inter: [count: elem(@records, 1)]) %>
             </td>
           </tr>
+          <tr id="footer-select" class="hidden">
+            <td colspan={@resource |> Resource.fields() |> Enum.count()}>
+              <div class="table__actions">
+                <%= if @resource.__live_admin_config__(:delete_with) != false do %>
+                  <button
+                    class="resource__action--danger"
+                    data-action="delete"
+                    phx-click={JS.dispatch("live_admin:action")}
+                  >
+                    <%= trans("Delete") %>
+                  </button>
+                <% end %>
+                <div class="resource__action--drop">
+                  <div>
+                    <nav>
+                      <ul>
+                        <%= for action <- @resource.__live_admin_config__(:actions) do %>
+                          <li>
+                            <button
+                              class="resource__action--link"
+                              data-action={action}
+                              phx-click={JS.dispatch("live_admin:action")}
+                            >
+                              <%= action |> to_string() |> humanize() %>
+                            </button>
+                          </li>
+                        <% end %>
+                      </ul>
+                    </nav>
+                  </div>
+                  <button
+                    class={"resource__action#{if Enum.empty?(@resource.__live_admin_config__(:actions)), do: "--disabled", else: "--btn"}"}
+                    disabled={
+                      if Enum.empty?(@resource.__live_admin_config__(:actions)), do: "disabled"
+                    }
+                  >
+                    <%= trans("Run action") %>
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
         </tfoot>
       </table>
     </div>
@@ -250,6 +242,81 @@ defmodule LiveAdmin.Components.Container.Index do
              |> Map.put(:search, query)
          )
      )}
+  end
+
+  @impl true
+  def handle_event(
+        "delete",
+        %{"ids" => ids},
+        %{
+          assigns: %{
+            resource: resource,
+            session: session,
+            prefix: prefix,
+            repo: repo
+          }
+        } = socket
+      ) do
+    results =
+      ids
+      |> Resource.all(resource, prefix, repo)
+      |> Enum.map(fn record ->
+        Task.Supervisor.async(LiveAdmin.Task.Supervisor, fn ->
+          Resource.delete(record, resource, session, socket.assigns.repo)
+        end)
+      end)
+      |> Task.await_many()
+
+    socket =
+      socket
+      |> put_flash(
+        :info,
+        trans("Deleted %{count} records", inter: [count: Enum.count(results)])
+      )
+      |> push_navigate(to: route_with_params(socket.assigns))
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "action",
+        %{"action" => action, "ids" => ids},
+        socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo}}
+      ) do
+    records = Resource.all(ids, resource, prefix, repo)
+
+    action_name = String.to_existing_atom(action)
+
+    results =
+      records
+      |> Enum.map(fn record ->
+        Task.Supervisor.async(LiveAdmin.Task.Supervisor, fn ->
+          {m, f, a} =
+            :actions
+            |> resource.__live_admin_config__()
+            |> Enum.find_value(fn
+              {^action_name, mfa} -> mfa
+              ^action_name -> {resource, action_name, []}
+              _ -> false
+            end)
+
+          apply(m, f, [record, socket.assigns.session] ++ a)
+        end)
+      end)
+      |> Task.await_many()
+
+    socket =
+      socket
+      |> put_flash(
+        :info,
+        trans("Action completed on %{count} records: %{action}",
+          inter: [count: Enum.count(results), action: action]
+        )
+      )
+      |> push_navigate(to: route_with_params(socket.assigns))
+
+    {:noreply, socket}
   end
 
   defp list_link(content, assigns, params, opts) do
