@@ -415,7 +415,7 @@ defmodule DemoWeb.UserAdmin do
       immutable_fields: [:encrypted_password, :inserted_at],
       components: [new: DemoWeb.CreateUserForm],
       label_with: :name,
-      actions: [:deactivate],
+      actions: [:deactivate, :fake, :fake],
       tasks: [:regenerate_passwords],
       render_with: :render_field
 

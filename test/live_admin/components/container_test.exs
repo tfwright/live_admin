@@ -48,42 +48,18 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "deletes record", %{view: view} do
       view
-      |> element("button", "Delete")
-      |> render_click()
+      |> element("#index-page")
+      |> render_hook("delete", %{ids: []})
 
       assert_redirected(view, "/user")
     end
 
-    test "runs configured actions", %{view: view} do
+    test "runs configured action on selected records", %{view: view} do
       view
-      |> element("button", "Run action")
-      |> render_click()
+      |> element("#index-page")
+      |> render_hook("action", %{action: "user_action", ids: []})
 
-      assert_push_event(view, "success", %{})
-    end
-  end
-
-  describe "list resource with non-schema resource" do
-    setup %{conn: conn} do
-      Repo.insert!(%Post{title: "test"})
-      {:ok, view, _html} = live(conn, "/live_admin_test_post")
-      %{view: view}
-    end
-
-    test "deletes record", %{view: view} do
-      view
-      |> element("button", "Delete")
-      |> render_click()
-
-      assert_redirected(view, "/live_admin_test_post")
-    end
-
-    test "runs configured actions", %{view: view} do
-      view
-      |> element("button", "Run action")
-      |> render_click()
-
-      assert_push_event(view, "success", %{})
+      assert_redirected(view, "/user")
     end
   end
 

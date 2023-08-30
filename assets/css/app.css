@@ -215,7 +215,6 @@ input[type="date"], input[type="number"] {
 
   .resource__action {
     @apply inline-flex;
-    @apply items-center;
     @apply h-8;
   }
 
@@ -225,7 +224,9 @@ input[type="date"], input[type="number"] {
 
   .resource__action--btn {
     @apply resource__action;
+    @apply items-center;
     @apply px-4;
+    @apply mx-1;
     @apply text-sm;
     @apply transition-colors;
     @apply duration-150;
@@ -250,6 +251,10 @@ input[type="date"], input[type="number"] {
   }
 
   [class$="--drop"] {
+    @apply flex-col;
+  }
+
+  [class$="--drop"] div {
     @apply relative;
   }
 
@@ -257,7 +262,6 @@ input[type="date"], input[type="number"] {
     @apply appearance-none;
     @apply hidden;
     @apply absolute;
-    @apply top-full;
     @apply left-0;
     @apply border;
     @apply rounded-md;
@@ -266,6 +270,14 @@ input[type="date"], input[type="number"] {
     @apply z-50;
     @apply max-h-80;
     @apply p-1;
+  }
+
+  [class$="--drop"] div:first-child nav {
+    @apply bottom-2;
+  }
+
+  [class$="--drop"] div:last-child nav {
+    @apply top-1;
   }
 
   #prefix-select nav {
@@ -286,8 +298,18 @@ input[type="date"], input[type="number"] {
     @apply mb-3;
   }
 
-  .resource__list {
+  #index-page {
     @apply overflow-x-auto;
+  }
+
+  tfoot td {
+    @apply p-1;
+  }
+
+  tfoot tr {
+    @apply p-1;
+    @apply bottom-0;
+    @apply sticky;
   }
 
   .list__search {
@@ -377,7 +399,12 @@ input[type="date"], input[type="number"] {
   }
 
   .form__actions {
-    @apply text-right;
+    @apply flex;
+    @apply justify-end;
+  }
+
+  .table__actions {
+    @apply flex;
   }
 
   .embed__title {
@@ -520,6 +547,12 @@ input[type="date"], input[type="number"] {
 
   [class^="toast__container"]:empty {
     display: none;
+  }
+
+  .toast__container--info {
+    @apply toast__container;
+    top: auto !important;
+    transform: translate(-50%, -50%) !important;
   }
 
   .toast__container--error {

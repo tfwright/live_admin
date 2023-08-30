@@ -7,6 +7,9 @@ defmodule LiveAdmin.Application do
   end
 
   defp children do
-    [{LiveAdmin.Session.Agent, %{}}]
+    [
+      {LiveAdmin.Session.Agent, %{}},
+      {Task.Supervisor, name: LiveAdmin.Task.Supervisor}
+    ]
   end
 end
