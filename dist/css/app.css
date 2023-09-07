@@ -881,7 +881,7 @@ select {
           text-decoration-line: underline;
 }
 
-.resource__view dd {
+#view-page dd {
   margin-bottom: 0.75rem;
 }
 

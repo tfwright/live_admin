@@ -34,6 +34,14 @@ Hooks.FormPage = {
   }
 }
 
+Hooks.ViewPage = {
+  mounted() {
+    this.el.addEventListener("live_admin:action", e => {
+      this.pushEventTo(this.el, "action", {action: e.target.dataset.action, ids: this.selected});
+    })
+  }
+}
+
 Hooks.IndexPage = {
   mounted() {
     this.selected = [];
