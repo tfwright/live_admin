@@ -31,13 +31,11 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   def render(assigns = %{disabled: true}) do
     ~H"""
     <div>
-      <span class="resource__action--disabled">
-        <%= if @selected_option do %>
-          <%= record_label(@selected_option, @resource) %>
-        <% else %>
-          <%= trans("None") %>
-        <% end %>
-      </span>
+      <%= if @selected_option do %>
+        <%= record_label(@selected_option, @resource) %>
+      <% else %>
+        <%= trans("None") %>
+      <% end %>
     </div>
     """
   end
@@ -45,33 +43,33 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
-      <div class="resource__action--drop">
-        <%= hidden_input(@form, @field,
+    <div class="search_select--drop">
+      <%= hidden_input(@form, @field,
+        disabled: @disabled,
+        value: if(@selected_option, do: @selected_option.id)
+      ) %>
+      <%= if @selected_option do %>
+        <a
+          href="#"
+          phx-click={JS.push("select", value: %{id: nil}, target: @myself, page_loading: true)}
+          class="resource__action--btn"
+        >
+          <%= record_label(@selected_option, @resource) %>
+        </a>
+      <% else %>
+        <%= text_input(:search, :select,
+          id: input_id(@form, @field) <> "search_select",
           disabled: @disabled,
-          value: if(@selected_option, do: @selected_option.id)
+          placeholder: trans("Search"),
+          phx_focus: "load_options",
+          phx_keyup: "load_options",
+          phx_target: @myself,
+          phx_debounce: 200,
+          autocomplete: "off"
         ) %>
-        <%= if @selected_option do %>
-          <a
-            href="#"
-            phx-click={JS.push("select", value: %{id: nil}, target: @myself, page_loading: true)}
-            class="resource__action--btn"
-          >
-            <%= record_label(@selected_option, @resource) %>
-          </a>
-        <% else %>
-          <%= text_input(:search, :select,
-            id: input_id(@form, @field) <> "search_select",
-            disabled: @disabled,
-            placeholder: trans("Search"),
-            phx_focus: "load_options",
-            phx_keyup: "load_options",
-            phx_target: @myself,
-            phx_debounce: 200,
-            autocomplete: "off"
-          ) %>
-        <% end %>
-        <%= unless @selected_option do %>
+      <% end %>
+      <%= unless @selected_option do %>
+        <div>
           <nav>
             <ul>
               <%= if Enum.empty?(@options) do %>
@@ -91,8 +89,8 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
               <% end %>
             </ul>
           </nav>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
     </div>
     """
   end

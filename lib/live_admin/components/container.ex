@@ -11,6 +11,8 @@ defmodule LiveAdmin.Components.Container do
       trans: 2
     ]
 
+  import LiveAdmin.Components
+
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
 
@@ -169,86 +171,63 @@ defmodule LiveAdmin.Components.Container do
               <%= trans("New") %>
             </button>
           <% end %>
-          <div class="resource__action--drop">
+          <.dropdown
+            :let={task}
+            label={trans("Run task")}
+            items={get_task_keys(@resource)}
+            disabled={@resource |> get_task_keys() |> Enum.empty?()}
+          >
             <button
-              class={"resource__action#{if @resource |> get_task_keys() |> Enum.empty?, do: "--disabled", else: "--btn"}"}
-              disabled={if @resource |> get_task_keys() |> Enum.empty?(), do: "disabled"}
+              class="resource__action--link"
+              phx-click={JS.push("task", value: %{task: task}, page_loading: true)}
+              ,
+              data-confirm="Are you sure?"
             >
-              <%= trans("Run task") %>
+              <%= task |> to_string() |> humanize() %>
             </button>
-            <div>
-              <nav>
-                <ul>
-                  <%= for key <- get_task_keys(@resource) do %>
-                    <li>
-                      <button
-                        class="resource__action--link"
-                        phx-click={JS.push("task", value: %{task: key}, page_loading: true)}
-                        ,
-                        data-confirm="Are you sure?"
-                      >
-                        <%= key |> to_string() |> humanize() %>
-                      </button>
-                    </li>
-                  <% end %>
-                </ul>
-              </nav>
-            </div>
-          </div>
+          </.dropdown>
           <%= if Enum.any?(@prefix_options) do %>
-            <div id="prefix-select" class="resource__action--drop">
-              <button class="resource__action--btn">
-                <%= @prefix || trans("Set prefix") %>
-              </button>
-              <div>
-                <nav>
-                  <ul>
-                    <%= if @prefix do %>
-                      <li>
-                        <button
-                          class="resource__action--link"
-                          phx-click={JS.push("clear_prefix", page_loading: true)}
-                        >
-                          <%= trans("clear") %>
-                        </button>
-                      </li>
-                    <% end %>
-                    <%= for option <- @prefix_options, to_string(option) != @prefix do %>
-                      <li>
-                        <.link navigate={route_with_params(assigns, params: [prefix: option])}>
-                          <%= option %>
-                        </.link>
-                      </li>
-                    <% end %>
-                  </ul>
-                </nav>
-              </div>
-            </div>
+            <%= if @prefix do %>
+              <.dropdown :let={clear} id="prefix-select" label={@prefix} items={[trans("clear")]}>
+                <button
+                  class="resource__action--link"
+                  phx-click={JS.push("clear_prefix", page_loading: true)}
+                >
+                  <%= clear %>
+                </button>
+              </.dropdown>
+            <% else %>
+              <.dropdown
+                :let={prefix}
+                id="prefix-select"
+                label={trans("Set prefix")}
+                items={Enum.filter(@prefix_options, &(to_string(&1) != @prefix))}
+              >
+                <.link navigate={route_with_params(assigns, params: [prefix: prefix])}>
+                  <%= prefix %>
+                </.link>
+              </.dropdown>
+            <% end %>
           <% end %>
           <%= if LiveAdmin.use_i18n? do %>
-            <div id="locale-select" class="resource__action--drop">
-              <button class="resource__action--btn">
-                <%= @session.locale || "Set locale" %>
+            <.dropdown
+              :let={locale}
+              id="locale-select"
+              label={@session.locale || "Set locale"}
+              items={
+                Enum.filter(
+                  LiveAdmin.gettext_backend().locales(),
+                  &(to_string(&1) != @session.locale)
+                )
+              }
+            >
+              <button
+                class="resource__action--link"
+                phx-click={JS.push("set_locale", value: %{locale: locale}, page_loading: true)}
+              >
+                <%= locale %>
               </button>
-              <div>
-                <nav>
-                  <ul>
-                    <%= for option <- LiveAdmin.gettext_backend().locales(), to_string(option) != @session.locale do %>
-                      <li>
-                        <button
-                          class="resource__action--link"
-                          phx-click={
-                            JS.push("set_locale", value: %{locale: option}, page_loading: true)
-                          }
-                        >
-                          <%= option %>
-                        </button>
-                      </li>
-                    <% end %>
-                  </ul>
-                </nav>
-              </div>
-            </div>
+            </.dropdown>
           <% end %>
         </div>
       </div>

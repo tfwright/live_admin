@@ -10,6 +10,8 @@ defmodule LiveAdmin.Components.Container.Index do
       trans: 2
     ]
 
+  import LiveAdmin.Components
+
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
 
@@ -195,34 +197,22 @@ defmodule LiveAdmin.Components.Container.Index do
                     <%= trans("Delete") %>
                   </button>
                 <% end %>
-                <div class="resource__action--drop">
-                  <div>
-                    <nav>
-                      <ul>
-                        <%= for action <- @resource.__live_admin_config__(:actions) do %>
-                          <li>
-                            <button
-                              class="resource__action--link"
-                              data-action={action}
-                              phx-click={JS.dispatch("live_admin:action")}
-                              data-confirm="Are you sure?"
-                            >
-                              <%= action |> to_string() |> humanize() %>
-                            </button>
-                          </li>
-                        <% end %>
-                      </ul>
-                    </nav>
-                  </div>
+                <.dropdown
+                  :let={action}
+                  orientation={:up}
+                  label={trans("Run action")}
+                  items={@resource.__live_admin_config__(:actions)}
+                  disabled={Enum.empty?(@resource.__live_admin_config__(:actions))}
+                >
                   <button
-                    class={"resource__action#{if Enum.empty?(@resource.__live_admin_config__(:actions)), do: "--disabled", else: "--btn"}"}
-                    disabled={
-                      if Enum.empty?(@resource.__live_admin_config__(:actions)), do: "disabled"
-                    }
+                    class="resource__action--link"
+                    data-action={action}
+                    phx-click={JS.dispatch("live_admin:action")}
+                    data-confirm="Are you sure?"
                   >
-                    <%= trans("Run action") %>
+                    <%= action |> to_string() |> humanize() %>
                   </button>
-                </div>
+                </.dropdown>
               </div>
             </td>
           </tr>
