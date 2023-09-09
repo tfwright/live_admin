@@ -795,7 +795,7 @@ select {
           text-decoration-line: underline;
 }
 
-.resource__action--btn {
+.resource__action--btn, .resource__action--secondary {
   display: inline-flex;
   height: 2rem;
   align-items: center;

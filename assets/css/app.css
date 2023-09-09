@@ -256,7 +256,7 @@ input[type="date"], input[type="number"] {
     @apply underline;
   }
 
-  .resource__action--btn {
+  .resource__action--btn, .resource__action--secondary {
     @apply resource__action;
     @apply items-center;
     @apply px-4;

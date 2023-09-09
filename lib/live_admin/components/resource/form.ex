@@ -65,6 +65,14 @@ defmodule LiveAdmin.Components.Container.Form do
           />
         <% end %>
         <div class="form__actions">
+          <%= if assigns[:record] do %>
+            <a
+              href={route_with_params(assigns, segments: [@record])}
+              class="resource__action--secondary"
+            >
+              <%= trans("Cancel") %>
+            </a>
+          <% end %>
           <%= submit(trans("Save"),
             class: "resource__action#{if !@enabled, do: "--disabled", else: "--btn"}",
             disabled: !@enabled
