@@ -46,31 +46,44 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
   def render(assigns) do
     ~H"""
     <div class="field__map--group">
-      <%= for {idx, %{"key" => k, "value" => v}} <- Enum.sort(@values) do %>
-        <div>
-          <a
-            phx-click={
-              JS.push("remove",
-                value: %{idx: idx},
-                target: @myself,
-                page_loading: true
-              )
-            }
-            href="#"
-            class="button__remove"
-          />
-          <textarea rows="1" name={input_name(@form, @field) <> "[#{idx}][key]"} phx-debounce={200}><%= k %></textarea>
-          <textarea rows="1" name={input_name(@form, @field) <> "[#{idx}][value]"} phx-debounce={200}><%= v %></textarea>
-        </div>
-      <% end %>
-      <div class="form__actions">
+      <div>
+        <%= for {idx, %{"key" => k, "value" => v}} <- Enum.sort(@values) do %>
+          <div class="field__map--row">
+            <a
+              href="#"
+              class="button__remove"
+              phx-click={
+                JS.push("remove",
+                  value: %{idx: idx},
+                  target: @myself,
+                  page_loading: true
+                )
+              }
+            />
+            <textarea
+              rows="1"
+              name={input_name(@form, @field) <> "[#{idx}][key]"}
+              phx-debounce={200}
+              placeholder={trans("Key")}
+            ><%= k %></textarea>
+            <textarea
+              rows="1"
+              name={input_name(@form, @field) <> "[#{idx}][value]"}
+              phx-debounce={200}
+              placeholder={trans("Value")}
+            ><%= v %></textarea>
+          </div>
+        <% end %>
         <a
-          phx-click={JS.push("add", target: @myself, page_loading: true)}
           href="#"
-          class="resource__action--btn"
-        >
-          <%= trans("New") %>
-        </a>
+          phx-click={
+            JS.push("add",
+              target: @myself,
+              page_loading: true
+            )
+          }
+          class="button__add"
+        />
       </div>
     </div>
     """

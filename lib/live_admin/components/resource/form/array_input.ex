@@ -2,8 +2,6 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import LiveAdmin, only: [trans: 1]
-
   alias Phoenix.LiveView.JS
 
   @impl true
@@ -48,6 +46,7 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
       <%= for {item, idx} <- Enum.with_index(@values) do %>
         <div>
           <a
+            href="#"
             class="button__remove"
             phx-click={
               JS.push("remove",
@@ -65,16 +64,16 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
           ) %>
         </div>
       <% end %>
-
-      <div class="form__actions">
-        <a
-          href="#"
-          phx-click={JS.push("add", target: @myself, page_loading: true)}
-          class="resource__action--btn"
-        >
-          <%= trans("New") %>
-        </a>
-      </div>
+      <a
+        href="#"
+        phx-click={
+          JS.push("add",
+            target: @myself,
+            page_loading: true
+          )
+        }
+        class="button__add"
+      />
     </div>
     """
   end

@@ -5,8 +5,6 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
   alias LiveAdmin.Components.Container.Form
   alias Phoenix.LiveView.JS
 
-  import LiveAdmin, only: [trans: 1]
-
   @impl true
   def update(assigns = %{form: form, field: field}, socket) do
     socket =
@@ -30,18 +28,17 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
         <%= hidden_input(@form, @field, value: "delete") %>
         <%= for embed_form <- @embed_forms do %>
           <div class="embed__item">
-            <div>
-              <a
-                class="button__remove"
-                phx-click={
-                  JS.push("remove",
-                    value: %{idx: embed_form.index},
-                    target: @myself,
-                    page_loading: true
-                  )
-                }
-              />
-            </div>
+            <a
+              href="#"
+              class="button__remove"
+              phx-click={
+                JS.push("remove",
+                  value: %{idx: embed_form.index},
+                  target: @myself,
+                  page_loading: true
+                )
+              }
+            />
             <div>
               <%= for {field, type, _} <- fields(@type) do %>
                 <Form.field
@@ -60,20 +57,16 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
           </div>
         <% end %>
         <%= if match?({_, _, %{cardinality: :many}}, @type) || Enum.empty?(@embed_forms) do %>
-          <div class="form__actions">
-            <a
-              href="#"
-              phx-click={
-                JS.push("add",
-                  target: @myself,
-                  page_loading: true
-                )
-              }
-              class="resource__action--btn"
-            >
-              <%= trans("New") %>
-            </a>
-          </div>
+          <a
+            href="#"
+            phx-click={
+              JS.push("add",
+                target: @myself,
+                page_loading: true
+              )
+            }
+            class="button__add"
+          />
         <% end %>
       <% else %>
         <pre><%= @form |> input_value(@field) |> inspect() %></pre>
