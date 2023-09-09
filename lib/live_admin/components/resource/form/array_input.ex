@@ -5,11 +5,6 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
   alias Phoenix.LiveView.JS
 
   @impl true
-  def mount(socket) do
-    {:ok, assign(socket, :values, [])}
-  end
-
-  @impl true
   def update(assigns = %{form: form, field: field}, socket) do
     socket =
       socket
