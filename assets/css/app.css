@@ -98,6 +98,16 @@ input[type="date"], input[type="number"] {
     @apply opacity-100;
   }
 
+  .search_select {
+    @apply flex;
+    @apply flex-row;
+    @apply content-center;
+  }
+
+  .search_select .button__remove {
+    @apply mr-1;
+  }
+
   .main__content {
     @apply flex;
     @apply flex-col;

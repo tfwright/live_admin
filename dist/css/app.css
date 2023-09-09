@@ -568,6 +568,16 @@ select {
   opacity: 1;
 }
 
+.search_select {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+}
+
+.search_select .button__remove {
+  margin-right: 0.25rem;
+}
+
 .main__content {
   display: flex;
   flex-direction: column;

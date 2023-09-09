@@ -43,7 +43,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="search_select--drop">
+    <div class="search_select">
       <%= hidden_input(@form, @field,
         disabled: @disabled,
         value: if(@selected_option, do: @selected_option.id)
@@ -52,43 +52,42 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
         <a
           href="#"
           phx-click={JS.push("select", value: %{id: nil}, target: @myself, page_loading: true)}
-          class="resource__action--btn"
-        >
-          <%= record_label(@selected_option, @resource) %>
-        </a>
+          class="button__remove"
+        />
+        <%= record_label(@selected_option, @resource) %>
       <% else %>
-        <%= text_input(:search, :select,
-          id: input_id(@form, @field) <> "search_select",
-          disabled: @disabled,
-          placeholder: trans("Search"),
-          phx_focus: "load_options",
-          phx_keyup: "load_options",
-          phx_target: @myself,
-          phx_debounce: 200,
-          autocomplete: "off"
-        ) %>
-      <% end %>
-      <%= unless @selected_option do %>
-        <div>
-          <nav>
-            <ul>
-              <%= if Enum.empty?(@options) do %>
-                <li><%= trans("No options") %></li>
-              <% end %>
-              <%= for option <- @options, option.id != input_value(@form, @field) do %>
-                <li>
-                  <a
-                    href="#"
-                    phx-click={
-                      JS.push("select", value: %{id: option.id}, target: @myself, page_loading: true)
-                    }
-                  >
-                    <%= record_label(option, @resource) %>
-                  </a>
-                </li>
-              <% end %>
-            </ul>
-          </nav>
+        <div class="search_select--drop">
+          <%= text_input(:search, :select,
+            id: input_id(@form, @field) <> "search_select",
+            disabled: @disabled,
+            placeholder: trans("Search"),
+            phx_focus: "load_options",
+            phx_keyup: "load_options",
+            phx_target: @myself,
+            phx_debounce: 200,
+            autocomplete: "off"
+          ) %>
+          <div>
+            <nav>
+              <ul>
+                <%= if Enum.empty?(@options) do %>
+                  <li><%= trans("No options") %></li>
+                <% end %>
+                <%= for option <- @options, option.id != input_value(@form, @field) do %>
+                  <li>
+                    <a
+                      href="#"
+                      phx-click={
+                        JS.push("select", value: %{id: option.id}, target: @myself, page_loading: true)
+                      }
+                    >
+                      <%= record_label(option, @resource) %>
+                    </a>
+                  </li>
+                <% end %>
+              </ul>
+            </nav>
+          </div>
         </div>
       <% end %>
     </div>
