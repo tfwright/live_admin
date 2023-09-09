@@ -462,7 +462,7 @@ input[type="date"], input[type="number"] {
     @apply -left-3;
   }
 
-  .embed__item .button__remove {
+  .embed__item > .button__remove {
     @apply absolute;
     @apply -top-1;
     @apply -right-1;
@@ -514,6 +514,17 @@ input[type="date"], input[type="number"] {
     @apply gap-1;
     @apply justify-items-start;
     @apply ml-3;
+  }
+
+  .field__array--group {
+    @apply relative;
+    @apply pb-6;
+  }
+
+  .field__array--group a.button__add {
+    @apply absolute;
+    @apply -left-0;
+    @apply -bottom-1;
   }
 
   .field__array--group > div {

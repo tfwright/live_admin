@@ -1075,7 +1075,7 @@ tfoot tr {
   left: -0.75rem;
 }
 
-.embed__item .button__remove {
+.embed__item > .button__remove {
   position: absolute;
   top: -0.25rem;
   right: -0.25rem;
@@ -1132,6 +1132,17 @@ tfoot tr {
   gap: 0.25rem;
   justify-items: start;
   margin-left: 0.75rem;
+}
+
+.field__array--group {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.field__array--group a.button__add {
+  position: absolute;
+  left: -0px;
+  bottom: -0.25rem;
 }
 
 .field__array--group > div {

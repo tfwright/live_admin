@@ -203,6 +203,7 @@ defmodule Demo.Posts.Post.Version do
   @primary_key false
   embedded_schema do
     field :body, :string
+    field :tags, {:array, :string}
 
     timestamps(updated_at: false)
   end
