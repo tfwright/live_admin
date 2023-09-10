@@ -453,7 +453,7 @@ input[type="date"], input[type="number"] {
     @apply border-dashed;
     @apply pb-5;
     @apply relative;
-    @apply ml-2;
+    @apply ml-3;
   }
 
   .embed__group .button__add {
