@@ -260,7 +260,6 @@ input[type="date"], input[type="number"] {
     @apply resource__action;
     @apply items-center;
     @apply px-4;
-    @apply mx-1;
     @apply text-sm;
     @apply transition-colors;
     @apply duration-150;

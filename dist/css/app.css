@@ -801,8 +801,6 @@ select {
   align-items: center;
   padding-left: 1rem;
   padding-right: 1rem;
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
   transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
@@ -820,8 +818,6 @@ select {
   display: inline-flex;
   height: 2rem;
   position: relative;
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
   align-items: center;
   white-space: nowrap;
   border-radius: 0.5rem;
@@ -842,8 +838,6 @@ select {
   display: inline-flex;
   height: 2rem;
   position: relative;
-  margin-left: 0.25rem;
-  margin-right: 0.25rem;
   align-items: center;
   white-space: nowrap;
   border-radius: 0.5rem;
