@@ -966,6 +966,13 @@ tfoot tr {
   border-width: 1px;
 }
 
+.resource__table > thead {
+  position: -webkit-sticky;
+  position: sticky;
+  z-index: 10;
+  top: 0px;
+}
+
 .resource__header {
   border-width: 1px;
   text-align: left;

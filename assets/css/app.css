@@ -374,6 +374,12 @@ input[type="date"], input[type="number"] {
     @apply border;
   }
 
+  .resource__table > thead {
+    @apply sticky;
+    @apply z-10;
+    @apply top-0;
+  }
+
   .resource__header {
     @apply border;
     @apply text-left;
