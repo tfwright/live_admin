@@ -223,6 +223,24 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
+  describe "edit resource with map field with map value" do
+    setup %{conn: conn} do
+      user =
+        Repo.insert!(%User{
+          settings: %{metadata: %{map_key: %{}}}
+        })
+
+      {:ok, view, html} = live(conn, "/user/edit/#{user.id}")
+      %{response: html, view: view}
+    end
+
+    test "disables field", %{response: response} do
+      assert response
+             |> Floki.find(".resource__action--disabled")
+             |> Enum.any?()
+    end
+  end
+
   describe "view resource" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})

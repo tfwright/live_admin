@@ -22,6 +22,7 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
       socket
       |> assign(assigns)
       |> assign(:values, values)
+      |> assign(:disabled, Enum.any?(values, fn {_, %{"value" => v}} -> is_map(v) end))
 
     {:ok, socket}
   end

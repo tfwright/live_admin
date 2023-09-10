@@ -105,6 +105,7 @@ defmodule LiveAdminTest.Settings do
 
   embedded_schema do
     field(:some_option, :string)
+    field(:metadata, :map)
   end
 end
 
