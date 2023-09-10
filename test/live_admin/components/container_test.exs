@@ -161,13 +161,13 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "includes search select field", %{response: response} do
       assert response
-             |> Floki.find("input[name='search[select]']")
+             |> Floki.find("#params_user_id_search_select")
              |> Enum.any?()
     end
 
     test "search select responds to focus", %{view: view} do
       view
-      |> element("input[name='search[select]']")
+      |> element("#params_user_id_search_select")
       |> render_focus(%{value: "xxx"})
     end
   end

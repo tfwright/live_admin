@@ -38,10 +38,15 @@ defmodule LiveAdmin.Components.Container.View do
                 <.link
                   class="field__assoc--link"
                   target="_blank"
-                  navigate={route_with_params(assigns,
-                    resource_path: elem(assoc_resource, 0),
-                    segments: [Map.fetch!(@record, field)]
-                  )}><%= label %></.link>
+                  navigate={
+                    route_with_params(assigns,
+                      resource_path: elem(assoc_resource, 0),
+                      segments: [Map.fetch!(@record, field)]
+                    )
+                  }
+                >
+                  <%= label %>
+                </.link>
               <% else %>
                 <%= label %>
               <% end %>

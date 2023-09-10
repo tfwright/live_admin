@@ -8,23 +8,14 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   alias LiveAdmin.Resource
 
   @impl true
-  def mount(socket) do
-    {:ok, assign(socket, :options, [])}
-  end
-
-  @impl true
   def update(assigns = %{form: form, field: field}, socket) do
     socket =
       socket
       |> assign(assigns)
+      |> assign(options: [])
       |> assign_selected_option(input_value(form, field))
 
     {:ok, socket}
-  end
-
-  @impl true
-  def update(assigns, socket) do
-    {:ok, assign(socket, assigns)}
   end
 
   @impl true
@@ -57,16 +48,17 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
         <%= record_label(@selected_option, @resource) %>
       <% else %>
         <div class="search_select--drop">
-          <%= text_input(:search, :select,
-            id: input_id(@form, @field) <> "search_select",
-            disabled: @disabled,
-            placeholder: trans("Search"),
-            phx_focus: "load_options",
-            phx_keyup: "load_options",
-            phx_target: @myself,
-            phx_debounce: 200,
-            autocomplete: "off"
-          ) %>
+          <input
+            type="text"
+            id={input_id(@form, @field) <> "_search_select"}
+            disabled={@disabled}
+            placeholder={trans("Search")}
+            autocomplete="off"
+            phx-focus="load_options"
+            phx-keyup="load_options"
+            phx-target={@myself}
+            phx-debounce={200}
+          />
           <div>
             <nav>
               <ul>
