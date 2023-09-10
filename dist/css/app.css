@@ -1050,6 +1050,10 @@ tfoot tr {
   justify-content: flex-end;
 }
 
+.form__actions > * {
+  margin-left: 0.25rem;
+}
+
 .table__actions {
   display: flex;
 }
