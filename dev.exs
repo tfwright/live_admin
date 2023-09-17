@@ -251,7 +251,7 @@ defmodule Demo.Posts.Post do
     record
     |> Ecto.Changeset.cast(params, [:title, :body, :user_id, :inserted_at])
     |> Ecto.Changeset.cast_embed(:previous_versions, with: fn version, params ->
-      Ecto.Changeset.cast(version, params, [:body, :status])
+      Ecto.Changeset.cast(version, params, [:body, :tags, :inserted_at])
     end)
     |> Ecto.Changeset.validate_required([:title, :body, :user_id, :inserted_at])
     |> Ecto.Changeset.validate_length(:title, max: 10, message: "cannot be longer than 10 characters")
