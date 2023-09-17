@@ -131,7 +131,8 @@ defmodule DemoWeb.PageController do
   def call(conn, :index) do
     content(conn, """
     <h2>LiveAdmin Dev</h2>
-    <a href="/admin">Open Admin</a>
+    <a href="/admin">Users</a>
+    <a href="/posts-admin">Posts</a>
     """)
   end
 
