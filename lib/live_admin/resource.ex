@@ -60,10 +60,7 @@ defmodule LiveAdmin.Resource do
         else
           record
           |> Map.fetch!(field)
-          |> case do
-            val when is_binary(val) -> val
-            val -> inspect(val, pretty: true)
-          end
+          |> render_field()
         end
 
       {m, f, a} ->
@@ -356,4 +353,9 @@ defmodule LiveAdmin.Resource do
       fk == schema.__schema__(:association, assoc_name).owner_key
     end)
   end
+
+  defp render_field(val = %{}), do: Phoenix.HTML.Tag.content_tag(:pre, inspect(val, pretty: true))
+  defp render_field(val) when is_list(val), do: Enum.map(val, &render_field/1)
+  defp render_field(val) when is_binary(val), do: Phoenix.HTML.Format.text_to_html(val)
+  defp render_field(val), do: val
 end
