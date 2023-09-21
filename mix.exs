@@ -43,8 +43,8 @@ defmodule LiveAdmin.MixProject do
     [
       {:phoenix_view, "~> 2.0"},
       {:phoenix_live_view, "~> 0.19.0"},
-      {:ecto, "~> 3.8"},
-      {:ecto_sql, "~> 3.8"},
+      {:ecto, "~> 3.10"},
+      {:ecto_sql, "~> 3.10"},
       {:phoenix_ecto, "~> 4.4"},
       {:gettext, "~> 0.22"},
       {:plug_cowboy, "~> 2.0", only: :dev},

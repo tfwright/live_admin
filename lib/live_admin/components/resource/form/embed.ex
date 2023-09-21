@@ -23,11 +23,18 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="embed__group">
+    <div id={@id <> "_container"} class="embed__group" phx-hook="EmbedComponent">
       <%= unless @disabled do %>
         <%= hidden_input(@form, @field, value: "delete") %>
+        <input type="checkbox" name={input_name(@form, :ecto_sort_position) <> "[]"} class="hidden" />
         <%= for embed_form <- @embed_forms do %>
           <div class="embed__item">
+            <input
+              type="hidden"
+              name={input_name(@form, :ecto_sort_position) <> "[]"}
+              value={embed_form.index}
+              class="embed__index"
+            />
             <a
               href="#"
               class="button__remove"
@@ -39,6 +46,12 @@ defmodule LiveAdmin.Components.Container.Form.Embed do
                 )
               }
             />
+            <%= if embed_form.index > 0 do %>
+              <a href="#" class="button__up" phx-click={JS.dispatch("live_admin:embed_up")} />
+            <% end %>
+            <%= if embed_form.index < Enum.count(@embed_forms) - 1 do %>
+              <a href="#" class="button__down" phx-click={JS.dispatch("live_admin:embed_down")} />
+            <% end %>
             <div>
               <%= for {field, type, _} <- fields(@type) do %>
                 <Form.field

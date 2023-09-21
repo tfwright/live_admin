@@ -304,7 +304,8 @@ defmodule LiveAdmin.Resource do
           )
         else
           Changeset.cast_embed(changeset, field_name,
-            with: fn embed, params -> build_changeset(embed, :embed, params) end
+            with: fn embed, params -> build_changeset(embed, :embed, params) end,
+            sort_param: if(meta.cardinality == :many, do: :ecto_sort_position, else: nil)
           )
         end
 

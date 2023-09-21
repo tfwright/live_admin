@@ -26,6 +26,36 @@ window.addEventListener("phx:error", (e) => {
 
 let Hooks = {}
 
+Hooks.EmbedComponent = {
+  mounted() {
+    this.el.addEventListener("live_admin:embed_up", e => {
+      const embedEl = e.target.parentElement;
+      const indexEl = embedEl.querySelector(".embed__index");
+
+      indexEl.value--;
+
+      const prevEmbedIndexEl = embedEl.previousElementSibling.querySelector(".embed__index");
+
+      prevEmbedIndexEl.value++;
+
+      indexEl.dispatchEvent(new Event("input", {bubbles: true, cancelable: true}));
+    });
+
+    this.el.addEventListener("live_admin:embed_down", e => {
+      const embedEl = e.target.parentElement;
+      const indexEl = embedEl.querySelector(".embed__index");
+
+      indexEl.value++;
+
+      const nextEmbedIndexEl = embedEl.nextElementSibling.querySelector(".embed__index");
+
+      nextEmbedIndexEl.value--;
+
+      indexEl.dispatchEvent(new Event("input", {bubbles: true, cancelable: true}));
+    })
+  }
+}
+
 Hooks.FormPage = {
   mounted(){
     this.handleEvent("change", () => {
