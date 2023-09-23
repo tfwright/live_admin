@@ -42,6 +42,9 @@ defmodule LiveAdmin.View do
     end
   end
 
+  def sort_param_name(field), do: :"#{field}_sort"
+  def drop_param_name(field), do: :"#{field}_drop"
+
   def field_class(type) when type in @supported_primitive_types, do: to_string(type)
   def field_class(:map), do: "map"
   def field_class({:array, _}), do: "array"

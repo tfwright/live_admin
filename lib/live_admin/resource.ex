@@ -296,17 +296,15 @@ defmodule LiveAdmin.Resource do
     end
     |> Enum.reduce(Changeset.cast(record, params, []), fn
       {field_name, {_, Ecto.Embedded, meta}, _}, changeset ->
-        if Map.get(params, to_string(field_name)) == "delete" do
-          Changeset.put_embed(
-            changeset,
-            field_name,
-            if(meta.cardinality == :many, do: [], else: nil)
-          )
-        else
-          Changeset.cast_embed(changeset, field_name,
-            with: fn embed, params -> build_changeset(embed, :embed, params) end
-          )
-        end
+        Changeset.cast_embed(changeset, field_name,
+          with: fn embed, params -> build_changeset(embed, :embed, params) end,
+          sort_param:
+            if(meta.cardinality == :many,
+              do: LiveAdmin.View.sort_param_name(field_name),
+              else: nil
+            ),
+          drop_param: LiveAdmin.View.drop_param_name(field_name)
+        )
 
       {field_name, type, opts}, changeset ->
         unless Keyword.get(opts, :immutable, false) do

@@ -217,9 +217,10 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
 
     test "includes multiple embed fields", %{response: response} do
-      assert response
-             |> Floki.find("input[name='params[previous_versions]']")
-             |> Enum.any?()
+      assert 2 =
+               response
+               |> Floki.find(".embed__item")
+               |> Enum.count()
     end
   end
 

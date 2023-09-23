@@ -2,11 +2,12 @@ defmodule LiveAdmin.Components.Container.Form do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
+  import LiveAdmin.Components
   import LiveAdmin.ErrorHelpers
   import LiveAdmin, only: [associated_resource: 4, route_with_params: 2, trans: 1]
   import LiveAdmin.View, only: [supported_type?: 1, field_class: 1]
 
-  alias __MODULE__.{ArrayInput, Embed, MapInput, SearchSelect}
+  alias __MODULE__.{ArrayInput, MapInput, SearchSelect}
   alias LiveAdmin.Resource
 
   @impl true
@@ -186,8 +187,7 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp input(assigns = %{type: {_, Ecto.Embedded, _}}) do
     ~H"""
-    <.live_component
-      module={Embed}
+    <.embed
       id={input_id(@form, @field)}
       type={@type}
       disabled={@disabled}
