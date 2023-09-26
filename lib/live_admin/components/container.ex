@@ -94,17 +94,6 @@ defmodule LiveAdmin.Components.Container do
   end
 
   @impl true
-  def handle_event("clear_prefix", _, socket) do
-    new_session = Map.put(socket.assigns.session, :prefix, nil)
-
-    LiveAdmin.session_store().persist!(new_session)
-
-    socket = assign(socket, prefix: nil, session: new_session)
-
-    {:noreply, push_redirect(socket, to: route_with_params(socket.assigns))}
-  end
-
-  @impl true
   def handle_event("task", %{"task" => task}, socket) do
     task_name = String.to_existing_atom(task)
 
@@ -187,27 +176,16 @@ defmodule LiveAdmin.Components.Container do
             </button>
           </.dropdown>
           <%= if Enum.any?(@prefix_options) do %>
-            <%= if @prefix do %>
-              <.dropdown :let={clear} id="prefix-select" label={@prefix} items={[trans("clear")]}>
-                <button
-                  class="resource__action--link"
-                  phx-click={JS.push("clear_prefix", page_loading: true)}
-                >
-                  <%= clear %>
-                </button>
-              </.dropdown>
-            <% else %>
-              <.dropdown
-                :let={prefix}
-                id="prefix-select"
-                label={trans("Set prefix")}
-                items={Enum.filter(@prefix_options, &(to_string(&1) != @prefix))}
-              >
-                <.link navigate={route_with_params(assigns, params: [prefix: prefix])}>
-                  <%= prefix %>
-                </.link>
-              </.dropdown>
-            <% end %>
+            <.dropdown
+              :let={prefix}
+              id="prefix-select"
+              label={@prefix || trans("Set prefix")}
+              items={[nil] ++ Enum.filter(@prefix_options, &(to_string(&1) != @prefix))}
+            >
+              <.link navigate={route_with_params(assigns, params: [prefix: prefix])}>
+                <%= prefix || trans("clear") %>
+              </.link>
+            </.dropdown>
           <% end %>
           <%= if LiveAdmin.use_i18n? do %>
             <.dropdown
@@ -307,6 +285,12 @@ defmodule LiveAdmin.Components.Container do
       repo={@repo}
     />
     """
+  end
+
+  defp assign_prefix(socket, %{"prefix" => ""}) do
+    socket
+    |> assign_and_presist_prefix(nil)
+    |> push_redirect(to: route_with_params(socket.assigns))
   end
 
   defp assign_prefix(socket, %{"prefix" => prefix}) do
