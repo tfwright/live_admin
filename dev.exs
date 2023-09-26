@@ -150,6 +150,9 @@ defmodule Demo.Accounts.User.Settings.Config do
   embedded_schema do
     field :key, :string
     field :val, :string
+
+    field :good, :boolean
+    field :legal, :boolean
   end
 end
 

@@ -273,7 +273,12 @@ defmodule LiveAdmin.Components.Container.Form do
   defp input(assigns = %{type: :boolean}) do
     ~H"""
     <div class="form__checkbox">
-      <%= checkbox(@form, @field, disabled: @disabled) %>
+      <%= for option <- ["true", "false"] do %>
+        <%= radio_button(@form, @field, option) %>
+        <%= trans(option) %>
+      <% end %>
+      <%= radio_button(@form, @field, "", checked: input_value(@form, @field) in ["", nil]) %>
+      <%= trans("nil") %>
     </div>
     """
   end
