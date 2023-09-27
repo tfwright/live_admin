@@ -87,21 +87,6 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def handle_event(
         "validate",
-        %{"field" => field, "value" => value},
-        socket = %{assigns: %{resource: resource, changeset: changeset, session: session}}
-      ) do
-    changeset = validate(resource, changeset, Map.put(changeset.params, field, value), session)
-
-    {:noreply,
-     assign(socket,
-       changeset: changeset,
-       enabled: enabled?(changeset, socket.assigns.action, resource)
-     )}
-  end
-
-  @impl true
-  def handle_event(
-        "validate",
         %{"params" => params},
         socket = %{assigns: %{resource: resource, changeset: changeset, session: session}}
       ) do
