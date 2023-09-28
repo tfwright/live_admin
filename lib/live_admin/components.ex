@@ -36,36 +36,41 @@ defmodule LiveAdmin.Components do
     ~H"""
     <div id={@id <> "_container"} class="embed__group" phx-hook="EmbedComponent">
       <%= unless @disabled do %>
-        <.inputs_for :let={embed_form} field={@form[@field]}>
+        <.inputs_for :let={embed_form} field={@form[@field]} skip_hidden={true}>
           <div class="embed__item">
-            <input
-              type="hidden"
-              name={input_name(@form, LiveAdmin.View.sort_param_name(@field)) <> "[]"}
-              value={embed_form.index}
-              class="embed__index"
-            />
-            <input
-              type="checkbox"
-              name={input_name(@form, LiveAdmin.View.drop_param_name(@field)) <> "[]"}
-              value={embed_form.index}
-              class="embed__drop"
-            />
-            <a href="#" class="button__remove" phx-click={JS.dispatch("live_admin:embed_drop")} />
-            <%= if embed_form.index > 0 do %>
-              <a
-                href="#"
-                class="button__up"
-                data-dir="-1"
-                phx-click={JS.dispatch("live_admin:move_embed")}
+            <%= if match?({_, _, %{cardinality: :many}}, @type) do %>
+              <input
+                type="hidden"
+                name={input_name(@form, LiveAdmin.View.sort_param_name(@field)) <> "[]"}
+                value={embed_form.index}
+                class="embed__index"
               />
-            <% end %>
-            <%= if embed_form.index < Enum.count(List.wrap(input_value(@form, @field))) - 1 do %>
-              <a
-                href="#"
-                class="button__down"
-                data-dir="-1"
-                phx-click={JS.dispatch("live_admin:move_embed")}
+              <input
+                type="checkbox"
+                name={input_name(@form, LiveAdmin.View.drop_param_name(@field)) <> "[]"}
+                value={embed_form.index}
+                class="embed__drop"
               />
+              <a href="#" class="button__remove" phx-click={JS.dispatch("live_admin:embed_drop")} />
+              <%= if embed_form.index > 0 do %>
+                <a
+                  href="#"
+                  class="button__up"
+                  data-dir="-1"
+                  phx-click={JS.dispatch("live_admin:move_embed")}
+                />
+              <% end %>
+              <%= if embed_form.index < Enum.count(List.wrap(input_value(@form, @field))) - 1 do %>
+                <a
+                  href="#"
+                  class="button__down"
+                  data-dir="-1"
+                  phx-click={JS.dispatch("live_admin:move_embed")}
+                />
+              <% end %>
+            <% else %>
+              <input type="hidden" name={input_name(@form, @field)} value="" disabled />
+              <a href="#" class="button__remove" phx-click={JS.dispatch("live_admin:embed_delete")} />
             <% end %>
             <div>
               <%= for {field, type, _} <- embed_fields(@type) do %>

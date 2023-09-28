@@ -50,6 +50,14 @@ Hooks.EmbedComponent = {
       deleteInput.checked = true;
       deleteInput.dispatchEvent(new Event("input", {bubbles: true, cancelable: true}));
     });
+
+    this.el.addEventListener("live_admin:embed_delete", e => {
+      e.target.nextElementSibling.remove();
+
+      const deleteInput = e.target.previousElementSibling;
+      deleteInput.disabled = false;
+      deleteInput.dispatchEvent(new Event("input", {bubbles: true, cancelable: true}));
+    });
   }
 }
 
