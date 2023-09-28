@@ -36,7 +36,7 @@ defmodule LiveAdmin.Components.Container.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="index-page" phx-hook="IndexPage" phx-target={@myself}>
+    <div id={@id} phx-hook="IndexPage" phx-target={@myself}>
       <div class="list__search">
         <div class="flex border-2 rounded-lg">
           <form phx-change={JS.push("search", target: @myself, page_loading: true)}>
@@ -220,6 +220,48 @@ defmodule LiveAdmin.Components.Container.Index do
       </table>
     </div>
     """
+  end
+
+  @impl true
+  def handle_event("task", %{"task" => task}, socket) do
+    task_name = String.to_existing_atom(task)
+
+    {m, f, a} =
+      :tasks
+      |> socket.assigns.resource.__live_admin_config__()
+      |> Enum.find_value(fn
+        {^task_name, mfa} -> mfa
+        ^task_name -> {socket.assigns.resource, task_name, []}
+      end)
+
+    socket =
+      case apply(m, f, [socket.assigns.session] ++ a) do
+        {:ok, result} ->
+          socket
+          |> put_flash(
+            :info,
+            trans("%{task} succeeded: %{result}",
+              inter: [
+                task: task,
+                result: result
+              ]
+            )
+          )
+          |> push_navigate(to: route_with_params(socket.assigns))
+
+        {:error, error} ->
+          push_event(socket, "error", %{
+            msg:
+              trans("%{task} failed: %{error}",
+                inter: [
+                  task: task,
+                  error: error
+                ]
+              )
+          })
+      end
+
+    {:noreply, socket}
   end
 
   @impl true

@@ -93,46 +93,6 @@ defmodule LiveAdmin.Components.Container do
     {:noreply, assign(socket, :session, new_session)}
   end
 
-  @impl true
-  def handle_event("task", %{"task" => task}, socket) do
-    task_name = String.to_existing_atom(task)
-
-    {m, f, a} =
-      :tasks
-      |> socket.assigns.resource.__live_admin_config__()
-      |> Enum.find_value(fn
-        {^task_name, mfa} -> mfa
-        ^task_name -> {socket.assigns.resource, task_name, []}
-      end)
-
-    socket =
-      case apply(m, f, [socket.assigns.session] ++ a) do
-        {:ok, result} ->
-          push_event(socket, "success", %{
-            msg:
-              trans("%{task} succeeded: %{result}",
-                inter: [
-                  task: task,
-                  result: result
-                ]
-              )
-          })
-
-        {:error, error} ->
-          push_event(socket, "error", %{
-            msg:
-              trans("%{task} failed: %{error}",
-                inter: [
-                  task: task,
-                  error: error
-                ]
-              )
-          })
-      end
-
-    {:noreply, socket}
-  end
-
   def render(assigns = %{loading: true}), do: ~H"
 "
 
@@ -168,7 +128,7 @@ defmodule LiveAdmin.Components.Container do
           >
             <button
               class="resource__action--link"
-              phx-click={JS.push("task", value: %{task: task}, page_loading: true)}
+              phx-click={JS.push("task", value: %{task: task}, page_loading: true, target: "#list")}
               ,
               data-confirm="Are you sure?"
             >
