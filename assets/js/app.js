@@ -46,6 +46,7 @@ Hooks.EmbedComponent = {
     });
 
     this.el.addEventListener("live_admin:embed_drop", e => {
+      e.target.parentElement.classList.add("hidden")
       const deleteInput = e.target.previousElementSibling;
       deleteInput.checked = true;
       deleteInput.dispatchEvent(new Event("input", {bubbles: true, cancelable: true}));
