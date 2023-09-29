@@ -7,8 +7,7 @@ defmodule LiveAdmin.Components.Container do
       resource_title: 1,
       route_with_params: 1,
       route_with_params: 2,
-      trans: 1,
-      trans: 2
+      trans: 1
     ]
 
   import LiveAdmin.Components
