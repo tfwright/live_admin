@@ -44,12 +44,14 @@ defmodule LiveAdmin.Components do
                 name={input_name(@form, LiveAdmin.View.sort_param_name(@field)) <> "[]"}
                 value={embed_form.index}
                 class="embed__index"
+                phx-page-loading
               />
               <input
                 type="checkbox"
                 name={input_name(@form, LiveAdmin.View.drop_param_name(@field)) <> "[]"}
                 value={embed_form.index}
                 class="embed__drop"
+                phx-page-loading
               />
               <a href="#" class="button__remove" phx-click={JS.dispatch("live_admin:embed_drop")} />
               <%= if embed_form.index > 0 do %>
@@ -64,7 +66,7 @@ defmodule LiveAdmin.Components do
                 <a
                   href="#"
                   class="button__down"
-                  data-dir="-1"
+                  data-dir="+1"
                   phx-click={JS.dispatch("live_admin:move_embed")}
                 />
               <% end %>
@@ -94,6 +96,7 @@ defmodule LiveAdmin.Components do
             type="checkbox"
             name={input_name(@form, LiveAdmin.View.sort_param_name(@field)) <> "[]"}
             class="embed__sort"
+            phx-page-loading
           />
           <a href="#" phx-click={JS.dispatch("live_admin:embed_add")} class="button__add" />
         <% end %>

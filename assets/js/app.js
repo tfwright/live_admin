@@ -32,11 +32,14 @@ Hooks.EmbedComponent = {
       const embedEl = e.target.parentElement;
       const indexEl = embedEl.querySelector(".embed__index");
       const fieldEl = embedEl.parentElement;
-      const targetEmbed = fieldEl.querySelectorAll(".embed__item")[+indexEl.value + +e.target.dataset.dir];
 
-      embedEl.parentElement.insertBefore(embedEl, targetEmbed)
+      const newIndex = +indexEl.value + +e.target.dataset.dir;
+      indexEl.value = newIndex;
 
-      fieldEl.querySelector(".embed__index").dispatchEvent(new Event("input", {bubbles: true, cancelable: true}));
+      const targetEl = fieldEl.querySelectorAll(".embed__index")[newIndex]
+      targetEl.value = +targetEl.value + (+e.target.dataset.dir * -1)
+
+      indexEl.dispatchEvent(new Event("input", {bubbles: true, cancelable: true}));
     });
 
     this.el.addEventListener("live_admin:embed_add", e => {
