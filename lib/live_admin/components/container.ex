@@ -105,15 +105,19 @@ defmodule LiveAdmin.Components.Container do
 
       <div class="resource__actions">
         <div>
-          <%= live_redirect(trans("List"),
-            to: route_with_params(assigns, params: [prefix: @prefix]),
-            class: "resource__action--btn"
-          ) %>
+          <.link
+            navigate={route_with_params(assigns, params: [prefix: @prefix])}
+            class="resource__action--btn"
+          >
+            <%= trans("List") %>
+          </.link>
           <%= if @resource.__live_admin_config__(:create_with) != false do %>
-            <%= live_redirect(trans("New"),
-              to: route_with_params(assigns, segments: ["new"], params: [prefix: @prefix]),
-              class: "resource__action--btn"
-            ) %>
+            <.link
+              navigate={route_with_params(assigns, segments: ["new"], params: [prefix: @prefix])}
+              class="resource__action--btn"
+            >
+              <%= trans("New") %>
+            </.link>
           <% else %>
             <button class="resource__action--disabled" disabled="disabled">
               <%= trans("New") %>

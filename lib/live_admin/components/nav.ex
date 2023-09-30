@@ -7,78 +7,80 @@ defmodule LiveAdmin.Components.Nav do
 
   @impl true
   def render(assigns) do
+    nested_resources =
+      Enum.reduce(assigns.resources, %{}, fn {key, resource}, groups ->
+        path =
+          resource.__live_admin_config__(:schema)
+          |> Module.split()
+          |> case do
+            list when length(list) == 1 -> list
+            list -> Enum.drop(list, -1)
+          end
+          |> Enum.map(&Access.key(&1, %{}))
+
+        update_in(groups, path, fn subs -> Map.put(subs, {key, resource}, %{}) end)
+      end)
+
+    assigns = assign(assigns, :nested_resources, nested_resources)
+
     ~H"""
     <div class="nav">
       <ul class="nav__list">
         <li class="nav__item--group"><%= @title %></li>
         <li class="nav__item--group">
-          <%= live_redirect(trans("Home"), to: @base_path) %>
+          <.link navigate={@base_path}><%= trans("Home") %></.link>
         </li>
         <li class="nav__item--group">
-          <ul>
-            <%= render_dropdowns(assigns) %>
-          </ul>
+          <.nav_group
+            items={@nested_resources}
+            base_path={@base_path}
+            current_resource={assigns[:resource]}
+          />
         </li>
         <li class="nav__item--group">
-          <%= live_redirect(trans("Session"),
-            to: route_with_params(assigns, resource_path: "session")
-          ) %>
+          <.link navigate={route_with_params(assigns, resource_path: "session")}>
+            <%= trans("Session") %>
+          </.link>
         </li>
       </ul>
     </div>
     """
   end
 
-  def render_dropdowns(assigns) do
-    assigns.resources
-    |> Enum.reduce(%{}, fn {key, resource}, groups ->
-      path =
-        resource.__live_admin_config__(:schema)
-        |> Module.split()
-        |> case do
-          list when length(list) == 1 -> list
-          list -> Enum.drop(list, -1)
-        end
-        |> Enum.map(&Access.key(&1, %{}))
-
-      update_in(groups, path, fn subs -> Map.put(subs, {key, resource}, %{}) end)
-    end)
-    |> render_resource_group(assigns)
+  defp nav_group(assigns) do
+    ~H"""
+    <ul>
+      <%= for {parent, children} <- Enum.sort(@items) do %>
+        <%= if match?({_key, _resource}, parent) do %>
+          <li class={"nav__item#{if elem(parent, 1) == @current_resource, do: "--selected"}"}>
+            <.link navigate={route_with_params(assigns, resource_path: elem(parent, 0))}>
+              <%= resource_title(elem(parent, 1)) %>
+            </.link>
+          </li>
+        <% else %>
+          <li class="nav__item--drop">
+            <input type="checkbox" id={"menu-group-#{parent}"} checked={open?(assigns, parent)} />
+            <label for={"menu-group-#{parent}"}><%= parent %></label>
+            <.nav_group items={children} base_path={@base_path} current_resource={@current_resource} />
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+    """
   end
 
-  defp render_resource_group(group = %{}, assigns) do
-    group
-    |> Enum.sort()
-    |> Enum.map(fn
-      {{key, resource}, %{}} ->
-        content_tag :li, class: "nav__item#{if resource == assigns[:resource], do: "--selected"}" do
-          resource
-          |> resource_title()
-          |> live_redirect(to: route_with_params(assigns, resource_path: key))
-        end
+  defp open?(assigns, schema) do
+    assigns
+    |> Map.get(:resource)
+    |> case do
+      nil ->
+        true
 
-      {item, subs} ->
-        content_tag :li, class: "nav__item--drop" do
-          open =
-            assigns
-            |> Map.get(:resource)
-            |> case do
-              nil ->
-                true
-
-              resource ->
-                resource.__live_admin_config__(:schema)
-                |> Module.split()
-                |> Enum.drop(-1)
-                |> Enum.member?(item)
-            end
-
-          [
-            content_tag(:input, "", type: "checkbox", id: "menu-group-#{item}", checked: open),
-            content_tag(:label, item, for: "menu-group-#{item}"),
-            content_tag(:ul, do: render_resource_group(subs, assigns))
-          ]
-        end
-    end)
+      resource ->
+        resource.__live_admin_config__(:schema)
+        |> Module.split()
+        |> Enum.drop(-1)
+        |> Enum.member?(schema)
+    end
   end
 end

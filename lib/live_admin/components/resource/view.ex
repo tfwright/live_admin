@@ -54,10 +54,12 @@ defmodule LiveAdmin.Components.Container.View do
           <% end %>
         </dl>
         <div class="form__actions">
-          <%= live_redirect(trans("Edit"),
-            to: route_with_params(assigns, segments: [:edit, @record]),
-            class: "resource__action--btn"
-          ) %>
+          <.link
+            navigate={route_with_params(assigns, segments: [:edit, @record])}
+            class="resource__action--btn"
+          >
+            <%= trans("Edit") %>
+          </.link>
           <%= if @resource.__live_admin_config__(:delete_with) != false do %>
             <button
               class="resource__action--danger"

@@ -74,20 +74,25 @@ defmodule LiveAdmin.Components.Container.Index do
             </th>
             <%= for {field, _, _} <- Resource.fields(@resource) do %>
               <th class="resource__header" title={field}>
-                <%= list_link(
-                  trans(humanize(field)),
-                  assigns,
-                  [
-                    sort_attr: field,
-                    sort_dir:
-                      if(field == @sort_attr,
-                        do: Enum.find([:asc, :desc], &(&1 != @sort_dir)),
-                        else: @sort_dir
-                      )
-                  ],
-                  class:
-                    "header__link#{if field == @sort_attr, do: "--#{[asc: :up, desc: :down][@sort_dir]}"}"
-                ) %>
+                <.link
+                  patch={
+                    route_with_params(
+                      assigns,
+                      params:
+                        list_link_params(assigns,
+                          sort_attr: field,
+                          sort_dir:
+                            if(field == @sort_attr,
+                              do: Enum.find([:asc, :desc], &(&1 != @sort_dir)),
+                              else: @sort_dir
+                            )
+                        )
+                    )
+                  }
+                  class={"header__link#{if field == @sort_attr, do: "--#{[asc: :up, desc: :down][@sort_dir]}"}"}
+                >
+                  <%= trans(humanize(field)) %>
+                </.link>
               </th>
             <% end %>
           </tr>
@@ -161,24 +166,42 @@ defmodule LiveAdmin.Components.Container.Index do
         <tfoot>
           <tr id="footer-nav">
             <td class="w-full" colspan={@resource |> Resource.fields() |> Enum.count()}>
-              <%= if @page > 1,
-                do:
-                  list_link(
-                    trans("Prev"),
-                    assigns,
-                    [page: @page - 1],
-                    class: "resource__action--btn"
-                  ),
-                else: content_tag(:span, trans("Prev"), class: "resource__action--disabled") %>
-              <%= if @page < (@records |> elem(1)) / 10,
-                do:
-                  list_link(
-                    trans("Next"),
-                    assigns,
-                    [page: @page + 1],
-                    class: "resource__action--btn"
-                  ),
-                else: content_tag(:span, trans("Next"), class: "resource__action--disabled") %>
+              <%= if @page > 1 do %>
+                <.link
+                  patch={
+                    route_with_params(
+                      assigns,
+                      params: list_link_params(assigns, page: @page - 1)
+                    )
+                  }
+                  class="resource__action--btn"
+                  }
+                >
+                  <%= trans("Prev") %>
+                </.link>
+              <% else %>
+                <span class="resource__action--disabled">
+                  <%= trans("Prev") %>
+                </span>
+              <% end %>
+              <%= if @page < (@records |> elem(1)) / 10 do %>
+                <.link
+                  patch={
+                    route_with_params(
+                      assigns,
+                      params: list_link_params(assigns, page: @page + 1)
+                    )
+                  }
+                  class="resource__action--btn"
+                  }
+                >
+                  <%= trans("Next") %>
+                </.link>
+              <% else %>
+                <span class="resource__action--disabled">
+                  <%= trans("Next") %>
+                </span>
+              <% end %>
             </td>
             <td class="text-right p-2">
               <%= trans("%{count} total rows", inter: [count: elem(@records, 1)]) %>
@@ -353,21 +376,11 @@ defmodule LiveAdmin.Components.Container.Index do
     {:noreply, socket}
   end
 
-  defp list_link(content, assigns, params, opts) do
-    new_params =
-      assigns
-      |> Map.take([:search, :page, :sort_attr, :sort_dir, :prefix])
-      |> Enum.into([])
-      |> Keyword.merge(params)
-
-    live_patch(
-      content,
-      Keyword.put(
-        opts,
-        :to,
-        route_with_params(assigns, params: new_params)
-      )
-    )
+  defp list_link_params(assigns, params) do
+    assigns
+    |> Map.take([:search, :page, :sort_attr, :sort_dir, :prefix])
+    |> Enum.into([])
+    |> Keyword.merge(params)
   end
 
   defp type_to_css_class({_, type, _}), do: type_to_css_class(type)
