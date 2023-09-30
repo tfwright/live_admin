@@ -524,6 +524,15 @@ select {
   --tw-filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
+.view__container {
+  overflow-y: auto;
+}
+
+#list .table__wrapper {
+  overflow: auto;
+  max-height: 100%;
+}
+
 #prefix-select nav {
   overflow-y: auto;
 }
@@ -771,8 +780,6 @@ input[class$="-loading"] + div nav:before {
   flex-direction: column;
   width: 80%;
   padding: 0.5rem;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 .home__intro {
@@ -968,13 +975,6 @@ tfoot td {
   padding: 0.25rem;
 }
 
-tfoot tr {
-  padding: 0.25rem;
-  bottom: 0px;
-  position: -webkit-sticky;
-  position: sticky;
-}
-
 .list__search {
   background-color: transparent;
   display: flex;
@@ -1005,13 +1005,21 @@ tfoot tr {
   border-radius: 0.25rem;
   border-collapse: collapse;
   border-width: 1px;
+  position: relative;
 }
 
-.resource__table > thead {
+.resource__table th {
   position: -webkit-sticky;
   position: sticky;
   z-index: 10;
   top: 0px;
+}
+
+.resource__table tfoot td {
+  padding: 0.25rem;
+  bottom: 0px;
+  position: -webkit-sticky;
+  position: sticky;
 }
 
 .resource__header {

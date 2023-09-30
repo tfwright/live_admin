@@ -10,7 +10,7 @@ defmodule LiveAdmin.Components.Session.Content do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="session-page" phx-hook="FormPage">
+    <div id="session-page" class="view__container" phx-hook="FormPage">
       <div class="resource__banner">
         <h1 class="resource__title">
           <%= trans("Session") %>

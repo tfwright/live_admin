@@ -21,7 +21,7 @@ defmodule LiveAdmin.Components.Container.View do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="view-page" phx-hook="IndexPage" phx-target={@myself}>
+    <div id="view-page" class="view__container" phx-hook="IndexPage" phx-target={@myself}>
       <div class="resource__table">
         <dl>
           <%= for {field, type, _} <- Resource.fields(@resource) do %>

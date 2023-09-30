@@ -46,6 +46,15 @@ input[type="date"], input[type="number"] {
 }
 
 @layer components {
+  .view__container {
+    @apply overflow-y-auto;
+  }
+
+  #list .table__wrapper {
+    @apply overflow-auto;
+    @apply max-h-full;
+  }
+
   #prefix-select nav {
     @apply overflow-y-auto;
   }
@@ -251,8 +260,6 @@ input[type="date"], input[type="number"] {
     @apply flex-col;
     @apply w-4/5;
     @apply p-2;
-    @apply overflow-y-auto;
-    @apply overflow-x-hidden;
   }
 
   .home__intro {
@@ -378,12 +385,6 @@ input[type="date"], input[type="number"] {
     @apply p-1;
   }
 
-  tfoot tr {
-    @apply p-1;
-    @apply bottom-0;
-    @apply sticky;
-  }
-
   .list__search {
     @apply bg-transparent;
     @apply flex;
@@ -410,12 +411,19 @@ input[type="date"], input[type="number"] {
     @apply rounded;
     @apply border-collapse;
     @apply border;
+    @apply relative;
   }
 
-  .resource__table > thead {
+  .resource__table th {
     @apply sticky;
     @apply z-10;
     @apply top-0;
+  }
+
+  .resource__table tfoot td {
+    @apply p-1;
+    @apply bottom-0;
+    @apply sticky;
   }
 
   .resource__header {
