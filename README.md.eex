@@ -33,13 +33,17 @@ defmodule MyApp.MyResource do
 end
 ```
 
-In your Phoenix router, add the resource to a LiveAdmin instance:
+In your Phoenix router, inside a scope configured to run LiveView (`:browser` if you followed the default installation), add the resource to a LiveAdmin instance:
 
 ```elixir
 import LiveAdmin.Router
 
-live_admin "/my_admin" do
-  admin_resource "/my_schemas", MyApp.MyResource
+scope "/" do
+  pipe_through: :browser
+
+  live_admin "/my_admin" do
+    admin_resource "/my_schemas", MyApp.MyResource
+  end
 end
 ```
 
