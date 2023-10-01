@@ -428,7 +428,6 @@ input[type="date"], input[type="number"] {
 
   .resource__header {
     @apply border;
-    @apply text-left;
     @apply px-8;
     @apply py-4;
     @apply whitespace-nowrap;
