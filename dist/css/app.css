@@ -794,7 +794,7 @@ input[class$="-loading"] + div nav:before {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .resource__banner {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -812,7 +812,7 @@ input[class$="-loading"] + div nav:before {
   justify-items: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .resource__title {
     justify-items: end;
   }
@@ -831,7 +831,7 @@ input[class$="-loading"] + div nav:before {
   justify-items: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .resource__actions {
     justify-items: end;
   }

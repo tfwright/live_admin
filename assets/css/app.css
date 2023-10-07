@@ -270,7 +270,7 @@ input[type="date"], input[type="number"] {
   .resource__banner {
     @apply grid;
     @apply grid-cols-1;
-    @apply md:grid-cols-2;
+    @apply lg:grid-cols-2;
     @apply whitespace-nowrap;
     @apply overflow-x-clip;
     @apply mb-2;
@@ -280,7 +280,7 @@ input[type="date"], input[type="number"] {
     @apply grid;
     @apply items-center;
     @apply justify-items-center;
-    @apply md:justify-items-end;
+    @apply lg:justify-items-end;
     @apply h-full;
     direction: rtl;
   }
@@ -291,7 +291,7 @@ input[type="date"], input[type="number"] {
     @apply items-center;
     @apply grid;
     @apply justify-items-center;
-    @apply md:justify-items-end;
+    @apply lg:justify-items-end;
     @apply whitespace-nowrap;
   }
 
