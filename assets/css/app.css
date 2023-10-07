@@ -458,6 +458,7 @@ input[type="date"], input[type="number"] {
 
   .cell__contents {
     @apply flex;
+    @apply flex-col;
     @apply h-full;
     @apply w-full;
     @apply justify-center;
