@@ -499,6 +499,10 @@ input[type="date"], input[type="number"] {
     @apply flex;
   }
 
+  .table__actions * {
+    @apply mr-2;
+  }
+
   .embed__sort, .embed__drop {
     @apply hidden;
   }

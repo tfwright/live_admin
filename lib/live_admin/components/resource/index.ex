@@ -171,42 +171,44 @@ defmodule LiveAdmin.Components.Container.Index do
           <tfoot>
             <tr id="footer-nav">
               <td class="w-full" colspan={@resource |> Resource.fields() |> Enum.count()}>
-                <%= if @page > 1 do %>
-                  <.link
-                    patch={
-                      route_with_params(
-                        assigns,
-                        params: list_link_params(assigns, page: @page - 1)
-                      )
-                    }
-                    class="resource__action--btn"
-                    }
-                  >
-                    <%= trans("Prev") %>
-                  </.link>
-                <% else %>
-                  <span class="resource__action--disabled">
-                    <%= trans("Prev") %>
-                  </span>
-                <% end %>
-                <%= if @page < (@records |> elem(1)) / 10 do %>
-                  <.link
-                    patch={
-                      route_with_params(
-                        assigns,
-                        params: list_link_params(assigns, page: @page + 1)
-                      )
-                    }
-                    class="resource__action--btn"
-                    }
-                  >
-                    <%= trans("Next") %>
-                  </.link>
-                <% else %>
-                  <span class="resource__action--disabled">
-                    <%= trans("Next") %>
-                  </span>
-                <% end %>
+                <div class="table__actions">
+                  <%= if @page > 1 do %>
+                    <.link
+                      patch={
+                        route_with_params(
+                          assigns,
+                          params: list_link_params(assigns, page: @page - 1)
+                        )
+                      }
+                      class="resource__action--btn"
+                      }
+                    >
+                      <%= trans("Prev") %>
+                    </.link>
+                  <% else %>
+                    <span class="resource__action--disabled">
+                      <%= trans("Prev") %>
+                    </span>
+                  <% end %>
+                  <%= if @page < (@records |> elem(1)) / 10 do %>
+                    <.link
+                      patch={
+                        route_with_params(
+                          assigns,
+                          params: list_link_params(assigns, page: @page + 1)
+                        )
+                      }
+                      class="resource__action--btn"
+                      }
+                    >
+                      <%= trans("Next") %>
+                    </.link>
+                  <% else %>
+                    <span class="resource__action--disabled">
+                      <%= trans("Next") %>
+                    </span>
+                  <% end %>
+                </div>
               </td>
               <td class="text-right p-2">
                 <%= trans("%{count} total rows", inter: [count: elem(@records, 1)]) %>

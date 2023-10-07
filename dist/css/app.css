@@ -1115,6 +1115,10 @@ tfoot td {
   display: flex;
 }
 
+.table__actions * {
+  margin-right: 0.5rem;
+}
+
 .embed__sort, .embed__drop {
   display: none;
 }
