@@ -70,8 +70,7 @@ defmodule LiveAdmin.Components.Nav do
   end
 
   defp open?(assigns, schema) do
-    assigns
-    |> Map.get(:resource)
+    assigns.current_resource
     |> case do
       nil ->
         true
