@@ -272,6 +272,8 @@ input[type="date"], input[type="number"] {
     @apply grid-cols-1;
     @apply md:grid-cols-2;
     @apply whitespace-nowrap;
+    @apply overflow-x-clip;
+    @apply mb-2;
   }
 
   .resource__title {

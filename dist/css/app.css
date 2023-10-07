@@ -802,6 +802,8 @@ input[class$="-loading"] + div nav:before {
 
 .resource__banner {
   white-space: nowrap;
+  overflow-x: clip;
+  margin-bottom: 0.5rem;
 }
 
 .resource__title {
