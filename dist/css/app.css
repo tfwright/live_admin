@@ -1024,6 +1024,10 @@ tfoot td {
   position: sticky;
 }
 
+.resource__table dd {
+  margin-bottom: 1.25rem;
+}
+
 .resource__header {
   border-width: 1px;
   padding-left: 2rem;

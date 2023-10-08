@@ -428,6 +428,10 @@ input[type="date"], input[type="number"] {
     @apply sticky;
   }
 
+  .resource__table dd {
+    @apply mb-5;
+  }
+
   .resource__header {
     @apply border;
     @apply px-8;
