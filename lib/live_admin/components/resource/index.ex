@@ -181,7 +181,6 @@ defmodule LiveAdmin.Components.Container.Index do
                         )
                       }
                       class="resource__action--btn"
-                      }
                     >
                       <%= trans("Prev") %>
                     </.link>
@@ -199,7 +198,6 @@ defmodule LiveAdmin.Components.Container.Index do
                         )
                       }
                       class="resource__action--btn"
-                      }
                     >
                       <%= trans("Next") %>
                     </.link>
