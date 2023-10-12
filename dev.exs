@@ -252,7 +252,7 @@ defmodule Demo.Posts.Post do
 
   def update(record, params, _) do
     record
-    |> Ecto.Changeset.cast(params, [:title, :body, :user_id, :inserted_at])
+    |> Ecto.Changeset.cast(params, [:title, :body, :user_id, :inserted_at, :tags, :categories])
     |> Ecto.Changeset.cast_embed(:previous_versions, with: fn version, params ->
       Ecto.Changeset.cast(version, params, [:body, :tags, :inserted_at])
     end)

@@ -75,10 +75,7 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
 
   @impl true
   def handle_event("add", _params, socket) do
-    socket =
-      socket
-      |> assign(values: socket.assigns.values ++ [" "])
-      |> push_event("change", %{})
+    socket = assign(socket, values: socket.assigns.values ++ [""])
 
     {:noreply, socket}
   end
