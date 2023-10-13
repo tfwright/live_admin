@@ -252,11 +252,13 @@ defmodule LiveAdmin.Resource do
     |> String.split(~r{[^\s]*:}, include_captures: true, trim: true)
     |> case do
       [q] ->
+        matcher = if String.contains?(q, "%"), do: q, else: "%#{q}%"
+
         Enum.reduce(fields, query, fn {field_name, _, _}, query ->
           or_where(
             query,
             [r],
-            ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
+            ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^matcher)
           )
         end)
 
