@@ -258,7 +258,10 @@ defmodule LiveAdmin.Resource do
           or_where(
             query,
             [r],
-            ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^matcher)
+            like(
+              fragment("LOWER(CAST(? AS text))", field(r, ^field_name)),
+              ^String.downcase(matcher)
+            )
           )
         end)
 
