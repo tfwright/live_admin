@@ -168,7 +168,7 @@ end
 
 defmodule Demo.Accounts.User.Profile do
   use Ecto.Schema
-  use LiveAdmin.Resource, create_with: nil
+  use LiveAdmin.Resource, create_with: false
 
   schema "user_profiles" do
     belongs_to :user, Demo.Accounts.User, type: :binary_id

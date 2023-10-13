@@ -15,9 +15,9 @@ defmodule LiveAdmin.Resource do
   * `title_with` - a binary, or MFA that returns a binary, used to identify the resource
   * `label_with` - a binary, or MFA that returns a binary, used to identify records
   * `list_with` - an atom or MFA that identifies the function that implements listing the resource
-  * `create_with` - an atom or MFA that identifies the function that implements creating the resource
-  * `update_with` - an atom or MFA that identifies the function that implements updating a record
-  * `delete_with` - an atom or MFA that identifies the function that implements deleting a record
+  * `create_with` - an atom or MFA that identifies the function that implements creating the resource (set to false to disable create)
+  * `update_with` - an atom or MFA that identifies the function that implements updating a record (set to false to disable update)
+  * `delete_with` - an atom or MFA that identifies the function that implements deleting a record (set to false to disable delete)
   * `validate_with` - an atom or MFA that identifies the function that implements validating a changed record
   * `render_with` - an atom or MFA that identifies the function that implements table field rendering logic
   * `hidden_fields` - a list of fields that should not be displayed in the UI
@@ -40,10 +40,15 @@ defmodule LiveAdmin.Resource do
 
       def __live_admin_config__, do: @__live_admin_config__
 
-      def __live_admin_config__(key),
-        do:
-          Keyword.get(@__live_admin_config__, key, Application.get_env(:live_admin, key)) ||
-            LiveAdmin.Resource.default_config_value(key)
+      def __live_admin_config__(key) do
+        @__live_admin_config__
+        |> Keyword.get(key, Application.get_env(:live_admin, key))
+        |> case do
+          false -> false
+          nil -> LiveAdmin.Resource.default_config_value(key)
+          config -> config
+        end
+      end
     end
   end
 
