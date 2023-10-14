@@ -368,7 +368,6 @@ input[type="date"], input[type="number"] {
   [class$="--drop"]:focus-within nav {
     @apply block;
     @apply translate-y-1;
-    @apply bg-white;
   }
 
   [class$="--drop"] nav a:hover {

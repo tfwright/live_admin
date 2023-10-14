@@ -956,8 +956,6 @@ input[class$="-loading"] + div nav:before {
   display: block;
   --tw-translate-y: 0.25rem;
   transform: var(--tw-transform);
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
 [class$="--drop"] nav a:hover {

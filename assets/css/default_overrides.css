@@ -1,0 +1,54 @@
+body {
+  @apply bg-white;
+}
+
+.resource__action--btn {
+  @apply bg-violet-600;
+  @apply border-violet-600;
+  @apply text-violet-50;
+}
+
+.resource__action--btn:hover {
+  @apply bg-violet-900;
+  @apply border-violet-900;
+}
+
+.resource__action--secondary {
+  @apply bg-violet-50;
+  @apply border-violet-50;
+  @apply text-violet-900;
+}
+
+.resource__action--secondary:hover {
+  @apply bg-violet-300;
+  @apply border-violet-300;
+}
+
+.resource__action--danger {
+  @apply bg-rose-500;
+  @apply border-rose-500;
+  @apply text-white;
+}
+
+.resource__header {
+  @apply bg-violet-100;
+}
+
+.nav a:hover {
+  @apply bg-violet-100;
+}
+
+.toast__container--error {
+  @apply border-rose-500;
+  @apply text-rose-500;
+}
+
+.toast__container--success {
+  @apply bg-lime-500;
+  @apply border-lime-500;
+}
+
+.toast__container--info {
+  @apply bg-violet-900;
+  @apply border-violet-900;
+}
