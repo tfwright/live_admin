@@ -30,6 +30,14 @@ Application.put_env(:live_admin, DemoWeb.Endpoint,
       "--postcss",
       "--watch",
       cd: "assets"
+    ],
+    npx: [
+      "tailwindcss",
+      "--input=css/default_overrides.css",
+      "--output=../dist/css/default_overrides.css",
+      "--postcss",
+      "--watch",
+      cd: "assets"
     ]
   ],
   live_reload: [
