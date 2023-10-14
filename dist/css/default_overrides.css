@@ -49,11 +49,6 @@ body {
   background-color: rgb(237 233 254 / var(--tw-bg-opacity))
 }
 
-.resource__row--selected {
-  --tw-bg-opacity: 1;
-  background-color: rgb(237 233 254 / var(--tw-bg-opacity))
-}
-
 .nav a:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(237 233 254 / var(--tw-bg-opacity))

@@ -34,10 +34,6 @@ body {
   @apply bg-violet-100;
 }
 
-.resource__row--selected {
-  @apply bg-violet-100;
-}
-
 .nav a:hover {
   @apply bg-violet-100;
 }
