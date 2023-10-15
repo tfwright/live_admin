@@ -19,6 +19,5 @@ defmodule LiveAdmin.Components.Session do
     """
   end
 
-  def render(assigns), do: ~H"
-"
+  def render(assigns), do: ~H""
 end

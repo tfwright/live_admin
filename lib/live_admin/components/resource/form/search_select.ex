@@ -70,7 +70,11 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
                     <a
                       href="#"
                       phx-click={
-                        JS.push("select", value: %{id: option.id}, target: @myself, page_loading: true)
+                        JS.push("select",
+                          value: %{id: option.id},
+                          target: @myself,
+                          page_loading: true
+                        )
                       }
                     >
                       <%= record_label(option, @resource) %>

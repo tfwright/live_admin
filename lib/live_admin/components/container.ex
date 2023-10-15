@@ -92,8 +92,7 @@ defmodule LiveAdmin.Components.Container do
     {:noreply, assign(socket, :session, new_session)}
   end
 
-  def render(assigns = %{loading: true}), do: ~H"
-"
+  def render(assigns = %{loading: true}), do: ~H""
 
   @impl true
   def render(assigns) do
