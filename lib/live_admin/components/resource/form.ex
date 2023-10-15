@@ -26,7 +26,6 @@ defmodule LiveAdmin.Components.Container.Form do
     socket =
       socket
       |> assign(assigns)
-      |> assign(:enabled, false)
       |> assign(:changeset, Resource.change(assigns.resource))
 
     {:ok, socket}
@@ -75,8 +74,9 @@ defmodule LiveAdmin.Components.Container.Form do
             </a>
           <% end %>
           <%= submit(trans("Save"),
-            class: "resource__action#{if !@enabled, do: "--disabled", else: "--btn"}",
-            disabled: !@enabled
+            class:
+              "resource__action#{if Enum.any?(@changeset.errors) || Enum.empty?(@changeset.changes), do: "--disabled", else: "--btn"}",
+            disabled: Enum.any?(@changeset.errors) || Enum.empty?(@changeset.changes)
           ) %>
         </div>
       </.form>
@@ -92,11 +92,7 @@ defmodule LiveAdmin.Components.Container.Form do
       ) do
     changeset = validate(resource, changeset, params, session)
 
-    {:noreply,
-     assign(socket,
-       changeset: changeset,
-       enabled: enabled?(changeset, socket.assigns.action, resource)
-     )}
+    {:noreply, assign(socket, changeset: changeset)}
   end
 
   @impl true
@@ -338,9 +334,5 @@ defmodule LiveAdmin.Components.Container.Form do
     resource
     |> Resource.change(changeset.data, params)
     |> Resource.validate(resource, session)
-  end
-
-  def enabled?(changeset, action, resource) do
-    resource.__live_admin_config__(:"#{action}_with") != false && Enum.empty?(changeset.errors)
   end
 end
