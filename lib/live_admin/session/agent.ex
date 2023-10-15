@@ -20,7 +20,7 @@ defmodule LiveAdmin.Session.Agent do
 
   @impl LiveAdmin.Session.Store
   def load!(id) do
-    Agent.get(__MODULE__, &Map.get(&1, id))
+    Agent.get(__MODULE__, &Map.fetch!(&1, id))
   end
 
   @impl LiveAdmin.Session.Store
