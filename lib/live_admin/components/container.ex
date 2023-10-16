@@ -142,10 +142,10 @@ defmodule LiveAdmin.Components.Container do
               :let={prefix}
               id="prefix-select"
               label={@prefix || trans("Set prefix")}
-              items={[nil] ++ Enum.filter(@prefix_options, &(to_string(&1) != @prefix))}
+              items={[""] ++ Enum.filter(@prefix_options, &(to_string(&1) != @prefix))}
             >
               <.link navigate={route_with_params(assigns, params: [prefix: prefix])}>
-                <%= prefix || trans("clear") %>
+                <%= if prefix == "", do: trans("clear"), else: prefix %>
               </.link>
             </.dropdown>
           <% end %>
