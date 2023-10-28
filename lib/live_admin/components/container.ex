@@ -48,7 +48,7 @@ defmodule LiveAdmin.Components.Container do
       |> assign_prefix(params)
 
     record =
-      Resource.find(id, socket.assigns.resource, socket.assigns.prefix, socket.assigns.repo)
+      Resource.find(id, socket.assigns.resource, socket.assigns[:prefix], socket.assigns.repo)
 
     socket = assign(socket, record: record)
 
@@ -260,7 +260,7 @@ defmodule LiveAdmin.Components.Container do
     |> Enum.find(fn option -> to_string(option) == prefix end)
     |> case do
       nil ->
-        push_redirect(socket, to: route_with_params(socket.assigns))
+        push_redirect(socket, to: route_with_params(socket.assigns, params: [prefix: ""]))
 
       prefix ->
         assign_and_presist_prefix(socket, prefix)
