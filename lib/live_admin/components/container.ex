@@ -23,7 +23,7 @@ defmodule LiveAdmin.Components.Container do
         loading: !connected?(socket)
       )
 
-    Process.send_after(self(), :clear_flash, 2000)
+    if connected?(socket), do: Process.send_after(self(), :clear_flash, 2000)
 
     {:ok, socket}
   end
