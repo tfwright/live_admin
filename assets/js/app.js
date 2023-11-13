@@ -56,9 +56,9 @@ Hooks.EmbedComponent = {
     });
 
     this.el.addEventListener("live_admin:embed_delete", e => {
-      e.target.nextElementSibling.remove();
+      e.target.parentElement.classList.add("hidden");
 
-      const deleteInput = e.target.previousElementSibling;
+      const deleteInput = e.target.closest(".embed__group").querySelector("input[value=\"\"]");
       deleteInput.disabled = false;
       deleteInput.dispatchEvent(new Event("input", {bubbles: true, cancelable: true}));
     });
