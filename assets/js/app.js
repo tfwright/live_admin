@@ -65,7 +65,23 @@ Hooks.EmbedComponent = {
   }
 }
 
-Hooks.FormPage = {
+Hooks.SearchSelect = {
+  mounted(){
+    this.handleEvent("change", () => {
+      this.el.querySelector('input').dispatchEvent(new Event("input", {bubbles: true, cancelable: true}))
+    })
+  }
+}
+
+Hooks.ArrayInput = {
+  mounted(){
+    this.handleEvent("change", () => {
+      this.el.querySelector('input').dispatchEvent(new Event("input", {bubbles: true, cancelable: true}))
+    })
+  }
+}
+
+Hooks.MapInput = {
   mounted(){
     this.handleEvent("change", () => {
       this.el.querySelector('input').dispatchEvent(new Event("input", {bubbles: true, cancelable: true}))

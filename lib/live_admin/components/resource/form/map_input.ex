@@ -46,7 +46,7 @@ defmodule LiveAdmin.Components.Container.Form.MapInput do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="field__map--group">
+    <div class="field__map--group"  phx-hook="MapInput" id={input_id(@form, @field) <> "_map_input"}>
       <div>
         <%= for {idx, %{"key" => k, "value" => v}} <- Enum.sort(@values) do %>
           <div class="field__map--row">

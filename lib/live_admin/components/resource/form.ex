@@ -41,7 +41,7 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="form-page" class="view__container" phx-hook="FormPage">
+    <div id="form-page" class="view__container">
       <.form
         :let={f}
         for={@changeset}
