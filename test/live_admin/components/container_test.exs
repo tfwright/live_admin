@@ -181,7 +181,7 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "search select responds to focus", %{view: view} do
       view
-      |> element("#params_user_id_search_select")
+      |> element("#params_user_id")
       |> render_focus(%{value: "xxx"})
     end
   end

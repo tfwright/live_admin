@@ -41,7 +41,8 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     >
       <%= hidden_input(@form, @field,
         disabled: @disabled,
-        value: if(@selected_option, do: @selected_option.id)
+        value: if(@selected_option, do: @selected_option.id),
+        id: input_id(@form, @field) <> "_hidden"
       ) %>
       <%= if @selected_option do %>
         <a
