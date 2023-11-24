@@ -37,7 +37,11 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="field__array--group"  phx-hook="ArrayInput" id={input_id(@form, @field) <> "_array_input"}>
+    <div
+      class="field__array--group"
+      phx-hook="ArrayInput"
+      id={input_id(@form, @field) <> "_array_input"}
+    >
       <%= for {item, idx} <- Enum.with_index(@values) do %>
         <div>
           <a

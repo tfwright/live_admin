@@ -34,7 +34,11 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="search_select" phx-hook="SearchSelect" id={input_id(@form, @field) <> "_search_select"}>
+    <div
+      class="search_select"
+      phx-hook="SearchSelect"
+      id={input_id(@form, @field) <> "_search_select"}
+    >
       <%= hidden_input(@form, @field,
         disabled: @disabled,
         value: if(@selected_option, do: @selected_option.id)

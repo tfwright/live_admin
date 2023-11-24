@@ -100,7 +100,12 @@ defmodule LiveAdmin.Components do
           <a href="#" phx-click={JS.dispatch("live_admin:embed_add")} class="button__add" />
         <% end %>
         <%= if match?({_, _, %{cardinality: :one}}, @type) do %>
-          <input type="hidden" name={input_name(@form, @field)} value="" disabled={!!input_value(@form, @field)} />
+          <input
+            type="hidden"
+            name={input_name(@form, @field)}
+            value=""
+            disabled={!!input_value(@form, @field)}
+          />
         <% end %>
       <% else %>
         <pre><%= @form |> input_value(@field) |> inspect() %></pre>
