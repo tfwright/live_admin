@@ -6,27 +6,34 @@ defmodule LiveAdmin.Components do
   alias Phoenix.LiveView.JS
 
   slot(:inner_block, required: true)
+  slot(:control)
+  slot(:empty_label)
 
   attr(:label, :string, required: true)
   attr(:disabled, :boolean, default: false)
   attr(:items, :list, default: [])
   attr(:orientation, :atom, values: [:up, :down], default: :down)
   attr(:id, :string, default: nil)
+  attr(:base_class, :string, default: "resource__action")
 
   def dropdown(assigns) do
     ~H"""
-    <div id={@id} class="resource__action--drop" tabindex="0">
+    <div id={@id} class={"#{@base_class}--drop"} tabindex="0">
       <%= if @orientation == :up do %>
         <.list items={@items} inner_block={@inner_block} />
       <% end %>
-      <button
-        class={"resource__action#{if @disabled, do: "--disabled", else: "--btn"}"}
-        disabled={if @disabled, do: "disabled"}
-      >
-        <%= @label %>
-      </button>
+      <%= if render_slot(@control) do %>
+        <%= render_slot(@control) %>
+      <% else %>
+        <button
+          class={"resource__action#{if @disabled, do: "--disabled", else: "--btn"}"}
+          disabled={if @disabled, do: "disabled"}
+        >
+          <%= @label %>
+        </button>
+      <% end %>
       <%= if @orientation == :down do %>
-        <.list items={@items} inner_block={@inner_block} />
+        <.list items={@items} inner_block={@inner_block} empty_label={@empty_label} />
       <% end %>
     </div>
     """
@@ -119,6 +126,9 @@ defmodule LiveAdmin.Components do
     <div>
       <nav>
         <ul>
+          <%= if Enum.empty?(@items) && assigns[:empty_label] do %>
+            <li><%= render_slot(@empty_label) %></li>
+          <% end %>
           <%= for item <- @items do %>
             <li><%= render_slot(@inner_block, item) %></li>
           <% end %>

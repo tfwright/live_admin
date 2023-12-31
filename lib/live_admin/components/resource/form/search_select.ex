@@ -3,6 +3,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   use Phoenix.HTML
 
   import LiveAdmin, only: [record_label: 2, trans: 1]
+  import LiveAdmin.Components
 
   alias Phoenix.LiveView.JS
   alias LiveAdmin.Resource
@@ -52,44 +53,46 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
         />
         <%= record_label(@selected_option, @resource) %>
       <% else %>
-        <div class="search_select--drop">
-          <input
-            type="text"
-            id={input_id(@form, @field)}
-            disabled={@disabled}
-            placeholder={trans("Search")}
-            autocomplete="off"
-            phx-focus="load_options"
-            phx-keyup="load_options"
-            phx-target={@myself}
-            phx-debounce={200}
-          />
-          <div>
-            <nav>
-              <ul>
-                <%= if Enum.empty?(@options) do %>
-                  <li><%= trans("No options") %></li>
-                <% end %>
-                <%= for option <- @options, option.id != input_value(@form, @field) do %>
-                  <li>
-                    <a
-                      href="#"
-                      phx-click={
-                        JS.push("select",
-                          value: %{id: option.id},
-                          target: @myself,
-                          page_loading: true
-                        )
-                      }
-                    >
-                      <%= record_label(option, @resource) %>
-                    </a>
-                  </li>
-                <% end %>
-              </ul>
-            </nav>
-          </div>
-        </div>
+        <.dropdown
+          :let={option}
+          id={input_id(@form, @field) <> "_dropdown"}
+          label="Select"
+          items={
+            Enum.filter(
+              @options,
+              &(&1.id != input_value(@form, @field))
+            )
+          }
+        >
+          <:empty_label>
+            <%= trans("No options") %>
+          </:empty_label>
+          <:control>
+            <input
+              type="text"
+              id={input_id(@form, @field)}
+              disabled={@disabled}
+              placeholder={trans("Search")}
+              autocomplete="off"
+              phx-focus="load_options"
+              phx-keyup="load_options"
+              phx-target={@myself}
+              phx-debounce={200}
+            />
+          </:control>
+          <a
+            href="#"
+            phx-click={
+              JS.push("select",
+                value: %{id: option.id},
+                target: @myself,
+                page_loading: true
+              )
+            }
+          >
+            <%= record_label(option, @resource) %>
+          </a>
+        </.dropdown>
       <% end %>
     </div>
     """
