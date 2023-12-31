@@ -15,7 +15,7 @@ defmodule LiveAdmin.Components do
 
   def dropdown(assigns) do
     ~H"""
-    <div id={@id} class="resource__action--drop">
+    <div id={@id} class="resource__action--drop" tabindex="0">
       <%= if @orientation == :up do %>
         <.list items={@items} inner_block={@inner_block} />
       <% end %>
