@@ -35,3 +35,5 @@ live_admin-*.tar
 .bash_history
 
 .DS_Store
+
+archives/
