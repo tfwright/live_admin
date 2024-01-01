@@ -1,4 +1,19 @@
 defmodule LiveAdmin.Session.Agent do
+  defmodule InvalidSessionId do
+    defexception [:message]
+
+    def exception(id) do
+      message = """
+      Could not load session with id `#{id}`
+
+      This can occur if the server was restarted (clearing the store) while sockets were still connected.
+      As the session will be automatically regenerated on reload, you can ignore this error.
+      """
+
+      %__MODULE__{message: message}
+    end
+  end
+
   use Agent
 
   @behaviour LiveAdmin.Session.Store
@@ -20,7 +35,7 @@ defmodule LiveAdmin.Session.Agent do
 
   @impl LiveAdmin.Session.Store
   def load!(id) do
-    Agent.get(__MODULE__, &Map.fetch!(&1, id))
+    Agent.get(__MODULE__, &Map.get(&1, id)) || raise InvalidSessionId, id
   end
 
   @impl LiveAdmin.Session.Store
