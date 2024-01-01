@@ -22,7 +22,7 @@ First, ensure your Phoenix app has been configured to use [LiveView](https://hex
 Add to your app's `deps`:
 
 ```elixir
-{:live_admin, "~> 0.11.2"}
+{:live_admin, "~> 0.11.3"}
 ```
 
 Configure a module to act as a LiveAdmin resource:
