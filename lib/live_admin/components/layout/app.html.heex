@@ -3,13 +3,14 @@
   <div class="main__wrap">
     <.live_component
       id="nav"
-      module={@nav_mod}
-      title={@title}
+      module={get_in(@config, [:components, :nav])}
+      title={Keyword.fetch!(@config, :title)}
       base_path={@base_path}
       resources={@resources}
       resource={assigns[:resource]}
       prefix={assigns[:prefix]}
       key={assigns[:key]}
+      config={@config}
     />
     <div class="content">
       <%= @inner_content %>

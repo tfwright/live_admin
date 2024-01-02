@@ -3,14 +3,15 @@ defmodule LiveAdmin.Components.Nav do
   use Phoenix.HTML
 
   import LiveAdmin,
-    only: [resource_title: 1, route_with_params: 2, trans: 1]
+    only: [resource_title: 2, route_with_params: 2, trans: 1]
 
   @impl true
   def render(assigns) do
     nested_resources =
       Enum.reduce(assigns.resources, %{}, fn {key, resource}, groups ->
         path =
-          resource.__live_admin_config__(:schema)
+          resource
+          |> LiveAdmin.fetch_config(:schema, assigns.config)
           |> Module.split()
           |> case do
             list when length(list) == 1 -> list
@@ -26,7 +27,7 @@ defmodule LiveAdmin.Components.Nav do
     ~H"""
     <div class="nav">
       <ul class="nav__list">
-        <li class="nav__item--group"><%= @title %></li>
+        <li class="nav__item--group"><%= Keyword.fetch!(@config, :title) %></li>
         <li class="nav__item--group">
           <.link navigate={@base_path}><%= trans("Home") %></.link>
         </li>
@@ -35,6 +36,7 @@ defmodule LiveAdmin.Components.Nav do
             items={@nested_resources}
             base_path={@base_path}
             current_resource={assigns[:resource]}
+            config={@config}
           />
         </li>
         <li class="nav__item--group">
@@ -54,14 +56,19 @@ defmodule LiveAdmin.Components.Nav do
         <%= if match?({_key, _resource}, parent) do %>
           <li class={"nav__item#{if elem(parent, 1) == @current_resource, do: "--selected"}"}>
             <.link navigate={route_with_params(assigns, resource_path: elem(parent, 0))}>
-              <%= resource_title(elem(parent, 1)) %>
+              <%= resource_title(elem(parent, 1), @config) %>
             </.link>
           </li>
         <% else %>
           <li class="nav__item--drop">
             <input type="checkbox" id={"menu-group-#{parent}"} checked={open?(assigns, parent)} />
             <label for={"menu-group-#{parent}"}><%= parent %></label>
-            <.nav_group items={children} base_path={@base_path} current_resource={@current_resource} />
+            <.nav_group
+              items={children}
+              base_path={@base_path}
+              current_resource={@current_resource}
+              config={@config}
+            />
           </li>
         <% end %>
       <% end %>
@@ -76,7 +83,8 @@ defmodule LiveAdmin.Components.Nav do
         true
 
       resource ->
-        resource.__live_admin_config__(:schema)
+        resource.__live_admin_config__()
+        |> Keyword.fetch!(:schema)
         |> Module.split()
         |> Enum.drop(-1)
         |> Enum.member?(schema)

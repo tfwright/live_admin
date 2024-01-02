@@ -4,7 +4,7 @@ defmodule LiveAdmin.Components.Container do
 
   import LiveAdmin,
     only: [
-      resource_title: 1,
+      resource_title: 2,
       route_with_params: 1,
       route_with_params: 2,
       trans: 1
@@ -16,12 +16,9 @@ defmodule LiveAdmin.Components.Container do
   alias Phoenix.LiveView.JS
 
   @impl true
-  def mount(_params, %{"components" => components}, socket) do
+  def mount(_params, _session, socket) do
     socket =
-      assign(socket,
-        default_mod: Map.fetch!(components, socket.assigns.live_action),
-        loading: !connected?(socket)
-      )
+      assign(socket, loading: !connected?(socket))
 
     if connected?(socket), do: Process.send_after(self(), :clear_flash, 2000)
 
@@ -48,7 +45,12 @@ defmodule LiveAdmin.Components.Container do
       |> assign_prefix(params)
 
     record =
-      Resource.find(id, socket.assigns.resource, socket.assigns[:prefix], socket.assigns.repo)
+      Resource.find(
+        id,
+        socket.assigns.resource,
+        socket.assigns[:prefix],
+        socket.assigns.repo
+      )
 
     socket = assign(socket, record: record)
 
@@ -99,7 +101,7 @@ defmodule LiveAdmin.Components.Container do
     ~H"""
     <div class="resource__banner">
       <h1 class="resource__title">
-        <%= resource_title(@resource) %>
+        <%= resource_title(@resource, @config) %>
       </h1>
 
       <div class="resource__actions">
@@ -110,7 +112,7 @@ defmodule LiveAdmin.Components.Container do
           >
             <%= trans("List") %>
           </.link>
-          <%= if @resource.__live_admin_config__(:create_with) != false do %>
+          <%= if LiveAdmin.fetch_config(@resource, :create_with, @config) != false do %>
             <.link
               navigate={route_with_params(assigns, segments: ["new"], params: [prefix: @prefix])}
               class="resource__action--btn"
@@ -125,8 +127,8 @@ defmodule LiveAdmin.Components.Container do
           <.dropdown
             :let={task}
             label={trans("Run task")}
-            items={get_task_keys(@resource)}
-            disabled={@resource |> get_task_keys() |> Enum.empty?()}
+            items={get_task_keys(@resource, @config)}
+            disabled={@resource |> get_task_keys(@config) |> Enum.empty?()}
           >
             <button
               class="resource__action--link"
@@ -193,6 +195,7 @@ defmodule LiveAdmin.Components.Container do
       base_path={@base_path}
       resources={@resources}
       repo={@repo}
+      config={@config}
     />
     """
   end
@@ -210,6 +213,7 @@ defmodule LiveAdmin.Components.Container do
       prefix={@prefix}
       base_path={@base_path}
       repo={@repo}
+      config={@config}
     />
     """
   end
@@ -228,6 +232,7 @@ defmodule LiveAdmin.Components.Container do
       prefix={@prefix}
       repo={@repo}
       base_path={@base_path}
+      config={@config}
     />
     """
   end
@@ -245,6 +250,7 @@ defmodule LiveAdmin.Components.Container do
       base_path={@base_path}
       prefix={@prefix}
       repo={@repo}
+      config={@config}
     />
     """
   end
@@ -285,9 +291,9 @@ defmodule LiveAdmin.Components.Container do
     assign(socket, prefix: prefix, session: new_session)
   end
 
-  defp get_task_keys(resource) do
-    :tasks
-    |> resource.__live_admin_config__()
+  defp get_task_keys(resource, config) do
+    resource
+    |> LiveAdmin.fetch_config(:tasks, config)
     |> Enum.map(fn
       {key, _} -> key
       key -> key
@@ -302,23 +308,17 @@ defmodule LiveAdmin.Components.Container do
     assign(socket, key: key, resource: mod)
   end
 
-  defp assign_mod(
-         socket = %{assigns: %{resource: resource, live_action: action, default_mod: default}}
-       ) do
+  defp assign_mod(socket = %{assigns: %{resource: resource, live_action: action, config: config}}) do
     mod =
-      :components
-      |> resource.__live_admin_config__()
-      |> Keyword.get(action, default)
+      resource
+      |> LiveAdmin.fetch_config(:components, config)
+      |> Keyword.fetch!(action)
 
     assign(socket, :mod, mod)
   end
 
-  defp assign_repo(socket = %{assigns: %{resource: resource, default_repo: default}}) do
-    repo =
-      :ecto_repo
-      |> resource.__live_admin_config__()
-      |> Kernel.||(default)
-      |> Kernel.||(raise "no repo configured")
+  defp assign_repo(socket = %{assigns: %{resource: resource, config: config}}) do
+    repo = LiveAdmin.fetch_config(resource, :ecto_repo, config)
 
     prefix_options =
       if function_exported?(repo, :prefixes, 0) do

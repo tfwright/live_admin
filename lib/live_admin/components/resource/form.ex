@@ -16,7 +16,7 @@ defmodule LiveAdmin.Components.Container.Form do
       socket
       |> assign(assigns)
       |> assign(:enabled, false)
-      |> assign(:changeset, Resource.change(assigns.resource, record))
+      |> assign(:changeset, Resource.change(assigns.resource, record, assigns.config))
 
     {:ok, socket}
   end
@@ -26,7 +26,7 @@ defmodule LiveAdmin.Components.Container.Form do
     socket =
       socket
       |> assign(assigns)
-      |> assign(:changeset, Resource.change(assigns.resource))
+      |> assign(:changeset, Resource.change(assigns.resource, assigns.config))
 
     {:ok, socket}
   end
@@ -51,7 +51,7 @@ defmodule LiveAdmin.Components.Container.Form do
         phx-target={@myself}
         class="resource__form"
       >
-        <%= for {field, type, opts} <- Resource.fields(@resource) do %>
+        <%= for {field, type, opts} <- Resource.fields(@resource, @config) do %>
           <.field
             field={field}
             type={type}
@@ -62,6 +62,7 @@ defmodule LiveAdmin.Components.Container.Form do
             session={@session}
             prefix={@prefix}
             repo={@repo}
+            config={@config}
           />
         <% end %>
         <div class="form__actions">
@@ -88,9 +89,11 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "validate",
         %{"params" => params},
-        socket = %{assigns: %{resource: resource, changeset: changeset, session: session}}
+        socket = %{
+          assigns: %{resource: resource, changeset: changeset, session: session, config: config}
+        }
       ) do
-    changeset = validate(resource, changeset, params, session)
+    changeset = validate(resource, changeset, params, session, config)
 
     {:noreply, assign(socket, changeset: changeset)}
   end
@@ -99,10 +102,10 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "create",
         %{"params" => params},
-        %{assigns: %{resource: resource, session: session, repo: repo}} = socket
+        %{assigns: %{resource: resource, session: session, repo: repo, config: config}} = socket
       ) do
     socket =
-      case Resource.create(resource, params, session, repo) do
+      case Resource.create(resource, params, session, repo, config) do
         {:ok, _} ->
           socket
           |> put_flash(:info, trans("Record successfully added"))
@@ -121,10 +124,11 @@ defmodule LiveAdmin.Components.Container.Form do
   def handle_event(
         "update",
         %{"params" => params},
-        %{assigns: %{resource: resource, session: session, record: record}} = socket
+        %{assigns: %{resource: resource, session: session, record: record, config: config}} =
+          socket
       ) do
     socket =
-      Resource.update(record, resource, params, session)
+      Resource.update(record, resource, params, session, config)
       |> case do
         {:ok, _} ->
           socket
@@ -153,6 +157,7 @@ defmodule LiveAdmin.Components.Container.Form do
           session={@session}
           prefix={@prefix}
           repo={@repo}
+          config={@config}
         />
       <% else %>
         <%= textarea(@form, @field,
@@ -179,6 +184,7 @@ defmodule LiveAdmin.Components.Container.Form do
       session={@session}
       prefix={@prefix}
       repo={@repo}
+      config={@config}
     />
     """
   end
@@ -189,7 +195,7 @@ defmodule LiveAdmin.Components.Container.Form do
         assigns,
         :associated_resource,
         associated_resource(
-          assigns.resource.__live_admin_config__(:schema),
+          LiveAdmin.fetch_config(assigns.resource, :schema, assigns.session),
           assigns.field,
           assigns.resources,
           :resource
@@ -209,6 +215,7 @@ defmodule LiveAdmin.Components.Container.Form do
           session={@session}
           prefix={@prefix}
           repo={@repo}
+          config={@config}
         />
       <% else %>
         <div class="form__number">
@@ -330,9 +337,9 @@ defmodule LiveAdmin.Components.Container.Form do
     """
   end
 
-  defp validate(resource, changeset, params, session) do
+  defp validate(resource, changeset, params, session, config) do
     resource
-    |> Resource.change(changeset.data, params)
-    |> Resource.validate(resource, session)
+    |> Resource.change(changeset.data, params, config)
+    |> Resource.validate(resource, session, config)
   end
 end

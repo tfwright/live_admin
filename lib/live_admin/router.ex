@@ -7,21 +7,12 @@ defmodule LiveAdmin.Router do
   ## Arguments
 
   * `path` - Defines a scope to be added to the router under which the resources will be grouped in a single live session
-  * `opts` - Opts for the Admin UI added at configured path
-    * `:title` - Title for the UI home view (Default: 'LiveAdmin')
-    * `:components` - Component overrides that will be used for every resource in the group
-      unless a resource is configurated to use its own overrides.
-    * `:repo` - An Ecto repo to use for queries within this group of admin resources, unless
-      overriden by an individual resource
-    * `on_mount` - A Tuple identifying a function with arity 1, that will be passed the socket and should return it
+  * `opts` - Configuration for this LiveAdmin scope. In addition to global options:
+    - `title` (binary) - Title to display in nav bar
+    - `on_mount` (tuple) - Module function when routes are mounted that will receive and should return session
   """
   defmacro live_admin(path, opts \\ [], do: context) do
     import Phoenix.LiveView.Router, only: [live: 4, live_session: 3]
-
-    title = Keyword.get(opts, :title, "LiveAdmin")
-    components = Keyword.get(opts, :components, Application.get_env(:live_admin, :components, []))
-    repo = Keyword.get(opts, :ecto_repo, Application.get_env(:live_admin, :ecto_repo))
-    on_mount = Keyword.get(opts, :on_mount)
 
     quote do
       current_path =
@@ -33,9 +24,7 @@ defmodule LiveAdmin.Router do
 
       scope unquote(path), alias: false, as: false do
         live_session :"live_admin_#{@base_path}",
-          session:
-            {unquote(__MODULE__), :build_session,
-             [@base_path, unquote(title), unquote(components), unquote(repo), unquote(on_mount)]},
+          session: {unquote(__MODULE__), :build_session, [@base_path, unquote(opts)]},
           root_layout: {LiveAdmin.View, :layout},
           layout: {LiveAdmin.View, :app},
           on_mount: {unquote(__MODULE__), :assign_options} do
@@ -88,14 +77,53 @@ defmodule LiveAdmin.Router do
     end
   end
 
-  def build_session(conn, base_path, title, components, repo, on_mount) do
+  def build_session(conn, base_path, opts) do
+    opts_schema =
+      LiveAdmin.base_configs_schema() ++
+        [title: [type: :string, default: "LiveAdmin"], on_mount: [type: {:tuple, [:atom, :atom]}]]
+
+    default_components =
+      Keyword.merge(
+        [
+          nav: LiveAdmin.Components.Nav,
+          home: LiveAdmin.Components.Home.Content,
+          session: LiveAdmin.Components.Session.Content,
+          new: LiveAdmin.Components.Container.Form,
+          edit: LiveAdmin.Components.Container.Form,
+          list: LiveAdmin.Components.Container.Index,
+          view: LiveAdmin.Components.Container.View
+        ],
+        Application.get_env(:live_admin, :components, [])
+      )
+
+    opts =
+      opts
+      |> NimbleOptions.validate!(opts_schema)
+      |> Keyword.put(
+        :components,
+        Keyword.merge(default_components, Keyword.get(opts, :components, []))
+      )
+      |> Keyword.put_new(:ecto_repo, Application.get_env(:live_admin, :ecto_repo))
+      |> Keyword.put_new(:render_with, Application.get_env(:live_admin, :render_with))
+      |> Keyword.put_new(:delete_with, Application.get_env(:live_admin, :delete_with))
+      |> Keyword.put_new(:create_with, Application.get_env(:live_admin, :create_with))
+      |> Keyword.put_new(:list_with, Application.get_env(:live_admin, :list_with))
+      |> Keyword.put_new(:update_with, Application.get_env(:live_admin, :update_with))
+      |> Keyword.put_new(:label_with, Application.get_env(:live_admin, :label_with, :id))
+      |> Keyword.put_new(:title_with, Application.get_env(:live_admin, :title_with))
+      |> Keyword.put_new(:validate_with, Application.get_env(:live_admin, :validate_with))
+      |> Keyword.put_new(:hidden_fields, Application.get_env(:live_admin, :hidden_fields, []))
+      |> Keyword.put_new(
+        :immutable_fields,
+        Application.get_env(:live_admin, :immutable_fields, [])
+      )
+      |> Keyword.put_new(:actions, Application.get_env(:live_admin, :actions, []))
+      |> Keyword.put_new(:tasks, Application.get_env(:live_admin, :tasks, []))
+
     %{
       "session_id" => LiveAdmin.session_store().init!(conn),
       "base_path" => base_path,
-      "title" => title,
-      "components" => components |> add_default_components() |> Enum.into(%{}),
-      "repo" => repo,
-      "on_mount" => on_mount
+      "opts" => opts
     }
   end
 
@@ -103,12 +131,9 @@ defmodule LiveAdmin.Router do
         :assign_options,
         _params,
         %{
-          "title" => title,
           "base_path" => base_path,
-          "components" => components,
           "session_id" => session_id,
-          "repo" => repo,
-          "on_mount" => on_mount
+          "opts" => opts
         },
         socket
       ) do
@@ -120,29 +145,16 @@ defmodule LiveAdmin.Router do
       assign(socket,
         session: session,
         base_path: base_path,
-        title: title,
-        nav_mod: Map.fetch!(components, :nav),
         resources: LiveAdmin.resources(socket.router, base_path),
-        default_repo: repo
+        config: opts
       )
 
     socket =
-      case on_mount do
+      case Keyword.get(opts, :on_mount) do
         {m, f} -> apply(m, f, [socket])
         _ -> socket
       end
 
     {:cont, socket}
-  end
-
-  defp add_default_components(components) do
-    components
-    |> Keyword.put_new(:nav, LiveAdmin.Components.Nav)
-    |> Keyword.put_new(:home, LiveAdmin.Components.Home.Content)
-    |> Keyword.put_new(:session, LiveAdmin.Components.Session.Content)
-    |> Keyword.put_new(:new, LiveAdmin.Components.Container.Form)
-    |> Keyword.put_new(:edit, LiveAdmin.Components.Container.Form)
-    |> Keyword.put_new(:list, LiveAdmin.Components.Container.Index)
-    |> Keyword.put_new(:view, LiveAdmin.Components.Container.View)
   end
 end

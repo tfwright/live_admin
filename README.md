@@ -71,7 +71,8 @@ If you want to customize the behavior of one or more resources, including how re
 are rendered or changes are validated, or to add custom behaviors, there are a variety of configuration options
 available. This includes component overrides if you would like to completely control
 every aspect of a particular resource view, like the edit form.
-For a complete list of options, see the `LiveAdmin.Resource` docs.
+For a list of base configuration and expected values, see `LiveAdmin.base_configs_schema/0`.
+
 
 For additional convenience and control, configuration in LiveAdmin can be set at 3 different levels.
 From more specific to more general, they are:
@@ -79,25 +80,29 @@ From more specific to more general, they are:
 ### Resource
 
 The second argument passed to `use LiveAdmin.Resource` will configure only that specific resource,
-in any LiveView it is used. If the module is not an Ecto schema, the `:schema` option must be passed.
-If you would like the same schema to behave differently in different LiveAdmin instances, or different
-routes in the same instance, you must create multiple resource modules to contain that configuration.
+in any LiveView it is used.
+
+Extra options:
+
+* `schema` - use to set the schema for the resource (default: calling module)
+* `preload` - manually choose which associations to preload (default: all `belongs_to` associations)
 
 ### Scope
 
-The second argument passed to `live_admin` will configure defaults for all resources in the group
-that do not specify the same configuration. Currently only component overrides and the repo can be
-configured at this level.
+The second argument passed to `live_admin` will configure defaults for all resources in the group (wrapped in a [Live Session](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.Router.html#live_session/3)) that do not already specify the same configuration.
+
+Extra options:
+
+* `title` - title to display in nav (default: "LiveAdmin")
 
 ### Application
 
-All resource configuration options can also be set in the LiveAdmin app runtime config. This will set a global
-default to apply to all resources unless overridden in their individual config, or the LiveAdmin instance.
+App config can be used to set a global default to apply to all resources unless overridden in their individual config, or the LiveAdmin instance.
 
-Additionally, the following options can only be set at the global level:
+Extra options:
 
+* `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data (default: LiveAdmin.Session.Agent)
 * `css_overrides` - a binary or MFA identifying a function that returns CSS to be appended to app css
-* `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data
 * `gettext_backend` - a module implementing the [Gettext API](https://hexdocs.pm/gettext/Gettext.html#module-gettext-api) that will be used for translations
 
 *For concrete examples of the various config options and to see them in action, consult the [development app](#development).*

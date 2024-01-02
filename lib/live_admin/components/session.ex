@@ -4,7 +4,9 @@ defmodule LiveAdmin.Components.Session do
   alias Ecto.Changeset
 
   @impl true
-  def mount(_params, %{"components" => %{session: mod}}, socket) do
+  def mount(_params, _, socket) do
+    mod = get_in(socket.assigns.config, [:components, :session])
+
     if socket.assigns.session do
       {:ok, assign(socket, changeset: Changeset.change(socket.assigns.session), mod: mod)}
     else

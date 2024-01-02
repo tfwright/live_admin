@@ -2,7 +2,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   use Phoenix.LiveComponent
   use Phoenix.HTML
 
-  import LiveAdmin, only: [record_label: 2, trans: 1]
+  import LiveAdmin, only: [record_label: 3, trans: 1]
   import LiveAdmin.Components
 
   alias Phoenix.LiveView.JS
@@ -24,7 +24,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     ~H"""
     <div>
       <%= if @selected_option do %>
-        <%= record_label(@selected_option, @resource) %>
+        <%= record_label(@selected_option, @resource, @config) %>
       <% else %>
         <%= trans("None") %>
       <% end %>
@@ -51,7 +51,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
           phx-click={JS.push("select", value: %{id: nil}, target: @myself, page_loading: true)}
           class="button__remove"
         />
-        <%= record_label(@selected_option, @resource) %>
+        <%= record_label(@selected_option, @resource, @config) %>
       <% else %>
         <.dropdown
           :let={option}
@@ -90,7 +90,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
               )
             }
           >
-            <%= record_label(option, @resource) %>
+            <%= record_label(option, @resource, @config) %>
           </a>
         </.dropdown>
       <% end %>
@@ -102,11 +102,16 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   def handle_event(
         "load_options",
         %{"value" => q},
-        socket = %{assigns: %{resource: resource, session: session}}
+        socket = %{assigns: %{resource: resource, session: session, config: config}}
       ) do
     options =
       resource
-      |> Resource.list([search: q, prefix: socket.assigns.prefix], session, socket.assigns.repo)
+      |> Resource.list(
+        [search: q, prefix: socket.assigns.prefix],
+        session,
+        socket.assigns.repo,
+        config
+      )
       |> elem(0)
 
     {:noreply, assign(socket, :options, options)}
@@ -136,6 +141,11 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
       assign(
         socket,
         :selected_option,
-        Resource.find!(id, socket.assigns.resource, socket.assigns.prefix, socket.assigns.repo)
+        Resource.find!(
+          id,
+          socket.assigns.resource,
+          socket.assigns.prefix,
+          socket.assigns.repo
+        )
       )
 end

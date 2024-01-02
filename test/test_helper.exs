@@ -87,6 +87,8 @@ defmodule LiveAdminTest.PostResource do
     actions: [:run_action]
 
   def run_action(_, _), do: {:ok, "worked"}
+
+  def label(post), do: post.id
 end
 
 defmodule LiveAdminTest.Post do
