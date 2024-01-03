@@ -95,14 +95,20 @@ Additionally, the following options can only be set at the global level:
 
 * `css_overrides` - a binary or MFA identifying a function that returns CSS to be appended to app css
 * `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data
-* `gettext_backend` - a module implementing the [Gettext API](https://hexdocs.pm/gettext/Gettext.html#module-gettext-api). It is expected to implement `locales/0` returning a list of binary locale names
+* `gettext_backend` - a module implementing the [Gettext API](https://hexdocs.pm/gettext/Gettext.html#module-gettext-api) that will be used for translations
+
+## Multi tenancy
+
+To enable Multi tenant support, simply implement a `prefixes/0` function in your Ecto Repo module that returns a list of prefixes.
+A dropdown will be added to the top nav bar that will allow you to switch between tenants.
 
 ## i18n
 
-LiveAdmin wraps all static strings in the UI with Gettext calls, but currently it does *not* provide any locales by default, so you will need
-to make sure they have been set up correctly for a custom backend. Unfortunately it is not currently possible to use
-Gettext's utilities to automatically extract the pot files so you will need to do this manually.
-To avoid conflicts with your own app's translations, it is recommended to create separate Gettext backends for LiveAdmin.
+LiveAdmin wraps all static strings in the UI with Gettext calls, but currently it does *not* provide any locales by default.
+To enable i18n, implement a `locales/0` function returning a list of binary locale names on your Gettext Backend module.
+
+Unfortunately it is not currently possible to use Gettext's utilities to automatically extract the pot files so you will need to do this manually.
+To avoid conflicts with your own app's translations, it is recommended to use a separate Gettext backend for LiveAdmin.
 
 ## Development environment
 
