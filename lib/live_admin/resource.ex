@@ -183,15 +183,16 @@ defmodule LiveAdmin.Resource do
 
   def fields(resource) do
     schema = resource.__live_admin_config__(:schema)
+    all_fields = schema.__schema__(:fields) ++ schema.__schema__(:virtual_fields)
 
-    Enum.flat_map(schema.__schema__(:fields), fn field_name ->
+    Enum.flat_map(all_fields, fn field_name ->
       :hidden_fields
       |> resource.__live_admin_config__()
       |> Enum.member?(field_name)
       |> case do
         false ->
           [
-            {field_name, schema.__schema__(:type, field_name),
+            {field_name, schema.__schema__(:type, field_name) || schema.__schema__(:virtual_type, field_name),
              [
                immutable:
                  Enum.member?(resource.__live_admin_config__(:immutable_fields) || [], field_name)
