@@ -9,13 +9,18 @@ An admin UI for Phoenix applications built on [Phoenix LiveView](https://github.
 
 Significant features:
 
+* Minimal required configuration
 * First class support for multi tenant applications via Ecto's `prefix` option
 * Overridable views and API
 * Easily add custom actions at the schema and record level
 * Ability to edit (nested) embedded schemas
 * i18n via [Gettext](elixir-gettext/gettext)
 
-## Installation
+## (Required) Installation
+
+One of the main design goals of LiveAdmin is to require as little config as possible.
+It should be useable out of the box for most internal admin use cases using defaults.
+If you are already running LiveView in your application, it should only take a few minutes to expose a UI for your resources.
 
 First, ensure your Phoenix app has been configured to use [LiveView](https://hexdocs.pm/phoenix_live_view/installation.html).
 
@@ -28,23 +33,25 @@ Add to your app's `deps`:
 Configure a module to act as a LiveAdmin resource:
 
 ```elixir
-defmodule MyApp.MyResource do
-  use LiveAdmin.Resource, schema: MyApp.Schema
+defmodule MyApp.Admin.Foo do
+  use LiveAdmin.Resource, schema: MyApp.Foo
 end
 ```
 
-*Note: if you use an Ecto schema you can omit the `schema' option.*
+*Note: if your module is an Ecto schema you can omit the `schema' option.*
 
 In your Phoenix router, inside a scope configured to run LiveView (`:browser` if you followed the default installation), add the resource to a LiveAdmin instance:
 
 ```elixir
 import LiveAdmin.Router
 
+...
+
 scope "/" do
   pipe_through: :browser
 
-  live_admin "/my_admin" do
-    admin_resource "/my_schemas", MyApp.MyResource
+  live_admin "/admin" do
+    admin_resource "/foos", MyApp.Admin.Foo
   end
 end
 ```
@@ -57,21 +64,17 @@ config :live_admin, ecto_repo: MyApp.Repo
 
 That's it, now an admin UI for `MyApp.Schema` will be available at `/my_admin/my_schemas`.
 
-## Configuration
+## (Optional) Configuration
 
-One of the main goals of LiveAdmin is to require as little config as possible.
-It should work out of the box, with only the above, for the vast majority of common
-app admin needs.
-
-However, if you want to customize the behavior of one or more resources, including how records
+You may want more control over how your resources appear in the UI, or which fields are editable.
+If you want to customize the behavior of one or more resources, including how records
 are rendered or changes are validated, or to add custom behaviors, there are a variety of configuration options
 available. This includes component overrides if you would like to completely control
-every aspect of a particular resource view, like the edit form. For a complete list of options, see the `LiveAdmin.Resource` docs.
+every aspect of a particular resource view, like the edit form.
+For a complete list of options, see the `LiveAdmin.Resource` docs.
 
 For additional convenience and control, configuration in LiveAdmin can be set at 3 different levels.
-From most specific to most general, they are resource, admin instance, and global.
-
-For concrete examples of the various config options and to see them in action, consult the [development app](#development-environment).
+From more specific to more general, they are:
 
 ### Resource
 
@@ -80,13 +83,13 @@ in any LiveView it is used. If the module is not an Ecto schema, the `:schema` o
 If you would like the same schema to behave differently in different LiveAdmin instances, or different
 routes in the same instance, you must create multiple resource modules to contain that configuration.
 
-### Admin instance
+### Scope
 
 The second argument passed to `live_admin` will configure defaults for all resources in the group
 that do not specify the same configuration. Currently only component overrides and the repo can be
 configured at this level.
 
-### Global
+### Application
 
 All resource configuration options can also be set in the LiveAdmin app runtime config. This will set a global
 default to apply to all resources unless overridden in their individual config, or the LiveAdmin instance.
@@ -97,12 +100,16 @@ Additionally, the following options can only be set at the global level:
 * `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data
 * `gettext_backend` - a module implementing the [Gettext API](https://hexdocs.pm/gettext/Gettext.html#module-gettext-api) that will be used for translations
 
-## Multi tenancy
+*For concrete examples of the various config options and to see them in action, consult the [development app](#development-environment).*
+
+## Features
+
+### Multi tenancy
 
 To enable Multi tenant support, simply implement a `prefixes/0` function in your Ecto Repo module that returns a list of prefixes.
 A dropdown will be added to the top nav bar that will allow you to switch between tenants.
 
-## i18n
+### i18n
 
 LiveAdmin wraps all static strings in the UI with Gettext calls, but currently it does *not* provide any locales by default.
 To enable i18n, implement a `locales/0` function returning a list of binary locale names on your Gettext Backend module.
@@ -110,7 +117,7 @@ To enable i18n, implement a `locales/0` function returning a list of binary loca
 Unfortunately it is not currently possible to use Gettext's utilities to automatically extract the pot files so you will need to do this manually.
 To avoid conflicts with your own app's translations, it is recommended to use a separate Gettext backend for LiveAdmin.
 
-## Development environment
+### Development environment
 
 This repo has been configured to run the application in [Docker](https://www.docker.com/) using [Compose](https://docs.docker.com/compose/).
 
