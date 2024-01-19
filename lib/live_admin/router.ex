@@ -109,7 +109,7 @@ defmodule LiveAdmin.Router do
       |> Keyword.put_new(:create_with, Application.get_env(:live_admin, :create_with))
       |> Keyword.put_new(:list_with, Application.get_env(:live_admin, :list_with))
       |> Keyword.put_new(:update_with, Application.get_env(:live_admin, :update_with))
-      |> Keyword.put_new(:label_with, Application.get_env(:live_admin, :label_with, :id))
+      |> Keyword.put_new(:label_with, Application.get_env(:live_admin, :label_with))
       |> Keyword.put_new(:title_with, Application.get_env(:live_admin, :title_with))
       |> Keyword.put_new(:validate_with, Application.get_env(:live_admin, :validate_with))
       |> Keyword.put_new(:hidden_fields, Application.get_env(:live_admin, :hidden_fields, []))

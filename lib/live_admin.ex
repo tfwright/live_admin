@@ -85,6 +85,12 @@ defmodule LiveAdmin do
   def fetch_config(resource, key, config),
     do: Keyword.get(resource.__live_admin_config__, key) || Keyword.fetch!(config, key)
 
+  def primary_key!(resource) do
+    [key] = Keyword.fetch!(resource.__live_admin_config__(), :schema).__schema__(:primary_key)
+
+    key
+  end
+
   def route_with_params(assigns, parts \\ []) do
     resource_path = parts[:resource_path] || assigns.key
 
@@ -113,11 +119,21 @@ defmodule LiveAdmin do
         _ -> ""
       end
 
-    Path.join(
-      [assigns.base_path, resource_path] ++
-        Enum.map(parts[:segments] || [], &Phoenix.Param.to_param/1)
-    ) <>
-      encoded_params
+    segments =
+      Enum.map(
+        parts[:segments] || [],
+        fn segment ->
+          cond do
+            is_struct(segment) && Phoenix.Param.impl_for(segment) ->
+              Phoenix.Param.to_param(segment)
+
+            true ->
+              to_string(segment)
+          end
+        end
+      )
+
+    Path.join([assigns.base_path, resource_path] ++ segments) <> encoded_params
   end
 
   def session_store,
@@ -173,6 +189,7 @@ defmodule LiveAdmin do
     resource
     |> fetch_config(:label_with, config)
     |> case do
+      nil -> Map.fetch!(record, LiveAdmin.primary_key!(resource))
       {m, f, a} -> apply(m, f, [record | a])
       label when is_atom(label) -> Map.fetch!(record, label)
     end

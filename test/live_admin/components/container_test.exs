@@ -226,7 +226,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "edit resource with plural embed with multiple entries" do
     setup %{conn: conn} do
       post = Repo.insert!(%Post{title: "test", previous_versions: [%Version{}, %Version{}]})
-      {:ok, view, html} = live(conn, "/live_admin_test_post/edit/#{post.id}")
+      {:ok, view, html} = live(conn, "/live_admin_test_post/edit/#{post.post_id}")
       %{response: html, view: view}
     end
 
@@ -292,7 +292,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
       post = Repo.insert!(%Post{title: "test", user: user})
-      {:ok, _, html} = live(conn, "/live_admin_test_post/#{post.id}")
+      {:ok, _, html} = live(conn, "/live_admin_test_post/#{post.post_id}")
       %{response: html, user: user}
     end
 

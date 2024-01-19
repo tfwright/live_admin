@@ -23,7 +23,7 @@ create table user_profiles (
 );
 
 create table posts (
-  id serial,
+  post_id serial,
   user_id uuid,
   disabled_user_id uuid,
   title text NOT NULL,
@@ -63,7 +63,7 @@ create table alt.user_profiles (
 );
 
 create table alt.posts (
-  id serial,
+  post_id serial,
   user_id uuid,
   disabled_user_id uuid,
   title text NOT NULL,
