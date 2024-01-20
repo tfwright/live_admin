@@ -38,7 +38,7 @@ defmodule MyApp.Admin.Foo do
 end
 ```
 
-*Note: if your module is an Ecto schema you can omit the `schema' option.*
+*Note: if your module is an Ecto schema you can omit the `schema` option.*
 
 In your Phoenix router, inside a scope configured to run LiveView (`:browser` if you followed the default installation), add the resource to a LiveAdmin instance:
 
