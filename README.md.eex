@@ -14,7 +14,7 @@ Significant features:
 * Overridable views and API
 * Easily add custom actions at the schema and record level
 * Ability to edit (nested) embedded schemas
-* i18n via [Gettext](elixir-gettext/gettext)
+* i18n via [Gettext](https://github.com/elixir-gettext/gettext)
 
 ## (Required) Installation
 
