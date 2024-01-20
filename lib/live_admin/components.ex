@@ -92,6 +92,7 @@ defmodule LiveAdmin.Components do
                   session={@session}
                   prefix={@prefix}
                   repo={@repo}
+                  config={@config}
                 />
               <% end %>
             </div>

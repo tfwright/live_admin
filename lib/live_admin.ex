@@ -1,6 +1,90 @@
 defmodule LiveAdmin do
   @moduledoc docout: [LiveAdmin.READMECompiler]
 
+  @doc """
+  Defines [NimbleOptions](https://hexdocs.pm/nimble_options/NimbleOptions.html) schema for configuration that can be set at all levels (resource, scope, and application).
+
+  - `components` - Modules implementing LiveViews to use in place of various UI views
+  - `ecto_repo` - Repo to use for running Ecto queries (`find`, `all` etc.)
+  - `render_with` - Function controlling how fields are rendered in the list table
+  - `delete_with` - Function implementing deletion of a record
+  - `update_with` - Function controlling updating a record
+  - `validate_with` - Function controlling validation of a record changeset
+  - `create_with` - Function implementing creation of a resource
+  - `list_with` - Function implementing listing of a resource
+  - `label_with` - Function implementing display text for a field
+  - `title_with` - Function implementing display text for a resource
+  - `hidden_fields` - List of fields that should not be displayed in UI
+  - `immutable_fields` - List of fields that should be editable in UI
+  - `actions` - List of functions that take a specific record as their first arg
+  - `tasks` - List of functions that take a resource as their first arg
+  """
+  def base_configs_schema do
+    [
+      components: [
+        type: :non_empty_keyword_list,
+        keys: [
+          nav: [type: :atom],
+          home: [type: :atom],
+          session: [type: :atom],
+          new: [type: :atom],
+          edit: [type: :atom],
+          list: [type: :atom],
+          view: [type: :atom]
+        ]
+      ],
+      ecto_repo: [
+        type: :atom
+      ],
+      render_with: [
+        type: {:or, [:atom, :mfa]}
+      ],
+      delete_with: [
+        type: {:or, [:atom, :mfa]}
+      ],
+      list_with: [
+        type: {:or, [:atom, :mfa]}
+      ],
+      create_with: [
+        type: {:or, [:atom, :mfa]}
+      ],
+      update_with: [
+        type: {:or, [:atom, :mfa]}
+      ],
+      validate_with: [
+        type: {:or, [:atom, :mfa]}
+      ],
+      hidden_fields: [
+        type: {:list, :atom}
+      ],
+      immutable_fields: [
+        type: {:list, :atom}
+      ],
+      actions: [
+        type: {:or, [{:list, :atom}, :non_empty_keyword_list]}
+      ],
+      tasks: [
+        type: {:or, [{:list, :atom}, :non_empty_keyword_list]}
+      ],
+      label_with: [
+        type: {:or, [:atom, :mfa]}
+      ],
+      title_with: [
+        type: {:or, [:string, :mfa]}
+      ]
+    ]
+  end
+
+  def fetch_config(resource, :components, config),
+    do:
+      Keyword.merge(
+        Keyword.fetch!(config, :components),
+        Keyword.get(resource.__live_admin_config__(), :components, [])
+      )
+
+  def fetch_config(resource, key, config),
+    do: Keyword.get(resource.__live_admin_config__, key) || Keyword.fetch!(config, key)
+
   def route_with_params(assigns, parts \\ []) do
     resource_path = parts[:resource_path] || assigns.key
 
@@ -44,7 +128,7 @@ defmodule LiveAdmin do
            schema |> parent_associations() |> Enum.find(&(&1.owner_key == field_name)),
          config when not is_nil(config) <-
            Enum.find(resources, fn {_, resource} ->
-             resource.__live_admin_config__(:schema) == assoc_schema
+             Keyword.fetch!(resource.__live_admin_config__, :schema) == assoc_schema
            end) do
       case part do
         nil -> config
@@ -65,21 +149,29 @@ defmodule LiveAdmin do
     end)
   end
 
-  def resource_title(resource) do
-    :title_with
-    |> resource.__live_admin_config__()
+  def resource_title(resource, session) do
+    resource
+    |> fetch_config(:title_with, session)
     |> case do
-      nil -> resource.__live_admin_config__(:schema) |> Module.split() |> Enum.at(-1)
-      {m, f, a} -> apply(m, f, a)
-      title when is_binary(title) -> title
+      nil ->
+        resource.__live_admin_config__()
+        |> Keyword.fetch!(:schema)
+        |> Module.split()
+        |> Enum.at(-1)
+
+      {m, f, a} ->
+        apply(m, f, a)
+
+      title when is_binary(title) ->
+        title
     end
   end
 
-  def record_label(nil, _), do: nil
+  def record_label(nil, _, _), do: nil
 
-  def record_label(record, resource) do
-    :label_with
-    |> resource.__live_admin_config__()
+  def record_label(record, resource, config) do
+    resource
+    |> fetch_config(:label_with, config)
     |> case do
       {m, f, a} -> apply(m, f, [record | a])
       label when is_atom(label) -> Map.fetch!(record, label)

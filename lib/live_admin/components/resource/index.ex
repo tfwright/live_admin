@@ -26,7 +26,8 @@ defmodule LiveAdmin.Components.Container.Index do
             assigns.resource,
             Map.take(assigns, [:prefix, :sort_attr, :sort_dir, :page, :search]),
             assigns.session,
-            assigns.repo
+            assigns.repo,
+            assigns.config
           )
       )
 
@@ -73,7 +74,7 @@ defmodule LiveAdmin.Components.Container.Index do
                   phx-click={JS.dispatch("live_admin:toggle_select")}
                 />
               </th>
-              <%= for {field, _, _} <- Resource.fields(@resource) do %>
+              <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
                 <th class="resource__header" title={field}>
                   <.link
                     patch={
@@ -111,16 +112,16 @@ defmodule LiveAdmin.Components.Container.Index do
                     />
                   </div>
                 </td>
-                <%= for {field, type, _} <- Resource.fields(@resource) do %>
+                <%= for {field, type, _} <- Resource.fields(@resource, @config) do %>
                   <% assoc_resource =
                     LiveAdmin.associated_resource(
-                      @resource.__live_admin_config__(:schema),
+                      LiveAdmin.fetch_config(@resource, :schema, @config),
                       field,
                       @resources
                     ) %>
                   <td class={"resource__cell resource__cell--#{type_to_css_class(type)}"}>
                     <div class="cell__contents">
-                      <%= Resource.render(record, field, @resource, assoc_resource, @session) %>
+                      <%= Resource.render(record, field, @resource, assoc_resource, @session, @config) %>
                     </div>
                     <div class="cell__icons">
                       <div class="cell__copy" data-message="Copied cell contents to clipboard">
@@ -170,7 +171,7 @@ defmodule LiveAdmin.Components.Container.Index do
           </tbody>
           <tfoot>
             <tr id="footer-nav">
-              <td class="w-full" colspan={@resource |> Resource.fields() |> Enum.count()}>
+              <td class="w-full" colspan={@resource |> Resource.fields(@config) |> Enum.count()}>
                 <div class="table__actions">
                   <%= if @page > 1 do %>
                     <.link
@@ -213,9 +214,9 @@ defmodule LiveAdmin.Components.Container.Index do
               </td>
             </tr>
             <tr id="footer-select" class="hidden">
-              <td colspan={@resource |> Resource.fields() |> Enum.count()}>
+              <td colspan={@resource |> Resource.fields(@config) |> Enum.count()}>
                 <div class="table__actions">
-                  <%= if @resource.__live_admin_config__(:delete_with) != false do %>
+                  <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
                     <button
                       class="resource__action--danger"
                       data-action="delete"
@@ -229,8 +230,8 @@ defmodule LiveAdmin.Components.Container.Index do
                     :let={action}
                     orientation={:up}
                     label={trans("Run action")}
-                    items={@resource.__live_admin_config__(:actions)}
-                    disabled={Enum.empty?(@resource.__live_admin_config__(:actions))}
+                    items={LiveAdmin.fetch_config(@resource, :actions, @config)}
+                    disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
                   >
                     <button
                       class="resource__action--link"
@@ -256,8 +257,8 @@ defmodule LiveAdmin.Components.Container.Index do
     task_name = String.to_existing_atom(task)
 
     {m, f, a} =
-      :tasks
-      |> socket.assigns.resource.__live_admin_config__()
+      socket.assigns.resource
+      |> LiveAdmin.fetch_config(:tasks, socket.assigns.session)
       |> Enum.find_value(fn
         {^task_name, mfa} -> mfa
         ^task_name -> {socket.assigns.resource, task_name, []}
@@ -325,7 +326,7 @@ defmodule LiveAdmin.Components.Container.Index do
       |> Resource.all(resource, prefix, repo)
       |> Enum.map(fn record ->
         Task.Supervisor.async(LiveAdmin.Task.Supervisor, fn ->
-          Resource.delete(record, resource, session, socket.assigns.repo)
+          Resource.delete(record, resource, session, socket.assigns.repo, socket.assigns.config)
         end)
       end)
       |> Task.await_many()
@@ -356,8 +357,8 @@ defmodule LiveAdmin.Components.Container.Index do
       |> Enum.map(fn record ->
         Task.Supervisor.async(LiveAdmin.Task.Supervisor, fn ->
           {m, f, a} =
-            :actions
-            |> resource.__live_admin_config__()
+            resource
+            |> LiveAdmin.fetch_config(:actions, socket.assigns.session)
             |> Enum.find_value(fn
               {^action_name, mfa} -> mfa
               ^action_name -> {resource, action_name, []}
