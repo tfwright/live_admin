@@ -100,7 +100,7 @@ Additionally, the following options can only be set at the global level:
 * `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data
 * `gettext_backend` - a module implementing the [Gettext API](https://hexdocs.pm/gettext/Gettext.html#module-gettext-api) that will be used for translations
 
-*For concrete examples of the various config options and to see them in action, consult the [development app](#development-environment).*
+*For concrete examples of the various config options and to see them in action, consult the [development app](#development).*
 
 ## Features
 
@@ -117,7 +117,7 @@ To enable i18n, implement a `locales/0` function returning a list of binary loca
 Unfortunately it is not currently possible to use Gettext's utilities to automatically extract the pot files so you will need to do this manually.
 To avoid conflicts with your own app's translations, it is recommended to use a separate Gettext backend for LiveAdmin.
 
-### Development environment
+## Development
 
 This repo has been configured to run the application in [Docker](https://www.docker.com/) using [Compose](https://docs.docker.com/compose/).
 
