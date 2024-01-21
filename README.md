@@ -62,7 +62,7 @@ Finally, tell LiveAdmin what Ecto repo to use to run queries in your `runtime.ex
 config :live_admin, ecto_repo: MyApp.Repo
 ```
 
-That's it, now an admin UI for `MyApp.Schema` will be available at `/my_admin/my_schemas`.
+That's it, now an admin UI for `MyApp.Foo` will be available at `/admin/foos`.
 
 ## (Optional) Configuration
 
