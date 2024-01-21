@@ -361,7 +361,7 @@ defmodule LiveAdmin.Resource do
   end
 
   defp render_field(val = %{}), do: Phoenix.HTML.Tag.content_tag(:pre, inspect(val, pretty: true))
-  defp render_field(val) when is_list(val), do: Enum.map(val, &render_field/1)
+  defp render_field(val) when is_list(val), do: Enum.map_join(val, ", ", &render_field/1)
   defp render_field(val) when is_binary(val), do: Phoenix.HTML.Format.text_to_html(val)
   defp render_field(val), do: inspect(val)
 end
