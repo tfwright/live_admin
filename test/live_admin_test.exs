@@ -22,7 +22,7 @@ defmodule LiveAdminTest do
 
   describe "record_label/2 when config uses mfa" do
     assert 1 =
-             LiveAdmin.record_label(%LiveAdminTest.Post{id: 1}, LiveAdminTest.PostResource,
+             LiveAdmin.record_label(%LiveAdminTest.Post{post_id: 1}, LiveAdminTest.PostResource,
                label_with: {LiveAdminTest.PostResource, :label, []}
              )
   end

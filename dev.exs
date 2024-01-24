@@ -232,6 +232,8 @@ defmodule Demo.Posts.Post do
 
   import Ecto.Changeset
 
+  @primary_key {:post_id, :id, autogenerate: true}
+  @derive {Phoenix.Param, key: :post_id}
   schema "posts" do
     field :title, :string
     field :body, :string

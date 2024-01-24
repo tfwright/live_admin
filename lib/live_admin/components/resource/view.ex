@@ -67,7 +67,11 @@ defmodule LiveAdmin.Components.Container.View do
               class="resource__action--danger"
               data-confirm="Are you sure?"
               phx-click={
-                JS.push("delete", value: %{id: @record.id}, page_loading: true, target: @myself)
+                JS.push("delete",
+                  value: %{key: Map.fetch!(@record, LiveAdmin.primary_key!(@resource))},
+                  page_loading: true,
+                  target: @myself
+                )
               }
             >
               <%= trans("Delete") %>
@@ -98,7 +102,7 @@ defmodule LiveAdmin.Components.Container.View do
   @impl true
   def handle_event(
         "delete",
-        %{"id" => id},
+        %{"key" => key},
         %{
           assigns: %{
             resource: resource,
@@ -108,7 +112,7 @@ defmodule LiveAdmin.Components.Container.View do
         } = socket
       ) do
     socket =
-      id
+      key
       |> Resource.find!(resource, socket.assigns.prefix, socket.assigns.repo)
       |> Resource.delete(resource, session, socket.assigns.repo, config)
       |> case do

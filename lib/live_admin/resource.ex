@@ -67,25 +67,27 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def all(ids, resource, prefix, repo) do
+  def all(keys, resource, prefix, repo) do
+    key = LiveAdmin.primary_key!(resource)
+
     resource.__live_admin_config__()
     |> Keyword.fetch!(:schema)
-    |> where([s], s.id in ^ids)
+    |> where([s], field(s, ^key) in ^keys)
     |> repo.all(prefix: prefix)
   end
 
-  def find!(id, resource, prefix, repo) do
-    find(id, resource, prefix, repo) ||
+  def find!(key, resource, prefix, repo) do
+    find(key, resource, prefix, repo) ||
       raise(Ecto.NoResultsError,
         queryable: Keyword.fetch!(resource.__live_admin_config__(), :schema)
       )
   end
 
-  def find(id, resource, prefix, repo) do
+  def find(key, resource, prefix, repo) do
     resource.__live_admin_config__()
     |> Keyword.fetch!(:schema)
     |> preload(^preloads(resource))
-    |> repo.get(id, prefix: prefix)
+    |> repo.get(key, prefix: prefix)
   end
 
   def delete(record, resource, session, repo, config) do
@@ -209,7 +211,7 @@ defmodule LiveAdmin.Resource do
       |> Enum.into(%{})
       |> Map.put_new(:page, 1)
       |> Map.put_new(:sort_dir, :asc)
-      |> Map.put_new(:sort_attr, :id)
+      |> Map.put_new(:sort_attr, LiveAdmin.primary_key!(resource))
 
     query =
       resource.__live_admin_config__()

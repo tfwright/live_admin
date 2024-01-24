@@ -61,11 +61,9 @@ defmodule LiveAdmin.Components.Container do
   def handle_params(params, uri, socket = %{assigns: %{live_action: :list, loading: false}}) do
     socket =
       socket
-      |> assign(page: String.to_integer(params["page"] || "1"))
-      |> assign(sort_attr: String.to_existing_atom(params["sort-attr"] || "id"))
-      |> assign(sort_dir: String.to_existing_atom(params["sort-dir"] || "asc"))
       |> assign(search: params["s"])
       |> assign_resource_info(uri)
+      |> assign_pagination_params(params)
       |> assign_mod()
       |> assign_repo()
       |> assign_prefix(params)
@@ -328,5 +326,40 @@ defmodule LiveAdmin.Components.Container do
       end
 
     assign(socket, repo: repo, prefix_options: prefix_options)
+  end
+
+  defp assign_pagination_params(socket, params) do
+    params =
+      Map.new(params, fn
+        {"sort-attr", val} -> {"sort_attr", val}
+        {"sort-dir", val} -> {"sort_dir", val}
+        pair -> pair
+      end)
+
+    types =
+      %{
+        page: :integer,
+        sort_attr:
+          Ecto.ParameterizedType.init(Ecto.Enum,
+            values:
+              socket.assigns.resource
+              |> LiveAdmin.Resource.fields(socket.assigns.config)
+              |> Enum.map(fn {field, _, _} -> field end)
+          ),
+        sort_dir: Ecto.ParameterizedType.init(Ecto.Enum, values: [:asc, :desc])
+      }
+
+    defaults = %{
+      page: 1,
+      sort_attr: LiveAdmin.primary_key!(socket.assigns.resource),
+      sort_dir: :asc
+    }
+
+    params =
+      {defaults, types}
+      |> Ecto.Changeset.cast(params, Map.keys(types))
+      |> Ecto.Changeset.apply_action!(:update)
+
+    assign(socket, params)
   end
 end

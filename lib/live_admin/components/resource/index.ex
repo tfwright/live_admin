@@ -107,7 +107,7 @@ defmodule LiveAdmin.Components.Container.Index do
                     <input
                       type="checkbox"
                       class="resource__select"
-                      data-record-id={record.id}
+                      data-record-key={Map.fetch!(record, LiveAdmin.primary_key!(@resource))}
                       phx-click={JS.dispatch("live_admin:toggle_select")}
                     />
                   </div>

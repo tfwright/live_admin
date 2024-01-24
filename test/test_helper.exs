@@ -88,12 +88,14 @@ defmodule LiveAdminTest.PostResource do
 
   def run_action(_, _), do: {:ok, "worked"}
 
-  def label(post), do: post.id
+  def label(post), do: post.post_id
 end
 
 defmodule LiveAdminTest.Post do
   use Ecto.Schema
 
+  @primary_key {:post_id, :id, autogenerate: true}
+  @derive {Phoenix.Param, key: :post_id}
   schema "posts" do
     field(:title, :string)
     belongs_to(:user, LiveAdminTest.User, type: :binary_id)

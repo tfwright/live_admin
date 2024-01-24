@@ -26,7 +26,8 @@ defmodule LiveAdmin.MixProject do
         extras: ["README.md"],
         source_ref: "v#{@version}"
       ],
-      compilers: Mix.compilers() ++ compilers(Mix.env())
+      compilers: Mix.compilers() ++ compilers(Mix.env()),
+      consolidate_protocols: !System.get_env("LIVE_ADMIN_DEV")
     ]
   end
 

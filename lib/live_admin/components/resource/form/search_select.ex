@@ -42,13 +42,16 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     >
       <%= hidden_input(@form, @field,
         disabled: @disabled,
-        value: if(@selected_option, do: @selected_option.id),
+        value:
+          if(@selected_option,
+            do: Map.fetch!(@selected_option, LiveAdmin.primary_key!(@resource))
+          ),
         id: input_id(@form, @field) <> "_hidden"
       ) %>
       <%= if @selected_option do %>
         <a
           href="#"
-          phx-click={JS.push("select", value: %{id: nil}, target: @myself, page_loading: true)}
+          phx-click={JS.push("select", value: %{key: nil}, target: @myself, page_loading: true)}
           class="button__remove"
         />
         <%= record_label(@selected_option, @resource, @config) %>
@@ -60,7 +63,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
           items={
             Enum.filter(
               @options,
-              &(&1.id != input_value(@form, @field))
+              &(Map.fetch!(&1, LiveAdmin.primary_key!(@resource)) != input_value(@form, @field))
             )
           }
         >
@@ -84,7 +87,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
             href="#"
             phx-click={
               JS.push("select",
-                value: %{id: option.id},
+                value: %{key: Map.fetch!(option, LiveAdmin.primary_key!(@resource))},
                 target: @myself,
                 page_loading: true
               )
@@ -117,35 +120,30 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     {:noreply, assign(socket, :options, options)}
   end
 
-  def handle_event("select", %{"id" => id}, socket) do
+  def handle_event("select", %{"key" => key}, socket) do
     socket =
       socket
-      |> assign_selected_option(id)
+      |> assign_selected_option(key)
       |> push_event("change", %{})
 
     {:noreply, socket}
   end
 
-  defp assign_selected_option(socket, id) when id in [nil, ""],
+  defp assign_selected_option(socket, key) when key in [nil, ""],
     do: assign(socket, :selected_option, nil)
 
   defp assign_selected_option(
-         socket = %{assigns: %{selected_option: %{id: selected_option_id}}},
-         id
+         socket = %{assigns: %{selected_option: %{key: selected_option_key}}},
+         key
        )
-       when selected_option_id == id,
+       when selected_option_key == key,
        do: socket
 
-  defp assign_selected_option(socket, id),
+  defp assign_selected_option(socket, key),
     do:
       assign(
         socket,
         :selected_option,
-        Resource.find!(
-          id,
-          socket.assigns.resource,
-          socket.assigns.prefix,
-          socket.assigns.repo
-        )
+        Resource.find!(key, socket.assigns.resource, socket.assigns.prefix, socket.assigns.repo)
       )
 end
