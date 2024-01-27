@@ -480,6 +480,20 @@ defmodule DemoWeb.PostsAdmin.Home do
   end
 end
 
+defmodule DemoWeb.Extra do
+  use Phoenix.LiveView
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div class="flex h-full items-center justify-center">
+      <div class="w-1/2">
+        This is an extra page
+      </div>
+    </div>
+    """
+  end
+end
 
 defmodule DemoWeb.Router do
   use Phoenix.Router
@@ -499,6 +513,7 @@ defmodule DemoWeb.Router do
     live_admin "/admin", title: "DevAdmin" do
       admin_resource "/users/profiles", Demo.Accounts.User.Profile
       admin_resource "/users", DemoWeb.UserAdmin
+      live "/extra", DemoWeb.Extra, :index, as: :extra
     end
 
     live_admin "/posts-admin", components: [home: DemoWeb.PostsAdmin.Home] do

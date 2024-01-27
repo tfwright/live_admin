@@ -6,6 +6,33 @@ defmodule LiveAdmin.Components.Nav do
     only: [resource_title: 2, route_with_params: 2, trans: 1]
 
   @impl true
+  def update(assigns, socket) do
+    base_path = assigns.base_path
+
+    extra_pages =
+      socket.router
+      |> Phoenix.Router.routes()
+      |> Enum.filter(fn r ->
+        match?(
+          %{
+            metadata: %{
+              phoenix_live_view: {_, _, _, %{extra: %{session: {_, _, [^base_path, _]}}}}
+            }
+          },
+          r
+        ) && is_nil(r.metadata[:resource]) &&
+          !Enum.member?(["home_/admin", "session_/admin"], r.helper)
+      end)
+
+    socket =
+      socket
+      |> assign(assigns)
+      |> assign(extra_pages: extra_pages)
+
+    {:ok, socket}
+  end
+
+  @impl true
   def render(assigns) do
     nested_resources =
       Enum.reduce(assigns.resources, %{}, fn {key, resource}, groups ->
@@ -39,6 +66,15 @@ defmodule LiveAdmin.Components.Nav do
             config={@config}
           />
         </li>
+        <%= if Enum.any?(@extra_pages) do %>
+          <li class="nav__item--group">
+            <%= for route <- @extra_pages do %>
+              <.link navigate={route.path}>
+                <%= humanize(route.helper) %>
+              </.link>
+            <% end %>
+          </li>
+        <% end %>
         <li class="nav__item--group">
           <.link navigate={route_with_params(assigns, resource_path: "session")}>
             <%= trans("Session") %>

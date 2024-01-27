@@ -701,6 +701,8 @@ input[class$="-loading"] + div nav:before {
   border-bottom-width: 1px;
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .nav__list > .nav__item--selected:first-of-type {
