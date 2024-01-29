@@ -253,14 +253,12 @@ defmodule LiveAdmin.Components.Container.Index do
 
   @impl true
   def handle_event("task", %{"task" => task}, socket) do
-    task_name = String.to_existing_atom(task)
-
     {m, f, a} =
       :tasks
       |> socket.assigns.resource.__live_admin_config__()
       |> Enum.find_value(fn
-        {^task_name, mfa} -> mfa
-        ^task_name -> {socket.assigns.resource, task_name, []}
+        {task_name, mfa} -> to_string(task_name) == task && mfa
+        task_name -> to_string(task_name) == task && {socket.assigns.resource, task_name, []}
       end)
 
     socket =

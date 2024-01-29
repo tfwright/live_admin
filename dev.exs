@@ -429,7 +429,7 @@ defmodule DemoWeb.UserAdmin do
       components: [new: DemoWeb.CreateUserForm],
       label_with: :name,
       actions: [:deactivate, :fake, :fake],
-      tasks: [:regenerate_passwords],
+      tasks: [:regenerate_passwords, :sum_stars],
       render_with: :render_field
 
   def deactivate(user, _) do
@@ -460,6 +460,12 @@ defmodule DemoWeb.UserAdmin do
     end)
 
     {:ok, "updated"}
+  end
+
+  def sum_stars(_) do
+    result = Demo.Repo.aggregate(Demo.Accounts.User, :count, :stars_count)
+
+    {:ok, "There are #{result} total stars"}
   end
 end
 
