@@ -450,9 +450,9 @@ defmodule DemoWeb.UserAdmin do
     DemoWeb.Renderer.render_field(record, field, session)
   end
 
-  def regenerate_passwords(_) do
+  def regenerate_passwords(session) do
     Demo.Accounts.User
-    |> Demo.Repo.all()
+    |> Demo.Repo.all(session.prefix)
     |> Enum.each(fn user ->
       user
       |> Ecto.Changeset.change(encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16())
@@ -462,8 +462,8 @@ defmodule DemoWeb.UserAdmin do
     {:ok, "updated"}
   end
 
-  def sum_stars(_) do
-    result = Demo.Repo.aggregate(Demo.Accounts.User, :count, :stars_count)
+  def sum_stars(session) do
+    result = Demo.Repo.aggregate(Demo.Accounts.User, :sum, :stars_count, prefix: session.prefix)
 
     {:ok, "There are #{result} total stars"}
   end
