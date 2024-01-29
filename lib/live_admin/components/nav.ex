@@ -21,7 +21,7 @@ defmodule LiveAdmin.Components.Nav do
           },
           r
         ) && is_nil(r.metadata[:resource]) &&
-          !Enum.member?(["home_/admin", "session_/admin"], r.helper)
+          !String.match?(r.helper, ~r/(home|session)/)
       end)
 
     socket =
