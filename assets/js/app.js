@@ -116,7 +116,7 @@ Hooks.IndexPage = {
         this.el.querySelector('#select-all').checked = false;
       }
 
-      this.selected = Array.from(this.el.querySelectorAll('input[data-record-id]:checked'), e => e.dataset.recordId);
+      this.selected = Array.from(this.el.querySelectorAll('input[data-record-key]:checked'), e => e.dataset.recordKey);
 
       if (this.selected.length > 0) {
         document.getElementById("footer-select").classList.remove("hidden");
