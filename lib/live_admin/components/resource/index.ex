@@ -347,8 +347,6 @@ defmodule LiveAdmin.Components.Container.Index do
       ) do
     records = Resource.all(ids, resource, prefix, repo)
 
-    action_name = String.to_existing_atom(action)
-
     results =
       records
       |> Enum.map(fn record ->
@@ -357,9 +355,8 @@ defmodule LiveAdmin.Components.Container.Index do
             :actions
             |> resource.__live_admin_config__()
             |> Enum.find_value(fn
-              {^action_name, mfa} -> mfa
-              ^action_name -> {resource, action_name, []}
-              _ -> false
+              {action_name, mfa} -> to_string(action_name) == action && mfa
+              action_name -> to_string(action_name) == action && {resource, action_name, []}
             end)
 
           apply(m, f, [record, socket.assigns.session] ++ a)
