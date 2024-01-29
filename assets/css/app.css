@@ -203,6 +203,8 @@ input[type="date"], input[type="number"] {
     @apply nav__item;
     @apply border-b;
     @apply py-1;
+    @apply flex;
+    @apply flex-col;
   }
 
   .nav__item--selected {
