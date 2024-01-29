@@ -128,14 +128,7 @@ defmodule LiveAdmin.Components.Container do
             items={get_task_keys(@resource, @config)}
             disabled={@resource |> get_task_keys(@config) |> Enum.empty?()}
           >
-            <button
-              class="resource__action--link"
-              phx-click={JS.push("task", value: %{task: task}, page_loading: true, target: "#list")}
-              ,
-              data-confirm="Are you sure?"
-            >
-              <%= task |> to_string() |> humanize() %>
-            </button>
+            <.task_control task={task} session={@session} resource={@resource} />
           </.dropdown>
           <%= if Enum.any?(@prefix_options) do %>
             <.dropdown
@@ -361,5 +354,72 @@ defmodule LiveAdmin.Components.Container do
       |> Ecto.Changeset.apply_action!(:update)
 
     assign(socket, params)
+  end
+
+  defp task_control(assigns) do
+    {m, f, _} =
+      assigns.resource
+      |> LiveAdmin.fetch_config(:tasks, assigns.session)
+      |> Enum.find_value(fn
+        {task_name, mfa} -> task_name == assigns.task && mfa
+        task_name -> task_name == assigns.task && {assigns.resource, task_name, []}
+      end)
+
+    arity =
+      :functions
+      |> m.__info__()
+      |> Enum.find_value(fn {name, arity} -> name == f && arity end)
+
+    assigns = assign(assigns, arity: arity)
+
+    ~H"""
+    <button
+      class="resource__action--link"
+      phx-click={
+        if @arity > 1,
+          do:
+            JS.show(
+              to: "##{@task}-task-modal",
+              transition: {"ease-in duration-300", "opacity-0", "opacity-100"}
+            ),
+          else: JS.push("task", value: %{"name" => @task}, page_loading: true, target: "#list")
+      }
+      ,
+      data-confirm={if @arity > 1, do: nil, else: "Are you sure?"}
+    >
+      <%= @task |> to_string() |> humanize() %>
+    </button>
+    <%= if @arity > 1 do %>
+      <.task_modal id={"#{@task}-task-modal"}>
+        <pre><%= @task %></pre> task requires additional arguments:
+        <.form for={Phoenix.Component.to_form(%{})} phx-submit="task" phx-target="#list">
+          <input type="hidden" name="name" value={@task} />
+          <%= for num <- 1..(@arity-1) do %>
+            <div>
+              <label><%= num %></label>
+              <input type="text" name="args[]" />
+            </div>
+          <% end %>
+          <input type="submit" value="Execute" />
+        </.form>
+      </.task_modal>
+    <% end %>
+    """
+  end
+
+  defp task_modal(assigns) do
+    ~H"""
+    <div
+      id={@id}
+      class="task__modal"
+      phx-capture-click={
+        JS.hide(to: "##{@id}", transition: {"ease-out duration-300", "opacity-100", "opacity-0"})
+      }
+    >
+      <div>
+        <%= render_slot(@inner_block) %>
+      </div>
+    </div>
+    """
   end
 end

@@ -45,6 +45,10 @@ input[type="date"], input[type="number"] {
   @apply w-32;
 }
 
+input[type="submit"] {
+  @apply cursor-pointer;
+};
+
 @layer components {
   .view__container {
     @apply overflow-y-auto;
@@ -343,7 +347,7 @@ input[type="date"], input[type="number"] {
     @apply flex-col;
   }
 
-  [class$="--drop"] div {
+  [class$="--drop"] > div {
     @apply relative;
   }
 
@@ -371,7 +375,6 @@ input[type="date"], input[type="number"] {
 
   [class$="--drop"]:focus-within nav {
     @apply block;
-    @apply translate-y-1;
   }
 
   [class$="--drop"] nav a:hover {
@@ -732,4 +735,68 @@ input[type="date"], input[type="number"] {
   height: 20px;
   @apply ml-2;
   @apply ml-2;
+}
+
+.task__modal {
+  @apply fixed;
+  @apply hidden;
+  @apply inset-0;
+  @apply bg-gray-600;
+  @apply bg-opacity-50;
+  @apply overflow-y-auto;
+  @apply h-full;
+  @apply w-full;
+  @apply z-50;
+  @apply m-0;
+}
+
+.task__modal > div {
+  @apply relative;
+  @apply top-20;
+  @apply mx-auto;
+  @apply p-5;
+  @apply border;
+  @apply w-1/4;
+  @apply shadow-lg;
+  @apply rounded-md;
+  @apply bg-white;
+  @apply whitespace-normal;
+}
+
+.task__modal form {
+  @apply flex;
+  @apply flex-col;
+  @apply mt-3;
+}
+
+.task__modal label {
+  @apply flex;
+  @apply h-7;
+  @apply w-7;
+  @apply rounded-full; 
+  @apply bg-gray-100;
+  @apply items-center;
+  @apply justify-center;
+  @apply mr-2;
+}
+
+.task__modal input {
+  @apply grow;
+}
+
+.task__modal pre {
+  @apply inline;
+  @apply underline;
+  @apply decoration-dotted;
+  @apply underline-offset-4;
+  @apply decoration-2;
+}
+
+.task__modal form > div {
+  @apply flex;
+  @apply my-1;
+}
+
+.task__modal form > div:last-of-type {
+  @apply mb-3;
 }
