@@ -185,6 +185,8 @@ input[type="date"], input[type="number"] {
   .nav__list > .nav__item:first-of-type {
     @apply pb-5;
     @apply text-3xl;
+    @apply font-bold;
+    @apply text-center;
   }
 
   .nav__item {

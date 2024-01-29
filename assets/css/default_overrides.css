@@ -2,6 +2,15 @@ body {
   @apply bg-white;
 }
 
+.nav__list > .nav__item--group:first-of-type span {
+  @apply mt-3;
+  @apply bg-gradient-to-r;
+  @apply from-violet-500;
+  @apply to-purple-900;
+  @apply bg-clip-text;
+  @apply text-transparent;
+}
+
 .resource__action--btn {
   @apply bg-violet-600;
   @apply border-violet-600;

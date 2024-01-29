@@ -3,6 +3,17 @@ body {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity))
 }
 
+.nav__list > .nav__item--group:first-of-type span {
+  margin-top: 0.75rem;
+  background-image: linear-gradient(to right, var(--tw-gradient-stops));
+  --tw-gradient-from: #8b5cf6;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgb(139 92 246 / 0));
+  --tw-gradient-to: #581c87;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent
+}
+
 .resource__action--btn {
   --tw-bg-opacity: 1;
   background-color: rgb(124 58 237 / var(--tw-bg-opacity));

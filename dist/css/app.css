@@ -664,6 +664,8 @@ input[class$="-loading"] + div nav:before {
   padding-bottom: 1.25rem;
   font-size: 1.875rem;
   line-height: 2.25rem;
+  font-weight: 700;
+  text-align: center;
 }
 
 .nav__item {
@@ -682,8 +684,10 @@ input[class$="-loading"] + div nav:before {
 
 .nav__list > .nav__item--group:first-of-type {
   padding-bottom: 1.25rem;
+  text-align: center;
   font-size: 1.875rem;
   line-height: 2.25rem;
+  font-weight: 700;
 }
 
 .nav__item--group {
@@ -707,8 +711,10 @@ input[class$="-loading"] + div nav:before {
 
 .nav__list > .nav__item--selected:first-of-type {
   padding-bottom: 1.25rem;
+  text-align: center;
   font-size: 1.875rem;
   line-height: 2.25rem;
+  font-weight: 700;
 }
 
 .nav__item--selected {

@@ -54,7 +54,11 @@ defmodule LiveAdmin.Components.Nav do
     ~H"""
     <div class="nav">
       <ul class="nav__list">
-        <li class="nav__item--group"><%= Keyword.fetch!(@config, :title) %></li>
+        <li class="nav__item--group">
+          <span>
+            <%= Keyword.fetch!(@config, :title) %>
+          </span>
+        </li>
         <li class="nav__item--group">
           <.link navigate={@base_path}><%= trans("Home") %></.link>
         </li>
