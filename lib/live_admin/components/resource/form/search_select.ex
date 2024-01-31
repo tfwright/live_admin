@@ -1,6 +1,7 @@
 defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   use Phoenix.LiveComponent
-  use Phoenix.HTML
+  import Phoenix.HTML.Form
+  use PhoenixHTMLHelpers
 
   import LiveAdmin, only: [record_label: 2, trans: 1]
   import LiveAdmin.Components

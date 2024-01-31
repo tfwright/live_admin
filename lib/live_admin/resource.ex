@@ -32,6 +32,7 @@ defmodule LiveAdmin.Resource do
   import LiveAdmin, only: [record_label: 2, parent_associations: 1]
 
   alias Ecto.Changeset
+  alias PhoenixHTMLHelpers.{Format, Tag}
 
   @doc false
   defmacro __using__(opts) do
@@ -367,8 +368,8 @@ defmodule LiveAdmin.Resource do
     end)
   end
 
-  defp render_field(val = %{}), do: Phoenix.HTML.Tag.content_tag(:pre, inspect(val, pretty: true))
+  defp render_field(val = %{}), do: Tag.content_tag(:pre, inspect(val, pretty: true))
   defp render_field(val) when is_list(val), do: Enum.map(val, &render_field/1)
-  defp render_field(val) when is_binary(val), do: Phoenix.HTML.Format.text_to_html(val)
+  defp render_field(val) when is_binary(val), do: Format.text_to_html(val)
   defp render_field(val), do: inspect(val)
 end

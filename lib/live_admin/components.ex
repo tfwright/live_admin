@@ -1,6 +1,7 @@
 defmodule LiveAdmin.Components do
   use Phoenix.Component
-  use Phoenix.HTML
+  import Phoenix.HTML.Form
+  use PhoenixHTMLHelpers
 
   alias LiveAdmin.Components.Container.Form
   alias Phoenix.LiveView.JS
