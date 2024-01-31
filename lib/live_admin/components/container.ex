@@ -1,6 +1,6 @@
 defmodule LiveAdmin.Components.Container do
   use Phoenix.LiveView
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   import LiveAdmin,
     only: [

@@ -1,6 +1,7 @@
 defmodule LiveAdmin.Components.Container.Form.MapInput do
   use Phoenix.LiveComponent
-  use Phoenix.HTML
+  import Phoenix.HTML.Form
+  use PhoenixHTMLHelpers
 
   import LiveAdmin, only: [trans: 1]
 

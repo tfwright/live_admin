@@ -1,6 +1,6 @@
 defmodule LiveAdmin.Components.Nav do
   use Phoenix.LiveComponent
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   import LiveAdmin,
     only: [resource_title: 2, route_with_params: 2, trans: 1]
