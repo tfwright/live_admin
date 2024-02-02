@@ -128,7 +128,7 @@ This repo has been configured to run the application in [Docker](https://www.doc
 
 The Phoenix app is running the `app` service, so all mix command should be run there. Examples:
 
-* `docker compose run web mix test`
+* `docker compose run app mix test`
 
 ---
 
