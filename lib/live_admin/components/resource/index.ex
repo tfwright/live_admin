@@ -253,7 +253,7 @@ defmodule LiveAdmin.Components.Container.Index do
   end
 
   @impl true
-  def handle_event("task", %{"task" => task}, socket) do
+  def handle_event("task", params = %{"name" => task}, socket) do
     {m, f, a} =
       socket.assigns.resource
       |> LiveAdmin.fetch_config(:tasks, socket.assigns.session)
@@ -263,7 +263,7 @@ defmodule LiveAdmin.Components.Container.Index do
       end)
 
     socket =
-      case apply(m, f, [socket.assigns.session] ++ a) do
+      case apply(m, f, [socket.assigns.session] ++ a ++ Map.get(params, "args", [])) do
         {:ok, result} ->
           socket
           |> put_flash(
