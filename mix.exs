@@ -44,7 +44,8 @@ defmodule LiveAdmin.MixProject do
     [
       {:phoenix_view, "~> 2.0"},
       {:phoenix_live_view, "~> 0.20.0"},
-      {:phoenix_html, "~> 3.3"},
+      {:phoenix_html, "~> 4.0"},
+      {:phoenix_html_helpers, "~> 1.0"},
       {:ecto, "~> 3.10"},
       {:ecto_sql, "~> 3.10"},
       {:phoenix_ecto, "~> 4.4"},

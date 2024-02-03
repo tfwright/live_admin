@@ -1,6 +1,6 @@
 defmodule LiveAdmin.Components.Container.View do
   use Phoenix.LiveComponent
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   import LiveAdmin,
     only: [route_with_params: 1, route_with_params: 2, trans: 1, record_label: 3, trans: 2]

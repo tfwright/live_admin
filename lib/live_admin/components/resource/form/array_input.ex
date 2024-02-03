@@ -1,6 +1,7 @@
 defmodule LiveAdmin.Components.Container.Form.ArrayInput do
   use Phoenix.LiveComponent
-  use Phoenix.HTML
+  import Phoenix.HTML.Form
+  use PhoenixHTMLHelpers
 
   alias Phoenix.LiveView.JS
 

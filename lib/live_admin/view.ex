@@ -1,6 +1,7 @@
 defmodule LiveAdmin.View do
   use Phoenix.Component
-  use Phoenix.HTML
+  import Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   js_path = Path.join(__DIR__, "../../dist/js/app.js")
   css_path = Path.join(__DIR__, "../../dist/css/app.css")
