@@ -9,6 +9,8 @@ defmodule DemoWeb.UserAdmin do
       tasks: [:regenerate_passwords, :aggregate],
       render_with: :render_field
 
+  use PhoenixHTMLHelpers
+
   def deactivate(user, _) do
     user
     |> Ecto.Changeset.change(active: false)
@@ -20,7 +22,7 @@ defmodule DemoWeb.UserAdmin do
   end
 
   def render_field(user, :email, _) do
-    Phoenix.HTML.Link.link(user.email, to: "mailto:\"#{user.name}\"<#{user.email}>")
+    link(user.email, to: "mailto:\"#{user.name}\"<#{user.email}>")
   end
 
   def render_field(record, field, session) do

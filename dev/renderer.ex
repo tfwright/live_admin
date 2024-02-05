@@ -1,5 +1,5 @@
 defmodule DemoWeb.Renderer do
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   def render_field(record, field, _session) do
     record
