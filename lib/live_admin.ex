@@ -175,8 +175,8 @@ defmodule LiveAdmin do
         |> Module.split()
         |> Enum.at(-1)
 
-      {m, f, a} ->
-        apply(m, f, a)
+      {m, f, []} ->
+        apply(m, f, [])
 
       title when is_binary(title) ->
         title
@@ -190,7 +190,7 @@ defmodule LiveAdmin do
     |> fetch_config(:label_with, config)
     |> case do
       nil -> Map.fetch!(record, LiveAdmin.primary_key!(resource))
-      {m, f, a} -> apply(m, f, [record | a])
+      {m, f, []} -> apply(m, f, [record])
       label when is_atom(label) -> Map.fetch!(record, label)
     end
   end

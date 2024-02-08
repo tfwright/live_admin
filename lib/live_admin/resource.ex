@@ -59,8 +59,8 @@ defmodule LiveAdmin.Resource do
           |> render_field()
         end
 
-      {m, f, a} ->
-        apply(m, f, [record, field, session] ++ a)
+      {m, f, []} ->
+        apply(m, f, [record, field, session])
 
       f when is_atom(f) ->
         apply(resource, f, [record, field, session])
@@ -348,8 +348,8 @@ defmodule LiveAdmin.Resource do
         |> parent_associations()
         |> Enum.map(& &1.field)
 
-      {m, f, a} ->
-        apply(m, f, [resource | a])
+      {m, f, []} ->
+        apply(m, f, [resource])
 
       preloads when is_list(preloads) ->
         preloads

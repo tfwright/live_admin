@@ -254,7 +254,7 @@ defmodule LiveAdmin.Components.Container.Index do
 
   @impl true
   def handle_event("task", params = %{"name" => task}, socket) do
-    {m, f, a} =
+    {m, f, []} =
       socket.assigns.resource
       |> LiveAdmin.fetch_config(:tasks, socket.assigns.session)
       |> Enum.find_value(fn
@@ -263,7 +263,7 @@ defmodule LiveAdmin.Components.Container.Index do
       end)
 
     socket =
-      case apply(m, f, [socket.assigns.session] ++ a ++ Map.get(params, "args", [])) do
+      case apply(m, f, [socket.assigns.session | Map.get(params, "args", [])]) do
         {:ok, result} ->
           socket
           |> put_flash(
@@ -352,7 +352,7 @@ defmodule LiveAdmin.Components.Container.Index do
       records
       |> Enum.map(fn record ->
         Task.Supervisor.async(LiveAdmin.Task.Supervisor, fn ->
-          {m, f, a} =
+          {m, f, []} =
             resource
             |> LiveAdmin.fetch_config(:actions, socket.assigns.session)
             |> Enum.find_value(fn
@@ -360,7 +360,7 @@ defmodule LiveAdmin.Components.Container.Index do
               action_name -> to_string(action_name) == action && {resource, action_name, []}
             end)
 
-          apply(m, f, [record, socket.assigns.session] ++ a)
+          apply(m, f, [record, socket.assigns.session])
         end)
       end)
       |> Task.await_many()

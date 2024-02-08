@@ -144,7 +144,7 @@ defmodule LiveAdmin.Components.Container.View do
 
     action_name = String.to_existing_atom(action)
 
-    {m, f, a} =
+    {m, f, []} =
       resource
       |> LiveAdmin.fetch_config(:actions, session)
       |> Enum.find_value(fn
@@ -154,7 +154,7 @@ defmodule LiveAdmin.Components.Container.View do
       end)
 
     socket =
-      case apply(m, f, [record, socket.assigns.session] ++ a) do
+      case apply(m, f, [record, socket.assigns.session]) do
         {:ok, record} ->
           socket
           |> push_event("success", %{

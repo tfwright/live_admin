@@ -357,7 +357,7 @@ defmodule LiveAdmin.Components.Container do
   end
 
   defp task_control(assigns) do
-    {m, f, _} =
+    {m, f, []} =
       assigns.resource
       |> LiveAdmin.fetch_config(:tasks, assigns.session)
       |> Enum.find_value(fn
