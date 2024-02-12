@@ -13,6 +13,7 @@ defmodule LiveAdmin.Resource do
   import LiveAdmin, only: [record_label: 3, parent_associations: 1]
 
   alias Ecto.Changeset
+  alias PhoenixHTMLHelpers.Tag
 
   @doc """
   Configure a module to act as a LiveAdmin resource
@@ -362,9 +363,8 @@ defmodule LiveAdmin.Resource do
     end)
   end
 
-  alias PhoenixHTMLHelpers.{Format, Tag}
   defp render_field(val = %{}), do: Tag.content_tag(:pre, inspect(val, pretty: true))
   defp render_field(val) when is_list(val), do: Enum.map_join(val, ", ", &render_field/1)
-  defp render_field(val) when is_binary(val), do: Format.text_to_html(val)
+  defp render_field(val) when is_binary(val), do: val
   defp render_field(val), do: inspect(val)
 end

@@ -98,6 +98,8 @@ defmodule LiveAdminTest.Post do
   @derive {Phoenix.Param, key: :post_id}
   schema "posts" do
     field(:title, :string)
+    field(:tags, {:array, :string}, default: ["test"])
+
     belongs_to(:user, LiveAdminTest.User, type: :binary_id)
 
     embeds_many(:previous_versions, __MODULE__.Version, on_replace: :delete)
