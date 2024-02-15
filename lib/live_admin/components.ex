@@ -123,6 +123,76 @@ defmodule LiveAdmin.Components do
     """
   end
 
+  def action_control(assigns) do
+    {m, f, []} =
+      assigns.resource
+      |> LiveAdmin.fetch_config(:actions, assigns.session)
+      |> Enum.find_value(fn
+        {action_name, mfa} -> action_name == assigns.action && mfa
+        action_name -> action_name == assigns.action && {assigns.resource, action_name, []}
+      end)
+
+    extra_arg_count =
+      :functions
+      |> m.__info__()
+      |> Enum.find_value(fn {name, arity} -> name == f && arity - 2 end)
+
+    assigns = assign(assigns, extra_arg_count: extra_arg_count)
+
+    ~H"""
+    <button
+      class="resource__action--link"
+      data-action={@action}
+      phx-click={
+        if @extra_arg_count > 0,
+          do:
+            JS.show(
+              to: "##{@action}-action-modal",
+              transition: {"ease-in duration-300", "opacity-0", "opacity-100"}
+            ),
+          else: JS.dispatch("live_admin:action")
+      }
+      data-confirm={if @extra_arg_count > 0, do: nil, else: "Are you sure?"}
+    >
+      <%= @action |> to_string() |> humanize() %>
+    </button>
+    <%= if @extra_arg_count > 0 do %>
+      <.action_modal id={"#{@action}-action-modal"}>
+        <pre><%= @action %></pre> action requires additional arguments:
+        <.form
+          for={Phoenix.Component.to_form(%{})}
+          phx-submit={JS.dispatch("live_admin:action") |> JS.hide(to: "##{@action}-action-modal")}
+        >
+          <input type="hidden" name="name" value={@action} />
+          <%= for num <- 1..@extra_arg_count do %>
+            <div>
+              <label><%= num %></label>
+              <input type="text" name="args[]" />
+            </div>
+          <% end %>
+          <input type="submit" value="Execute" />
+        </.form>
+      </.action_modal>
+    <% end %>
+    """
+  end
+
+  defp action_modal(assigns) do
+    ~H"""
+    <div
+      id={@id}
+      class="modal"
+      phx-capture-click={
+        JS.hide(to: "##{@id}", transition: {"ease-out duration-300", "opacity-100", "opacity-0"})
+      }
+    >
+      <div>
+        <%= render_slot(@inner_block) %>
+      </div>
+    </div>
+    """
+  end
+
   defp list(assigns) do
     ~H"""
     <div>

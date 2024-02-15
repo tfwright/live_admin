@@ -431,7 +431,6 @@ input[type="submit"] {
   .resource__table tfoot td {
     @apply p-1;
     @apply bottom-0;
-    @apply sticky;
   }
 
   .resource__table dd {
@@ -737,7 +736,7 @@ input[type="submit"] {
   @apply ml-2;
 }
 
-.task__modal {
+.modal {
   @apply fixed;
   @apply hidden;
   @apply inset-0;
@@ -750,7 +749,7 @@ input[type="submit"] {
   @apply m-0;
 }
 
-.task__modal > div {
+.modal > div {
   @apply relative;
   @apply top-20;
   @apply mx-auto;
@@ -763,28 +762,28 @@ input[type="submit"] {
   @apply whitespace-normal;
 }
 
-.task__modal form {
+.modal form {
   @apply flex;
   @apply flex-col;
   @apply mt-3;
 }
 
-.task__modal label {
+.modal label {
   @apply flex;
   @apply h-7;
   @apply w-7;
-  @apply rounded-full; 
+  @apply rounded-full;
   @apply bg-gray-100;
   @apply items-center;
   @apply justify-center;
   @apply mr-2;
 }
 
-.task__modal input {
+.modal input {
   @apply grow;
 }
 
-.task__modal pre {
+.modal pre {
   @apply inline;
   @apply underline;
   @apply decoration-dotted;
@@ -792,11 +791,11 @@ input[type="submit"] {
   @apply decoration-2;
 }
 
-.task__modal form > div {
+.modal form > div {
   @apply flex;
   @apply my-1;
 }
 
-.task__modal form > div:last-of-type {
+.modal form > div:last-of-type {
   @apply mb-3;
 }

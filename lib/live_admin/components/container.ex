@@ -411,7 +411,7 @@ defmodule LiveAdmin.Components.Container do
     ~H"""
     <div
       id={@id}
-      class="task__modal"
+      class="modal"
       phx-capture-click={
         JS.hide(to: "##{@id}", transition: {"ease-out duration-300", "opacity-100", "opacity-0"})
       }

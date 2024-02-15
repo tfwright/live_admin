@@ -1171,8 +1171,6 @@ tfoot td {
 .resource__table tfoot td {
   padding: 0.25rem;
   bottom: 0px;
-  position: -webkit-sticky;
-  position: sticky;
 }
 
 .resource__table dd {
@@ -1720,7 +1718,7 @@ input[type="submit"] {
   margin-left: 0.5rem;
 }
 
-.task__modal {
+.modal {
   position: fixed;
   display: none;
   inset: 0px;
@@ -1733,7 +1731,7 @@ input[type="submit"] {
   margin: 0px;
 }
 
-.task__modal > div {
+.modal > div {
   position: relative;
   top: 5rem;
   margin-left: auto;
@@ -1750,13 +1748,13 @@ input[type="submit"] {
   white-space: normal;
 }
 
-.task__modal form {
+.modal form {
   display: flex;
   flex-direction: column;
   margin-top: 0.75rem;
 }
 
-.task__modal label {
+.modal label {
   display: flex;
   height: 1.75rem;
   width: 1.75rem;
@@ -1768,11 +1766,11 @@ input[type="submit"] {
   margin-right: 0.5rem;
 }
 
-.task__modal input {
+.modal input {
   flex-grow: 1;
 }
 
-.task__modal pre {
+.modal pre {
   display: inline;
   -webkit-text-decoration-line: underline;
           text-decoration-line: underline;
@@ -1782,13 +1780,13 @@ input[type="submit"] {
   text-decoration-thickness: 2px;
 }
 
-.task__modal form > div {
+.modal form > div {
   display: flex;
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 }
 
-.task__modal form > div:last-of-type {
+.modal form > div:last-of-type {
   margin-bottom: 0.75rem;
 }
 
