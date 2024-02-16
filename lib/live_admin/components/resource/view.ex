@@ -21,7 +21,7 @@ defmodule LiveAdmin.Components.Container.View do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="view-page" class="view__container" phx-hook="IndexPage" phx-target={@myself}>
+    <div id="view-page" class="view__container" phx-hook="ViewPage" phx-target={@myself}>
       <div class="resource__table">
         <dl>
           <%= for {field, type, _} <- Resource.fields(@resource, @config) do %>
@@ -84,14 +84,7 @@ defmodule LiveAdmin.Components.Container.View do
             items={LiveAdmin.fetch_config(@resource, :actions, @config)}
             disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
           >
-            <button
-              class="resource__action--link"
-              data-action={action}
-              phx-click={JS.dispatch("live_admin:action")}
-              data-confirm="Are you sure?"
-            >
-              <%= action |> to_string() |> humanize() %>
-            </button>
+            <.action_control action={action} session={@session} resource={@resource} />
           </.dropdown>
         </div>
       </div>
@@ -136,7 +129,7 @@ defmodule LiveAdmin.Components.Container.View do
   @impl true
   def handle_event(
         "action",
-        params = %{"action" => action},
+        params = %{"name" => action},
         socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo, session: session}}
       ) do
     record =
@@ -154,7 +147,7 @@ defmodule LiveAdmin.Components.Container.View do
       end)
 
     socket =
-      case apply(m, f, [record, socket.assigns.session]) do
+      case apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", [])) do
         {:ok, record} ->
           socket
           |> push_event("success", %{

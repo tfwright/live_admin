@@ -233,14 +233,7 @@ defmodule LiveAdmin.Components.Container.Index do
                     items={LiveAdmin.fetch_config(@resource, :actions, @config)}
                     disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
                   >
-                    <button
-                      class="resource__action--link"
-                      data-action={action}
-                      phx-click={JS.dispatch("live_admin:action")}
-                      data-confirm="Are you sure?"
-                    >
-                      <%= action |> to_string() |> humanize() %>
-                    </button>
+                    <.action_control action={action} session={@session} resource={@resource} />
                   </.dropdown>
                 </div>
               </td>
@@ -343,7 +336,7 @@ defmodule LiveAdmin.Components.Container.Index do
   @impl true
   def handle_event(
         "action",
-        %{"action" => action, "ids" => ids},
+        params = %{"name" => action, "ids" => ids},
         socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo}}
       ) do
     records = Resource.all(ids, resource, prefix, repo)
@@ -360,7 +353,7 @@ defmodule LiveAdmin.Components.Container.Index do
               action_name -> to_string(action_name) == action && {resource, action_name, []}
             end)
 
-          apply(m, f, [record, socket.assigns.session])
+          apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", []))
         end)
       end)
       |> Task.await_many()

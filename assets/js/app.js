@@ -92,7 +92,21 @@ Hooks.MapInput = {
 Hooks.ViewPage = {
   mounted() {
     this.el.addEventListener("live_admin:action", e => {
-      this.pushEventTo(this.el, "action", {action: e.target.dataset.action, ids: this.selected});
+      if (e.target.tagName === "FORM") {
+        const params = [...new FormData(e.target)].reduce((params, [key,val]) => {
+          if (key === "args[]") {
+            return { ...params, args: [...params.args, val] }
+          } else {
+            return { ...params, [key] : val }
+          }
+        }, {args: []}) ;
+
+        e.target.reset();
+
+        this.pushEventTo(this.el, "action", params);
+      } else {
+        this.pushEventTo(this.el, "action", {name: e.target.dataset.action});
+      }
     })
   }
 }
@@ -104,8 +118,18 @@ Hooks.IndexPage = {
     this.el.addEventListener("live_admin:action", e => {
       if (e.target.dataset.action === "delete") {
         this.pushEventTo(this.el, "delete", {ids: this.selected});
+      } else if (e.target.tagName === "FORM") {
+        const params = [...new FormData(e.target)].reduce((params, [key,val]) => {
+          if (key === "args[]") {
+            return { ...params, args: [...params.args, val] }
+          } else {
+            return { ...params, [key] : val }
+          }
+        }, {args: []}) ;
+
+        this.pushEventTo(this.el, "action", {...params, ids: this.selected});
       } else {
-        this.pushEventTo(this.el, "action", {action: e.target.dataset.action, ids: this.selected});
+        this.pushEventTo(this.el, "action", {name: e.target.dataset.action, ids: this.selected});
       }
     })
 

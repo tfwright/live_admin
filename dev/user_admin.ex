@@ -5,11 +5,20 @@ defmodule DemoWeb.UserAdmin do
       immutable_fields: [:encrypted_password, :inserted_at],
       components: [new: DemoWeb.CreateUserForm],
       label_with: :name,
-      actions: [:deactivate, :fake, :fake],
+      actions: [:deactivate, :set_password],
       tasks: [:regenerate_passwords, :aggregate],
       render_with: :render_field
 
   use PhoenixHTMLHelpers
+
+  def set_password(user, _, new_password) do
+    user =
+      user
+      |> Ecto.Changeset.change(encrypted_password: Base.encode16(new_password))
+      |> Demo.Repo.update!()
+
+    {:ok, user}
+  end
 
   def deactivate(user, _) do
     user
