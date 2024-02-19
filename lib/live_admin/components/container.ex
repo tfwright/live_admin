@@ -390,7 +390,7 @@ defmodule LiveAdmin.Components.Container do
       <%= @task |> to_string() |> humanize() %>
     </button>
     <%= if @arity > 1 do %>
-      <.task_modal id={"#{@task}-task-modal"}>
+      <.modal id={"#{@task}-task-modal"}>
         <pre><%= @task %></pre> task requires additional arguments:
         <.form for={Phoenix.Component.to_form(%{})} phx-submit="task" phx-target="#list">
           <input type="hidden" name="name" value={@task} />
@@ -402,24 +402,8 @@ defmodule LiveAdmin.Components.Container do
           <% end %>
           <input type="submit" value="Execute" />
         </.form>
-      </.task_modal>
+      </.modal>
     <% end %>
-    """
-  end
-
-  defp task_modal(assigns) do
-    ~H"""
-    <div
-      id={@id}
-      class="modal"
-      phx-capture-click={
-        JS.hide(to: "##{@id}", transition: {"ease-out duration-300", "opacity-100", "opacity-0"})
-      }
-    >
-      <div>
-        <%= render_slot(@inner_block) %>
-      </div>
-    </div>
     """
   end
 end

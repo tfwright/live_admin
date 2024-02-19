@@ -157,7 +157,7 @@ defmodule LiveAdmin.Components do
       <%= @action |> to_string() |> humanize() %>
     </button>
     <%= if @extra_arg_count > 0 do %>
-      <.action_modal id={"#{@action}-action-modal"}>
+      <.modal id={"#{@action}-action-modal"}>
         <pre><%= @action %></pre> action requires additional arguments:
         <.form
           for={Phoenix.Component.to_form(%{})}
@@ -172,12 +172,12 @@ defmodule LiveAdmin.Components do
           <% end %>
           <input type="submit" value="Execute" />
         </.form>
-      </.action_modal>
+      </.modal>
     <% end %>
     """
   end
 
-  defp action_modal(assigns) do
+  def modal(assigns) do
     ~H"""
     <div
       id={@id}
