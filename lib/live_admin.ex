@@ -1,79 +1,89 @@
 defmodule LiveAdmin do
   @moduledoc docout: [LiveAdmin.READMECompiler]
 
+  @type func_ref :: :atom | :mfa
+  @type func_list :: [func_ref]
+  @type field_list :: [:atom]
+  @options_schema [
+    components: [
+      type: :non_empty_keyword_list,
+      type_doc: "list of modules implementing LiveComponent overrides of LiveAdmin views",
+      keys: [
+        nav: [type: :atom],
+        home: [type: :atom],
+        session: [type: :atom],
+        new: [type: :atom],
+        edit: [type: :atom],
+        list: [type: :atom],
+        view: [type: :atom]
+      ]
+    ],
+    ecto_repo: [
+      type: :atom,
+      type_doc: "Ecto Repo used to query resource"
+    ],
+    list_with: [
+      type: {:or, [:atom, :mfa]},
+      type_doc:
+        "`t:func_ref/0` returning `{records, count}` used to fetch records in LiveAdmin :list component"
+    ],
+    render_with: [
+      type: {:or, [:atom, :mfa]},
+      type_doc:
+        "`t:func_ref/0` used to convert field values to string in LiveAdmin :list component"
+    ],
+    delete_with: [
+      type: {:or, [:atom, :mfa]},
+      type_doc: "`t:func_ref/0` or `false` to disable deleting records"
+    ],
+    create_with: [
+      type: {:or, [:atom, :mfa]},
+      type_doc: "`t:func_ref/0` or `false` to disable creating records"
+    ],
+    update_with: [
+      type: {:or, [:atom, :mfa]},
+      type_doc: "`t:func_ref/0` or `false` to disable updating records"
+    ],
+    validate_with: [
+      type: {:or, [:atom, :mfa]},
+      type_doc:
+        "`t:func_ref/0` used to validate create/update changesets in LiveAdmin :form component"
+    ],
+    label_with: [
+      type: {:or, [:atom, :mfa]},
+      type_doc:
+        "`t:func_ref/0` used to convert (association) record to string in LiveAdmin SearchSelect component"
+    ],
+    title_with: [
+      type: {:or, [:string, :mfa]},
+      type_doc: "string literal or MFA returning a string used to render LiveAdmin UI heading"
+    ],
+    hidden_fields: [
+      type: {:list, :atom},
+      type_doc: "`t:field_list/0` to be hidden from LiveView"
+    ],
+    immutable_fields: [
+      type: {:list, :atom},
+      type_doc: "`t:field_list/0` to be disabled in LiveAdmin :form component"
+    ],
+    actions: [
+      type: {:or, [{:list, :atom}, :non_empty_keyword_list]},
+      type_doc: "`t:func_list/0` taking a record, LiveAdmin session struct, and any extra args"
+    ],
+    tasks: [
+      type: {:or, [{:list, :atom}, :non_empty_keyword_list]},
+      type_doc: "`t:func_list/0` taking a LiveAdmin session and any extra args"
+    ]
+  ]
   @doc """
   Defines [NimbleOptions](https://hexdocs.pm/nimble_options/NimbleOptions.html) schema for configuration that can be set at all levels (resource, scope, and application).
 
-  - `components` - Modules implementing LiveViews to use in place of various UI views
-  - `ecto_repo` - Repo to use for running Ecto queries (`find`, `all` etc.)
-  - `render_with` - Function controlling how fields are rendered in the list table
-  - `delete_with` - Function implementing deletion of a record
-  - `update_with` - Function controlling updating a record
-  - `validate_with` - Function controlling validation of a record changeset
-  - `create_with` - Function implementing creation of a resource
-  - `list_with` - Function implementing listing of a resource
-  - `label_with` - Function implementing display text for a field
-  - `title_with` - Function implementing display text for a resource
-  - `hidden_fields` - List of fields that should not be displayed in UI
-  - `immutable_fields` - List of fields that should be editable in UI
-  - `actions` - List of functions that take a specific record as their first arg
-  - `tasks` - List of functions that take a resource as their first arg
+  Used internally to validate configuration in apps using LiveAdmin.
+
+  Supported options:
+  #{@options_schema |> NimbleOptions.new!() |> NimbleOptions.docs()}
   """
-  def base_configs_schema do
-    [
-      components: [
-        type: :non_empty_keyword_list,
-        keys: [
-          nav: [type: :atom],
-          home: [type: :atom],
-          session: [type: :atom],
-          new: [type: :atom],
-          edit: [type: :atom],
-          list: [type: :atom],
-          view: [type: :atom]
-        ]
-      ],
-      ecto_repo: [
-        type: :atom
-      ],
-      render_with: [
-        type: {:or, [:atom, :mfa]}
-      ],
-      delete_with: [
-        type: {:or, [:atom, :mfa]}
-      ],
-      list_with: [
-        type: {:or, [:atom, :mfa]}
-      ],
-      create_with: [
-        type: {:or, [:atom, :mfa]}
-      ],
-      update_with: [
-        type: {:or, [:atom, :mfa]}
-      ],
-      validate_with: [
-        type: {:or, [:atom, :mfa]}
-      ],
-      hidden_fields: [
-        type: {:list, :atom}
-      ],
-      immutable_fields: [
-        type: {:list, :atom}
-      ],
-      actions: [
-        type: {:or, [{:list, :atom}, :non_empty_keyword_list]}
-      ],
-      tasks: [
-        type: {:or, [{:list, :atom}, :non_empty_keyword_list]}
-      ],
-      label_with: [
-        type: {:or, [:atom, :mfa]}
-      ],
-      title_with: [
-        type: {:or, [:string, :mfa]}
-      ]
-    ]
-  end
+  def base_configs_schema, do: @options_schema
 
   def fetch_config(resource, :components, config),
     do:
