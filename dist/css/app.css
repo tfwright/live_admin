@@ -1516,10 +1516,6 @@ tfoot td {
   display: block;
 }
 
-.inline {
-  display: inline;
-}
-
 .flex {
   display: flex;
 }
@@ -1770,14 +1766,10 @@ input[type="submit"] {
   flex-grow: 1;
 }
 
-.modal pre {
-  display: inline;
-  -webkit-text-decoration-line: underline;
-          text-decoration-line: underline;
-  -webkit-text-decoration-style: dotted;
-          text-decoration-style: dotted;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 2px;
+.modal__title {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 700;
 }
 
 .modal form > div {
@@ -1788,6 +1780,18 @@ input[type="submit"] {
 
 .modal form > div:last-of-type {
   margin-bottom: 0.75rem;
+}
+
+.docs {
+  white-space: pre-wrap;
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  border-radius: 0.25rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .focus\:ring:focus {

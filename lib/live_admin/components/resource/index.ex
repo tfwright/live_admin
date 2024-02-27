@@ -11,6 +11,7 @@ defmodule LiveAdmin.Components.Container.Index do
     ]
 
   import LiveAdmin.Components
+  import LiveAdmin.View, only: [get_function_keys: 3]
 
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
@@ -230,7 +231,7 @@ defmodule LiveAdmin.Components.Container.Index do
                     :let={action}
                     orientation={:up}
                     label={trans("Run action")}
-                    items={LiveAdmin.fetch_config(@resource, :actions, @config)}
+                    items={get_function_keys(@resource, @config, :actions)}
                     disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
                   >
                     <.action_control action={action} session={@session} resource={@resource} />
@@ -247,13 +248,13 @@ defmodule LiveAdmin.Components.Container.Index do
 
   @impl true
   def handle_event("task", params = %{"name" => task}, socket) do
-    {m, f} =
-      socket.assigns.resource
-      |> LiveAdmin.fetch_config(:tasks, socket.assigns.session)
-      |> Enum.find_value(fn
-        {task_name, mf} -> to_string(task_name) == task && mf
-        task_name -> to_string(task_name) == task && {socket.assigns.resource, task_name}
-      end)
+    {_, m, f, _, _} =
+      LiveAdmin.fetch_function(
+        socket.assigns.resource,
+        socket.assigns.session,
+        :tasks,
+        String.to_existing_atom(task)
+      )
 
     socket =
       case apply(m, f, [socket.assigns.session | Map.get(params, "args", [])]) do
@@ -345,13 +346,13 @@ defmodule LiveAdmin.Components.Container.Index do
       records
       |> Enum.map(fn record ->
         Task.Supervisor.async(LiveAdmin.Task.Supervisor, fn ->
-          {m, f} =
-            resource
-            |> LiveAdmin.fetch_config(:actions, socket.assigns.session)
-            |> Enum.find_value(fn
-              {action_name, mf} -> to_string(action_name) == action && mf
-              action_name -> to_string(action_name) == action && {resource, action_name}
-            end)
+          {_, m, f, _, _} =
+            LiveAdmin.fetch_function(
+              socket.assigns.resource,
+              socket.assigns.session,
+              :actions,
+              String.to_existing_atom(action)
+            )
 
           apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", []))
         end)

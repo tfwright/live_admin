@@ -11,6 +11,7 @@ defmodule LiveAdmin.Components.Container do
     ]
 
   import LiveAdmin.Components
+  import LiveAdmin.View, only: [get_function_keys: 3]
 
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
@@ -125,8 +126,8 @@ defmodule LiveAdmin.Components.Container do
           <.dropdown
             :let={task}
             label={trans("Run task")}
-            items={get_task_keys(@resource, @config)}
-            disabled={@resource |> get_task_keys(@config) |> Enum.empty?()}
+            items={get_function_keys(@resource, @config, :tasks)}
+            disabled={Enum.empty?(get_function_keys(@resource, @config, :tasks))}
           >
             <.task_control task={task} session={@session} resource={@resource} />
           </.dropdown>
@@ -282,15 +283,6 @@ defmodule LiveAdmin.Components.Container do
     assign(socket, prefix: prefix, session: new_session)
   end
 
-  defp get_task_keys(resource, config) do
-    resource
-    |> LiveAdmin.fetch_config(:tasks, config)
-    |> Enum.map(fn
-      {key, _} -> key
-      key -> key
-    end)
-  end
-
   defp assign_resource_info(socket, uri) do
     %URI{host: host, path: path} = URI.parse(uri)
 
@@ -357,26 +349,24 @@ defmodule LiveAdmin.Components.Container do
   end
 
   defp task_control(assigns) do
-    {m, f, []} =
-      assigns.resource
-      |> LiveAdmin.fetch_config(:tasks, assigns.session)
-      |> Enum.find_value(fn
-        {task_name, mfa} -> task_name == assigns.task && mfa
-        task_name -> task_name == assigns.task && {assigns.resource, task_name, []}
-      end)
+    {name, _, _, arity, docs} =
+      LiveAdmin.fetch_function(assigns.resource, assigns.session, :tasks, assigns.task)
 
-    arity =
-      :functions
-      |> m.__info__()
-      |> Enum.find_value(fn {name, arity} -> name == f && arity end)
+    extra_arg_count = arity - 1
 
-    assigns = assign(assigns, arity: arity)
+    assigns =
+      assign(assigns,
+        extra_arg_count: extra_arg_count,
+        function_docs: docs,
+        modalize: extra_arg_count > 0 or Enum.any?(docs),
+        title: name |> to_string() |> humanize()
+      )
 
     ~H"""
     <button
       class="resource__action--link"
       phx-click={
-        if @arity > 1,
+        if @modalize,
           do:
             JS.show(
               to: "##{@task}-task-modal",
@@ -385,20 +375,26 @@ defmodule LiveAdmin.Components.Container do
           else: JS.push("task", value: %{"name" => @task}, page_loading: true, target: "#list")
       }
       ,
-      data-confirm={if @arity > 1, do: nil, else: "Are you sure?"}
+      data-confirm={if @modalize, do: nil, else: "Are you sure?"}
     >
       <%= @task |> to_string() |> humanize() %>
     </button>
-    <%= if @arity > 1 do %>
+    <%= if @modalize do %>
       <.modal id={"#{@task}-task-modal"}>
-        <pre><%= @task %></pre> task requires additional arguments:
+        <span class="modal__title"><%= @title %></span>
+        <%= for {_lang, doc} <- @function_docs do %>
+          <span class="docs"><%= doc %></span>
+        <% end %>
         <.form for={Phoenix.Component.to_form(%{})} phx-submit="task" phx-target="#list">
           <input type="hidden" name="name" value={@task} />
-          <%= for num <- 1..(@arity-1) do %>
-            <div>
-              <label><%= num %></label>
-              <input type="text" name="args[]" />
-            </div>
+          <%= if @extra_arg_count > 0 do %>
+            <b>Arguments</b>
+            <%= for num <- 1..@extra_arg_count do %>
+              <div>
+                <label><%= num %></label>
+                <input type="text" name="args[]" />
+              </div>
+            <% end %>
           <% end %>
           <input type="submit" value="Execute" />
         </.form>

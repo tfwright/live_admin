@@ -2,9 +2,10 @@ defmodule LiveAdmin do
   @moduledoc docout: [LiveAdmin.READMECompiler]
 
   @type mod_func :: {module(), :atom}
-  @type func_ref :: :atom | mod_func()
-  @type func_list :: [:atom] | keyword(mod_func)
+  @type func_ref :: :atom | mod_func() | :mfa
+  @type func_list :: [func_ref] | keyword(func_ref)
   @type field_list :: [:atom]
+
   @options_schema [
     components: [
       type: :non_empty_keyword_list,
@@ -68,11 +69,29 @@ defmodule LiveAdmin do
       type_doc: "`t:field_list/0` to be disabled in LiveAdmin :form component"
     ],
     actions: [
-      type: {:or, [{:list, :atom}, {:list, {:tuple, [:atom, :atom]}}]},
+      type:
+        {:list,
+         {:or,
+          [
+            :atom,
+            {:tuple, [:atom, :atom]},
+            {:tuple, [:atom, :atom, :integer]},
+            {:tuple,
+             [:atom, {:or, [{:tuple, [:atom, :atom]}, {:tuple, [:atom, :atom, :integer]}]}]}
+          ]}},
       type_doc: "`t:func_list/0` taking a record, LiveAdmin session struct, and any extra args"
     ],
     tasks: [
-      type: {:or, [{:list, :atom}, {:list, {:tuple, [:atom, :atom]}}]},
+      type:
+        {:list,
+         {:or,
+          [
+            :atom,
+            {:tuple, [:atom, :atom]},
+            {:tuple, [:atom, :atom, :integer]},
+            {:tuple,
+             [:atom, {:or, [{:tuple, [:atom, :atom]}, {:tuple, [:atom, :atom, :integer]}]}]}
+          ]}},
       type_doc: "`t:func_list/0` taking a LiveAdmin session and any extra args"
     ]
   ]
@@ -85,6 +104,15 @@ defmodule LiveAdmin do
   #{@options_schema |> NimbleOptions.new!() |> NimbleOptions.docs()}
   """
   def base_configs_schema, do: @options_schema
+
+  def fetch_function(resource, session, function_type, function)
+      when function_type in [:tasks, :actions] and is_atom(function) do
+    with result = {_, m, f, _} <-
+           extract_function_from_config(resource, session, function_type, function),
+         docs when is_map(docs) <- extract_function_docs(m, f) do
+      Tuple.append(result, docs)
+    end
+  end
 
   def fetch_config(resource, :components, config),
     do:
@@ -227,5 +255,31 @@ defmodule LiveAdmin do
       %{metadata: %{base_path: ^base_path, resource: resource}} -> [resource]
       _ -> []
     end)
+  end
+
+  defp extract_function_from_config(resource, session, function_type, function) do
+    default_arity = if function_type == :tasks, do: 1, else: 2
+
+    resource
+    |> LiveAdmin.fetch_config(function_type, session)
+    |> Enum.find_value(:error, fn
+      {name, {m, f, a}} -> name == function && {name, m, f, a}
+      {name, {m, f}} -> name == function && {name, m, f, default_arity}
+      {m, f, a} -> f == function && {f, m, f, a}
+      {m, f} -> f == function && {f, m, f, default_arity}
+      name -> name == function && {name, resource, name, default_arity}
+    end)
+  end
+
+  def extract_function_docs(module, function) do
+    with {_, _, _, _, _, _, module_docs} <- Code.fetch_docs(module),
+         function_docs <-
+           Enum.find_value(module_docs, %{}, fn {{_, name, _}, _, _, docs, _} ->
+             name == function && is_map(docs) && docs
+           end) do
+      function_docs
+    else
+      {:error, _} -> %{}
+    end
   end
 end

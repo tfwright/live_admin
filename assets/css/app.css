@@ -783,12 +783,9 @@ input[type="submit"] {
   @apply grow;
 }
 
-.modal pre {
-  @apply inline;
-  @apply underline;
-  @apply decoration-dotted;
-  @apply underline-offset-4;
-  @apply decoration-2;
+.modal__title {
+  @apply text-lg;
+  @apply font-bold;
 }
 
 .modal form > div {
@@ -798,4 +795,14 @@ input[type="submit"] {
 
 .modal form > div:last-of-type {
   @apply mb-3;
+}
+
+.docs {
+  @apply whitespace-pre-wrap;
+  @apply block;
+  @apply font-mono;
+  @apply rounded;
+  @apply bg-gray-100;
+  @apply p-2;
+  @apply my-2;
 }
