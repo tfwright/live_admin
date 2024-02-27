@@ -60,7 +60,7 @@ defmodule LiveAdmin.Resource do
           |> render_field()
         end
 
-      {m, f, []} ->
+      {m, f} ->
         apply(m, f, [record, field, session])
 
       f when is_atom(f) ->
@@ -98,8 +98,8 @@ defmodule LiveAdmin.Resource do
       nil ->
         repo.delete(record)
 
-      {mod, func_name, args} ->
-        apply(mod, func_name, [record, session] ++ args)
+      {mod, func_name} ->
+        apply(mod, func_name, [record, session])
 
       name when is_atom(name) ->
         apply(resource, name, [record, session])
@@ -113,8 +113,8 @@ defmodule LiveAdmin.Resource do
       nil ->
         build_list(resource, opts, repo, config)
 
-      {mod, func_name, args} ->
-        apply(mod, func_name, [resource, opts, session] ++ args)
+      {mod, func_name} ->
+        apply(mod, func_name, [resource, opts, session])
 
       name when is_atom(name) ->
         apply(resource, name, [opts, session])
@@ -143,8 +143,8 @@ defmodule LiveAdmin.Resource do
         |> change(nil, params, config)
         |> repo.insert(prefix: session.prefix)
 
-      {mod, func_name, args} ->
-        apply(mod, func_name, [params, session] ++ args)
+      {mod, func_name} ->
+        apply(mod, func_name, [params, session])
 
       name when is_atom(name) ->
         apply(resource, name, [params, session])
@@ -162,8 +162,8 @@ defmodule LiveAdmin.Resource do
         |> change(record, params, config)
         |> repo.update()
 
-      {mod, func_name, args} ->
-        apply(mod, func_name, [record, params, session] ++ args)
+      {mod, func_name} ->
+        apply(mod, func_name, [record, params, session])
 
       name when is_atom(name) ->
         apply(resource, name, [record, params, session])
@@ -175,7 +175,7 @@ defmodule LiveAdmin.Resource do
     |> LiveAdmin.fetch_config(:validate_with, config)
     |> case do
       nil -> changeset
-      {mod, func_name, args} -> apply(mod, func_name, [changeset, session] ++ args)
+      {mod, func_name} -> apply(mod, func_name, [changeset, session])
       name when is_atom(name) -> apply(resource, name, [changeset, session])
     end
     |> Map.put(:action, :validate)

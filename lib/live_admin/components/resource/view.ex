@@ -137,12 +137,12 @@ defmodule LiveAdmin.Components.Container.View do
 
     action_name = String.to_existing_atom(action)
 
-    {m, f, []} =
+    {m, f} =
       resource
       |> LiveAdmin.fetch_config(:actions, session)
       |> Enum.find_value(fn
-        {^action_name, mfa} -> mfa
-        ^action_name -> {resource, action_name, []}
+        {^action_name, mf} -> mf
+        ^action_name -> {resource, action_name}
         _ -> false
       end)
 

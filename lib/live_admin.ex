@@ -1,8 +1,9 @@
 defmodule LiveAdmin do
   @moduledoc docout: [LiveAdmin.READMECompiler]
 
-  @type func_ref :: :atom | :mfa
-  @type func_list :: [func_ref]
+  @type mod_func :: {module(), :atom}
+  @type func_ref :: :atom | mod_func()
+  @type func_list :: [:atom] | keyword(mod_func)
   @type field_list :: [:atom]
   @options_schema [
     components: [
@@ -23,39 +24,39 @@ defmodule LiveAdmin do
       type_doc: "Ecto Repo used to query resource"
     ],
     list_with: [
-      type: {:or, [:atom, :mfa]},
+      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
       type_doc:
         "`t:func_ref/0` returning `{records, count}` used to fetch records in LiveAdmin :list component"
     ],
     render_with: [
-      type: {:or, [:atom, :mfa]},
+      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
       type_doc:
         "`t:func_ref/0` used to convert field values to string in LiveAdmin :list component"
     ],
     delete_with: [
-      type: {:or, [:atom, :mfa]},
+      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
       type_doc: "`t:func_ref/0` or `false` to disable deleting records"
     ],
     create_with: [
-      type: {:or, [:atom, :mfa]},
+      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
       type_doc: "`t:func_ref/0` or `false` to disable creating records"
     ],
     update_with: [
-      type: {:or, [:atom, :mfa]},
+      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
       type_doc: "`t:func_ref/0` or `false` to disable updating records"
     ],
     validate_with: [
-      type: {:or, [:atom, :mfa]},
+      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
       type_doc:
         "`t:func_ref/0` used to validate create/update changesets in LiveAdmin :form component"
     ],
     label_with: [
-      type: {:or, [:atom, :mfa]},
+      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
       type_doc:
         "`t:func_ref/0` used to convert (association) record to string in LiveAdmin SearchSelect component"
     ],
     title_with: [
-      type: {:or, [:string, :mfa]},
+      type: {:or, [:string, {:tuple, [:atom, :atom]}]},
       type_doc: "string literal or MFA returning a string used to render LiveAdmin UI heading"
     ],
     hidden_fields: [
@@ -67,11 +68,11 @@ defmodule LiveAdmin do
       type_doc: "`t:field_list/0` to be disabled in LiveAdmin :form component"
     ],
     actions: [
-      type: {:or, [{:list, :atom}, :non_empty_keyword_list]},
+      type: {:or, [{:list, :atom}, {:list, {:tuple, [:atom, :atom]}}]},
       type_doc: "`t:func_list/0` taking a record, LiveAdmin session struct, and any extra args"
     ],
     tasks: [
-      type: {:or, [{:list, :atom}, :non_empty_keyword_list]},
+      type: {:or, [{:list, :atom}, {:list, {:tuple, [:atom, :atom]}}]},
       type_doc: "`t:func_list/0` taking a LiveAdmin session and any extra args"
     ]
   ]
@@ -185,7 +186,7 @@ defmodule LiveAdmin do
         |> Module.split()
         |> Enum.at(-1)
 
-      {m, f, []} ->
+      {m, f} ->
         apply(m, f, [])
 
       title when is_binary(title) ->
@@ -200,7 +201,7 @@ defmodule LiveAdmin do
     |> fetch_config(:label_with, config)
     |> case do
       nil -> Map.fetch!(record, LiveAdmin.primary_key!(resource))
-      {m, f, []} -> apply(m, f, [record])
+      {m, f} -> apply(m, f, [record])
       label when is_atom(label) -> Map.fetch!(record, label)
     end
   end

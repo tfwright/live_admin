@@ -247,12 +247,12 @@ defmodule LiveAdmin.Components.Container.Index do
 
   @impl true
   def handle_event("task", params = %{"name" => task}, socket) do
-    {m, f, []} =
+    {m, f} =
       socket.assigns.resource
       |> LiveAdmin.fetch_config(:tasks, socket.assigns.session)
       |> Enum.find_value(fn
-        {task_name, mfa} -> to_string(task_name) == task && mfa
-        task_name -> to_string(task_name) == task && {socket.assigns.resource, task_name, []}
+        {task_name, mf} -> to_string(task_name) == task && mf
+        task_name -> to_string(task_name) == task && {socket.assigns.resource, task_name}
       end)
 
     socket =
@@ -345,12 +345,12 @@ defmodule LiveAdmin.Components.Container.Index do
       records
       |> Enum.map(fn record ->
         Task.Supervisor.async(LiveAdmin.Task.Supervisor, fn ->
-          {m, f, []} =
+          {m, f} =
             resource
             |> LiveAdmin.fetch_config(:actions, socket.assigns.session)
             |> Enum.find_value(fn
-              {action_name, mfa} -> to_string(action_name) == action && mfa
-              action_name -> to_string(action_name) == action && {resource, action_name, []}
+              {action_name, mf} -> to_string(action_name) == action && mf
+              action_name -> to_string(action_name) == action && {resource, action_name}
             end)
 
           apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", []))
