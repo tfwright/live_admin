@@ -79,10 +79,10 @@ defmodule LiveAdmin.MixProject do
   end
 
   defp elixirc_paths(env) do
-    if env == :dev && System.get_env("LIVE_ADMIN_DEV") do
-      ["lib", "dev"]
-    else
-      ["lib"]
+    cond do
+      env == :dev && System.get_env("LIVE_ADMIN_DEV") -> ["lib", "dev"]
+      env == :test -> ["lib", "test"]
+      true -> ["lib"]
     end
   end
 end

@@ -59,4 +59,15 @@ defmodule LiveAdmin.View do
   def supported_type?({_, Ecto.Embedded, _}), do: true
   def supported_type?({_, Ecto.Enum, _}), do: true
   def supported_type?(_), do: false
+
+  def get_function_keys(resource, config, function) do
+    resource
+    |> LiveAdmin.fetch_config(function, config)
+    |> Enum.map(fn
+      {_, key, _} -> key
+      {_, key} when is_atom(key) -> key
+      {key, _} -> key
+      key -> key
+    end)
+  end
 end

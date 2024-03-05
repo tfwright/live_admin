@@ -5,7 +5,7 @@ defmodule LiveAdmin.Components.Container.View do
   import LiveAdmin,
     only: [route_with_params: 1, route_with_params: 2, trans: 1, record_label: 3, trans: 2]
 
-  import LiveAdmin.View, only: [field_class: 1]
+  import LiveAdmin.View, only: [field_class: 1, get_function_keys: 3]
   import LiveAdmin.Components
 
   alias LiveAdmin.Resource
@@ -81,7 +81,7 @@ defmodule LiveAdmin.Components.Container.View do
             :let={action}
             orientation={:up}
             label={trans("Run action")}
-            items={LiveAdmin.fetch_config(@resource, :actions, @config)}
+            items={get_function_keys(@resource, @config, :actions)}
             disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
           >
             <.action_control action={action} session={@session} resource={@resource} />
@@ -135,16 +135,8 @@ defmodule LiveAdmin.Components.Container.View do
     record =
       socket.assigns[:record] || Resource.find!(params["id"], resource, prefix, repo)
 
-    action_name = String.to_existing_atom(action)
-
-    {m, f} =
-      resource
-      |> LiveAdmin.fetch_config(:actions, session)
-      |> Enum.find_value(fn
-        {^action_name, mf} -> mf
-        ^action_name -> {resource, action_name}
-        _ -> false
-      end)
+    {_, m, f, _, _} =
+      LiveAdmin.fetch_function(resource, session, :actions, String.to_existing_atom(action))
 
     socket =
       case apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", [])) do

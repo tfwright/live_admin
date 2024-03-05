@@ -10,7 +10,6 @@ create table users (
   private_data jsonb,
   encrypted_password text,
   status varchar(100),
-  other_resource_id int,
   roles character varying[] DEFAULT '{}'::character varying[],
   rating real
 );
@@ -50,7 +49,6 @@ create table alt.users (
   private_data jsonb,
   encrypted_password text,
   status varchar(100),
-  other_resource_id int,
   roles character varying[] DEFAULT '{}'::character varying[],
   rating real
 );
