@@ -74,8 +74,11 @@ defmodule Demo.Populator do
         posts: [
           %Demo.Posts.Post{
             title: Faker.Lorem.paragraph(1) |> String.slice(0..9),
+            categories: Ecto.Enum.values(Demo.Posts.Post, :categories) |> Enum.take(Enum.random(0..2)),
+            tags: Faker.Lorem.words(Enum.random(0..5)),
             body: Faker.Lorem.paragraphs() |> Enum.join("\n\n"),
-            disabled_user: get_user_if(:rand.uniform(2) == 1)
+            disabled_user: get_user_if(:rand.uniform(2) == 1),
+            previous_versions: [%Demo.Posts.Post.Version{body: Faker.Lorem.paragraphs() |> Enum.join("\n\n")}]
           }
         ]
       }
