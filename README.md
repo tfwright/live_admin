@@ -125,6 +125,7 @@ To avoid conflicts with your own app's translations, it is recommended to use a 
 ## Development
 
 To report bugs/problems: https://github.com/tfwright/live_admin/issues
+
 For feature/improvement requests, or anything else: https://github.com/tfwright/live_admin/discussions
 
 This repo has been configured to run the application in [Docker](https://www.docker.com/) using [Compose](https://docs.docker.com/compose/).
