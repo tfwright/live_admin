@@ -150,7 +150,7 @@ defmodule LiveAdmin.Components do
             ),
           else: JS.dispatch("live_admin:action")
       }
-      data-confirm={if @extra_arg_count > 0, do: nil, else: "Are you sure?"}
+      data-confirm={if @modalize, do: nil, else: "Are you sure?"}
     >
       <%= @title %>
     </button>
@@ -165,7 +165,7 @@ defmodule LiveAdmin.Components do
           phx-submit={JS.dispatch("live_admin:action") |> JS.hide(to: "##{@action}-action-modal")}
         >
           <input type="hidden" name="name" value={@action} />
-          <%= if @extra_arg_count do %>
+          <%= if @extra_arg_count > 0 do %>
             <b>Arguments</b>
             <%= for num <- 1..@extra_arg_count do %>
               <div>
