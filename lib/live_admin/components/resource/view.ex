@@ -140,12 +140,26 @@ defmodule LiveAdmin.Components.Container.View do
 
     socket =
       case apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", [])) do
-        {:ok, record} ->
-          socket
-          |> push_event("success", %{
-            msg: trans("%{action} succeeded", inter: [action: action])
-          })
-          |> assign(:record, record)
+        {:ok, result} ->
+          if is_struct(result, Keyword.fetch!(resource.__live_admin_config__(), :schema)) do
+            socket
+            |> push_event("success", %{
+              msg: trans("%{action} succeeded", inter: [action: action])
+            })
+            |> assign(:record, record)
+          else
+            socket
+            |> push_event("success", %{msg: result})
+            |> assign(
+              :record,
+              Resource.find!(
+                Map.fetch!(record, LiveAdmin.primary_key!(resource)),
+                resource,
+                prefix,
+                repo
+              )
+            )
+          end
 
         {:error, error} ->
           push_event(
