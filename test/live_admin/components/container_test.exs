@@ -71,7 +71,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
 
     test "filters results", %{view: view} do
-      assert render(view) =~ "0 total"
+      assert render_async(view) =~ "0 total"
     end
 
     test "clears search", %{view: view} do
@@ -79,7 +79,7 @@ defmodule LiveAdmin.Components.ContainerTest do
       |> element("button[phx-click='search']")
       |> render_click()
 
-      assert render(view) =~ "1 total"
+      assert render_async(view) =~ "1 total"
     end
   end
 
@@ -91,7 +91,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
 
     test "renders result from prefix", %{view: view} do
-      assert render(view) =~ "1 total"
+      assert render_async(view) =~ "1 total"
     end
   end
 
@@ -104,13 +104,12 @@ defmodule LiveAdmin.Components.ContainerTest do
       end)
 
       {:ok, view, _} = live(conn, "/user")
-      %{view: view}
 
       %{view: view}
     end
 
     test "renders results from prefix", %{view: view} do
-      assert render(view) =~ "1 total"
+      assert render_async(view) =~ "1 total"
     end
   end
 

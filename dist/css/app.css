@@ -748,16 +748,28 @@ select {
   }
 }
 
-input[class$="-loading"] + div nav:before {
-  content: '';
+.spinner {
+  content: "";
   box-sizing: border-box;
   width: 20px;
   height: 20px;
   border-radius: 50%;
   border: 2px solid #ccc;
   border-top-color: #000;
-  -webkit-animation: spinner .6s linear infinite;
-          animation: spinner .6s linear infinite;
+  -webkit-animation: spinner 0.6s linear infinite;
+          animation: spinner 0.6s linear infinite;
+}
+
+input[class$="-loading"] + div nav:before {
+  content: "";
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  border-top-color: #000;
+  -webkit-animation: spinner 0.6s linear infinite;
+          animation: spinner 0.6s linear infinite;
   position: absolute;
   top: 0.25rem;
   right: 0.25rem;
@@ -1610,6 +1622,10 @@ tfoot td {
 
 .border-l {
   border-left-width: 1px;
+}
+
+.p-10 {
+  padding: 2.5rem;
 }
 
 .p-2 {

@@ -127,16 +127,19 @@ input[type="submit"] {
     to {transform: rotate(360deg);}
   }
 
-  input[class$="-loading"] + div nav:before {
-    content: '';
+  .spinner {
+    content: "";
     box-sizing: border-box;
     width: 20px;
     height: 20px;
     border-radius: 50%;
     border: 2px solid #ccc;
     border-top-color: #000;
-    animation: spinner .6s linear infinite;
+    animation: spinner 0.6s linear infinite;
+  }
 
+  input[class$="-loading"] + div nav:before {
+    @apply spinner;
     @apply absolute;
     @apply top-1;
     @apply right-1;
