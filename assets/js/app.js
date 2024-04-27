@@ -11,10 +11,7 @@ topbar.config({
   className: "topbar",
 });
 window.addEventListener("phx:page-loading-start", (info) => topbar.show());
-window.addEventListener("phx:page-loading-stop", () => {
-  document.activeElement.blur();
-  topbar.hide();
-});
+window.addEventListener("phx:page-loading-stop", () => topbar.hide());
 window.addEventListener("phx:success", (e) => {
   Toastify({
     text: e.detail.msg,

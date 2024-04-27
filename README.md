@@ -124,15 +124,11 @@ To avoid conflicts with your own app's translations, it is recommended to use a 
 
 ## Development
 
-This repo has been configured to run a [demo app](/dev) in [Docker](https://www.docker.com/) using [Compose](https://docs.docker.com/compose/).
+This repo has been configured to run the application in [Docker](https://www.docker.com/) using [Compose](https://docs.docker.com/compose/).
 
 The Phoenix app is running the `app` service, so all mix command should be run there. Examples:
 
 * `docker compose run app mix test`
-
-To report bugs/problems: https://github.com/tfwright/live_admin/issues
-
-For feature/improvement requests, or anything else: https://github.com/tfwright/live_admin/discussions
 
 ---
 
