@@ -181,6 +181,9 @@ Hooks.IndexPage = {
         document.getElementById("footer-select").classList.add("hidden");
       }
     });
+  },
+  updated() {
+    this.selected = [];
 
     var clipboard = new ClipboardJS(this.el.querySelectorAll(".cell__copy"), {
       target: function (trigger) {
@@ -194,9 +197,6 @@ Hooks.IndexPage = {
         className: "toast__container",
       }).showToast();
     });
-  },
-  updated() {
-    this.selected = [];
   },
 };
 
