@@ -108,7 +108,7 @@ defmodule LiveAdmin.Components.Container.Index do
             </tr>
           </thead>
           <tbody>
-            <%= if @records.ok? do %>
+            <%= if !@records.loading do %>
               <%= for record <- @records.result |> elem(0) do %>
                 <tr class="resource__row">
                   <td>
