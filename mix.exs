@@ -27,7 +27,8 @@ defmodule LiveAdmin.MixProject do
         source_ref: "v#{@version}"
       ],
       compilers: Mix.compilers() ++ compilers(Mix.env()),
-      consolidate_protocols: !System.get_env("LIVE_ADMIN_DEV")
+      consolidate_protocols: !System.get_env("LIVE_ADMIN_DEV"),
+      dialyzer: [plt_add_apps: [:docout]]
     ]
   end
 
