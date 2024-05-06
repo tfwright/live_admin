@@ -61,7 +61,7 @@ defmodule Demo.Populator do
   end
 
   def run do
-    Enum.each(1..100, fn _ ->
+    Enum.each(1..Enum.random(1..10001), fn _ ->
       %Demo.Accounts.User{
         name: Faker.Person.name(),
         email: "#{Ecto.UUID.generate()}@example.com",
