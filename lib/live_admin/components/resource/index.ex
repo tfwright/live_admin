@@ -198,7 +198,10 @@ defmodule LiveAdmin.Components.Container.Index do
         <div id="footer-nav">
           <%= if @records.ok? do %>
             <div>
-              <%= (@page - 1) * 10 + 1 %>-<%= min(@page * 10, elem(@records.result, 1)) %>/<%= elem(
+              <%= min((@page - 1) * 10 + 1, elem(@records.result, 1)) %>-<%= min(
+                @page * 10,
+                elem(@records.result, 1)
+              ) %>/<%= elem(
                 @records.result,
                 1
               ) %>
