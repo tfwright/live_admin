@@ -195,7 +195,13 @@ defmodule LiveAdmin.Components.Container.Index do
           <tfoot>
             <tr id="footer-nav">
               <%= if @records.ok? do %>
-                <td class="w-full" colspan={@resource |> Resource.fields(@config) |> Enum.count()}>
+                <td>
+                  <%= (@page - 1) * 10 + 1 %>-<%= min(@page * 10, elem(@records.result, 1)) %>/<%= elem(
+                    @records.result,
+                    1
+                  ) %>
+                </td>
+                <td colspan={(@resource |> Resource.fields(@config) |> Enum.count()) - 1}>
                   <div class="table__actions">
                     <%= if @page > 1 do %>
                       <.link
@@ -233,13 +239,11 @@ defmodule LiveAdmin.Components.Container.Index do
                     <% end %>
                   </div>
                 </td>
-                <td class="text-right p-2">
-                  <%= trans("%{count} total rows", inter: [count: elem(@records.result, 1)]) %>
-                </td>
               <% end %>
             </tr>
             <tr id="footer-select" class="hidden">
-              <td colspan={@resource |> Resource.fields(@config) |> Enum.count()}>
+              <td></td>
+              <td colspan={(@resource |> Resource.fields(@config) |> Enum.count()) - 1}>
                 <div class="table__actions">
                   <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
                     <button

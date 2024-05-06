@@ -1181,8 +1181,16 @@ tfoot td {
 }
 
 .resource__table tfoot td {
-  padding: 0.25rem;
-  bottom: 0px;
+  padding: 0.5rem;
+}
+
+.resource__table tfoot td:first-of-type {
+  text-align: center;
+  font-weight: 600;
+}
+
+.resource__table tfoot td:nth-of-type(2) {
+  padding-left: 1.25rem;
 }
 
 .resource__table dd {
@@ -1572,10 +1580,6 @@ tfoot td {
   width: 1.5rem;
 }
 
-.w-full {
-  width: 100%;
-}
-
 .grow {
   flex-grow: 1;
 }
@@ -1628,17 +1632,9 @@ tfoot td {
   padding: 2.5rem;
 }
 
-.p-2 {
-  padding: 0.5rem;
-}
-
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
-}
-
-.text-right {
-  text-align: right;
 }
 
 .uppercase {

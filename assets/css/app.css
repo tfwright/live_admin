@@ -432,8 +432,16 @@ input[type="submit"] {
   }
 
   .resource__table tfoot td {
-    @apply p-1;
-    @apply bottom-0;
+    @apply p-2;
+  }
+
+  .resource__table tfoot td:first-of-type {
+    @apply text-center;
+    @apply font-semibold;
+  }
+
+  .resource__table tfoot td:nth-of-type(2) {
+    @apply pl-5;
   }
 
   .resource__table dd {
