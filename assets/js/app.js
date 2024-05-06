@@ -174,11 +174,11 @@ Hooks.IndexPage = {
       );
 
       if (this.selected.length > 0) {
-        document.getElementById("footer-select").classList.remove("hidden");
-        document.getElementById("footer-nav").classList.add("hidden");
+        document.getElementById("footer-select").style.removeProperty("display");
+        document.getElementById("footer-nav").style.display = "none";
       } else {
-        document.getElementById("footer-nav").classList.remove("hidden");
-        document.getElementById("footer-select").classList.add("hidden");
+        document.getElementById("footer-nav").style.removeProperty("display");
+        document.getElementById("footer-select").style.display = "none";
       }
 
       document.getElementById("footer-select").firstElementChild.innerHTML = this.selected.length;

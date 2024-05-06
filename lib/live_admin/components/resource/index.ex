@@ -192,83 +192,83 @@ defmodule LiveAdmin.Components.Container.Index do
               </tr>
             <% end %>
           </tbody>
-          <tfoot>
-            <tr id="footer-nav">
-              <%= if @records.ok? do %>
-                <td>
-                  <%= (@page - 1) * 10 + 1 %>-<%= min(@page * 10, elem(@records.result, 1)) %>/<%= elem(
-                    @records.result,
-                    1
-                  ) %>
-                </td>
-                <td colspan={(@resource |> Resource.fields(@config) |> Enum.count()) - 1}>
-                  <div class="table__actions">
-                    <%= if @page > 1 do %>
-                      <.link
-                        patch={
-                          route_with_params(
-                            assigns,
-                            params: list_link_params(assigns, page: @page - 1)
-                          )
-                        }
-                        class="resource__action--btn"
-                      >
-                        <%= trans("Prev") %>
-                      </.link>
-                    <% else %>
-                      <span class="resource__action--disabled">
-                        <%= trans("Prev") %>
-                      </span>
-                    <% end %>
-                    <%= if @page < (@records.result |> elem(1)) / 10 do %>
-                      <.link
-                        patch={
-                          route_with_params(
-                            assigns,
-                            params: list_link_params(assigns, page: @page + 1)
-                          )
-                        }
-                        class="resource__action--btn"
-                      >
-                        <%= trans("Next") %>
-                      </.link>
-                    <% else %>
-                      <span class="resource__action--disabled">
-                        <%= trans("Next") %>
-                      </span>
-                    <% end %>
-                  </div>
-                </td>
-              <% end %>
-            </tr>
-            <tr id="footer-select" class="hidden">
-              <td></td>
-              <td colspan={(@resource |> Resource.fields(@config) |> Enum.count()) - 1}>
-                <div class="table__actions">
-                  <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
-                    <button
-                      class="resource__action--danger"
-                      data-action="delete"
-                      phx-click={JS.dispatch("live_admin:action")}
-                      data-confirm="Are you sure?"
-                    >
-                      <%= trans("Delete") %>
-                    </button>
-                  <% end %>
-                  <.dropdown
-                    :let={action}
-                    orientation={:up}
-                    label={trans("Run action")}
-                    items={get_function_keys(@resource, @config, :actions)}
-                    disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
-                  >
-                    <.action_control action={action} session={@session} resource={@resource} />
-                  </.dropdown>
-                </div>
-              </td>
-            </tr>
-          </tfoot>
         </table>
+      </div>
+      <div class="table__footer">
+        <div id="footer-nav">
+          <%= if @records.ok? do %>
+            <div>
+              <%= (@page - 1) * 10 + 1 %>-<%= min(@page * 10, elem(@records.result, 1)) %>/<%= elem(
+                @records.result,
+                1
+              ) %>
+            </div>
+            <div colspan={(@resource |> Resource.fields(@config) |> Enum.count()) - 1}>
+              <div class="table__actions">
+                <%= if @page > 1 do %>
+                  <.link
+                    patch={
+                      route_with_params(
+                        assigns,
+                        params: list_link_params(assigns, page: @page - 1)
+                      )
+                    }
+                    class="resource__action--btn"
+                  >
+                    <%= trans("Prev") %>
+                  </.link>
+                <% else %>
+                  <span class="resource__action--disabled">
+                    <%= trans("Prev") %>
+                  </span>
+                <% end %>
+                <%= if @page < (@records.result |> elem(1)) / 10 do %>
+                  <.link
+                    patch={
+                      route_with_params(
+                        assigns,
+                        params: list_link_params(assigns, page: @page + 1)
+                      )
+                    }
+                    class="resource__action--btn"
+                  >
+                    <%= trans("Next") %>
+                  </.link>
+                <% else %>
+                  <span class="resource__action--disabled">
+                    <%= trans("Next") %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <div id="footer-select" style="display:none">
+          <div></div>
+          <div>
+            <div class="table__actions">
+              <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
+                <button
+                  class="resource__action--danger"
+                  data-action="delete"
+                  phx-click={JS.dispatch("live_admin:action")}
+                  data-confirm="Are you sure?"
+                >
+                  <%= trans("Delete") %>
+                </button>
+              <% end %>
+              <.dropdown
+                :let={action}
+                orientation={:up}
+                label={trans("Run action")}
+                items={get_function_keys(@resource, @config, :actions)}
+                disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
+              >
+                <.action_control action={action} session={@session} resource={@resource} />
+              </.dropdown>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     """

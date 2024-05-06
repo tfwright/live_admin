@@ -392,10 +392,6 @@ input[type="submit"] {
     @apply overflow-x-auto;
   }
 
-  tfoot td {
-    @apply p-1;
-  }
-
   .list__search {
     @apply bg-transparent;
     @apply flex;
@@ -431,16 +427,18 @@ input[type="submit"] {
     @apply top-0;
   }
 
-  .resource__table tfoot td {
+  .table__footer > div {
     @apply p-2;
+    @apply flex;
+    @apply items-center;
   }
 
-  .resource__table tfoot td:first-of-type {
+  .table__footer div:first-of-type {
     @apply text-center;
     @apply font-semibold;
   }
 
-  .resource__table tfoot td:nth-of-type(2) {
+  .table__footer div:nth-of-type(2) {
     @apply pl-5;
   }
 

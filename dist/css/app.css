@@ -1136,10 +1136,6 @@ input[class$="-loading"] + div nav:before {
   overflow-x: auto;
 }
 
-tfoot td {
-  padding: 0.25rem;
-}
-
 .list__search {
   background-color: transparent;
   display: flex;
@@ -1180,16 +1176,18 @@ tfoot td {
   top: 0px;
 }
 
-.resource__table tfoot td {
+.table__footer > div {
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
 }
 
-.resource__table tfoot td:first-of-type {
+.table__footer div:first-of-type {
   text-align: center;
   font-weight: 600;
 }
 
-.resource__table tfoot td:nth-of-type(2) {
+.table__footer div:nth-of-type(2) {
   padding-left: 1.25rem;
 }
 
