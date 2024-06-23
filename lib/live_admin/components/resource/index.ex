@@ -229,8 +229,8 @@ defmodule LiveAdmin.Components.Container.Index do
                   )
                 }
               >
-                <%= min((@page - 1) * @session.index_page_size + 1, elem(@records.result, 1)) %>-<%= min(
-                  @page * @session.index_page_size,
+                <%= min((@page - 1) * @per + 1, elem(@records.result, 1)) %>-<%= min(
+                  @page * @per,
                   elem(@records.result, 1)
                 ) %>/<%= elem(@records.result, 1) %>
               </button>
