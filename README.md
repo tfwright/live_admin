@@ -16,6 +16,8 @@ Significant features:
 * Ability to edit (nested) embedded schemas
 * i18n via [Gettext](https://github.com/elixir-gettext/gettext)
 
+See for yourself, try out the [demo app](#development)
+
 ## (Required) Installation
 
 One of the main design goals of LiveAdmin is to require as little config as possible.
@@ -129,6 +131,11 @@ This repo has been configured to run the application in [Docker](https://www.doc
 The Phoenix app is running the `app` service, so all mix command should be run there. Examples:
 
 * `docker compose run app mix test`
+
+To run the [demo app](/dev.exs):
+
+* `docker compose up`
+* Navigate your preferred browser to localhost:4000
 
 ---
 
