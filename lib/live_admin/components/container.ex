@@ -68,6 +68,7 @@ defmodule LiveAdmin.Components.Container do
       |> assign_mod()
       |> assign_repo()
       |> assign_prefix(params)
+      |> redirect_with_params(params)
 
     {:noreply, socket}
   end
@@ -349,6 +350,20 @@ defmodule LiveAdmin.Components.Container do
       |> Ecto.Changeset.apply_action!(:update)
 
     assign(socket, params)
+  end
+
+  defp redirect_with_params(socket, %{"page" => _, "per" => _, "sort-attr" => _, "sort-dir" => _}),
+    do: socket
+
+  defp redirect_with_params(socket, params) do
+    IO.inspect(socket.assigns)
+
+    push_redirect(socket,
+      to:
+        route_with_params(socket.assigns,
+          params: Map.take(socket.assigns, [:per, :page, :sort_attr, :sort_dir])
+        )
+    )
   end
 
   defp task_control(assigns) do
