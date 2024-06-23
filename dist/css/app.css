@@ -1182,13 +1182,36 @@ input[class$="-loading"] + div nav:before {
   align-items: center;
 }
 
-.table__footer div:first-of-type {
-  text-align: center;
+#footer-nav div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   font-weight: 600;
 }
 
-.table__footer div:nth-of-type(2) {
-  padding-left: 1.25rem;
+#pagination-modal div {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#pagination-modal form {
+  display: inline-block;
+}
+
+#pagination-modal label {
+  background-color: inherit;
+}
+
+#pagination-modal input {
+  width: 5ch;
+  box-sizing: content-box;
+}
+
+#pagination-modal form * {
+  display: inline;
 }
 
 .resource__table dd {
@@ -1534,6 +1557,10 @@ input[class$="-loading"] + div nav:before {
   display: block;
 }
 
+.inline {
+  display: inline;
+}
+
 .flex {
   display: flex;
 }
@@ -1552,6 +1579,11 @@ input[class$="-loading"] + div nav:before {
 
 .hidden {
   display: none;
+}
+
+.size-6 {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .h-5 {

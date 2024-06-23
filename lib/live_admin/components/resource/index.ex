@@ -198,56 +198,68 @@ defmodule LiveAdmin.Components.Container.Index do
         <div id="footer-nav">
           <%= if @records.ok? do %>
             <div>
-              <%= min((@page - 1) * 10 + 1, elem(@records.result, 1)) %>-<%= min(
-                @page * 10,
-                elem(@records.result, 1)
-              ) %>/<%= elem(
-                @records.result,
-                1
-              ) %>
-            </div>
-            <div colspan={(@resource |> Resource.fields(@config) |> Enum.count()) - 1}>
-              <div class="table__actions">
-                <%= if @page > 1 do %>
-                  <.link
-                    patch={
-                      route_with_params(
-                        assigns,
-                        params: list_link_params(assigns, page: @page - 1)
-                      )
-                    }
-                    class="resource__action--btn"
+              <%= if @page > 1 do %>
+                <.link patch={
+                  route_with_params(
+                    assigns,
+                    params: list_link_params(assigns, page: @page - 1)
+                  )
+                }>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="size-6"
                   >
-                    <%= trans("Prev") %>
-                  </.link>
-                <% else %>
-                  <span class="resource__action--disabled">
-                    <%= trans("Prev") %>
-                  </span>
-                <% end %>
-                <%= if @page < (@records.result |> elem(1)) / 10 do %>
-                  <.link
-                    patch={
-                      route_with_params(
-                        assigns,
-                        params: list_link_params(assigns, page: @page + 1)
-                      )
-                    }
-                    class="resource__action--btn"
+                    <path
+                      fill-rule="evenodd"
+                      d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 12l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </.link>
+              <% end %>
+
+              <button
+                class="resource__action--secondary"
+                phx-click={
+                  JS.show(
+                    to: "#pagination-modal",
+                    transition: {"ease-in duration-300", "opacity-0", "opacity-100"}
+                  )
+                }
+              >
+                <%= min((@page - 1) * 10 + 1, elem(@records.result, 1)) %>-<%= min(
+                  @page * 10,
+                  elem(@records.result, 1)
+                ) %>/<%= elem(@records.result, 1) %>
+              </button>
+
+              <%= if @page < (@records.result |> elem(1)) / 10 do %>
+                <.link patch={
+                  route_with_params(
+                    assigns,
+                    params: list_link_params(assigns, page: @page + 1)
+                  )
+                }>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="size-6"
                   >
-                    <%= trans("Next") %>
-                  </.link>
-                <% else %>
-                  <span class="resource__action--disabled">
-                    <%= trans("Next") %>
-                  </span>
-                <% end %>
-              </div>
+                    <path
+                      fill-rule="evenodd"
+                      d="M16.28 11.47a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 0 1-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 0 1 1.06-1.06l7.5 7.5Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </.link>
+              <% end %>
             </div>
           <% end %>
         </div>
         <div id="footer-select" style="display:none">
-          <div></div>
           <div>
             <div class="table__actions">
               <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
@@ -273,6 +285,13 @@ defmodule LiveAdmin.Components.Container.Index do
           </div>
         </div>
       </div>
+      <.modal id="pagination-modal">
+        <form phx-submit="go" phx-target={@myself}>
+          <label><%= trans("Page") %></label>
+          <input type="number" name="page" value={@page} />
+          <input type="submit" value="Go" />
+        </form>
+      </.modal>
     </div>
     """
   end
@@ -327,6 +346,20 @@ defmodule LiveAdmin.Components.Container.Index do
              assigns
              |> Map.take([:prefix, :sort_dir, :sort_attr, :page])
              |> Map.put(:search, query)
+         )
+     )}
+  end
+
+  @impl true
+  def handle_event("go", %{"page" => page}, socket = %{assigns: assigns}) do
+    {:noreply,
+     push_patch(socket,
+       to:
+         route_with_params(socket.assigns,
+           params:
+             assigns
+             |> Map.take([:prefix, :sort_dir, :sort_attr, :search])
+             |> Map.put(:page, page)
          )
      )}
   end

@@ -180,8 +180,6 @@ Hooks.IndexPage = {
         document.getElementById("footer-nav").style.removeProperty("display");
         document.getElementById("footer-select").style.display = "none";
       }
-
-      document.getElementById("footer-select").firstElementChild.innerHTML = this.selected.length;
     });
   },
   updated() {

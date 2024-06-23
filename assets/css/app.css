@@ -433,13 +433,36 @@ input[type="submit"] {
     @apply items-center;
   }
 
-  .table__footer div:first-of-type {
-    @apply text-center;
+  #footer-nav div {
+    @apply flex;
+    @apply flex-row;
+    @apply items-center;
+    @apply justify-center;
+    @apply w-full;
     @apply font-semibold;
   }
 
-  .table__footer div:nth-of-type(2) {
-    @apply pl-5;
+  #pagination-modal div {
+    @apply flex;
+    @apply flex-row;
+    @apply justify-center;
+  }
+
+  #pagination-modal form {
+    @apply inline-block;
+  }
+
+  #pagination-modal label {
+    @apply bg-inherit;
+  }
+
+  #pagination-modal input {
+    width: 5ch;
+    @apply box-content;
+  }
+
+  #pagination-modal form * {
+    @apply inline;
   }
 
   .resource__table dd {
