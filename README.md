@@ -73,8 +73,22 @@ If you want to customize the behavior of one or more resources, including how re
 are rendered or changes are validated, or to add custom behaviors, there are a variety of configuration options
 available. This includes component overrides if you would like to completely control
 every aspect of a particular resource view, like the edit form.
-For a list of base configuration and expected values, see `LiveAdmin.base_configs_schema/0`.
 
+* `components` - override portions of the UI
+* `ecto_repo` - module used to execute queries
+* `list_with` - function used to fetch records
+* `render_with` - function used encode field values in views
+* `create_with` - function used to insert a record
+* `update_with` - function used to update a record
+* `validate_with` - function used to validate a changeset
+* `label_with` - function used to refer to records in views
+* `title_with` - function used to encode resource module names in views
+* `hidden_fields` - list of fields not to show anywhere in views
+* `immutable_fields` - list of fields not to be editable in forms
+* `actions` - functions that operate on a specific record
+* `tasks` - functions that operate on a resource as a whole
+
+For more information about how to use options, see documentation for `LiveAdmin.base_configs_schema/0`.
 
 For additional convenience and control, configuration in LiveAdmin can be set at 3 different levels.
 From more specific to more general, they are:
@@ -106,8 +120,6 @@ Extra options:
 * `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data (default: LiveAdmin.Session.Agent)
 * `css_overrides` - a binary or MFA identifying a function that returns CSS to be appended to app css
 * `gettext_backend` - a module implementing the [Gettext API](https://hexdocs.pm/gettext/Gettext.html#module-gettext-api) that will be used for translations
-
-*For concrete examples of the various config options and to see them in action, consult the [development app](#development).*
 
 ## Features
 
