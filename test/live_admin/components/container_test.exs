@@ -35,7 +35,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "list resource" do
     setup %{conn: conn} do
       Repo.insert!(%User{})
-      {:ok, view, _html} = live(conn, "/user")
+      {:ok, view, _html} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc")
       %{view: view}
     end
 
@@ -66,7 +66,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "list resource with search param" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"})
-      {:ok, view, html} = live(conn, "/user?s=fred")
+      {:ok, view, html} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc&s=fred")
       %{view: view, response: html}
     end
 
@@ -86,7 +86,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "list resource with prefix param" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"}, prefix: "alt")
-      {:ok, view, _} = live(conn, "/user?prefix=alt")
+      {:ok, view, _} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc&prefix=alt")
       %{view: view}
     end
 
@@ -103,27 +103,14 @@ defmodule LiveAdmin.Components.ContainerTest do
         %LiveAdmin.Session{prefix: "alt"}
       end)
 
-      {:ok, view, _} = live(conn, "/user")
-
-      %{view: view}
+      %{response: live(conn, "/user")}
     end
 
-    test "renders results from prefix", %{view: view} do
-      assert render_async(view) =~ "1-1/1"
-    end
-  end
-
-  describe "list resource with invalid prefix in session" do
-    setup %{conn: conn} do
-      stub(LiveAdminTest.MockSession, :load!, fn _customer_id ->
-        %LiveAdmin.Session{prefix: "invalid"}
-      end)
-
-      %{page: live(conn, "/user")}
-    end
-
-    test "redirects to clear prefix", %{page: page} do
-      assert {:error, {:live_redirect, %{to: "/user?prefix="}}} = page
+    test "redirects with prefix param", %{response: response} do
+      assert {:error,
+              {:live_redirect,
+               %{kind: :push, to: "/user?page=1&per=10&prefix=alt&sort-attr=id&sort-dir=asc"}}} =
+               response
     end
   end
 
@@ -252,22 +239,6 @@ defmodule LiveAdmin.Components.ContainerTest do
       assert response
              |> Floki.find(".resource__action--disabled")
              |> Enum.any?()
-    end
-  end
-
-  describe "edit resource with invalid prefix in session" do
-    setup %{conn: conn} do
-      stub(LiveAdminTest.MockSession, :load!, fn _customer_id ->
-        %LiveAdmin.Session{prefix: "invalid"}
-      end)
-
-      user = Repo.insert!(%User{settings: %{}})
-
-      %{page: live(conn, "/user/edit/#{user.id}")}
-    end
-
-    test "redirects to clear prefix", %{page: page} do
-      assert {:error, {:live_redirect, %{to: "/user?prefix="}}} = page
     end
   end
 

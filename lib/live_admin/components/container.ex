@@ -5,7 +5,6 @@ defmodule LiveAdmin.Components.Container do
   import LiveAdmin,
     only: [
       resource_title: 2,
-      route_with_params: 1,
       route_with_params: 2,
       trans: 1
     ]
@@ -249,31 +248,17 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  defp assign_prefix(socket, %{"prefix" => ""}) do
-    socket
-    |> assign_and_presist_prefix(nil)
-    |> push_redirect(to: route_with_params(socket.assigns))
-  end
-
-  defp assign_prefix(socket, %{"prefix" => prefix}) do
+  defp assign_prefix(socket, params) do
     socket.assigns.prefix_options
-    |> Enum.find(fn option -> to_string(option) == prefix end)
+    |> Enum.find(fn option ->
+      to_string(option) == Map.get(params, "prefix", socket.assigns.session.prefix)
+    end)
     |> case do
-      nil ->
-        push_redirect(socket, to: route_with_params(socket.assigns, params: [prefix: ""]))
-
-      prefix ->
-        assign_and_presist_prefix(socket, prefix)
-    end
-  end
-
-  defp assign_prefix(socket = %{assigns: %{session: session}}, _) do
-    case session.prefix do
       nil ->
         assign_and_presist_prefix(socket, nil)
 
       prefix ->
-        push_patch(socket, to: route_with_params(socket.assigns, params: [prefix: prefix]))
+        assign_and_presist_prefix(socket, prefix)
     end
   end
 
@@ -352,18 +337,18 @@ defmodule LiveAdmin.Components.Container do
     assign(socket, params)
   end
 
-  defp redirect_with_params(socket, %{"page" => _, "per" => _, "sort-attr" => _, "sort-dir" => _}),
-    do: socket
-
   defp redirect_with_params(socket, params) do
-    IO.inspect(socket.assigns)
-
-    push_redirect(socket,
-      to:
-        route_with_params(socket.assigns,
-          params: Map.take(socket.assigns, [:per, :page, :sort_attr, :sort_dir])
-        )
-    )
+    if Enum.all?(["per", "page", "sort-attr", "sort-dir"], &Map.has_key?(params, &1)) &&
+         Map.get(params, "prefix") == socket.assigns.prefix do
+      socket
+    else
+      push_redirect(socket,
+        to:
+          route_with_params(socket.assigns,
+            params: Map.take(socket.assigns, [:per, :page, :sort_attr, :sort_dir, :prefix])
+          )
+      )
+    end
   end
 
   defp task_control(assigns) do
