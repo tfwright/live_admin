@@ -183,6 +183,7 @@ defmodule LiveAdmin.Components.Container do
       sort_dir={@sort_dir}
       search={@search}
       prefix={@prefix}
+      per={@per}
       session={@session}
       base_path={@base_path}
       resources={@resources}
@@ -324,6 +325,7 @@ defmodule LiveAdmin.Components.Container do
     types =
       %{
         page: :integer,
+        per: :integer,
         sort_attr:
           Ecto.ParameterizedType.init(Ecto.Enum,
             values:
@@ -337,7 +339,8 @@ defmodule LiveAdmin.Components.Container do
     defaults = %{
       page: 1,
       sort_attr: LiveAdmin.primary_key!(socket.assigns.resource),
-      sort_dir: :asc
+      sort_dir: :asc,
+      per: socket.assigns.session.index_page_size
     }
 
     params =

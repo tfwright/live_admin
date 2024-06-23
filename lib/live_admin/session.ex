@@ -5,7 +5,8 @@ defmodule LiveAdmin.Session do
           id: String.t(),
           prefix: String.t(),
           locale: String.t(),
-          metadata: map()
+          metadata: map(),
+          index_page_size: :integer
         }
 
   @primary_key {:id, :string, autogenerate: false}
@@ -13,5 +14,6 @@ defmodule LiveAdmin.Session do
     field(:prefix, :string)
     field(:locale, :string, default: "en")
     field(:metadata, :map, default: %{})
+    field(:index_page_size, :integer, default: 10)
   end
 end

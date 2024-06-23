@@ -39,6 +39,10 @@ defmodule LiveAdmin.Components.Session.Content do
           <%= textarea(f, :locale, rows: 1, class: "field__text", disabled: true) %>
         </div>
         <div class="field__group">
+          <%= label(f, :index_page_size, trans("Index page size"), class: "field__label") %>
+          <%= textarea(f, :index_page_size, rows: 1, class: "field__text") %>
+        </div>
+        <div class="field__group">
           <%= label(f, :metadata, trans("metadata"), class: "field__label") %>
           <.live_component module={MapInput} id="metadata" form={f} field={:metadata} />
         </div>
@@ -54,7 +58,7 @@ defmodule LiveAdmin.Components.Session.Content do
   def handle_event("validate", %{"session" => params}, socket = %{assigns: %{}}) do
     changeset =
       socket.assigns.changeset
-      |> Changeset.cast(params, [:metadata])
+      |> Changeset.cast(params, [:metadata, :index_page_size])
       |> Changeset.update_change(:metadata, &parse_map_param/1)
 
     {:noreply, assign(socket, :changeset, changeset)}
@@ -64,7 +68,7 @@ defmodule LiveAdmin.Components.Session.Content do
   def handle_event("save", params, socket) do
     session =
       socket.assigns.changeset
-      |> Changeset.cast(params["session"] || %{}, [:metadata, :locale])
+      |> Changeset.cast(params["session"] || %{}, [:metadata, :locale, :index_page_size])
       |> Changeset.update_change(:metadata, &parse_map_param/1)
       |> Changeset.apply_action!(:insert)
 

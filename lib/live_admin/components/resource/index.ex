@@ -29,7 +29,7 @@ defmodule LiveAdmin.Components.Container.Index do
              records:
                Resource.list(
                  assigns.resource,
-                 Map.take(assigns, [:prefix, :sort_attr, :sort_dir, :page, :search]),
+                 list_link_params(assigns),
                  assigns.session,
                  assigns.repo,
                  assigns.config
@@ -229,8 +229,8 @@ defmodule LiveAdmin.Components.Container.Index do
                   )
                 }
               >
-                <%= min((@page - 1) * 10 + 1, elem(@records.result, 1)) %>-<%= min(
-                  @page * 10,
+                <%= min((@page - 1) * @session.index_page_size + 1, elem(@records.result, 1)) %>-<%= min(
+                  @page * @session.index_page_size,
                   elem(@records.result, 1)
                 ) %>/<%= elem(@records.result, 1) %>
               </button>
@@ -342,10 +342,7 @@ defmodule LiveAdmin.Components.Container.Index do
      push_patch(socket,
        to:
          route_with_params(socket.assigns,
-           params:
-             assigns
-             |> Map.take([:prefix, :sort_dir, :sort_attr, :page])
-             |> Map.put(:search, query)
+           params: list_link_params(assigns, search: query)
          )
      )}
   end
@@ -354,13 +351,7 @@ defmodule LiveAdmin.Components.Container.Index do
   def handle_event("go", %{"page" => page}, socket = %{assigns: assigns}) do
     {:noreply,
      push_patch(socket,
-       to:
-         route_with_params(socket.assigns,
-           params:
-             assigns
-             |> Map.take([:prefix, :sort_dir, :sort_attr, :search])
-             |> Map.put(:page, page)
-         )
+       to: route_with_params(socket.assigns, params: list_link_params(assigns, page: page))
      )}
   end
 
@@ -436,11 +427,11 @@ defmodule LiveAdmin.Components.Container.Index do
     {:noreply, socket}
   end
 
-  defp list_link_params(assigns, params) do
+  defp list_link_params(assigns, overrides \\ []) do
     assigns
-    |> Map.take([:search, :page, :sort_attr, :sort_dir, :prefix])
+    |> Map.take([:search, :page, :sort_attr, :sort_dir, :prefix, :per])
     |> Enum.into([])
-    |> Keyword.merge(params)
+    |> Keyword.merge(overrides)
   end
 
   defp type_to_css_class({_, type, _}), do: type_to_css_class(type)

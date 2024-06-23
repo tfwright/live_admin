@@ -111,7 +111,7 @@ defmodule LiveAdmin.Resource do
     |> LiveAdmin.fetch_config(:list_with, config)
     |> case do
       nil ->
-        build_list(resource, opts, repo, config)
+        build_list(resource, opts, session, repo, config)
 
       {mod, func_name} ->
         apply(mod, func_name, [resource, opts, session])
@@ -206,19 +206,20 @@ defmodule LiveAdmin.Resource do
     end)
   end
 
-  defp build_list(resource, opts, repo, config) do
+  defp build_list(resource, opts, session, repo, config) do
     opts =
       opts
       |> Enum.into(%{})
       |> Map.put_new(:page, 1)
+      |> Map.put_new(:per, session.index_page_size)
       |> Map.put_new(:sort_dir, :asc)
       |> Map.put_new(:sort_attr, LiveAdmin.primary_key!(resource))
 
     query =
       resource.__live_admin_config__()
       |> Keyword.fetch!(:schema)
-      |> limit(10)
-      |> offset(^((opts[:page] - 1) * 10))
+      |> limit(^opts[:per])
+      |> offset(^((opts[:page] - 1) * opts[:per]))
       |> order_by(^[{opts[:sort_dir], opts[:sort_attr]}])
       |> preload(^preloads(resource))
 
