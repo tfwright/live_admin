@@ -80,7 +80,7 @@ defmodule LiveAdmin.Components.Nav do
           </li>
         <% end %>
         <li class="nav__item--group">
-          <.link navigate={route_with_params(assigns, resource_path: "session")}>
+          <.link navigate={Path.join(@base_path, "session")}>
             <%= trans("Session") %>
           </.link>
         </li>
