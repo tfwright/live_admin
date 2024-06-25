@@ -5,7 +5,7 @@ defmodule DemoWeb.UserAdmin do
       immutable_fields: [:encrypted_password, :inserted_at],
       components: [new: DemoWeb.CreateUserForm],
       label_with: :name,
-      actions: [:deactivate, set_password: {__MODULE__, :set_password, 3}],
+      actions: [:deactivate, :activate, set_password: {__MODULE__, :set_password, 3}],
       tasks: [:regenerate_passwords, {__MODULE__, :aggregate, 3}],
       render_with: :render_field
 
@@ -27,8 +27,20 @@ defmodule DemoWeb.UserAdmin do
   Deactivated users cannot login
   """
   def deactivate(user, _) do
+    Process.sleep(1000)
     user
     |> Ecto.Changeset.change(active: false)
+    |> Demo.Repo.update()
+    |> case do
+      {:ok, user} -> {:ok, user}
+      error -> error
+    end
+  end
+
+  def activate(user, _) do
+    Process.sleep(1000)
+    user
+    |> Ecto.Changeset.change(active: true)
     |> Demo.Repo.update()
     |> case do
       {:ok, user} -> {:ok, user}

@@ -157,4 +157,6 @@ defmodule LiveAdmin.Router do
 
     {:cont, socket}
   end
+
+  def on_mount(_, _params, _, socket), do: {:cont, socket}
 end

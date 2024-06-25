@@ -82,7 +82,17 @@ body {
 
 .toast__container--info {
   --tw-bg-opacity: 1;
-  background-color: rgb(76 29 149 / var(--tw-bg-opacity));
+  background-color: rgb(196 181 253 / var(--tw-bg-opacity));
   --tw-border-opacity: 1;
-  border-color: rgb(76 29 149 / var(--tw-border-opacity))
+  border-color: rgb(196 181 253 / var(--tw-border-opacity))
+}
+
+.job__container {
+  --tw-text-opacity: 1;
+  color: rgb(245 243 255 / var(--tw-text-opacity))
+}
+
+.job__bar {
+  --tw-bg-opacity: 1;
+  background-color: rgb(124 58 237 / var(--tw-bg-opacity))
 }
