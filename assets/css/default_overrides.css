@@ -58,6 +58,14 @@ body {
 }
 
 .toast__container--info {
-  @apply bg-violet-900;
-  @apply border-violet-900;
+  @apply bg-violet-300;
+  @apply border-violet-300;
+}
+
+.job__container {
+  @apply text-violet-50;
+}
+
+.job__bar {
+  @apply bg-violet-600;
 }

@@ -20,6 +20,7 @@ defmodule LiveAdmin.Application do
   defp children do
     [
       {LiveAdmin.Session.Agent, %{}},
+      {Phoenix.PubSub, name: LiveAdmin.PubSub},
       {Task.Supervisor, name: LiveAdmin.Task.Supervisor}
     ]
   end

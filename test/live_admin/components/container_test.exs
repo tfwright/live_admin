@@ -46,20 +46,12 @@ defmodule LiveAdmin.Components.ContainerTest do
                |> render_click()
     end
 
-    test "deletes record", %{view: view} do
-      view
-      |> element("#list")
-      |> render_hook("delete", %{ids: []})
-
-      assert_redirected(view, "/user")
-    end
-
     test "runs configured action on selected records", %{view: view} do
       view
       |> element("#list")
       |> render_hook("action", %{name: "user_action", ids: []})
 
-      assert_redirected(view, "/user")
+      assert_redirected(view, "/user?page=1&per=10&sort-attr=id&sort-dir=asc")
     end
   end
 

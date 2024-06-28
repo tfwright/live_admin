@@ -136,9 +136,7 @@ Hooks.IndexPage = {
     this.selected = [];
 
     this.el.addEventListener("live_admin:action", (e) => {
-      if (e.target.dataset.action === "delete") {
-        this.pushEventTo(this.el, "delete", { ids: this.selected });
-      } else if (e.target.tagName === "FORM") {
+      if (e.target.tagName === "FORM") {
         const params = [...new FormData(e.target)].reduce(
           (params, [key, val]) => {
             if (key === "args[]") {
@@ -183,7 +181,17 @@ Hooks.IndexPage = {
     });
   },
   updated() {
-    this.selected = [];
+    this.el
+      .querySelectorAll(".resource__select")
+      .forEach((box) => (box.checked = this.selected.includes(box.dataset.recordKey)));
+
+    if (this.selected.length > 0) {
+      document.getElementById("footer-select").style.removeProperty("display");
+      document.getElementById("footer-nav").style.display = "none";
+    } else {
+      document.getElementById("footer-nav").style.removeProperty("display");
+      document.getElementById("footer-select").style.display = "none";
+    }
 
     var clipboard = new ClipboardJS(this.el.querySelectorAll(".cell__copy"), {
       target: function (trigger) {

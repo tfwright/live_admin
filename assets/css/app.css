@@ -63,6 +63,54 @@ input[type="submit"] {
     @apply overflow-y-auto;
   }
 
+  #jobs {
+    @apply absolute;
+    @apply bottom-0;
+    @apply left-5;
+    @apply w-60;
+    @apply z-50;
+    @apply border-x-2;
+    @apply border-t-2;
+    @apply p-5;
+    @apply rounded-t-md;
+  }
+
+  #jobs:empty {
+    @apply invisible;
+  }
+
+  .job__container {
+    @apply w-full;
+    @apply rounded-full;
+    @apply mb-2;
+    @apply relative;
+    @apply bg-transparent;
+    @apply h-5;
+  }
+
+  .job__label {
+    @apply inline-block;
+    @apply text-xs;
+    @apply font-medium;
+    @apply pl-1;
+    @apply w-full;
+    @apply h-full;
+    @apply rounded-full;
+    @apply border;
+    @apply absolute;
+    @apply top-0;
+    @apply leading-normal;
+  }
+
+  .job__bar {
+    @apply absolute;
+    @apply top-0;
+    @apply h-full;
+    @apply rounded-full;
+    @apply -z-10;
+    @apply min-w-5;
+  }
+
   .topbar {
     @apply bg-transparent;
   }

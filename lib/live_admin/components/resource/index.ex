@@ -17,6 +17,34 @@ defmodule LiveAdmin.Components.Container.Index do
   alias Phoenix.LiveView.JS
 
   @impl true
+  def update(
+        %{changed: keys},
+        socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo}}
+      ) do
+    socket =
+      update(socket, :records, fn result ->
+        {records, count} = result.result
+
+        records =
+          Enum.flat_map(records, fn record ->
+            record_key = Map.fetch!(record, LiveAdmin.primary_key!(resource))
+
+            if Enum.member?(keys, record_key) do
+              record = LiveAdmin.Resource.find(record_key, resource, prefix, repo)
+
+              if record, do: [record], else: []
+            else
+              [record]
+            end
+          end)
+
+        Map.put(result, :result, {records, count})
+      end)
+
+    {:ok, socket}
+  end
+
+  @impl true
   def update(assigns, socket) do
     socket =
       socket
@@ -259,29 +287,35 @@ defmodule LiveAdmin.Components.Container.Index do
             </div>
           <% end %>
         </div>
-        <div id="footer-select" style="display:none">
+        <div id="footer-select">
           <div>
-            <div class="table__actions">
-              <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
-                <button
-                  class="resource__action--danger"
-                  data-action="delete"
-                  phx-click={JS.dispatch("live_admin:action")}
-                  data-confirm="Are you sure?"
+            <%= if !assigns[:job] do %>
+              <div class="table__actions">
+                <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
+                  <button
+                    class="resource__action--danger"
+                    data-action="delete"
+                    phx-click={JS.dispatch("live_admin:action")}
+                    data-confirm="Are you sure?"
+                  >
+                    <%= trans("Delete") %>
+                  </button>
+                <% end %>
+                <.dropdown
+                  :let={action}
+                  orientation={:up}
+                  label={trans("Run action")}
+                  items={get_function_keys(@resource, @config, :actions)}
+                  disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
                 >
-                  <%= trans("Delete") %>
-                </button>
-              <% end %>
-              <.dropdown
-                :let={action}
-                orientation={:up}
-                label={trans("Run action")}
-                items={get_function_keys(@resource, @config, :actions)}
-                disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
-              >
-                <.action_control action={action} session={@session} resource={@resource} />
-              </.dropdown>
-            </div>
+                  <.action_control action={action} session={@session} resource={@resource} />
+                </.dropdown>
+              </div>
+            <% else %>
+              <div>
+                <%= elem(@job, 0) %>: <%= elem(@job, 1) %>
+              </div>
+            <% end %>
           </div>
         </div>
       </div>
@@ -357,72 +391,79 @@ defmodule LiveAdmin.Components.Container.Index do
 
   @impl true
   def handle_event(
-        "delete",
-        %{"ids" => ids},
-        %{
-          assigns: %{
-            resource: resource,
-            session: session,
-            prefix: prefix,
-            repo: repo
-          }
-        } = socket
-      ) do
-    results =
-      ids
-      |> Resource.all(resource, prefix, repo)
-      |> Enum.map(fn record ->
-        Task.Supervisor.async(LiveAdmin.Task.Supervisor, fn ->
-          Resource.delete(record, resource, session, socket.assigns.repo, socket.assigns.config)
-        end)
-      end)
-      |> Task.await_many()
-
-    socket =
-      socket
-      |> put_flash(
-        :info,
-        trans("Deleted %{count} records", inter: [count: Enum.count(results)])
-      )
-      |> push_navigate(to: route_with_params(socket.assigns))
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_event(
         "action",
         params = %{"name" => action, "ids" => ids},
-        socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo}}
+        socket = %{
+          assigns: %{
+            session: session,
+            resource: resource,
+            prefix: prefix,
+            repo: repo,
+            config: config
+          }
+        }
       ) do
-    records = Resource.all(ids, resource, prefix, repo)
+    {label, mod, func, args} =
+      if action == "delete" do
+        {"delete", Resource, :delete, [resource, session, repo, config]}
+      else
+        {label, mod, func, _, _} =
+          LiveAdmin.fetch_function(
+            resource,
+            session,
+            :actions,
+            String.to_existing_atom(action)
+          )
 
-    results =
-      records
-      |> Enum.map(fn record ->
-        Task.Supervisor.async(LiveAdmin.Task.Supervisor, fn ->
-          {_, m, f, _, _} =
-            LiveAdmin.fetch_function(
-              socket.assigns.resource,
-              socket.assigns.session,
-              :actions,
-              String.to_existing_atom(action)
-            )
+        {label, mod, func, [session | Map.get(params, "args", [])]}
+      end
 
-          apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", []))
+    Task.Supervisor.async_nolink(
+      LiveAdmin.Task.Supervisor,
+      fn ->
+        pid = self()
+
+        Phoenix.PubSub.broadcast(
+          LiveAdmin.PubSub,
+          "session:#{session.id}",
+          {:job, pid, :start, label}
+        )
+
+        records = Resource.all(ids, resource, prefix, repo)
+
+        Enum.reduce(records, 0.0, fn record, progress ->
+          apply(mod, func, [record | args])
+
+          progress = progress + 1 / length(records)
+
+          Phoenix.PubSub.broadcast(
+            LiveAdmin.PubSub,
+            "session:#{session.id}",
+            {:job, pid, :progress, progress,
+             [Map.fetch!(record, LiveAdmin.primary_key!(resource))]}
+          )
+
+          progress
         end)
-      end)
-      |> Task.await_many()
+
+        Phoenix.PubSub.broadcast(
+          LiveAdmin.PubSub,
+          "session:#{session.id}",
+          {:job, pid, :complete}
+        )
+      end,
+      timeout: :infinity
+    )
 
     socket =
       socket
       |> put_flash(
-        :info,
-        trans("Action completed on %{count} records: %{action}",
-          inter: [count: Enum.count(results), action: action]
+        :success,
+        trans("Action running on %{count} records: %{action}",
+          inter: [count: Enum.count(ids), action: action]
         )
       )
-      |> push_navigate(to: route_with_params(socket.assigns))
+      |> push_patch(to: route_with_params(socket.assigns))
 
     {:noreply, socket}
   end

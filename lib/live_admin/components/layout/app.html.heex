@@ -1,5 +1,10 @@
 <main class="main__content">
   <div class="toast__container--success"><%= Phoenix.Flash.get(@flash, :info) %></div>
+  <%= live_render(@socket, LiveAdmin.Components.Nav.Jobs,
+    sticky: true,
+    id: "jobs",
+    session: %{"session_id" => @session.id}
+  ) %>
   <div class="main__wrap">
     <.live_component
       id="nav"
@@ -11,6 +16,7 @@
       prefix={assigns[:prefix]}
       key={assigns[:key]}
       config={@config}
+      session={@session}
     />
     <div class="content">
       <%= @inner_content %>
