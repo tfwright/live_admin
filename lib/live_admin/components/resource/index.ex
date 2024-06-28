@@ -340,32 +340,14 @@ defmodule LiveAdmin.Components.Container.Index do
         String.to_existing_atom(task)
       )
 
-    socket =
-      case apply(m, f, [socket.assigns.session | Map.get(params, "args", [])]) do
-        {:ok, result} ->
-          socket
-          |> put_flash(
-            :info,
-            trans("%{task} succeeded: %{result}",
-              inter: [
-                task: task,
-                result: result
-              ]
-            )
-          )
-          |> push_navigate(to: route_with_params(socket.assigns))
+    Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, m, f, [
+      socket.assigns.session | Map.get(params, "args", [])
+    ])
 
-        {:error, error} ->
-          push_event(socket, "error", %{
-            msg:
-              trans("%{task} failed: %{error}",
-                inter: [
-                  task: task,
-                  error: error
-                ]
-              )
-          })
-      end
+    socket =
+      socket
+      |> put_flash(:info, trans("%{task} started", inter: [task: task]))
+      |> push_navigate(to: route_with_params(socket.assigns))
 
     {:noreply, socket}
   end

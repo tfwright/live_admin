@@ -27,7 +27,6 @@ defmodule DemoWeb.UserAdmin do
   Deactivated users cannot login
   """
   def deactivate(user, _) do
-    Process.sleep(1000)
     user
     |> Ecto.Changeset.change(active: false)
     |> Demo.Repo.update()
@@ -38,7 +37,6 @@ defmodule DemoWeb.UserAdmin do
   end
 
   def activate(user, _) do
-    Process.sleep(1000)
     user
     |> Ecto.Changeset.change(active: true)
     |> Demo.Repo.update()
@@ -62,13 +60,38 @@ defmodule DemoWeb.UserAdmin do
   Each user will get 16 random bytes of their very own.
   """
   def regenerate_passwords(session) do
-    Demo.Accounts.User
-    |> Demo.Repo.all(prefix: session.prefix)
-    |> Enum.each(fn user ->
-      user
-      |> Ecto.Changeset.change(encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16())
-      |> Demo.Repo.update()
-    end)
+      Phoenix.PubSub.broadcast(
+        LiveAdmin.PubSub,
+        "session:#{session.id}",
+        {:job, :regenerate, :start, "Regenerating user passwords"}
+      )
+
+      count = Demo.Repo.aggregate(Demo.Accounts.User, :count, prefix: session.prefix)
+
+      Demo.Accounts.User
+      |> Demo.Repo.all(prefix: session.prefix)
+      |> Enum.reduce(0.0, fn user, progress ->
+        user
+        |> Ecto.Changeset.change(encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16())
+        |> Demo.Repo.update()
+
+        progress = progress + 1/count
+
+        Phoenix.PubSub.broadcast(
+          LiveAdmin.PubSub,
+          "session:#{session.id}",
+          {:job, :regenerate, :progress, progress}
+        )
+
+        progress
+      end)
+
+
+    Phoenix.PubSub.broadcast(
+      LiveAdmin.PubSub,
+      "session:#{session.id}",
+      {:job, :regenerate, :complete}
+    )
 
     {:ok, "updated"}
   end
