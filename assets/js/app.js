@@ -181,17 +181,7 @@ Hooks.IndexPage = {
     });
   },
   updated() {
-    this.el
-      .querySelectorAll(".resource__select")
-      .forEach((box) => (box.checked = this.selected.includes(box.dataset.recordKey)));
-
-    if (this.selected.length > 0) {
-      document.getElementById("footer-select").style.removeProperty("display");
-      document.getElementById("footer-nav").style.display = "none";
-    } else {
-      document.getElementById("footer-nav").style.removeProperty("display");
-      document.getElementById("footer-select").style.display = "none";
-    }
+    this.selected = [];
 
     var clipboard = new ClipboardJS(this.el.querySelectorAll(".cell__copy"), {
       target: function (trigger) {
