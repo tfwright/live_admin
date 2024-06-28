@@ -287,7 +287,7 @@ defmodule LiveAdmin.Components.Container.Index do
             </div>
           <% end %>
         </div>
-        <div id="footer-select">
+        <div id="footer-select" style="display:none">
           <div>
             <%= if !assigns[:job] do %>
               <div class="table__actions">
