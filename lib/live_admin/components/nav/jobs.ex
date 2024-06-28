@@ -19,7 +19,7 @@ defmodule LiveAdmin.Components.Nav.Jobs do
   end
 
   @impl true
-  def handle_info({:job, pid, :progress, progress, _keys}, socket) do
+  def handle_info({:job, pid, :progress, progress}, socket) do
     socket =
       update(socket, :jobs, fn jobs ->
         Enum.map(jobs, fn job = {job_pid, label, _} ->
@@ -50,7 +50,6 @@ defmodule LiveAdmin.Components.Nav.Jobs do
 
     {:noreply, socket}
   end
-
 
   @impl true
   def handle_info({:DOWN, _, _, pid, _}, socket) do

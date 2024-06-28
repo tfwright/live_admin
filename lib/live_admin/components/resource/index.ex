@@ -439,8 +439,7 @@ defmodule LiveAdmin.Components.Container.Index do
           Phoenix.PubSub.broadcast(
             LiveAdmin.PubSub,
             "session:#{session.id}",
-            {:job, pid, :progress, progress,
-             [Map.fetch!(record, LiveAdmin.primary_key!(resource))]}
+            {:job, pid, :progress, progress}
           )
 
           progress
