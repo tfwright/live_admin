@@ -355,7 +355,7 @@ defmodule LiveAdmin.Components.Container do
     {name, _, _, arity, docs} =
       LiveAdmin.fetch_function(assigns.resource, assigns.session, :tasks, assigns.task)
 
-    extra_arg_count = arity - 1
+    extra_arg_count = arity - 2
 
     assigns =
       assign(assigns,

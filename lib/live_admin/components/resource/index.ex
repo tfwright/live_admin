@@ -331,17 +331,20 @@ defmodule LiveAdmin.Components.Container.Index do
   end
 
   @impl true
-  def handle_event("task", params = %{"name" => task}, socket) do
+  def handle_event(
+        "task",
+        params = %{"name" => task},
+        socket = %{
+          assigns: %{search: search, session: session, resource: resource, config: config}
+        }
+      ) do
     {_, m, f, _, _} =
-      LiveAdmin.fetch_function(
-        socket.assigns.resource,
-        socket.assigns.session,
-        :tasks,
-        String.to_existing_atom(task)
-      )
+      LiveAdmin.fetch_function(resource, session, :tasks, String.to_existing_atom(task))
+
+    args = [session | Map.get(params, "args", [])]
 
     Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, m, f, [
-      socket.assigns.session | Map.get(params, "args", [])
+      Resource.query(resource, search, config) | args
     ])
 
     socket =

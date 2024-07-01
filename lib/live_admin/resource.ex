@@ -106,6 +106,21 @@ defmodule LiveAdmin.Resource do
     end
   end
 
+  def query(resource, search, config) do
+    resource.__live_admin_config__()
+    |> Keyword.fetch!(:schema)
+    |> then(fn query ->
+      case search do
+        q when not is_nil(q) and byte_size(q) > 0 ->
+          apply_search(query, q, fields(resource, config))
+
+        _ ->
+          query
+      end
+    end)
+    |> preload(^preloads(resource))
+  end
+
   def list(resource, opts, session, repo, config) do
     resource
     |> LiveAdmin.fetch_config(:list_with, config)
@@ -216,22 +231,11 @@ defmodule LiveAdmin.Resource do
       |> Map.put_new(:sort_attr, LiveAdmin.primary_key!(resource))
 
     query =
-      resource.__live_admin_config__()
-      |> Keyword.fetch!(:schema)
+      resource
+      |> query(opts[:search], config)
       |> limit(^opts[:per])
       |> offset(^((opts[:page] - 1) * opts[:per]))
       |> order_by(^[{opts[:sort_dir], opts[:sort_attr]}])
-      |> preload(^preloads(resource))
-
-    query =
-      opts
-      |> Enum.reduce(query, fn
-        {:search, q}, query when byte_size(q) > 0 ->
-          apply_search(query, q, fields(resource, config))
-
-        _, query ->
-          query
-      end)
 
     {
       repo.all(query, prefix: opts[:prefix]),

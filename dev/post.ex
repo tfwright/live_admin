@@ -25,7 +25,7 @@ defmodule Demo.Posts.Post do
     timestamps(updated_at: false)
   end
 
-  def fail(_) do
+  def fail(_, _) do
     {:error, "failed"}
   end
 
