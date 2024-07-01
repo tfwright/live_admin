@@ -124,6 +124,13 @@ Extra options:
 
 ## Features
 
+### Annotated actions and tasks with extra arguments.
+
+In addition to the record or resource, respecitively, functions configured to act as actions or tasks also receive the `LiveAdmin.Session` object.
+This allows them to implement varying behavior based on user-specific configuration and state.
+However, they can also support an arbitrary number of extra arguments in case they require the user to specify additional values.
+LiveAdmin will prompt the user when the action or task is selected and display any function docs.
+
 ### Multi tenancy
 
 To enable Multi tenant support, simply implement a `prefixes/0` function in your Ecto Repo module that returns a list of prefixes.
