@@ -75,8 +75,8 @@ available. This includes component overrides if you would like to completely con
 every aspect of a particular resource view, like the edit form.
 For a list of base configuration and expected values, see `LiveAdmin.base_configs_schema/0`.
 
-* `components` - override portions of the UI
-* `ecto_repo` - module used to execute queries
+* `actions` - functions that operate on a specific record
+* `tasks` - functions that operate on a resource as a whole
 * `list_with` - function used to fetch records
 * `render_with` - function used encode field values in views
 * `create_with` - function used to insert a record
@@ -86,8 +86,8 @@ For a list of base configuration and expected values, see `LiveAdmin.base_config
 * `title_with` - function used to encode resource module names in views
 * `hidden_fields` - list of fields not to show anywhere in views
 * `immutable_fields` - list of fields not to be editable in forms
-* `actions` - functions that operate on a specific record
-* `tasks` - functions that operate on a resource as a whole
+* `components` - override portions of the UI
+* `ecto_repo` - module used to execute queries
 
 For more information about how to use options, see documentation for `LiveAdmin.base_configs_schema/0`.
 
