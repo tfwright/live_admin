@@ -73,12 +73,11 @@ If you want to customize the behavior of one or more resources, including how re
 are rendered or changes are validated, or to add custom behaviors, there are a variety of configuration options
 available. This includes component overrides if you would like to completely control
 every aspect of a particular resource view, like the edit form.
-For a list of base configuration and expected values, see `LiveAdmin.base_configs_schema/0`.
 
 * `actions` - functions that operate on a specific record
 * `tasks` - functions that operate on a resource as a whole
 * `list_with` - function used to fetch records
-* `render_with` - function used encode field values in views
+* `render_with` - function used to encode field values in views
 * `create_with` - function used to insert a record
 * `update_with` - function used to update a record
 * `validate_with` - function used to validate a changeset
@@ -89,10 +88,11 @@ For a list of base configuration and expected values, see `LiveAdmin.base_config
 * `components` - override portions of the UI
 * `ecto_repo` - module used to execute queries
 
-For more information about how to use options, see documentation for `LiveAdmin.base_configs_schema/0`.
+*For more information about how to use options, see documentation for `LiveAdmin.base_configs_schema/0`.*
 
-For additional convenience and control, configuration in LiveAdmin can be set at 3 different levels.
-From more specific to more general, they are:
+---
+
+Configuration in LiveAdmin can be set at 3 different levels. From more local to more global, they are:
 
 ### Resource
 
