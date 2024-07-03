@@ -20,49 +20,49 @@ See for yourself, try out the [demo app](#development)
 
 ## (Required) Installation
 
-One of the main design goals of LiveAdmin is to require as little config as possible.
-It should be useable out of the box for most internal admin use cases using defaults.
-If you are already running LiveView in your application, it should only take a few minutes to expose a UI for your resources.
+The overriding design goal of LiveAdmin is to require as little config as possible.
+Its primary intended use case is an internal tool for managing application data.
+It should be useable out of the box for this purpose, although it supports significant *optional* customization.
+If you are already [running LiveView](https://hexdocs.pm/phoenix_live_view/installation.html) in your application, it should only take a few minutes to expose a UI for your resources.
 
-First, ensure your Phoenix app has been configured to use [LiveView](https://hexdocs.pm/phoenix_live_view/installation.html).
+1. Add to your app's `deps`:
 
-Add to your app's `deps`:
+    ```elixir
+    {:live_admin, "~> <%= app_version %>"}
+    ```
 
-```elixir
-{:live_admin, "~> <%= app_version %>"}
-```
+2. Configure module(s) to act as a LiveAdmin resource:
 
-Configure a module to act as a LiveAdmin resource:
+    ```elixir
+    defmodule MyApp.Admin.Foo do
+      use LiveAdmin.Resource, schema: MyApp.Foo
+    end
+    ```
 
-```elixir
-defmodule MyApp.Admin.Foo do
-  use LiveAdmin.Resource, schema: MyApp.Foo
-end
-```
+    *Note: if your module is an Ecto schema you can omit the `schema` option.*
 
-*Note: if your module is an Ecto schema you can omit the `schema` option.*
+3. In your Phoenix router, inside a scope configured to run LiveView (`:browser` if you followed the default installation), add your resources to a LiveAdmin instance:
 
-In your Phoenix router, inside a scope configured to run LiveView (`:browser` if you followed the default installation), add the resource to a LiveAdmin instance:
+    ```elixir
+    import LiveAdmin.Router
 
-```elixir
-import LiveAdmin.Router
+    ...
 
-...
+    scope "/" do
+      pipe_through: :browser
 
-scope "/" do
-  pipe_through: :browser
+      live_admin "/admin" do
+        admin_resource "/foos", MyApp.Admin.Foo
+        # more resources
+      end
+    end
+    ```
 
-  live_admin "/admin" do
-    admin_resource "/foos", MyApp.Admin.Foo
-  end
-end
-```
+4. Finally, tell LiveAdmin what Ecto repo to use to run queries in your `runtime.ex`:
 
-Finally, tell LiveAdmin what Ecto repo to use to run queries in your `runtime.ex`:
-
-```
-config :live_admin, ecto_repo: MyApp.Repo
-```
+    ```
+    config :live_admin, ecto_repo: MyApp.Repo
+    ```
 
 That's it, now an admin UI for `MyApp.Foo` will be available at `/admin/foos`.
 
