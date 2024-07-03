@@ -447,7 +447,9 @@ defmodule LiveAdmin.Components.Container.Index do
           inter: [count: Enum.count(ids), action: action]
         )
       )
-      |> push_patch(to: route_with_params(socket.assigns))
+      |> push_patch(
+        to: route_with_params(socket.assigns, params: list_link_params(socket.assigns))
+      )
 
     {:noreply, socket}
   end
