@@ -92,7 +92,7 @@ defmodule LiveAdmin do
             {:tuple,
              [:atom, {:or, [{:tuple, [:atom, :atom]}, {:tuple, [:atom, :atom, :integer]}]}]}
           ]}},
-      type_doc: "`t:func_list/0` taking a LiveAdmin session and any extra args"
+      type_doc: "`t:func_list/0` taking a query, LiveAdmin session and any extra args. The query will include any search conditions limiting results, but not pagination or order"
     ]
   ]
   @doc """
