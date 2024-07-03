@@ -9,11 +9,11 @@ An admin UI for Phoenix applications built on [Phoenix LiveView](https://github.
 
 Significant features:
 
-* Minimal required configuration
-* First class support for multi tenant applications via Ecto's `prefix` option
-* Overridable views and API
-* Easily add custom actions at the schema and record level
-* Ability to edit (nested) embedded schemas
+* First class support for multi tenant applications via [Ecto's prefix option](https://hexdocs.pm/ecto/multi-tenancy-with-query-prefixes.html#per-query-and-per-struct-prefixes)
+* Persistent user "sessions"
+* Overridable views, styles, and API
+* Custom actions at the resource and record level, with support for dynamic inputs
+* Edit (nested) embedded schemas
 * i18n via [Gettext](https://github.com/elixir-gettext/gettext)
 
 See for yourself, try out the [demo app](#development)
