@@ -36,7 +36,7 @@ defmodule LiveAdmin.Components.Nav.Jobs do
 
   @impl true
   def handle_info({:job, pid, :complete}, socket) do
-    Process.send_after(self(), {:remove_job, pid}, 1000)
+    Process.send_after(self(), {:remove_job, pid}, 1500)
 
     {:noreply, socket}
   end
