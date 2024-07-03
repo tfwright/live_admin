@@ -124,12 +124,27 @@ Extra options:
 
 ## Features
 
-### Annotated actions and tasks with extra arguments.
+### Annotated actions and tasks with extra arguments
 
-In addition to the record or resource, respecitively, functions configured to act as actions or tasks also receive the `LiveAdmin.Session` object.
-This allows them to implement varying behavior based on user-specific configuration and state.
-However, they can also support an arbitrary number of extra arguments in case they require the user to specify additional values.
+In addition to the record or resource, respectively, functions configured to act as actions or tasks also receive the `LiveAdmin.Session` object.
+This allows them to implement varying behavior based on user-specific state (like their id or the currently selected prefix).
+However, they can also support an arbitrary number of extra arguments to support user *specified* values.
 LiveAdmin will prompt the user when the action or task is selected and display any function docs.
+
+```
+def MyModule
+  use LiveAdmin.Resource,
+    actions: [{__MODULE__, :my_action, 4}],
+    # ...
+
+  @doc """
+  This text will be shown to the user when running the action
+  """
+  def my_action(record, session, extra, extra2) do
+    # do something
+  end
+end
+```
 
 ### Multi tenancy
 
