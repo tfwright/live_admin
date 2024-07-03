@@ -257,17 +257,16 @@ defmodule LiveAdmin do
     end)
   end
 
+  @default_function_arity 2
   defp extract_function_from_config(resource, session, function_type, function) do
-    default_arity = if function_type == :tasks, do: 1, else: 2
-
     resource
     |> LiveAdmin.fetch_config(function_type, session)
     |> Enum.find_value(:error, fn
       {name, {m, f, a}} -> name == function && {name, m, f, a}
-      {name, {m, f}} -> name == function && {name, m, f, default_arity}
+      {name, {m, f}} -> name == function && {name, m, f, @default_function_arity}
       {m, f, a} -> f == function && {f, m, f, a}
-      {m, f} -> f == function && {f, m, f, default_arity}
-      name -> name == function && {name, resource, name, default_arity}
+      {m, f} -> f == function && {f, m, f, @default_function_arity}
+      name -> name == function && {name, resource, name, @default_function_arity}
     end)
   end
 

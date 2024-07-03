@@ -53,6 +53,22 @@ defmodule LiveAdmin.Components.ContainerTest do
 
       assert_redirected(view, "/user?page=1&per=10&sort-attr=id&sort-dir=asc")
     end
+
+    test "runs task", %{view: view} do
+      view
+      |> element("button", "User task")
+      |> render_click()
+
+      assert_redirected(view, "/user")
+    end
+
+    test "runs task with custom arity", %{view: view} do
+      view
+      |> element("#custom_arity_task-task-modal form")
+      |> render_submit(%{name: "custom_arity_task", args: ["test"]})
+
+      assert_redirected(view, "/user")
+    end
   end
 
   describe "list resource with search param" do

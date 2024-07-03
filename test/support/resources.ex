@@ -3,7 +3,8 @@ defmodule LiveAdminTest.User do
 
   use LiveAdmin.Resource,
     immutable_fields: [:encrypted_password],
-    actions: [:user_action]
+    actions: [:user_action],
+    tasks: [:user_task, {__MODULE__, :custom_arity_task, 3}]
 
   @primary_key {:id, :binary_id, autogenerate: true}
   schema "users" do
@@ -13,16 +14,19 @@ defmodule LiveAdminTest.User do
     embeds_one(:settings, LiveAdminTest.Settings)
   end
 
+  def user_task(_, _), do: {:ok, "worked"}
   def user_action(%__MODULE__{}, %{}), do: {:ok, "worked"}
+  def custom_arity_task(_, _, _), do: {:ok, "worked"}
 end
 
 defmodule LiveAdminTest.PostResource do
   use LiveAdmin.Resource,
     schema: LiveAdminTest.Post,
-    actions: [:run_action],
+    actions: [:run_action, {__MODULE__, :custom_arity_action, 3}],
     label_with: {__MODULE__, :label}
 
   def run_action(_, _), do: {:ok, "worked"}
+  def custom_arity_action(_, _, _), do: {:ok, "worked"}
 
   def label(post), do: post.post_id
 end
