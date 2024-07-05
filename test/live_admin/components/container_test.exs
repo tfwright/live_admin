@@ -51,7 +51,7 @@ defmodule LiveAdmin.Components.ContainerTest do
       |> element("#list")
       |> render_hook("action", %{name: "user_action", ids: []})
 
-      assert_redirected(view, "/user?page=1&per=10&sort-attr=id&sort-dir=asc")
+      assert_patched(view, "/user?page=1&per=10&sort-attr=id&sort-dir=asc")
     end
 
     test "runs task", %{view: view} do
