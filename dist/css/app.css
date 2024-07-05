@@ -1242,27 +1242,9 @@ input[class$="-loading"] + div nav:before {
   font-weight: 600;
 }
 
-#pagination-modal div {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-}
-
-#pagination-modal form {
-  display: inline-block;
-}
-
 #pagination-modal label {
   background-color: inherit;
-}
-
-#pagination-modal input {
-  width: 5ch;
-  box-sizing: content-box;
-}
-
-#pagination-modal form * {
-  display: inline;
+  width: 50%;
 }
 
 .resource__table dd {
@@ -1612,10 +1594,6 @@ input[class$="-loading"] + div nav:before {
   display: block;
 }
 
-.inline {
-  display: inline;
-}
-
 .flex {
   display: flex;
 }
@@ -1867,6 +1845,7 @@ input[type="submit"] {
   font-size: 1.125rem;
   line-height: 1.75rem;
   font-weight: 700;
+  border-bottom-width: 2px;
 }
 
 .modal form > div {

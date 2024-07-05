@@ -490,27 +490,9 @@ input[type="submit"] {
     @apply font-semibold;
   }
 
-  #pagination-modal div {
-    @apply flex;
-    @apply flex-row;
-    @apply justify-center;
-  }
-
-  #pagination-modal form {
-    @apply inline-block;
-  }
-
   #pagination-modal label {
     @apply bg-inherit;
-  }
-
-  #pagination-modal input {
-    width: 5ch;
-    @apply box-content;
-  }
-
-  #pagination-modal form * {
-    @apply inline;
+    @apply w-1/2;
   }
 
   .resource__table dd {
@@ -866,6 +848,7 @@ input[type="submit"] {
 .modal__title {
   @apply text-lg;
   @apply font-bold;
+  @apply border-b-2;
 }
 
 .modal form > div {

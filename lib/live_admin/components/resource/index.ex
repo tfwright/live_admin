@@ -320,10 +320,17 @@ defmodule LiveAdmin.Components.Container.Index do
         </div>
       </div>
       <.modal id="pagination-modal">
+        <div class="modal__title"><%= trans("Page") %></div>
         <form phx-submit="go" phx-target={@myself}>
-          <label><%= trans("Page") %></label>
-          <input type="number" name="page" value={@page} />
-          <input type="submit" value="Go" />
+          <div>
+            <label><%= trans("Number") %></label>
+            <input type="number" name="page" value={@page} />
+          </div>
+          <div>
+            <label><%= trans("Size") %></label>
+            <input type="number" name="per" value={@per} />
+          </div>
+          <input type="submit" value="Go" phx-click={JS.hide(to: "#pagination-modal")} />
         </form>
       </.modal>
     </div>
@@ -367,10 +374,13 @@ defmodule LiveAdmin.Components.Container.Index do
   end
 
   @impl true
-  def handle_event("go", %{"page" => page}, socket = %{assigns: assigns}) do
+  def handle_event("go", %{"page" => page, "per" => per}, socket = %{assigns: assigns}) do
     {:noreply,
      push_patch(socket,
-       to: route_with_params(socket.assigns, params: list_link_params(assigns, page: page))
+       to:
+         route_with_params(socket.assigns,
+           params: list_link_params(assigns, page: page, per: per)
+         )
      )}
   end
 
