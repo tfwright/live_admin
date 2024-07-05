@@ -5,6 +5,7 @@ defmodule LiveAdmin.Components.Container do
   import LiveAdmin,
     only: [
       resource_title: 2,
+      route_with_params: 1,
       route_with_params: 2,
       trans: 1
     ]
@@ -90,7 +91,12 @@ defmodule LiveAdmin.Components.Container do
 
     LiveAdmin.session_store().persist!(new_session)
 
-    {:noreply, assign(socket, :session, new_session)}
+    socket =
+      socket
+      |> assign(:session, new_session)
+      |> push_navigate(to: route_with_params(socket.assigns))
+
+    {:noreply, socket}
   end
 
   def render(assigns = %{loading: true}), do: ~H""
