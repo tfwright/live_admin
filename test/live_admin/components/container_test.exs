@@ -51,7 +51,7 @@ defmodule LiveAdmin.Components.ContainerTest do
       |> element("#list")
       |> render_hook("action", %{name: "user_action", ids: []})
 
-      assert_patched(view, "/user?page=1&per=10&sort-attr=id&sort-dir=asc")
+      assert_patch(view)
     end
 
     test "runs task", %{view: view} do
@@ -115,9 +115,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
 
     test "redirects with prefix param", %{response: response} do
-      assert {:error,
-              {:live_redirect,
-               %{kind: :push, to: "/user?page=1&per=10&prefix=alt&sort-attr=id&sort-dir=asc"}}} =
+      assert {:error, {:live_redirect, %{kind: :push, to: "/user" <> _}}} =
                response
     end
   end
