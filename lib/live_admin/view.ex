@@ -1,7 +1,10 @@
 defmodule LiveAdmin.View do
   use Phoenix.Component
-  import Phoenix.HTML
   use PhoenixHTMLHelpers
+
+  require Integer
+
+  import Phoenix.HTML
 
   js_path = Path.join(__DIR__, "../../dist/js/app.js")
   css_path = Path.join(__DIR__, "../../dist/css/app.css")
@@ -59,6 +62,21 @@ defmodule LiveAdmin.View do
   def supported_type?({_, {Ecto.Embedded, _}}), do: true
   def supported_type?({_, {Ecto.Enum, _}}), do: true
   def supported_type?(_), do: false
+
+  def parse_search(q) do
+    parts = String.split(q, ~r{([^\s]*:)}, include_captures: true, trim: true)
+
+    if parts |> Enum.count() |> Integer.is_odd() do
+      [{"*", q}]
+    else
+      parts
+      |> Enum.map(&String.trim/1)
+      |> Enum.chunk_every(2)
+      |> Enum.map(fn
+        [column, param] -> {String.replace(column, ":", ""), param}
+      end)
+    end
+  end
 
   def get_function_keys(resource, config, function) do
     resource

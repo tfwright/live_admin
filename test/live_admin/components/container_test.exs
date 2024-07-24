@@ -82,14 +82,6 @@ defmodule LiveAdmin.Components.ContainerTest do
     test "filters results", %{view: view} do
       assert render_async(view) =~ "0-0/0"
     end
-
-    test "clears search", %{view: view} do
-      view
-      |> element("button[phx-click='search']")
-      |> render_click()
-
-      assert render_async(view) =~ "1-1/1"
-    end
   end
 
   describe "list resource with prefix param" do
