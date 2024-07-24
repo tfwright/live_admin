@@ -261,46 +261,26 @@ defmodule LiveAdmin.Resource do
 
   defp apply_search(query, q, fields) do
     q
-    |> String.split(~r{[^\s]*:}, include_captures: true, trim: true)
+    |> LiveAdmin.View.parse_search()
     |> case do
-      [q] ->
-        matcher = if String.contains?(q, "%"), do: q, else: "%#{q}%"
-
-        Enum.reduce(fields, query, fn {field_name, _, _}, query ->
-          or_where(
-            query,
-            [r],
-            like(
-              fragment("LOWER(CAST(? AS text))", field(r, ^field_name)),
-              ^String.downcase(matcher)
-            )
-          )
-        end)
-
-      field_queries ->
+      field_queries when is_list(field_queries) ->
         field_queries
-        |> Enum.map(&String.trim/1)
-        |> Enum.chunk_every(2)
         |> Enum.reduce(query, fn
-          [field_key, q], query ->
-            fields
-            |> Enum.find_value(fn {field_name, _, _} ->
-              if "#{field_name}:" == field_key, do: field_name
-            end)
-            |> case do
-              nil ->
-                query
+          {field_key, q}, query ->
+            conds =
+              fields
+              |> Enum.reduce(dynamic([], false), fn {field_name, _, _}, conds ->
+                if field_key == "*" || to_string(field_name) == field_key do
+                  dynamic(
+                    [r],
+                    ^conds or ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
+                  )
+                else
+                  conds
+                end
+              end)
 
-              field_name ->
-                or_where(
-                  query,
-                  [r],
-                  ilike(fragment("CAST(? AS text)", field(r, ^field_name)), ^"%#{q}%")
-                )
-            end
-
-          _, query ->
-            query
+          where(query, ^conds)
         end)
     end
   end

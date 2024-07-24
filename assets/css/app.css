@@ -490,9 +490,32 @@ input[type="submit"] {
     @apply font-semibold;
   }
 
-  #pagination-modal label {
+  #settings-modal label {
     @apply bg-inherit;
     @apply w-1/2;
+  }
+
+  #list-filters > div:nth-child(1) {
+      @apply flex;
+      @apply justify-evenly;
+  }
+
+  #list-filters div > div:nth-child(1) {
+    @apply flex;
+  }
+
+  #list-filters > div > div:nth-child(2) {
+      @apply flex;
+      @apply justify-evenly;
+  }
+
+  #list-filters div > div:nth-child(2) > * {
+    @apply w-1/4;
+    @apply leading-5;
+  }
+
+  #list-filters > div:last-of-type {
+    @apply justify-start;
   }
 
   .resource__table dd {
@@ -670,6 +693,10 @@ input[type="submit"] {
     @apply pb-6;
   }
 
+  .field__array--row input:not(first-of-type) {
+    @apply mr-2;
+  }
+
   .field__array--group a.button__add {
     @apply absolute;
     @apply -left-0;
@@ -841,20 +868,43 @@ input[type="submit"] {
   @apply mr-2;
 }
 
-.modal input {
-  @apply grow;
-}
-
 .modal__title {
   @apply text-lg;
   @apply font-bold;
   @apply border-b-2;
 }
 
+.modal__tabs {
+  @apply border-b-2;
+}
+
+.modal__tabs > .modal__title--active {
+  @apply text-lg;
+  @apply font-bold;
+  @apply border-b-2;
+  @apply inline-block;
+  @apply mr-2;
+  @apply border-0;
+}
+
+.modal__tabs > .modal__title {
+  @apply inline-block;
+  @apply mr-2;
+  @apply border-0;
+  @apply cursor-pointer;
+}
+
 .modal form > div {
   @apply flex;
   @apply my-1;
+  @apply items-center;
 }
+
+.modal form > input[type="submit"] {
+  @apply w-24;
+  @apply mx-auto;
+}
+
 
 .modal form > div:last-of-type {
   @apply mb-3;

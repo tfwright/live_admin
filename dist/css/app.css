@@ -1242,9 +1242,32 @@ input[class$="-loading"] + div nav:before {
   font-weight: 600;
 }
 
-#pagination-modal label {
+#settings-modal label {
   background-color: inherit;
   width: 50%;
+}
+
+#list-filters > div:nth-child(1) {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#list-filters div > div:nth-child(1) {
+  display: flex;
+}
+
+#list-filters > div > div:nth-child(2) {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#list-filters div > div:nth-child(2) > * {
+  width: 25%;
+  line-height: 1.25rem;
+}
+
+#list-filters > div:last-of-type {
+  justify-content: flex-start;
 }
 
 .resource__table dd {
@@ -1446,6 +1469,10 @@ input[class$="-loading"] + div nav:before {
 .field__array--group {
   position: relative;
   padding-bottom: 1.5rem;
+}
+
+.field__array--row input:not(first-of-type) {
+  margin-right: 0.5rem;
 }
 
 .field__array--group a.button__add {
@@ -1717,6 +1744,10 @@ input[class$="-loading"] + div nav:before {
   opacity: 1;
 }
 
+.opacity-30 {
+  opacity: 0.3;
+}
+
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
@@ -1837,10 +1868,6 @@ input[type="submit"] {
   margin-right: 0.5rem;
 }
 
-.modal input {
-  flex-grow: 1;
-}
-
 .modal__title {
   font-size: 1.125rem;
   line-height: 1.75rem;
@@ -1848,10 +1875,38 @@ input[type="submit"] {
   border-bottom-width: 2px;
 }
 
+.modal__tabs {
+  border-bottom-width: 2px;
+}
+
+.modal__tabs > .modal__title--active {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  border-bottom-width: 2px;
+  display: inline-block;
+  margin-right: 0.5rem;
+  border-width: 0px;
+}
+
+.modal__tabs > .modal__title {
+  display: inline-block;
+  margin-right: 0.5rem;
+  border-width: 0px;
+  cursor: pointer;
+}
+
 .modal form > div {
   display: flex;
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
+  align-items: center;
+}
+
+.modal form > input[type="submit"] {
+  width: 6rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .modal form > div:last-of-type {

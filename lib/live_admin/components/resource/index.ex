@@ -22,6 +22,7 @@ defmodule LiveAdmin.Components.Container.Index do
     socket =
       socket
       |> assign(assigns)
+      |> assign(search: assigns.search || "")
       |> assign_async(
         [:records],
         fn ->
@@ -60,9 +61,13 @@ defmodule LiveAdmin.Components.Container.Index do
             />
           </form>
           <button
-            phx-click="search"
-            phx-value-query=""
-            phx-target={@myself}
+            phx-click={
+              JS.show(to: "#settings-modal")
+              |> JS.add_class("hidden", to: "#settings-modal > div > div:nth-child(2)")
+              |> JS.remove_class("hidden", to: "#settings-modal > div > div:nth-child(3)")
+              |> JS.remove_class("opacity-30", to: "#settings-modal .modal__title:nth-child(2)")
+              |> JS.add_class("opacity-30", to: "#settings-modal .modal__title:nth-child(1)")
+            }
             class="flex items-center justify-center px-2 border-l"
           >
             <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -229,7 +234,7 @@ defmodule LiveAdmin.Components.Container.Index do
                 class="resource__action--secondary"
                 phx-click={
                   JS.show(
-                    to: "#pagination-modal",
+                    to: "#settings-modal",
                     transition: {"ease-in duration-300", "opacity-0", "opacity-100"}
                   )
                 }
@@ -296,19 +301,71 @@ defmodule LiveAdmin.Components.Container.Index do
           </div>
         </div>
       </div>
-      <.modal id="pagination-modal">
-        <div class="modal__title"><%= trans("Page") %></div>
-        <form phx-submit="go" phx-target={@myself}>
-          <div>
-            <label><%= trans("Number") %></label>
-            <input type="number" name="page" value={@page} />
-          </div>
-          <div>
-            <label><%= trans("Size") %></label>
-            <input type="number" name="per" value={@per} />
-          </div>
-          <input type="submit" value="Go" phx-click={JS.hide(to: "#pagination-modal")} />
-        </form>
+      <.modal id="settings-modal">
+        <div class="modal__tabs">
+          <a
+            class="modal__title"
+            phx-click={
+              JS.add_class("hidden", to: "#settings-modal > div > div:nth-child(3)")
+              |> JS.remove_class("hidden", to: "#settings-modal > div > div:nth-child(2)")
+              |> JS.remove_class("opacity-30")
+              |> JS.add_class("opacity-30", to: "#settings-modal .modal__title:nth-child(2)")
+            }
+          >
+            <%= trans("Page") %>
+          </a>
+          <a
+            class="modal__title opacity-30"
+            phx-click={
+              JS.add_class("hidden", to: "#settings-modal > div > div:nth-child(2)")
+              |> JS.remove_class("hidden", to: "#settings-modal > div > div:nth-child(3)")
+              |> JS.remove_class("opacity-30")
+              |> JS.add_class("opacity-30", to: "#settings-modal .modal__title:nth-child(1)")
+            }
+          >
+            <%= trans("Filters") %>
+          </a>
+        </div>
+        <div>
+          <form phx-submit="go" phx-target={@myself}>
+            <div>
+              <label><%= trans("Number") %></label>
+              <input type="number" name="page" value={@page} />
+            </div>
+            <div>
+              <label><%= trans("Size") %></label>
+              <input type="number" name="per" value={@per} />
+            </div>
+            <input type="submit" value={trans("Go")} phx-click={JS.hide(to: "#settings-modal")} />
+          </form>
+        </div>
+        <div class="hidden">
+          <form phx-submit="update_filters" phx-target={@myself} id="list-filters">
+            <%= for {{col, val}, i} <- @search |> LiveAdmin.View.parse_search() |> Enum.with_index() do %>
+              <div>
+                <div>
+                  <a href="#" class="button__remove" phx-click={JS.exec("alert('remove')")} />
+                </div>
+                <div>
+                  <select name={"filters[#{i}][field]"}>
+                    <option selected={is_nil(col)}><%= trans("any") %></option>
+                    <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
+                      <option selected={col == to_string(field)}><%= to_string(field) %></option>
+                    <% end %>
+                  </select>
+                  <select name={"filters[#{i}][operator]"} disabled="disabled">
+                    <option>contains</option>
+                  </select>
+                  <input type="text" name={"filters[#{i}][param]"} value={val} />
+                </div>
+              </div>
+            <% end %>
+            <div>
+              <a href="#" phx-target={@myself} phx-click="add_filter" class="button__add" />
+            </div>
+            <input type="submit" value={trans("Apply")} phx-click={JS.hide(to: "#settings-modal")} />
+          </form>
+        </div>
       </.modal>
     </div>
     """
@@ -332,6 +389,46 @@ defmodule LiveAdmin.Components.Container.Index do
        to:
          route_with_params(socket.assigns,
            params: list_link_params(assigns, page: page, per: per)
+         )
+     )}
+  end
+
+  @impl true
+  def handle_event("add_filter", _, socket = %{assigns: assigns}) do
+    new_search =
+      socket.assigns.search
+      |> LiveAdmin.View.parse_search()
+      |> Enum.concat([{"*", "_"}])
+      |> Enum.map_join(" ", fn
+        {field, param} -> "#{field}:#{param}"
+      end)
+
+    {:noreply,
+     push_patch(socket,
+       to:
+         route_with_params(socket.assigns,
+           params: list_link_params(assigns, search: new_search)
+         )
+     )}
+  end
+
+  @impl true
+  def handle_event("update_filters", %{"filters" => filter_params}, socket = %{assigns: assigns}) do
+    new_search =
+      filter_params
+      |> Map.values()
+      |> Enum.filter(fn p -> p["param"] != "" end)
+      |> Enum.map_join(" ", fn
+        %{"field" => "any", "param" => param} -> "*:#{param}"
+        %{"field" => field, "param" => param} -> "#{field}:#{param}"
+        {field, param} -> "#{field}:#{param}"
+      end)
+
+    {:noreply,
+     push_patch(socket,
+       to:
+         route_with_params(socket.assigns,
+           params: list_link_params(assigns, search: new_search)
          )
      )}
   end
