@@ -264,6 +264,23 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
+  describe "view resource with failing action" do
+    setup %{conn: conn} do
+      user = Repo.insert!(%User{})
+      {:ok, view, _} = live(conn, "/user/#{user.id}")
+
+      view
+      |> element("#view-page")
+      |> render_hook("action", %{name: "failing_action"})
+
+      %{view: view}
+    end
+
+    test "pushes error", %{view: view} do
+      assert_push_event(view, "error", %{msg: _})
+    end
+  end
+
   describe "view resource with associated resource" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})

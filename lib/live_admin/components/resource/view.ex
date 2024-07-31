@@ -84,7 +84,7 @@ defmodule LiveAdmin.Components.Container.View do
             items={get_function_keys(@resource, @config, :actions)}
             disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
           >
-            <.action_control action={action} session={@session} resource={@resource} />
+            <.action_control action={action} session={@session} resource={@resource} target={@myself} />
           </.dropdown>
         </div>
       </div>
@@ -165,12 +165,15 @@ defmodule LiveAdmin.Components.Container.View do
           push_event(
             socket,
             "error",
-            trans("%{action} failed: %{error}",
-              inter: [
-                action: action,
-                error: error
-              ]
-            )
+            %{
+              msg:
+                trans("%{action} failed: %{error}",
+                  inter: [
+                    action: action,
+                    error: error
+                  ]
+                )
+            }
           )
       end
 

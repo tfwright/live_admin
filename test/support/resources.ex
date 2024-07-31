@@ -3,7 +3,7 @@ defmodule LiveAdminTest.User do
 
   use LiveAdmin.Resource,
     immutable_fields: [:encrypted_password],
-    actions: [:user_action],
+    actions: [:user_action, :failing_action],
     tasks: [:user_task, {__MODULE__, :custom_arity_task, 3}]
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -17,6 +17,7 @@ defmodule LiveAdminTest.User do
   def user_task(_, _), do: {:ok, "worked"}
   def user_action(%__MODULE__{}, %{}), do: {:ok, "worked"}
   def custom_arity_task(_, _, _), do: {:ok, "worked"}
+  def failing_action(_, _), do: {:error, "failed"}
 end
 
 defmodule LiveAdminTest.PostResource do

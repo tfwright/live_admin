@@ -26,25 +26,27 @@ defmodule DemoWeb.UserAdmin do
   @doc """
   Deactivated users cannot login
   """
-  def deactivate(user, _) do
+  def deactivate(user = %{active: true}, _) do
+    user =
     user
     |> Ecto.Changeset.change(active: false)
-    |> Demo.Repo.update()
-    |> case do
-      {:ok, user} -> {:ok, user}
-      error -> error
-    end
+    |> Demo.Repo.update!()
+
+    {:ok, user}
   end
 
-  def activate(user, _) do
-    user
-    |> Ecto.Changeset.change(active: true)
-    |> Demo.Repo.update()
-    |> case do
-      {:ok, user} -> {:ok, user}
-      error -> error
-    end
+  def deactivate(_, _), do: {:error, "user not active"}
+
+  def activate(user = %{active: false}, _) do
+    user =
+      user
+      |> Ecto.Changeset.change(active: true)
+      |> Demo.Repo.update!()
+
+    {:ok, user}
   end
+
+  def activate(_, _), do: {:error, "user already active"}
 
   def render_field(user, :email, _) do
     link(user.email, to: "mailto:\"#{user.name}\"<#{user.email}>")

@@ -141,6 +141,7 @@ defmodule LiveAdmin.Components do
     <button
       class="resource__action--link"
       data-action={@action}
+      phx-target={assigns[:target]}
       phx-click={
         if @modalize,
           do:
