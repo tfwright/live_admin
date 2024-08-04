@@ -136,7 +136,7 @@ defmodule LiveAdmin.Components.Container.Index do
             </tr>
           </thead>
           <tbody>
-            <%= if !@records.loading do %>
+            <%= if @records.ok? do %>
               <%= for record <- @records.result |> elem(0) do %>
                 <tr class="resource__row">
                   <td>
@@ -215,7 +215,11 @@ defmodule LiveAdmin.Components.Container.Index do
             <% else %>
               <tr>
                 <td class="p-10">
-                  <div class="spinner" />
+                  <%= if @records.loading do %>
+                    <div class="spinner" />
+                  <% else %>
+                    <%= trans("Error") %>
+                  <% end %>
                 </td>
               </tr>
             <% end %>
