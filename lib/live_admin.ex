@@ -123,7 +123,7 @@ defmodule LiveAdmin do
       )
 
   def fetch_config(resource, key, config),
-    do: Keyword.get(resource.__live_admin_config__, key) || Keyword.fetch!(config, key)
+    do: Keyword.get(resource.__live_admin_config__(), key) || Keyword.fetch!(config, key)
 
   def primary_key!(resource) do
     [key] = Keyword.fetch!(resource.__live_admin_config__(), :schema).__schema__(:primary_key)
