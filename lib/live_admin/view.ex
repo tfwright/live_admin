@@ -49,15 +49,15 @@ defmodule LiveAdmin.View do
   def field_class(type) when type in @supported_primitive_types, do: to_string(type)
   def field_class(:map), do: "map"
   def field_class({:array, _}), do: "array"
-  def field_class({_, Ecto.Embedded, _}), do: "embed"
-  def field_class({_, Ecto.Enum, _}), do: "enum"
+  def field_class({_, {Ecto.Embedded, _}}), do: "embed"
+  def field_class({_, {Ecto.Enum, _}}), do: "enum"
   def field_class(_), do: "other"
 
   def supported_type?(type) when type in @supported_primitive_types, do: true
   def supported_type?(:map), do: true
   def supported_type?({:array, _}), do: true
-  def supported_type?({_, Ecto.Embedded, _}), do: true
-  def supported_type?({_, Ecto.Enum, _}), do: true
+  def supported_type?({_, {Ecto.Embedded, _}}), do: true
+  def supported_type?({_, {Ecto.Enum, _}}), do: true
   def supported_type?(_), do: false
 
   def get_function_keys(resource, config, function) do

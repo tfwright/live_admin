@@ -475,8 +475,8 @@ defmodule LiveAdmin.Components.Container.Index do
     |> Keyword.merge(overrides)
   end
 
-  defp type_to_css_class({_, type, _}), do: type_to_css_class(type)
-  defp type_to_css_class({:array, {_, type, _}}), do: {:array, type} |> type_to_css_class()
+  defp type_to_css_class({_, {type, _}}), do: type_to_css_class(type)
+  defp type_to_css_class({:array, {_, {type, _}}}), do: {:array, type} |> type_to_css_class()
   defp type_to_css_class({:array, type}), do: "array.#{type}" |> type_to_css_class()
 
   defp type_to_css_class(type),

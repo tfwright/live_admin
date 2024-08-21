@@ -172,7 +172,7 @@ defmodule LiveAdmin.Components.Container.Form do
     """
   end
 
-  defp input(assigns = %{type: {_, Ecto.Embedded, _}}) do
+  defp input(assigns = %{type: {_, {Ecto.Embedded, _}}}) do
     ~H"""
     <.embed
       id={input_id(@form, @field)}
@@ -302,7 +302,7 @@ defmodule LiveAdmin.Components.Container.Form do
     """
   end
 
-  defp input(assigns = %{type: {_, Ecto.Enum, %{mappings: mappings}}}) do
+  defp input(assigns = %{type: {_, {Ecto.Enum, %{mappings: mappings}}}}) do
     assigns = assign(assigns, :mappings, mappings)
 
     ~H"""
@@ -310,7 +310,7 @@ defmodule LiveAdmin.Components.Container.Form do
     """
   end
 
-  defp input(assigns = %{type: {:array, {_, Ecto.Enum, %{mappings: mappings}}}}) do
+  defp input(assigns = %{type: {:array, {_, {Ecto.Enum, %{mappings: mappings}}}}}) do
     assigns = assign(assigns, :mappings, mappings)
 
     ~H"""

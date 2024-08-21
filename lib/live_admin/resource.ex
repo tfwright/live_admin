@@ -305,14 +305,14 @@ defmodule LiveAdmin.Resource do
         fields(resource, config)
     end
     |> Enum.reduce(Changeset.cast(record, params, []), fn
-      {field_name, {_, Ecto.Embedded, %{cardinality: :many}}, _}, changeset ->
+      {field_name, {_, {Ecto.Embedded, %{cardinality: :many}}}, _}, changeset ->
         Changeset.cast_embed(changeset, field_name,
           with: fn embed, params -> build_changeset(embed, :embed, params, config) end,
           sort_param: LiveAdmin.View.sort_param_name(field_name),
           drop_param: LiveAdmin.View.drop_param_name(field_name)
         )
 
-      {field_name, {_, Ecto.Embedded, %{cardinality: :one}}, _}, changeset ->
+      {field_name, {_, {Ecto.Embedded, %{cardinality: :one}}}, _}, changeset ->
         if Map.get(params, to_string(field_name)) == "" do
           Changeset.put_change(changeset, field_name, nil)
         else
