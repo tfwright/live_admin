@@ -215,6 +215,6 @@ defmodule LiveAdmin.Components do
     """
   end
 
-  defp embed_fields({_, _, %{related: schema}}),
+  defp embed_fields({_, {_, %{related: schema}}}),
     do: Enum.map(schema.__schema__(:fields), &{&1, schema.__schema__(:type, &1), []})
 end
