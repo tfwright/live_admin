@@ -46,7 +46,7 @@ defmodule LiveAdmin.Components do
       <%= unless @disabled do %>
         <.inputs_for :let={embed_form} field={@form[@field]} skip_hidden={true}>
           <div class="embed__item">
-            <%= if match?({_, _, %{cardinality: :many}}, @type) do %>
+            <%= if match?({_, {_, %{cardinality: :many}}}, @type) do %>
               <input
                 type="hidden"
                 name={input_name(@form, LiveAdmin.View.sort_param_name(@field)) <> "[]"}
@@ -99,7 +99,7 @@ defmodule LiveAdmin.Components do
             </div>
           </div>
         </.inputs_for>
-        <%= if match?({_, _, %{cardinality: :many}}, @type) || !input_value(@form, @field) do %>
+        <%= if match?({_, {_, %{cardinality: :many}}}, @type) || !input_value(@form, @field) do %>
           <input
             type="checkbox"
             name={input_name(@form, LiveAdmin.View.sort_param_name(@field)) <> "[]"}
@@ -108,7 +108,7 @@ defmodule LiveAdmin.Components do
           />
           <a href="#" phx-click={JS.dispatch("live_admin:embed_add")} class="button__add" />
         <% end %>
-        <%= if match?({_, _, %{cardinality: :one}}, @type) do %>
+        <%= if match?({_, {_, %{cardinality: :one}}}, @type) do %>
           <input
             type="hidden"
             name={input_name(@form, @field)}
