@@ -21,7 +21,7 @@ defmodule LiveAdmin.Components.Container do
     socket =
       assign(socket, loading: !connected?(socket), jobs: [])
 
-    if connected?(socket), do: Process.send_after(self(), :clear_flash, 2000)
+    if connected?(socket), do: Process.send_after(self(), :clear_flash, 1000)
 
     {:ok, socket}
   end
@@ -29,6 +29,10 @@ defmodule LiveAdmin.Components.Container do
   @impl true
   def handle_info(:clear_flash, socket) do
     {:noreply, clear_flash(socket)}
+  end
+
+  def handle_info(_, socket) do
+    {:noreply, socket}
   end
 
   @impl true
