@@ -198,50 +198,39 @@ defmodule LiveAdmin.Resource do
 
   def fields(resource, config) do
     schema = Keyword.fetch!(resource.__live_admin_config__(), :schema)
+    hidden_fields = LiveAdmin.fetch_config(resource, :hidden_fields, config)
+    immutable_fields = LiveAdmin.fetch_config(resource, :immutable_fields, config)
 
-    Enum.flat_map(schema.__schema__(:fields), fn field_name ->
+    schema.__schema__(:fields)
+    |> Enum.reject(&(&1 in hidden_fields))
+    |> Enum.map(fn field_name ->
       type = schema.__schema__(:type, field_name)
+      {known_type, is_custom_type?} = parse_type(type)
+      is_immutable? = field_name in immutable_fields
 
-      is_custom_type? =
-        case type do
-          {:parameterized, custom_type, _} ->
-            function_exported?(custom_type, :render_as, 0)
-
-          custom_type when is_atom(custom_type) ->
-            function_exported?(custom_type, :render_as, 0)
-
-          _ ->
-            false
-        end
-
-      known_type =
-        if is_custom_type? do
-          type.render_as()
-        else
-          type
-        end
-
-      is_immutable? =
-        resource
-        |> LiveAdmin.fetch_config(:immutable_fields, config)
-        |> Enum.member?(field_name)
-
-      resource
-      |> LiveAdmin.fetch_config(:hidden_fields, config)
-      |> Enum.member?(field_name)
-      |> case do
-        false ->
-          [
-            {field_name, known_type,
-             [
-               immutable: is_immutable? and not is_custom_type?
-             ]}
-          ]
-
-        true ->
-          []
-      end
+      {field_name, known_type, [immutable: is_immutable? and not is_custom_type?]}
     end)
+  end
+
+  defp parse_type(type) do
+    case type do
+      {:parameterized, custom_type, _} ->
+        get_custom_type(custom_type)
+
+      custom_type when is_atom(custom_type) ->
+        get_custom_type(custom_type)
+
+      _ ->
+        {type, false}
+    end
+  end
+
+  defp get_custom_type(custom_type) do
+    if function_exported?(custom_type, :render_as, 0) do
+      {custom_type.render_as(), true}
+    else
+      {custom_type, false}
+    end
   end
 
   defp build_list(resource, opts, session, repo, config) do
