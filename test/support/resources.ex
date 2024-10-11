@@ -20,6 +20,23 @@ defmodule LiveAdminTest.User do
   def failing_action(_, _), do: {:error, "failed"}
 end
 
+defmodule LiveAdminTest.CustomStringType do
+  use Ecto.Type
+  @behaviour LiveAdmin.Type
+
+  # Ecto.Type callbacks
+  def type, do: :string
+
+  def cast(value) when is_binary(value), do: {:ok, String.trim(value)}
+  def cast(_), do: :error
+
+  def load(value), do: {:ok, value}
+  def dump(value), do: {:ok, value}
+
+  # LiveAdmin.Type callbacks
+  def render_as(), do: :string
+end
+
 defmodule LiveAdminTest.PostResource do
   use LiveAdmin.Resource,
     schema: LiveAdminTest.Post,
