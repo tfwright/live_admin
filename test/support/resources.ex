@@ -57,6 +57,7 @@ defmodule LiveAdminTest.Post do
   schema "posts" do
     field(:title, :string)
     field(:tags, {:array, :string}, default: ["test"])
+    field(:custom_string_field, LiveAdminTest.CustomStringType)
 
     belongs_to(:user, LiveAdminTest.User, type: :binary_id)
 

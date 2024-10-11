@@ -200,18 +200,41 @@ defmodule LiveAdmin.Resource do
     schema = Keyword.fetch!(resource.__live_admin_config__(), :schema)
 
     Enum.flat_map(schema.__schema__(:fields), fn field_name ->
+      type = schema.__schema__(:type, field_name)
+
+      is_custom_type? =
+        case type do
+          {:parameterized, custom_type, _} ->
+            function_exported?(custom_type, :render_as, 0)
+
+          custom_type when is_atom(custom_type) ->
+            function_exported?(custom_type, :render_as, 0)
+
+          _ ->
+            false
+        end
+
+      known_type =
+        if is_custom_type? do
+          type.render_as()
+        else
+          type
+        end
+
+      is_immutable? =
+        resource
+        |> LiveAdmin.fetch_config(:immutable_fields, config)
+        |> Enum.member?(field_name)
+
       resource
       |> LiveAdmin.fetch_config(:hidden_fields, config)
       |> Enum.member?(field_name)
       |> case do
         false ->
           [
-            {field_name, schema.__schema__(:type, field_name),
+            {field_name, known_type,
              [
-               immutable:
-                 resource
-                 |> LiveAdmin.fetch_config(:immutable_fields, config)
-                 |> Enum.member?(field_name)
+               immutable: is_immutable? and not is_custom_type?
              ]}
           ]
 
