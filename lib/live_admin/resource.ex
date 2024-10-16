@@ -226,8 +226,8 @@ defmodule LiveAdmin.Resource do
   end
 
   defp get_custom_type(custom_type) do
-    if function_exported?(custom_type, :render_as, 0) do
-      {custom_type.render_as(), true}
+    if function_exported?(custom_type, :type, 0) do
+      {custom_type.type(), true}
     else
       {custom_type, false}
     end
