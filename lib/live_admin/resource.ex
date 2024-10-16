@@ -206,8 +206,9 @@ defmodule LiveAdmin.Resource do
     |> Enum.map(fn field_name ->
       type = schema.__schema__(:type, field_name)
       is_immutable? = field_name in immutable_fields
+      native_type = parse_type(type)
 
-      {field_name, parse_type(type), [immutable: is_immutable?]}
+      {field_name, native_type, [immutable: is_immutable?]}
     end)
   end
 
