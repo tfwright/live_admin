@@ -26,6 +26,7 @@ defmodule LiveAdminTest.CustomStringType do
   # Ecto.Type callbacks
   def type, do: :string
 
+  def cast("bad string"), do: {:error, [message: "that was a bad string"]}
   def cast(value) when is_binary(value), do: {:ok, String.trim(value)}
   def cast(_), do: :error
 

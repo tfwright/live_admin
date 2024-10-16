@@ -303,7 +303,7 @@ defmodule LiveAdmin.Components.ContainerTest do
       %{view: view, response: html}
     end
 
-    test "includes input field for custom string type", %{response: response} do
+    test "includes non-disabled input field for custom string type", %{response: response} do
       assert response
              |> Floki.find("textarea[name='params[custom_string_field]']")
              |> Enum.any?()
@@ -325,6 +325,15 @@ defmodule LiveAdmin.Components.ContainerTest do
       post = Repo.one(from(p in Post, where: p.title == "Sample Title"))
 
       assert post.custom_string_field == "Test Value"
+    end
+
+    test "handles error from custom string type", %{view: view} do
+      response =
+        view
+        |> element(".resource__form")
+        |> render_change(%{"params" => %{"custom_string_field" => "bad string"}})
+
+      assert response =~ "that was a bad string"
     end
   end
 end
