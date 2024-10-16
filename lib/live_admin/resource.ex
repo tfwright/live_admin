@@ -205,10 +205,9 @@ defmodule LiveAdmin.Resource do
     |> Enum.reject(&(&1 in hidden_fields))
     |> Enum.map(fn field_name ->
       type = schema.__schema__(:type, field_name)
-      {native, is_custom_type?} = parse_type(type)
       is_immutable? = field_name in immutable_fields
 
-      {field_name, native, [immutable: is_immutable? and not is_custom_type?]}
+      {field_name, parse_type(type), [immutable: is_immutable?]}
     end)
   end
 
@@ -221,15 +220,15 @@ defmodule LiveAdmin.Resource do
         get_custom_type(custom_type)
 
       _ ->
-        {type, false}
+        type
     end
   end
 
   defp get_custom_type(custom_type) do
     if function_exported?(custom_type, :type, 0) do
-      {custom_type.type(), true}
+      custom_type.type()
     else
-      {custom_type, false}
+      custom_type
     end
   end
 
