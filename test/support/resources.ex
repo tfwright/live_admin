@@ -22,7 +22,6 @@ end
 
 defmodule LiveAdminTest.CustomStringType do
   use Ecto.Type
-  @behaviour LiveAdmin.Type
 
   # Ecto.Type callbacks
   def type, do: :string
@@ -32,9 +31,6 @@ defmodule LiveAdminTest.CustomStringType do
 
   def load(value), do: {:ok, value}
   def dump(value), do: {:ok, value}
-
-  # LiveAdmin.Type callbacks
-  def render_as(), do: :string
 end
 
 defmodule LiveAdminTest.PostResource do
