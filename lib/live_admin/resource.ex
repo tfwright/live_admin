@@ -205,10 +205,10 @@ defmodule LiveAdmin.Resource do
     |> Enum.reject(&(&1 in hidden_fields))
     |> Enum.map(fn field_name ->
       type = schema.__schema__(:type, field_name)
-      {known_type, is_custom_type?} = parse_type(type)
+      {native, is_custom_type?} = parse_type(type)
       is_immutable? = field_name in immutable_fields
 
-      {field_name, known_type, [immutable: is_immutable? and not is_custom_type?]}
+      {field_name, native, [immutable: is_immutable? and not is_custom_type?]}
     end)
   end
 
