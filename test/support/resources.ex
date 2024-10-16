@@ -20,6 +20,20 @@ defmodule LiveAdminTest.User do
   def failing_action(_, _), do: {:error, "failed"}
 end
 
+defmodule LiveAdminTest.CustomStringType do
+  use Ecto.Type
+
+  # Ecto.Type callbacks
+  def type, do: :string
+
+  def cast("bad string"), do: {:error, [message: "that was a bad string"]}
+  def cast(value) when is_binary(value), do: {:ok, String.trim(value)}
+  def cast(_), do: :error
+
+  def load(value), do: {:ok, value}
+  def dump(value), do: {:ok, value}
+end
+
 defmodule LiveAdminTest.PostResource do
   use LiveAdmin.Resource,
     schema: LiveAdminTest.Post,
@@ -40,6 +54,7 @@ defmodule LiveAdminTest.Post do
   schema "posts" do
     field(:title, :string)
     field(:tags, {:array, :string}, default: ["test"])
+    field(:custom_string_field, LiveAdminTest.CustomStringType)
 
     belongs_to(:user, LiveAdminTest.User, type: :binary_id)
 

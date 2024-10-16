@@ -4,6 +4,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   import Phoenix.ConnTest
   import Phoenix.LiveViewTest
   import Mox
+  import Ecto.Query
 
   alias LiveAdminTest.{Post, Repo, User}
   alias LiveAdminTest.Post.Version
@@ -293,6 +294,46 @@ defmodule LiveAdmin.Components.ContainerTest do
       assert response
              |> Floki.find("a[href='/user/#{user.id}']")
              |> Enum.any?()
+    end
+  end
+
+  describe "new post with custom string field" do
+    setup %{conn: conn} do
+      {:ok, view, html} = live(conn, "/live_admin_test_post/new")
+      %{view: view, response: html}
+    end
+
+    test "includes non-disabled input field for custom string type", %{response: response} do
+      assert response
+             |> Floki.find("textarea[name='params[custom_string_field]']")
+             |> Enum.any?()
+    end
+
+    test "handles form change with custom string type", %{view: view} do
+      assert view
+             |> element(".resource__form")
+             |> render_change(%{"params" => %{"custom_string_field" => "  Trimmed Value  "}})
+    end
+
+    test "creates post with trimmed custom string field on form submit", %{view: view} do
+      view
+      |> form(".resource__form", %{
+        params: %{custom_string_field: "  Test Value  ", title: "Sample Title"}
+      })
+      |> render_submit()
+
+      post = Repo.one(from(p in Post, where: p.title == "Sample Title"))
+
+      assert post.custom_string_field == "Test Value"
+    end
+
+    test "handles error from custom string type", %{view: view} do
+      response =
+        view
+        |> element(".resource__form")
+        |> render_change(%{"params" => %{"custom_string_field" => "bad string"}})
+
+      assert response =~ "that was a bad string"
     end
   end
 end

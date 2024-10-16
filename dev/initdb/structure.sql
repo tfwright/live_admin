@@ -32,7 +32,8 @@ create table posts (
   categories jsonb,
   status varchar(100),
   previous_versions jsonb DEFAULT '[]'::jsonb,
-  metadata jsonb DEFAULT '{}'::jsonb
+  metadata jsonb DEFAULT '{}'::jsonb,
+  custom_string_field varchar(255)
 );
 
 create schema alt;
@@ -71,5 +72,6 @@ create table alt.posts (
   categories jsonb,
   status varchar(100),
   previous_versions jsonb DEFAULT '[]'::jsonb,
-  metadata jsonb DEFAULT '{}'::jsonb
+  metadata jsonb DEFAULT '{}'::jsonb,
+  custom_string_field varchar(255)
 );

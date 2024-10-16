@@ -198,27 +198,39 @@ defmodule LiveAdmin.Resource do
 
   def fields(resource, config) do
     schema = Keyword.fetch!(resource.__live_admin_config__(), :schema)
+    hidden_fields = LiveAdmin.fetch_config(resource, :hidden_fields, config)
+    immutable_fields = LiveAdmin.fetch_config(resource, :immutable_fields, config)
 
-    Enum.flat_map(schema.__schema__(:fields), fn field_name ->
-      resource
-      |> LiveAdmin.fetch_config(:hidden_fields, config)
-      |> Enum.member?(field_name)
-      |> case do
-        false ->
-          [
-            {field_name, schema.__schema__(:type, field_name),
-             [
-               immutable:
-                 resource
-                 |> LiveAdmin.fetch_config(:immutable_fields, config)
-                 |> Enum.member?(field_name)
-             ]}
-          ]
+    schema.__schema__(:fields)
+    |> Enum.reject(&(&1 in hidden_fields))
+    |> Enum.map(fn field_name ->
+      type = schema.__schema__(:type, field_name)
+      is_immutable? = field_name in immutable_fields
+      native_type = parse_type(type)
 
-        true ->
-          []
-      end
+      {field_name, native_type, [immutable: is_immutable?]}
     end)
+  end
+
+  defp parse_type(type) do
+    case type do
+      {:parameterized, custom_type, _} ->
+        get_custom_type(custom_type)
+
+      custom_type when is_atom(custom_type) ->
+        get_custom_type(custom_type)
+
+      _ ->
+        type
+    end
+  end
+
+  defp get_custom_type(custom_type) do
+    if function_exported?(custom_type, :type, 0) do
+      custom_type.type()
+    else
+      custom_type
+    end
   end
 
   defp build_list(resource, opts, session, repo, config) do
