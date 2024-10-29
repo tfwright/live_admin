@@ -49,19 +49,21 @@ If you are already [running LiveView](https://hexdocs.pm/phoenix_live_view/insta
     ...
 
     scope "/" do
-      pipe_through: :browser
+      pipe_through :browser
 
       live_admin "/admin" do
         admin_resource "/foos", MyApp.Admin.Foo
         # more resources
       end
+      live "/", MyAppLive, :index
     end
     ```
 
 4. Finally, tell LiveAdmin what Ecto repo to use to run queries in your `runtime.ex`:
 
     ```
-    config :live_admin, ecto_repo: MyApp.Repo
+    config :live_admin,
+        ecto_repo: MyApp.Repo
     ```
 
 That's it, now an admin UI for `MyApp.Foo` will be available at `/admin/foos`.
