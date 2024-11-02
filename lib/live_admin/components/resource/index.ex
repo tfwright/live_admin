@@ -4,7 +4,6 @@ defmodule LiveAdmin.Components.Container.Index do
 
   import LiveAdmin,
     only: [
-      route_with_params: 1,
       route_with_params: 2,
       trans: 1,
       trans: 2
@@ -339,31 +338,6 @@ defmodule LiveAdmin.Components.Container.Index do
       </.modal>
     </div>
     """
-  end
-
-  @impl true
-  def handle_event(
-        "task",
-        params = %{"name" => task},
-        socket = %{
-          assigns: %{search: search, session: session, resource: resource, config: config}
-        }
-      ) do
-    {_, m, f, _, _} =
-      LiveAdmin.fetch_function(resource, session, :tasks, String.to_existing_atom(task))
-
-    args = [session | Map.get(params, "args", [])]
-
-    Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, m, f, [
-      Resource.query(resource, search, config) | args
-    ])
-
-    socket =
-      socket
-      |> put_flash(:info, trans("%{task} started", inter: [task: task]))
-      |> push_navigate(to: route_with_params(socket.assigns))
-
-    {:noreply, socket}
   end
 
   @impl true

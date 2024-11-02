@@ -7,7 +7,8 @@ defmodule LiveAdmin.Components.Container do
       resource_title: 2,
       route_with_params: 1,
       route_with_params: 2,
-      trans: 1
+      trans: 1,
+      trans: 2
     ]
 
   import LiveAdmin.Components
@@ -88,6 +89,33 @@ defmodule LiveAdmin.Components.Container do
        |> assign_prefix(params)}
 
   def handle_params(_, _, socket), do: {:noreply, socket}
+
+  @impl true
+  def handle_event(
+        "task",
+        params = %{"name" => task},
+        socket = %{
+          assigns: %{session: session, resource: resource, config: config}
+        }
+      ) do
+    {_, m, f, _, _} =
+      LiveAdmin.fetch_function(resource, session, :tasks, String.to_existing_atom(task))
+
+    args = [session | Map.get(params, "args", [])]
+
+    search = Map.get(socket.assigns, :search)
+
+    Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, m, f, [
+      Resource.query(resource, search, config) | args
+    ])
+
+    socket =
+      socket
+      |> put_flash(:info, trans("%{task} started", inter: [task: task]))
+      |> push_navigate(to: route_with_params(socket.assigns))
+
+    {:noreply, socket}
+  end
 
   @impl true
   def handle_event("set_locale", %{"locale" => locale}, socket) do
@@ -385,7 +413,7 @@ defmodule LiveAdmin.Components.Container do
               to: "##{@task}-task-modal",
               transition: {"ease-in duration-300", "opacity-0", "opacity-100"}
             ),
-          else: JS.push("task", value: %{"name" => @task}, page_loading: true, target: "#list")
+          else: JS.push("task", value: %{"name" => @task}, page_loading: true)
       }
       ,
       data-confirm={if @modalize, do: nil, else: "Are you sure?"}
@@ -398,7 +426,7 @@ defmodule LiveAdmin.Components.Container do
         <%= for {_lang, doc} <- @function_docs do %>
           <span class="docs"><%= doc %></span>
         <% end %>
-        <.form for={Phoenix.Component.to_form(%{})} phx-submit="task" phx-target="#list">
+        <.form for={Phoenix.Component.to_form(%{})} phx-submit="task">
           <input type="hidden" name="name" value={@task} />
           <%= if @extra_arg_count > 0 do %>
             <b>Arguments</b>
