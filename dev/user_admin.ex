@@ -62,38 +62,20 @@ defmodule DemoWeb.UserAdmin do
   Each user will get 16 random bytes of their very own.
   """
   def regenerate_passwords(query, session) do
-      Phoenix.PubSub.broadcast(
-        LiveAdmin.PubSub,
-        "session:#{session.id}",
-        {:job, :regenerate, :start, "Regenerating user passwords"}
-      )
+    count = Demo.Repo.aggregate(Demo.Accounts.User, :count, prefix: session.prefix)
 
-      count = Demo.Repo.aggregate(Demo.Accounts.User, :count, prefix: session.prefix)
+    query
+    |> Demo.Repo.all(prefix: session.prefix)
+    |> Enum.with_index()
+    |> Enum.each(fn {user, i} ->
+      user
+      |> Ecto.Changeset.change(encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16())
+      |> Demo.Repo.update()
 
-      query
-      |> Demo.Repo.all(prefix: session.prefix)
-      |> Enum.reduce(0.0, fn user, progress ->
-        user
-        |> Ecto.Changeset.change(encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16())
-        |> Demo.Repo.update()
+      LiveAdmin.Notifier.job(session, self(), i/count)
+    end)
 
-        progress = progress + 1/count
-
-        Phoenix.PubSub.broadcast(
-          LiveAdmin.PubSub,
-          "session:#{session.id}",
-          {:job, :regenerate, :progress, progress}
-        )
-
-        progress
-      end)
-
-
-    Phoenix.PubSub.broadcast(
-      LiveAdmin.PubSub,
-      "session:#{session.id}",
-      {:job, :regenerate, :complete}
-    )
+    LiveAdmin.Notifier.job(session, self(), 1)
 
     {:ok, "updated"}
   end

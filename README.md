@@ -14,6 +14,7 @@ Significant features:
 * Overridable views, styles, and API
 * Custom actions at the resource and record level, with support for dynamic inputs
 * Edit (nested) embedded schemas
+* Notifications
 * i18n via [Gettext](https://github.com/elixir-gettext/gettext)
 
 See for yourself, try out the [demo app](#development)
@@ -150,6 +151,14 @@ end
 
 To enable Multi tenant support, simply implement a `prefixes/0` function in your Ecto Repo module that returns a list of prefixes.
 A dropdown will be added to the top nav bar that will allow you to switch between tenants.
+
+### Notifications
+
+`LiveAdmin.Notifier` provides an API for triggering events from LiveAdmin.Resource modules, or other application code.
+
+Currently supported:
+
+* Background job progress
 
 ### i18n
 

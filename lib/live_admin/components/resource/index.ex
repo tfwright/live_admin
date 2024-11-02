@@ -396,33 +396,19 @@ defmodule LiveAdmin.Components.Container.Index do
       fn ->
         pid = self()
 
-        Phoenix.PubSub.broadcast(
-          LiveAdmin.PubSub,
-          "session:#{session.id}",
-          {:job, pid, :start, label}
-        )
+        LiveAdmin.Notifier.job(session, pid, 0, label: label)
 
         records = Resource.all(ids, resource, prefix, repo)
 
-        Enum.reduce(records, 0.0, fn record, progress ->
+        records
+        |> Enum.with_index()
+        |> Enum.each(fn {record, i} ->
           apply(mod, func, [record | args])
 
-          progress = progress + 1 / length(records)
-
-          Phoenix.PubSub.broadcast(
-            LiveAdmin.PubSub,
-            "session:#{session.id}",
-            {:job, pid, :progress, progress}
-          )
-
-          progress
+          LiveAdmin.Notifier.job(session, pid, i / length(records))
         end)
 
-        Phoenix.PubSub.broadcast(
-          LiveAdmin.PubSub,
-          "session:#{session.id}",
-          {:job, pid, :complete}
-        )
+        LiveAdmin.Notifier.job(session, pid, 1)
       end,
       timeout: :infinity
     )

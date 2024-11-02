@@ -9,6 +9,18 @@ defmodule LiveAdmin.Components.Nav.Jobs do
     {:ok, assign(socket, jobs: []), layout: false}
   end
 
+  defp set_progress(socket, target_pid, progress) do
+    update(socket, :jobs, fn jobs ->
+      Enum.map(jobs, fn job = {pid, label, _} ->
+        if target_pid == pid do
+          {pid, label, progress}
+        else
+          job
+        end
+      end)
+    end)
+  end
+
   @impl true
   def handle_info({:job, pid, :start, label}, socket) do
     Process.monitor(pid)
@@ -20,16 +32,7 @@ defmodule LiveAdmin.Components.Nav.Jobs do
 
   @impl true
   def handle_info({:job, pid, :progress, progress}, socket) do
-    socket =
-      update(socket, :jobs, fn jobs ->
-        Enum.map(jobs, fn job = {job_pid, label, _} ->
-          if pid == job_pid do
-            {pid, label, progress}
-          else
-            job
-          end
-        end)
-      end)
+    socket = set_progress(socket, pid, progress)
 
     {:noreply, socket}
   end
@@ -38,7 +41,7 @@ defmodule LiveAdmin.Components.Nav.Jobs do
   def handle_info({:job, pid, :complete}, socket) do
     Process.send_after(self(), {:remove_job, pid}, 1500)
 
-    {:noreply, socket}
+    {:noreply, set_progress(socket, pid, 1.0)}
   end
 
   @impl true

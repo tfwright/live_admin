@@ -93,25 +93,28 @@ defmodule LiveAdmin.Components.Container do
   @impl true
   def handle_event(
         "task",
-        params = %{"name" => task},
+        params = %{"name" => name},
         socket = %{
           assigns: %{session: session, resource: resource, config: config}
         }
       ) do
     {_, m, f, _, _} =
-      LiveAdmin.fetch_function(resource, session, :tasks, String.to_existing_atom(task))
+      LiveAdmin.fetch_function(resource, session, :tasks, String.to_existing_atom(name))
 
     args = [session | Map.get(params, "args", [])]
 
     search = Map.get(socket.assigns, :search)
 
-    Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, m, f, [
-      Resource.query(resource, search, config) | args
-    ])
+    task =
+      Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, m, f, [
+        Resource.query(resource, search, config) | args
+      ])
+
+    LiveAdmin.Notifier.job(session, task.pid, 0, label: name)
 
     socket =
       socket
-      |> put_flash(:info, trans("%{task} started", inter: [task: task]))
+      |> put_flash(:info, trans("%{task} started", inter: [task: name]))
       |> push_navigate(to: route_with_params(socket.assigns))
 
     {:noreply, socket}
