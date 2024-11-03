@@ -4,6 +4,8 @@ defmodule LiveAdmin.Components.Container.Index do
 
   import LiveAdmin,
     only: [
+      record_label: 3,
+      resource_title: 2,
       route_with_params: 2,
       trans: 1,
       trans: 2
@@ -14,34 +16,6 @@ defmodule LiveAdmin.Components.Container.Index do
 
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
-
-  @impl true
-  def update(
-        %{changed: keys},
-        socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo}}
-      ) do
-    socket =
-      update(socket, :records, fn result ->
-        {records, count} = result.result
-
-        records =
-          Enum.flat_map(records, fn record ->
-            record_key = Map.fetch!(record, LiveAdmin.primary_key!(resource))
-
-            if Enum.member?(keys, record_key) do
-              record = LiveAdmin.Resource.find(record_key, resource, prefix, repo)
-
-              if record, do: [record], else: []
-            else
-              [record]
-            end
-          end)
-
-        Map.put(result, :result, {records, count})
-      end)
-
-    {:ok, socket}
-  end
 
   @impl true
   def update(assigns, socket) do
@@ -365,19 +339,18 @@ defmodule LiveAdmin.Components.Container.Index do
   @impl true
   def handle_event(
         "action",
-        params = %{"name" => action, "ids" => ids},
+        params = %{"name" => name, "ids" => ids},
         socket = %{
           assigns: %{
             session: session,
             resource: resource,
-            prefix: prefix,
             repo: repo,
             config: config
           }
         }
       ) do
-    {label, mod, func, args} =
-      if action == "delete" do
+    task_def =
+      if name == "delete" do
         {"delete", Resource, :delete, [resource, session, repo, config]}
       else
         {label, mod, func, _, _} =
@@ -385,12 +358,69 @@ defmodule LiveAdmin.Components.Container.Index do
             resource,
             session,
             :actions,
-            String.to_existing_atom(action)
+            String.to_existing_atom(name)
           )
 
         {label, mod, func, [session | Map.get(params, "args", [])]}
       end
 
+    socket =
+      socket
+      |> handle_action(name, ids, task_def)
+      |> push_redirect(
+        to: route_with_params(socket.assigns, params: list_link_params(socket.assigns))
+      )
+
+    {:noreply, socket}
+  end
+
+  defp handle_action(
+         socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo, config: config}},
+         name,
+         [id],
+         {_, mod, func, args}
+       ) do
+    record = Resource.find(id, resource, prefix, repo)
+
+    apply(mod, func, [record | args])
+    |> case do
+      {:ok, record} ->
+        put_flash(
+          socket,
+          :success,
+          trans(
+            "%{name} action succeeded on %{resource} %{label}",
+            inter: [
+              name: name,
+              resource: resource_title(resource, config),
+              label: record_label(record, resource, config)
+            ]
+          )
+        )
+
+      {:error, message} ->
+        put_flash(
+          socket,
+          :error,
+          trans(
+            "%{name} action failed on %{resource} %{label}: '%{message}'",
+            inter: [
+              name: name,
+              message: message,
+              resource: resource_title(resource, config),
+              label: record_label(record, resource, config)
+            ]
+          )
+        )
+    end
+  end
+
+  defp handle_action(
+         socket = %{assigns: %{session: session, prefix: prefix, resource: resource, repo: repo}},
+         name,
+         ids,
+         {label, mod, func, args}
+       ) do
     Task.Supervisor.async_nolink(
       LiveAdmin.Task.Supervisor,
       fn ->
@@ -400,32 +430,47 @@ defmodule LiveAdmin.Components.Container.Index do
 
         records = Resource.all(ids, resource, prefix, repo)
 
-        records
-        |> Enum.with_index()
-        |> Enum.each(fn {record, i} ->
-          apply(mod, func, [record | args])
+        {type, message} =
+          records
+          |> Enum.with_index()
+          |> Enum.reduce(0, fn {record, i}, failed_count ->
+            try do
+              case apply(mod, func, [record | args]) do
+                {:ok, _} -> failed_count
+                {:error, _} -> failed_count + 1
+              end
+            rescue
+              _ -> failed_count + 1
+            after
+              LiveAdmin.Notifier.job(session, pid, (i + 1) / length(records))
+            end
+          end)
+          |> case do
+            0 ->
+              {:success,
+               trans("%{name} action run successfully on %{count} records",
+                 inter: [name: name, count: length(records)]
+               )}
 
-          LiveAdmin.Notifier.job(session, pid, i / length(records))
-        end)
+            error_count ->
+              {:error,
+               trans(
+                 "%{name} action failed on %{error_count} records (%{success_count} succeeeded)",
+                 inter: [
+                   name: name,
+                   error_count: error_count,
+                   success_count: length(records) - error_count
+                 ]
+               )}
+          end
 
         LiveAdmin.Notifier.job(session, pid, 1)
+        LiveAdmin.Notifier.announce(session, message, type: type)
       end,
       timeout: :infinity
     )
 
-    socket =
-      socket
-      |> put_flash(
-        :info,
-        trans("Action running on %{count} records: %{action}",
-          inter: [count: Enum.count(ids), action: action]
-        )
-      )
-      |> push_redirect(
-        to: route_with_params(socket.assigns, params: list_link_params(socket.assigns))
-      )
-
-    {:noreply, socket}
+    socket
   end
 
   defp list_link_params(assigns, overrides \\ []) do

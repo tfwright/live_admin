@@ -75,8 +75,6 @@ defmodule DemoWeb.UserAdmin do
       LiveAdmin.Notifier.job(session, self(), i/count)
     end)
 
-    LiveAdmin.Notifier.job(session, self(), 1)
-
     {:ok, "updated"}
   end
 

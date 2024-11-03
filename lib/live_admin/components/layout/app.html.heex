@@ -1,5 +1,7 @@
 <main class="main__content">
-  <div class="toast__container--success"><%= Phoenix.Flash.get(@flash, :info) %></div>
+  <div class="toast__container--success"><%= Phoenix.Flash.get(@flash, :success) %></div>
+  <div class="toast__container--info"><%= Phoenix.Flash.get(@flash, :info) %></div>
+  <div class="toast__container--error"><%= Phoenix.Flash.get(@flash, :error) %></div>
   <%= live_render(@socket, LiveAdmin.Components.Nav.Jobs,
     sticky: true,
     id: "jobs",

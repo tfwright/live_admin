@@ -1,10 +1,14 @@
 defmodule LiveAdmin.Components.Nav.Jobs do
   use Phoenix.LiveView
 
+  require Logger
+
   @impl true
   def mount(_, %{"session_id" => session_id}, socket) do
-    if connected?(socket),
-      do: :ok = Phoenix.PubSub.subscribe(LiveAdmin.PubSub, "session:#{session_id}")
+    if connected?(socket) do
+      :ok = Phoenix.PubSub.subscribe(LiveAdmin.PubSub, "session:#{session_id}")
+      :ok = Phoenix.PubSub.subscribe(LiveAdmin.PubSub, "all")
+    end
 
     {:ok, assign(socket, jobs: []), layout: false}
   end
@@ -19,6 +23,12 @@ defmodule LiveAdmin.Components.Nav.Jobs do
         end
       end)
     end)
+  end
+
+  @impl true
+  def handle_info(info = {:announce, message, type}, socket) do
+    Logger.debug("ANNOUNCE: #{inspect(info)}")
+    {:noreply, push_event(socket, type, %{msg: message})}
   end
 
   @impl true
@@ -60,6 +70,9 @@ defmodule LiveAdmin.Components.Nav.Jobs do
 
     {:noreply, socket}
   end
+
+  @impl true
+  def handle_info(_, socket), do: {:noreply, socket}
 
   @impl true
   def render(assigns) do

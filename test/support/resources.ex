@@ -15,7 +15,7 @@ defmodule LiveAdminTest.User do
   end
 
   def user_task(_, _), do: {:ok, "worked"}
-  def user_action(%__MODULE__{}, %{}), do: {:ok, "worked"}
+  def user_action(record, %{}), do: {:ok, record}
   def custom_arity_task(_, _, _), do: {:ok, "worked"}
   def failing_action(_, _), do: {:error, "failed"}
 end

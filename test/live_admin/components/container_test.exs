@@ -35,9 +35,9 @@ defmodule LiveAdmin.Components.ContainerTest do
 
   describe "list resource" do
     setup %{conn: conn} do
-      Repo.insert!(%User{})
+      user = Repo.insert!(%User{})
       {:ok, view, _html} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc")
-      %{view: view}
+      %{view: view, user: user}
     end
 
     test "links to new form", %{view: view} do
@@ -47,10 +47,10 @@ defmodule LiveAdmin.Components.ContainerTest do
                |> render_click()
     end
 
-    test "runs configured action on selected records", %{view: view} do
+    test "runs configured action on selected records", %{view: view, user: user} do
       view
       |> element("#list")
-      |> render_hook("action", %{name: "user_action", ids: []})
+      |> render_hook("action", %{name: "user_action", ids: [user.id]})
 
       assert_redirect(view)
     end

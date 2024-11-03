@@ -159,6 +159,7 @@ A dropdown will be added to the top nav bar that will allow you to switch betwee
 Currently supported:
 
 * Background job progress
+* Announcements with success/error states
 
 ### i18n
 

@@ -18,11 +18,16 @@ defmodule LiveAdmin.Components.Container do
   alias Phoenix.LiveView.JS
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, %{"session_id" => session_id}, socket) do
     socket =
       assign(socket, loading: !connected?(socket), jobs: [])
 
-    if connected?(socket), do: Process.send_after(self(), :clear_flash, 1000)
+    if connected?(socket) do
+      Process.send_after(self(), :clear_flash, 1000)
+
+      :ok = Phoenix.PubSub.subscribe(LiveAdmin.PubSub, "session:#{session_id}")
+      :ok = Phoenix.PubSub.subscribe(LiveAdmin.PubSub, "all")
+    end
 
     {:ok, socket}
   end
@@ -106,18 +111,40 @@ defmodule LiveAdmin.Components.Container do
     search = Map.get(socket.assigns, :search)
 
     task =
-      Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, m, f, [
-        Resource.query(resource, search, config) | args
-      ])
+      Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, fn ->
+        try do
+          case apply(m, f, [Resource.query(resource, search, config) | args]) do
+            {:ok, message} ->
+              LiveAdmin.Notifier.announce(
+                session,
+                trans("Task %{name} succeeded: '%{message}'",
+                  inter: [name: name, message: message]
+                ),
+                type: :success
+              )
+
+            {:error, message} ->
+              LiveAdmin.Notifier.announce(
+                session,
+                trans("Task %{name} failed: '%{message}'", inter: [name: name, message: message]),
+                type: :error
+              )
+          end
+        rescue
+          _ ->
+            LiveAdmin.Notifier.announce(
+              session,
+              trans("Task %{name} failed", inter: [name: name]),
+              type: :error
+            )
+        after
+          LiveAdmin.Notifier.job(session, self(), 1)
+        end
+      end)
 
     LiveAdmin.Notifier.job(session, task.pid, 0, label: name)
 
-    socket =
-      socket
-      |> put_flash(:info, trans("%{task} started", inter: [task: name]))
-      |> push_navigate(to: route_with_params(socket.assigns))
-
-    {:noreply, socket}
+    {:noreply, push_redirect(socket, to: route_with_params(socket.assigns))}
   end
 
   @impl true
