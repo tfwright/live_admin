@@ -14,7 +14,7 @@ Significant features:
 * Overridable views, styles, and API
 * Custom actions at the resource and record level, with support for dynamic inputs
 * Edit (nested) embedded schemas
-* Notifications
+* Notifications via [Phoenix.PubSub](https://github.com/phoenixframework/phoenix_pubsub)
 * i18n via [Gettext](https://github.com/elixir-gettext/gettext)
 
 See for yourself, try out the [demo app](#development)
@@ -154,7 +154,7 @@ A dropdown will be added to the top nav bar that will allow you to switch betwee
 
 ### Notifications
 
-`LiveAdmin.Notifier` provides an API for triggering events from LiveAdmin.Resource modules, or other application code.
+LiveAdmin broadcasts notifications about certain events and responds with UI events.
 
 Currently supported:
 

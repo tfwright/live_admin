@@ -6,8 +6,8 @@ defmodule LiveAdmin.Components.Nav.Jobs do
   @impl true
   def mount(_, %{"session_id" => session_id}, socket) do
     if connected?(socket) do
-      :ok = Phoenix.PubSub.subscribe(LiveAdmin.PubSub, "session:#{session_id}")
-      :ok = Phoenix.PubSub.subscribe(LiveAdmin.PubSub, "all")
+      :ok = LiveAdmin.PubSub.subscribe(session_id)
+      :ok = LiveAdmin.PubSub.subscribe()
     end
 
     {:ok, assign(socket, jobs: []), layout: false}
@@ -26,32 +26,38 @@ defmodule LiveAdmin.Components.Nav.Jobs do
   end
 
   @impl true
-  def handle_info(info = {:announce, message, type}, socket) do
+  def handle_info(info = {:announce, %{message: message, type: type}}, socket) do
     Logger.debug("ANNOUNCE: #{inspect(info)}")
     {:noreply, push_event(socket, type, %{msg: message})}
   end
 
   @impl true
-  def handle_info({:job, pid, :start, label}, socket) do
-    Process.monitor(pid)
-
-    socket = update(socket, :jobs, fn jobs -> [{pid, label, 0.0} | jobs] end)
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_info({:job, pid, :progress, progress}, socket) do
-    socket = set_progress(socket, pid, progress)
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_info({:job, pid, :complete}, socket) do
+  def handle_info({:job, %{pid: pid, progress: progress}}, socket)
+      when progress >= 1 do
     Process.send_after(self(), {:remove_job, pid}, 1500)
 
     {:noreply, set_progress(socket, pid, 1.0)}
+  end
+
+  @impl true
+  def handle_info({:job, job = %{pid: pid, progress: progress}}, socket) do
+    socket =
+      update(socket, :jobs, fn jobs ->
+        jobs
+        |> Enum.find_index(fn {job_pid, _, _} -> job_pid == pid end)
+        |> case do
+          nil ->
+            Process.monitor(pid)
+            [{pid, Map.fetch!(job, :label), 0.0} | jobs]
+
+          i ->
+            List.update_at(jobs, i, fn {pid, job_label, _} ->
+              {pid, Map.get(job, :label, job_label), progress}
+            end)
+        end
+      end)
+
+    {:noreply, socket}
   end
 
   @impl true

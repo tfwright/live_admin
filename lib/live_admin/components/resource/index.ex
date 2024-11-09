@@ -426,7 +426,7 @@ defmodule LiveAdmin.Components.Container.Index do
       fn ->
         pid = self()
 
-        LiveAdmin.Notifier.job(session, pid, 0, label: label)
+        LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: pid, progress: 0, label: label}})
 
         records = Resource.all(ids, resource, prefix, repo)
 
@@ -442,7 +442,10 @@ defmodule LiveAdmin.Components.Container.Index do
             rescue
               _ -> failed_count + 1
             after
-              LiveAdmin.Notifier.job(session, pid, (i + 1) / length(records))
+              LiveAdmin.PubSub.broadcast(
+                session.id,
+                {:job, %{pid: pid, progress: (i + 1) / length(records)}}
+              )
             end
           end)
           |> case do
@@ -464,8 +467,8 @@ defmodule LiveAdmin.Components.Container.Index do
                )}
           end
 
-        LiveAdmin.Notifier.job(session, pid, 1)
-        LiveAdmin.Notifier.announce(session, message, type: type)
+        LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: pid, progress: 1}})
+        LiveAdmin.PubSub.broadcast(session.id, {:announce, %{message: message, type: type}})
       end,
       timeout: :infinity
     )

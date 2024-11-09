@@ -72,7 +72,7 @@ defmodule DemoWeb.UserAdmin do
       |> Ecto.Changeset.change(encrypted_password: :crypto.strong_rand_bytes(16) |> Base.encode16())
       |> Demo.Repo.update()
 
-      LiveAdmin.Notifier.job(session, self(), i/count)
+      LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: self(), progress: i/count, label: "Regenerating passwords"}})
     end)
 
     {:ok, "updated"}

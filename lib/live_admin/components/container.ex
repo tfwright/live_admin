@@ -2,6 +2,8 @@ defmodule LiveAdmin.Components.Container do
   use Phoenix.LiveView
   use PhoenixHTMLHelpers
 
+  require Logger
+
   import LiveAdmin,
     only: [
       resource_title: 2,
@@ -18,15 +20,12 @@ defmodule LiveAdmin.Components.Container do
   alias Phoenix.LiveView.JS
 
   @impl true
-  def mount(_params, %{"session_id" => session_id}, socket) do
+  def mount(_params, _session, socket) do
     socket =
       assign(socket, loading: !connected?(socket), jobs: [])
 
     if connected?(socket) do
       Process.send_after(self(), :clear_flash, 1000)
-
-      :ok = Phoenix.PubSub.subscribe(LiveAdmin.PubSub, "session:#{session_id}")
-      :ok = Phoenix.PubSub.subscribe(LiveAdmin.PubSub, "all")
     end
 
     {:ok, socket}
@@ -115,34 +114,45 @@ defmodule LiveAdmin.Components.Container do
         try do
           case apply(m, f, [Resource.query(resource, search, config) | args]) do
             {:ok, message} ->
-              LiveAdmin.Notifier.announce(
-                session,
-                trans("Task %{name} succeeded: '%{message}'",
-                  inter: [name: name, message: message]
-                ),
-                type: :success
+              LiveAdmin.PubSub.broadcast(
+                session.id,
+                {:announce,
+                 %{
+                   message:
+                     trans("Task %{name} succeeded: '%{message}'",
+                       inter: [name: name, message: message]
+                     )
+                 }, type: :success}
               )
 
             {:error, message} ->
-              LiveAdmin.Notifier.announce(
-                session,
-                trans("Task %{name} failed: '%{message}'", inter: [name: name, message: message]),
-                type: :error
+              LiveAdmin.PubSub.broadcast(
+                session.id,
+                {:announce,
+                 %{
+                   message:
+                     trans("Task %{name} failed: '%{message}'",
+                       inter: [name: name, message: message]
+                     ),
+                   type: :error
+                 }}
               )
           end
         rescue
-          _ ->
-            LiveAdmin.Notifier.announce(
-              session,
-              trans("Task %{name} failed", inter: [name: name]),
-              type: :error
+          error ->
+            Logger.error(inspect(error))
+
+            LiveAdmin.PubSub.broadcast(
+              session.id,
+              {:announce,
+               %{message: trans("Task %{name} failed", inter: [name: name]), type: :error}}
             )
         after
-          LiveAdmin.Notifier.job(session, self(), 1)
+          LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: self(), progress: 1}})
         end
       end)
 
-    LiveAdmin.Notifier.job(session, task.pid, 0, label: name)
+    LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: task.pid, progress: 0, label: "name"}})
 
     {:noreply, push_redirect(socket, to: route_with_params(socket.assigns))}
   end
