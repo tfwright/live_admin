@@ -152,7 +152,7 @@ defmodule LiveAdmin.Components.Container do
         end
       end)
 
-    LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: task.pid, progress: 0, label: "name"}})
+    LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: task.pid, progress: 0, label: name}})
 
     {:noreply, push_redirect(socket, to: route_with_params(socket.assigns))}
   end
