@@ -2,7 +2,7 @@ defmodule LiveAdmin.PubSub do
   @moduledoc """
     PubSub system for exchanging messages with LiveAdmin.
 
-    Includes the following events:
+    Includes built in support for the following events:
       * :job - Shows progress bar indicating status of any ongoing process. LiveAdmin uses this internally to indicate progress of actions on multiple records and tasks. Metadata consists of `pid`, `progress` float/int, and `label` string.
       * :announce - Show temporary message with severity level. Meta consists of `message` string, and `type` (`:error`, `:success`, or `:info`)
 
