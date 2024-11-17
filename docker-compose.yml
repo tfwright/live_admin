@@ -15,7 +15,7 @@ services:
     command: mix dev
     healthcheck:
       test: curl --fail http://localhost:4000 || exit 1
-      interval: 30s
+      interval: 10s
       timeout: 10s
       retries: 5
   db:
