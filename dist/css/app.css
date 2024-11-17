@@ -1193,6 +1193,15 @@ input[class$="-loading"] + div nav:before {
   margin: 0.25rem;
 }
 
+.list__error {
+  width: 100%;
+  text-align: center;
+}
+
+.list__error * {
+  margin: 0.5rem;
+}
+
 .list__search input {
   padding-left: 1rem;
   padding-right: 1rem;

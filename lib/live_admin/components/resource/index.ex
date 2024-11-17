@@ -26,17 +26,20 @@ defmodule LiveAdmin.Components.Container.Index do
       |> assign_async(
         [:records],
         fn ->
-          {:ok,
-           %{
-             records:
-               Resource.list(
-                 assigns.resource,
-                 list_link_params(assigns),
-                 assigns.session,
-                 assigns.repo,
-                 assigns.config
-               )
-           }}
+          {records, count} =
+            Resource.list(
+              assigns.resource,
+              list_link_params(assigns),
+              assigns.session,
+              assigns.repo,
+              assigns.config
+            )
+
+          if Enum.any?(records) do
+            {:ok, %{records: {records, count}}}
+          else
+            {:error, :no_results}
+          end
         end,
         reset: true
       )
@@ -192,11 +195,11 @@ defmodule LiveAdmin.Components.Container.Index do
               <% end %>
             <% else %>
               <tr>
-                <td class="p-10">
+                <td class="p-10" colspan={@resource |> Resource.fields(@config) |> Enum.count()}>
                   <%= if @records.loading do %>
                     <div class="spinner" />
                   <% else %>
-                    <%= trans("Error") %>
+                    <.list_error failed={@records.failed} />
                   <% end %>
                 </td>
               </tr>
@@ -382,6 +385,33 @@ defmodule LiveAdmin.Components.Container.Index do
         </div>
       </.modal>
     </div>
+    """
+  end
+
+  defp list_error(assigns = %{failed: {:error, :no_results}}) do
+    ~H"""
+    <div class="list__error">
+      <%= trans("No results for this page with current filters.") %>
+      <p>
+        <button
+          class="resource__action--btn"
+          phx-click={
+            JS.show(
+              to: "#settings-modal",
+              transition: {"ease-in duration-300", "opacity-0", "opacity-100"}
+            )
+          }
+        >
+          <%= trans("Edit view") %>
+        </button>
+      </p>
+    </div>
+    """
+  end
+
+  defp list_error(assigns) do
+    ~H"""
+    <%= trans("Error") %>
     """
   end
 

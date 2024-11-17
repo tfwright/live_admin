@@ -446,6 +446,15 @@ input[type="submit"] {
     @apply m-1;
   }
 
+  .list__error {
+    @apply w-full;
+    @apply text-center;
+  }
+
+  .list__error * {
+    @apply m-2;
+  }
+
   .list__search input {
     @apply px-4;
     @apply py-1;

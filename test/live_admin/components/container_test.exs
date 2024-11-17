@@ -72,15 +72,15 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
-  describe "list resource with search param" do
+  describe "list resource with search param not matching any records" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"})
       {:ok, view, html} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc&s=fred")
       %{view: view, response: html}
     end
 
-    test "filters results", %{view: view} do
-      assert render_async(view) =~ "0-0/0"
+    test "shows error", %{view: view} do
+      assert render_async(view) =~ "No results"
     end
   end
 
