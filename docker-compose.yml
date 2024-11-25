@@ -7,6 +7,8 @@ services:
       - "4000:4000"
     volumes:
       - .:/opt/app
+      - /opt/app/deps
+      - /opt/app/_build
     environment:
       PG_URL: postgres:postgres@db
       LIVE_ADMIN_DEV: 'true'
