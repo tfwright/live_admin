@@ -21,7 +21,7 @@ defmodule LiveAdmin.Components.Nav do
           },
           r
         ) && is_nil(r.metadata[:resource]) &&
-          !String.match?(r.helper, ~r/(home|session)/)
+          (is_nil(r.helper) || !String.match?(r.helper, ~r/(home|session)/))
       end)
 
     socket =
