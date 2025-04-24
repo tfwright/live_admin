@@ -1,5 +1,6 @@
 defmodule LiveAdmin.Components.NavTest do
   use ExUnit.Case, async: true
+  import Phoenix.LiveViewTest
   alias LiveAdmin.Components.Nav
 
   defmodule DummyLive do
@@ -129,7 +130,7 @@ defmodule LiveAdmin.Components.NavTest do
     assigns = %{
       id: :nav_test,
       base_path: "/admin",
-      config: [],
+      config: [title: "Test"],
       router: FakeRouter,
       resources: [],
       resource: nil
@@ -145,7 +146,7 @@ defmodule LiveAdmin.Components.NavTest do
     {:ok, assigns: assigns, socket: socket}
   end
 
-  test "filters out base, session, resource, and non-admin routes, keeping only custom extras", %{
+  test "extra_pages contains only admin scoped routes, filters out base and session", %{
     assigns: assigns,
     socket: socket
   } do
@@ -153,5 +154,23 @@ defmodule LiveAdmin.Components.NavTest do
 
     extra_paths = Enum.map(socket.assigns.extra_pages, & &1.path)
     assert extra_paths == ["/admin/alpha", "/admin/metrics", "/admin/zeta"]
+  end
+
+  test "renders the navigation component with correct routes", %{assigns: assigns} do
+    html = render_component(Nav, assigns, router: FakeRouter)
+
+    # Should include links to custom admin_resource routes
+    assert html =~ ~s|href="/admin/alpha"|
+    assert html =~ ~s|href="/admin/metrics"|
+    assert html =~ ~s|href="/admin/zeta"|
+
+    # Excluded from assigns.extra_pages but hardcoded in the nav component
+    assert html =~ ~s|href="/admin"|
+    assert html =~ ~s|href="/admin/session"|
+
+    # Should not include links to excluded routes
+    refute html =~ ~s|href="/admin/entries"|
+    refute html =~ ~s|href="/log"|
+    refute html =~ ~s|href="/admin/user/preferences"|
   end
 end
