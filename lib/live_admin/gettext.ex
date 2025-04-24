@@ -1,3 +1,3 @@
 defmodule LiveAdmin.Gettext do
-  use Gettext, otp_app: :live_admin
+  use Gettext.Backend, otp_app: :live_admin
 end

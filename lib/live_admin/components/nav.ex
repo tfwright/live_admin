@@ -7,8 +7,6 @@ defmodule LiveAdmin.Components.Nav do
 
   @impl true
   def update(assigns, socket) do
-    base_path = assigns.base_path
-
     extra_pages =
       socket.router
       |> Phoenix.Router.routes()
@@ -57,11 +55,11 @@ defmodule LiveAdmin.Components.Nav do
       <ul class="nav__list">
         <li class="nav__item--group">
           <span>
-            <%= Keyword.fetch!(@config, :title) %>
+            {Keyword.fetch!(@config, :title)}
           </span>
         </li>
         <li class="nav__item--group">
-          <.link navigate={@base_path}><%= trans("Home") %></.link>
+          <.link navigate={@base_path}>{trans("Home")}</.link>
         </li>
         <li class="nav__item--group">
           <.nav_group
@@ -75,14 +73,14 @@ defmodule LiveAdmin.Components.Nav do
           <li class="nav__item--group">
             <%= for route <- @extra_pages do %>
               <.link navigate={route.path}>
-                <%= humanize(route.helper) %>
+                {humanize(route.helper)}
               </.link>
             <% end %>
           </li>
         <% end %>
         <li class="nav__item--group">
           <.link navigate={Path.join(@base_path, "session")}>
-            <%= trans("Session") %>
+            {trans("Session")}
           </.link>
         </li>
       </ul>
@@ -97,13 +95,13 @@ defmodule LiveAdmin.Components.Nav do
         <%= if match?({_key, _resource}, parent) do %>
           <li class={"nav__item#{if elem(parent, 1) == @current_resource, do: "--selected"}"}>
             <.link navigate={route_with_params(assigns, resource_path: elem(parent, 0))}>
-              <%= resource_title(elem(parent, 1), @config) %>
+              {resource_title(elem(parent, 1), @config)}
             </.link>
           </li>
         <% else %>
           <li class="nav__item--drop">
             <input type="checkbox" id={"menu-group-#{parent}"} checked={open?(assigns, parent)} />
-            <label for={"menu-group-#{parent}"}><%= parent %></label>
+            <label for={"menu-group-#{parent}"}>{parent}</label>
             <.nav_group
               items={children}
               base_path={@base_path}
