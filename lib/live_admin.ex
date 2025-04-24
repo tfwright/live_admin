@@ -111,7 +111,7 @@ defmodule LiveAdmin do
     with result = {_, m, f, _} <-
            extract_function_from_config(resource, session, function_type, function),
          docs when is_map(docs) <- extract_function_docs(m, f) do
-      Tuple.append(result, docs)
+      Tuple.insert_at(result, tuple_size(result), docs)
     end
   end
 
