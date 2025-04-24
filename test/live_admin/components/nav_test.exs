@@ -12,44 +12,94 @@ defmodule LiveAdmin.Components.NavTest do
   end
 
   defmodule FakeRouter do
+    @base "/admin"
+
     def __routes__ do
       [
+        # 1) Home (base path) - should be excluded
         %Phoenix.Router.Route{
           verb: "GET",
-          path: "/admin/metrics",
+          path: @base,
+          helper: nil,
+          plug: Phoenix.LiveView.Plug,
+          plug_opts: :"home_/admin",
+          metadata: %{
+            phoenix_live_view: {DummyLive, :home, [], %{extra: %{layout: true}}}
+          }
+        },
+
+        # 2) Custom extra pages - should be included
+        %Phoenix.Router.Route{
+          verb: "GET",
+          path: "#{@base}/metrics",
           helper: :admin_metrics,
           plug: DummyController,
           plug_opts: :index,
           metadata: %{
-            phoenix_live_view: {
-              DummyLive,
-              :index,
-              [],
-              %{extra: %{custom: true}}
-            }
+            phoenix_live_view: {DummyLive, :index, [], %{extra: %{custom: true}}}
           }
         },
         %Phoenix.Router.Route{
           verb: "GET",
-          path: "/admin/session",
+          path: "/admin/alpha",
+          helper: :admin_alpha,
+          plug: DummyController,
+          plug_opts: :index,
+          metadata: %{
+            phoenix_live_view: {DummyLive, :index, [], %{extra: %{foo: true}}}
+          }
+        },
+        %Phoenix.Router.Route{
+          verb: "GET",
+          path: "/admin/zeta",
+          helper: :admin_zeta,
+          plug: DummyController,
+          plug_opts: :index,
+          metadata: %{
+            phoenix_live_view: {DummyLive, :index, [], %{extra: %{bar: true}}}
+          }
+        },
+
+        # 3) Session page - should be excluded
+        %Phoenix.Router.Route{
+          verb: "GET",
+          path: "#{@base}/session",
           helper: :admin_session,
           plug: DummyController,
           plug_opts: :index,
           metadata: %{
             resource: nil,
-            phoenix_live_view: {
-              DummyLive,
-              :index,
-              [],
-              %{extra: %{session: true}}
-            }
+            phoenix_live_view: {DummyLive, :index, [], %{extra: %{session: true}}}
           }
+        },
+
+        # 4) Resource route - should be excluded
+        %Phoenix.Router.Route{
+          verb: "GET",
+          path: "#{@base}/entries",
+          helper: nil,
+          plug: Phoenix.LiveView.Plug,
+          plug_opts: :"list_/admin/entries",
+          metadata: %{
+            resource: {"/entries", MyApp.Entries.Entry},
+            phoenix_live_view: {DummyLive, :list, [], %{extra: %{layout: true}}}
+          }
+        },
+
+        # 5) Non-admin path - should be excluded
+        %Phoenix.Router.Route{
+          verb: "GET",
+          path: "/log",
+          helper: nil,
+          plug: DummyController,
+          plug_opts: nil,
+          metadata: %{log: :debug}
         }
       ]
     end
   end
 
-  test "only extra non-session routes are assigned as extra_pages" do
+  setup do
     assigns = %{
       id: :nav_test,
       base_path: "/admin",
@@ -59,19 +109,23 @@ defmodule LiveAdmin.Components.NavTest do
       resource: nil
     }
 
-    socket =
-      %Phoenix.LiveView.Socket{
-        endpoint: DummyEndpoint,
-        router: FakeRouter,
-        view: DummyLive,
-        assigns: %{__changed__: %{}}
-      }
+    socket = %Phoenix.LiveView.Socket{
+      endpoint: MyApp.Endpoint,
+      router: FakeRouter,
+      view: DummyLive,
+      assigns: %{__changed__: %{}}
+    }
 
+    {:ok, assigns: assigns, socket: socket}
+  end
+
+  test "filters out base, session, resource, and non-admin routes, keeping only custom extras", %{
+    assigns: assigns,
+    socket: socket
+  } do
     {:ok, socket} = Nav.update(assigns, socket)
 
     extra_paths = Enum.map(socket.assigns.extra_pages, & &1.path)
-
-    assert "/admin/metrics" in extra_paths
-    refute "/admin/session" in extra_paths
+    assert extra_paths == ["/admin/alpha", "/admin/metrics", "/admin/zeta"]
   end
 end
