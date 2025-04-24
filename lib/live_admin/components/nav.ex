@@ -6,22 +6,12 @@ defmodule LiveAdmin.Components.Nav do
     only: [resource_title: 2, route_with_params: 2, trans: 1]
 
   @impl true
-  def update(assigns, socket) do
+  def update(assigns, %{router: router} = socket) do
     extra_pages =
-      socket.router
+      router
       |> Phoenix.Router.routes()
-      |> Enum.filter(fn r ->
-        case r.metadata[:phoenix_live_view] do
-          {_, _, _, %{extra: extra_meta}} when is_map(extra_meta) ->
-            is_nil(r.metadata[:resource]) and
-              extra_meta
-              |> Map.keys()
-              |> Enum.any?(fn key -> key != :session end)
-
-          _ ->
-            false
-        end
-      end)
+      |> Enum.filter(&extra_page?(&1, assigns))
+      |> Enum.sort_by(& &1.path)
 
     socket =
       socket
@@ -129,4 +119,35 @@ defmodule LiveAdmin.Components.Nav do
         |> Enum.member?(schema)
     end
   end
+
+  defp extra_page?(route, assigns) do
+    valid_path?(route, assigns) and
+      no_resource?(route) and
+      has_non_session_keys?(route)
+  end
+
+  defp valid_path?(%{path: path}, %{base_path: base}) when is_binary(path) and is_binary(base) do
+    starts_with_base?(path, base) and
+      not_base_path?(path, base) and
+      not_session_path?(path, base)
+  end
+
+  defp valid_path?(_, _), do: false
+
+  defp starts_with_base?(path, base), do: String.starts_with?(path, base)
+
+  defp not_base_path?(path, path), do: false
+  defp not_base_path?(_, _), do: true
+
+  defp not_session_path?(path, base), do: path != Path.join(base, "session")
+
+  defp no_resource?(%{metadata: %{resource: nil}}), do: true
+  defp no_resource?(%{metadata: metadata}) when not is_map_key(metadata, :resource), do: true
+  defp no_resource?(_), do: false
+
+  defp has_non_session_keys?(%{metadata: %{phoenix_live_view: {_, _, _, %{extra: extra_meta}}}})
+       when is_map(extra_meta),
+       do: Map.keys(extra_meta) -- [:session] != []
+
+  defp has_non_session_keys?(_), do: false
 end
