@@ -20,7 +20,9 @@ defmodule LiveAdmin.Components.Nav do
             }
           },
           r
-        ) && is_nil(r.metadata[:resource]) &&
+        ) &&
+          is_nil(r.metadata[:resource]) &&
+          is_binary(r.helper) &&
           !String.match?(r.helper, ~r/(home|session)/)
       end)
 
