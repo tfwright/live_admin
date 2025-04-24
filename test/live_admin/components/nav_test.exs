@@ -16,7 +16,9 @@ defmodule LiveAdmin.Components.NavTest do
 
     def __routes__ do
       [
-        # 1) Home (base path) - should be excluded
+        # 1) Home (base path)
+        # - should be excluded from extra_pages
+        # - but later hardcoded in the nav component
         %Phoenix.Router.Route{
           verb: "GET",
           path: @base,
@@ -28,7 +30,8 @@ defmodule LiveAdmin.Components.NavTest do
           }
         },
 
-        # 2) Custom extra pages - should be included
+        # 2) Custom extra pages
+        # - should be included in extra_pages
         %Phoenix.Router.Route{
           verb: "GET",
           path: "#{@base}/metrics",
@@ -60,7 +63,9 @@ defmodule LiveAdmin.Components.NavTest do
           }
         },
 
-        # 3) Session page - should be excluded
+        # 3) Session page
+        # - should be excluded from extra_pages
+        # - but later hardcoded in the nav component
         %Phoenix.Router.Route{
           verb: "GET",
           path: "#{@base}/session",
@@ -73,7 +78,9 @@ defmodule LiveAdmin.Components.NavTest do
           }
         },
 
-        # 4) Resource route - should be excluded
+        # 4) Resource route
+        # - should be excluded
+        # - edge case bonus: somehow shares the base path
         %Phoenix.Router.Route{
           verb: "GET",
           path: "#{@base}/entries",
@@ -86,7 +93,8 @@ defmodule LiveAdmin.Components.NavTest do
           }
         },
 
-        # 5) Non-admin path - should be excluded
+        # 5) Non-admin path
+        # - should be excluded
         %Phoenix.Router.Route{
           verb: "GET",
           path: "/log",
@@ -94,6 +102,24 @@ defmodule LiveAdmin.Components.NavTest do
           plug: DummyController,
           plug_opts: nil,
           metadata: %{log: :debug}
+        },
+
+        # 6) Contains only session key
+        # - should be excluded
+        # - `not_session_path?/2` removes `/admin/session` by path, but…
+        #   If someone mounted a custom LiveView at some other URL
+        #   and only passed `extra: %{session: …}` (say via a plug),
+        #   the only way to tell the component to exclude it is by
+        #   inspecting the metadata keys.
+        %Phoenix.Router.Route{
+          verb: "GET",
+          path: "#{@base}/user/preferences",
+          helper: :admin_user_preferences,
+          plug: Phoenix.LiveView.Plug,
+          plug_opts: :"Elixir.MyApp.UserPreferencesLive",
+          metadata: %{
+            phoenix_live_view: {DummyLive, :index, [], %{extra: %{session: %{foo: "bar"}}}}
+          }
         }
       ]
     end
