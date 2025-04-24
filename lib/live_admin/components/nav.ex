@@ -120,16 +120,17 @@ defmodule LiveAdmin.Components.Nav do
     end
   end
 
+  # If it's:
+  # - a route under /admin
+  # - not the home or session page
+  # - not an Ecto resource
+  # then show it.
   defp extra_page?(route, assigns) do
-    valid_path?(route, assigns) and
-      no_resource?(route) and
-      has_non_session_keys?(route)
+    valid_path?(route, assigns) and no_resource?(route)
   end
 
   defp valid_path?(%{path: path}, %{base_path: base}) when is_binary(path) and is_binary(base) do
-    starts_with_base?(path, base) and
-      not_base_path?(path, base) and
-      not_session_path?(path, base)
+    starts_with_base?(path, base) and not_base_path?(path, base) and not_session_path?(path, base)
   end
 
   defp valid_path?(_, _), do: false
@@ -144,10 +145,4 @@ defmodule LiveAdmin.Components.Nav do
   defp no_resource?(%{metadata: %{resource: nil}}), do: true
   defp no_resource?(%{metadata: metadata}) when not is_map_key(metadata, :resource), do: true
   defp no_resource?(_), do: false
-
-  defp has_non_session_keys?(%{metadata: %{phoenix_live_view: {_, _, _, %{extra: extra_meta}}}})
-       when is_map(extra_meta),
-       do: Map.keys(extra_meta) -- [:session] != []
-
-  defp has_non_session_keys?(_), do: false
 end

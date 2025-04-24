@@ -103,24 +103,6 @@ defmodule LiveAdmin.Components.NavTest do
           plug: DummyController,
           plug_opts: nil,
           metadata: %{log: :debug}
-        },
-
-        # 6) Contains only session key
-        # - should be excluded
-        # - `not_session_path?/2` removes `/admin/session` by path, but…
-        #   If someone mounted a custom LiveView at some other URL
-        #   and only passed `extra: %{session: …}` (say via a plug),
-        #   the only way to tell the component to exclude it is by
-        #   inspecting the metadata keys.
-        %Phoenix.Router.Route{
-          verb: "GET",
-          path: "#{@base}/user/preferences",
-          helper: :admin_user_preferences,
-          plug: Phoenix.LiveView.Plug,
-          plug_opts: :"Elixir.MyApp.UserPreferencesLive",
-          metadata: %{
-            phoenix_live_view: {DummyLive, :index, [], %{extra: %{session: %{foo: "bar"}}}}
-          }
         }
       ]
     end
@@ -171,6 +153,5 @@ defmodule LiveAdmin.Components.NavTest do
     # Should not include links to excluded routes
     refute html =~ ~s|href="/admin/entries"|
     refute html =~ ~s|href="/log"|
-    refute html =~ ~s|href="/admin/user/preferences"|
   end
 end
