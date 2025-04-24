@@ -13,17 +13,16 @@ defmodule LiveAdmin.Components.Nav do
       socket.router
       |> Phoenix.Router.routes()
       |> Enum.filter(fn r ->
-        match?(
-          %{
-            metadata: %{
-              phoenix_live_view: {_, _, _, %{extra: %{session: {_, _, [^base_path, _]}}}}
-            }
-          },
-          r
-        ) &&
-          is_nil(r.metadata[:resource]) &&
-          is_binary(r.helper) &&
-          !String.match?(r.helper, ~r/(home|session)/)
+        case r.metadata[:phoenix_live_view] do
+          {_, _, _, %{extra: extra_meta}} when is_map(extra_meta) ->
+            is_nil(r.metadata[:resource]) and
+              extra_meta
+              |> Map.keys()
+              |> Enum.any?(fn key -> key != :session end)
+
+          _ ->
+            false
+        end
       end)
 
     socket =
