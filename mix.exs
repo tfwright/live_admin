@@ -44,7 +44,7 @@ defmodule LiveAdmin.MixProject do
   defp deps do
     [
       {:phoenix_view, "~> 2.0"},
-      {:phoenix_live_view, ">= 0.20.0 and < 0.21.0"},
+      {:phoenix_live_view, "~> 1.0.0"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_html_helpers, "~> 1.0"},
       {:ecto, "~> 3.12"},
@@ -57,7 +57,7 @@ defmodule LiveAdmin.MixProject do
       {:jason, "~> 1.3", only: [:dev, :test]},
       {:ecto_psql_extras, "~> 0.7", only: [:dev, :test]},
       {:faker, "~> 0.17", only: :dev},
-      {:floki, ">= 0.30.0", only: :test},
+      {:floki, "~> 0.36.0", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:docout, github: "tfwright/docout", branch: "main", runtime: false, only: [:dev, :test]},
       {:dialyxir, "~> 1.2", only: :dev, runtime: false},

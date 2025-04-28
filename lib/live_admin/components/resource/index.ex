@@ -110,7 +110,7 @@ defmodule LiveAdmin.Components.Container.Index do
                     }
                     class={"header__link#{if field == @sort_attr, do: "--#{[asc: :up, desc: :down][@sort_dir]}"}"}
                   >
-                    <%= trans(humanize(field)) %>
+                    {trans(humanize(field))}
                   </.link>
                 </th>
               <% end %>
@@ -139,14 +139,14 @@ defmodule LiveAdmin.Components.Container.Index do
                       ) %>
                     <td class={"resource__cell resource__cell--#{type_to_css_class(type)}"}>
                       <div class="cell__contents">
-                        <%= Resource.render(
-                          record,
-                          field,
-                          @resource,
-                          assoc_resource,
-                          @session,
-                          @config
-                        ) %>
+                        {Resource.render(
+                        record,
+                        field,
+                        @resource,
+                        assoc_resource,
+                        @session,
+                        @config
+                        )}
                       </div>
                       <div class="cell__icons">
                         <div class="cell__copy" data-message="Copied cell contents to clipboard">
@@ -242,10 +242,10 @@ defmodule LiveAdmin.Components.Container.Index do
                   )
                 }
               >
-                <%= min((@page - 1) * @per + 1, elem(@records.result, 1)) %>-<%= min(
-                  @page * @per,
-                  elem(@records.result, 1)
-                ) %>/<%= elem(@records.result, 1) %>
+                {min((@page - 1) * @per + 1, elem(@records.result, 1))}-{min(
+                @page * @per,
+                elem(@records.result, 1)
+                )}/{elem(@records.result, 1)}
               </button>
 
               <%= if @page < (@records.result |> elem(1)) / 10 do %>
@@ -283,7 +283,7 @@ defmodule LiveAdmin.Components.Container.Index do
                     phx-click={JS.dispatch("live_admin:action")}
                     data-confirm="Are you sure?"
                   >
-                    <%= trans("Delete") %>
+                    {trans("Delete")}
                   </button>
                 <% end %>
                 <.dropdown
@@ -298,7 +298,7 @@ defmodule LiveAdmin.Components.Container.Index do
               </div>
             <% else %>
               <div>
-                <%= elem(@job, 0) %>: <%= elem(@job, 1) %>
+                {elem(@job, 0)}: {elem(@job, 1)}
               </div>
             <% end %>
           </div>
@@ -315,7 +315,7 @@ defmodule LiveAdmin.Components.Container.Index do
               |> JS.add_class("opacity-30", to: "#settings-modal .modal__title:nth-child(2)")
             }
           >
-            <%= trans("Page") %>
+            {trans("Page")}
           </a>
           <a
             class="modal__title opacity-30"
@@ -326,17 +326,17 @@ defmodule LiveAdmin.Components.Container.Index do
               |> JS.add_class("opacity-30", to: "#settings-modal .modal__title:nth-child(1)")
             }
           >
-            <%= trans("Filters") %>
+            {trans("Filters")}
           </a>
         </div>
         <div>
           <form phx-submit="go" phx-target={@myself}>
             <div>
-              <label><%= trans("Number") %></label>
+              <label>{trans("Number")}</label>
               <input type="number" name="page" value={@page} />
             </div>
             <div>
-              <label><%= trans("Size") %></label>
+              <label>{trans("Size")}</label>
               <input type="number" name="per" value={@per} />
             </div>
             <input type="submit" value={trans("Go")} phx-click={JS.hide(to: "#settings-modal")} />
@@ -361,9 +361,9 @@ defmodule LiveAdmin.Components.Container.Index do
                 </div>
                 <div>
                   <select name={"filters[#{i}][field]"}>
-                    <option selected={is_nil(col)}><%= trans("any") %></option>
+                    <option selected={is_nil(col)}>{trans("any")}</option>
                     <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
-                      <option selected={col == to_string(field)}><%= to_string(field) %></option>
+                      <option selected={col == to_string(field)}>{to_string(field)}</option>
                     <% end %>
                   </select>
                   <select name={"filters[#{i}][operator]"} disabled="disabled">
@@ -391,7 +391,7 @@ defmodule LiveAdmin.Components.Container.Index do
   defp list_error(assigns = %{failed: {:error, :no_results}}) do
     ~H"""
     <div class="list__error">
-      <%= trans("No results for this page with current filters.") %>
+      {trans("No results for this page with current filters.")}
       <p>
         <button
           class="resource__action--btn"
@@ -402,7 +402,7 @@ defmodule LiveAdmin.Components.Container.Index do
             )
           }
         >
-          <%= trans("Edit view") %>
+          {trans("Edit view")}
         </button>
       </p>
     </div>
@@ -411,7 +411,7 @@ defmodule LiveAdmin.Components.Container.Index do
 
   defp list_error(assigns) do
     ~H"""
-    <%= trans("Error") %>
+    {trans("Error")}
     """
   end
 
@@ -527,7 +527,7 @@ defmodule LiveAdmin.Components.Container.Index do
     socket =
       socket
       |> handle_action(name, ids, task_def)
-      |> push_redirect(
+      |> push_navigate(
         to: route_with_params(socket.assigns, params: list_link_params(socket.assigns))
       )
 
