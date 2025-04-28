@@ -3,26 +3,15 @@ defmodule LiveAdmin.Components.Nav do
   use PhoenixHTMLHelpers
 
   import LiveAdmin,
-    only: [resource_title: 2, route_with_params: 2, trans: 1]
+    only: [route_with_params: 2]
 
   @impl true
-  def update(assigns, socket) do
-    base_path = assigns.base_path
-
+  def update(assigns, %{router: router} = socket) do
     extra_pages =
-      socket.router
+      router
       |> Phoenix.Router.routes()
-      |> Enum.filter(fn r ->
-        match?(
-          %{
-            metadata: %{
-              phoenix_live_view: {_, _, _, %{extra: %{session: {_, _, [^base_path, _]}}}}
-            }
-          },
-          r
-        ) && is_nil(r.metadata[:resource]) &&
-          !String.match?(r.helper, ~r/(home|session)/)
-      end)
+      |> Enum.filter(&extra_page?(&1, assigns))
+      |> Enum.sort_by(& &1.path)
 
     socket =
       socket
@@ -130,4 +119,30 @@ defmodule LiveAdmin.Components.Nav do
         |> Enum.member?(schema)
     end
   end
+
+  # If it's:
+  # - a route under /admin
+  # - not the home or session page
+  # - not an Ecto resource
+  # then show it.
+  defp extra_page?(route, assigns) do
+    valid_path?(route, assigns) and no_resource?(route)
+  end
+
+  defp valid_path?(%{path: path}, %{base_path: base}) when is_binary(path) and is_binary(base) do
+    starts_with_base?(path, base) and not_base_path?(path, base) and not_session_path?(path, base)
+  end
+
+  defp valid_path?(_, _), do: false
+
+  defp starts_with_base?(path, base), do: String.starts_with?(path, base)
+
+  defp not_base_path?(path, path), do: false
+  defp not_base_path?(_, _), do: true
+
+  defp not_session_path?(path, base), do: path != Path.join(base, "session")
+
+  defp no_resource?(%{metadata: %{resource: nil}}), do: true
+  defp no_resource?(%{metadata: metadata}) when not is_map_key(metadata, :resource), do: true
+  defp no_resource?(_), do: false
 end
