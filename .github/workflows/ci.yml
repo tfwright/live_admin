@@ -27,7 +27,7 @@ jobs:
       with:
         elixir-version: ${{ matrix.elixir }}
         otp-version: ${{ matrix.otp }}
-    - uses: actions/cache@v2
+    - uses: actions/cache@v4
       with:
         path: |
           deps
@@ -35,6 +35,8 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
     - name: Get deps
       run: docker compose run app mix deps.get
+    - name: Compile deps
+      run: docker compose run app mix deps.compile
     - name: Check for uncommitted changes
       run: exit $( git status --porcelain | head -255 | wc -l )
     - name: Run tests
