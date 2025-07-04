@@ -110,7 +110,7 @@ defmodule LiveAdmin.Components.Container.Form do
         {:ok, _} ->
           socket
           |> put_flash(:info, trans("Record successfully added"))
-          |> push_redirect(
+          |> push_navigate(
             to: route_with_params(socket.assigns, params: [prefix: socket.assigns.prefix])
           )
 
@@ -134,7 +134,7 @@ defmodule LiveAdmin.Components.Container.Form do
         {:ok, _} ->
           socket
           |> put_flash(:info, trans("Record successfully updated"))
-          |> push_redirect(to: route_with_params(socket.assigns, segments: [record]))
+          |> push_navigate(to: route_with_params(socket.assigns, segments: [record]))
 
         {:error, changeset} ->
           assign(socket, changeset: changeset)

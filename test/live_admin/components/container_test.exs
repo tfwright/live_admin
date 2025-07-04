@@ -29,6 +29,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
 
     test "links to resource", %{response: response} do
+      {:ok, response} = Floki.parse_document(response)
       assert response |> Floki.find("a[href='/user']") |> Enum.any?()
     end
   end
@@ -116,6 +117,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "new parent resource" do
     setup %{conn: conn} do
       {:ok, view, html} = live(conn, "/user/new")
+      {:ok, html} = Floki.parse_document(html)
       %{response: html, view: view}
     end
 
@@ -155,6 +157,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "new child resource" do
     setup %{conn: conn} do
       {:ok, view, html} = live(conn, "/live_admin_test_post/new")
+      {:ok, html} = Floki.parse_document(html)
       %{response: html, view: view}
     end
 
@@ -175,6 +178,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
       {:ok, view, html} = live(conn, "/user/edit/#{user.id}")
+      {:ok, html} = Floki.parse_document(html)
       %{response: html, view: view, user: user}
     end
 
@@ -197,7 +201,9 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "edit resource with embed" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{settings: %{}})
-      {:ok, view, html} = live(conn, "/user/edit/#{user.id}")
+      conn = get(conn, "/user/edit/#{user.id}")
+      {:ok, view, html} = live(conn)
+      {:ok, html} = Floki.parse_document(html)
       %{response: html, view: view}
     end
 
@@ -212,6 +218,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     setup %{conn: conn} do
       post = Repo.insert!(%Post{title: "test", previous_versions: [%Version{}, %Version{}]})
       {:ok, view, html} = live(conn, "/live_admin_test_post/edit/#{post.post_id}")
+      {:ok, html} = Floki.parse_document(html)
       %{response: html, view: view}
     end
 
@@ -231,6 +238,7 @@ defmodule LiveAdmin.Components.ContainerTest do
         })
 
       {:ok, view, html} = live(conn, "/user/edit/#{user.id}")
+      {:ok, html} = Floki.parse_document(html)
       %{response: html, view: view}
     end
 
@@ -279,6 +287,7 @@ defmodule LiveAdmin.Components.ContainerTest do
       user = Repo.insert!(%User{})
       post = Repo.insert!(%Post{title: "test", user: user})
       {:ok, _, html} = live(conn, "/live_admin_test_post/#{post.post_id}")
+      {:ok, html} = Floki.parse_document(html)
       %{response: html, user: user}
     end
 
@@ -292,6 +301,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "new post with custom string field" do
     setup %{conn: conn} do
       {:ok, view, html} = live(conn, "/live_admin_test_post/new")
+      {:ok, html} = Floki.parse_document(html)
       %{view: view, response: html}
     end
 

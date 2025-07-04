@@ -527,7 +527,7 @@ defmodule LiveAdmin.Components.Container.Index do
     socket =
       socket
       |> handle_action(name, ids, task_def)
-      |> push_redirect(
+      |> push_navigate(
         to: route_with_params(socket.assigns, params: list_link_params(socket.assigns))
       )
 

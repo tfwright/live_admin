@@ -192,7 +192,7 @@ defmodule DemoWeb.CreateUserForm do
       |> Ecto.Changeset.unique_constraint(:email)
       |> Demo.Repo.insert(prefix: assigns.prefix)
       |> case do
-        {:ok, _} -> push_redirect(socket, to: route_with_params(assigns, params: [prefix: assigns.prefix]))
+        {:ok, _} -> push_navigate(socket, to: route_with_params(assigns, params: [prefix: assigns.prefix]))
         {:error, changeset} -> assign(socket, changeset: changeset)
       end
 
