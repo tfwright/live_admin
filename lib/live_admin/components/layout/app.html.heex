@@ -1,13 +1,55 @@
-<main class="main__content">
-  <div class="toast__container--success">{Phoenix.Flash.get(@flash, :success)}</div>
-  <div class="toast__container--info">{Phoenix.Flash.get(@flash, :info)}</div>
-  <div class="toast__container--error">{Phoenix.Flash.get(@flash, :error)}</div>
-  {live_render(@socket, LiveAdmin.Components.Nav.Jobs,
+<header class="header">
+  <div class="header-content">
+    <div class="logo">{Keyword.fetch!(@config, :title)}</div>
+    <div class="user-menu">
+      <%= if assigns[:prefix_options] do %>
+        <.drop_down
+          :let={prefix}
+          id="prefix-select"
+          items={Map.get(assigns, :prefix_options, [])}
+          label={if @session.prefix, do: "prefix: #{@session.prefix}", else: "No prefix selected"}
+        >
+          <.link
+            navigate={LiveAdmin.route_with_params(assigns, params: [prefix: prefix])}
+            class="drop-link"
+          >
+            {prefix}
+          </.link>
+        </.drop_down>
+      <% end %>
+
+      <%= if LiveAdmin.use_i18n? do %>
+        <.drop_down
+          :let={locale}
+          id="locale-select"
+          items={LiveAdmin.gettext_backend().locales()}
+          label={if @session.locale, do: "locale: #{@session.locale}", else: "No locale selected"}
+        >
+          <a
+            phx-click={
+              Phoenix.LiveView.JS.push("set_locale",
+                value: %{locale: locale},
+                page_loading: true
+              )
+            }
+            class="drop-link"
+          >
+            {locale}
+          </a>
+        </.drop_down>
+      <% end %>
+    </div>
+  </div>
+  {live_render(@socket, LiveAdmin.Components.AlertBar,
     sticky: true,
-    id: "jobs",
+    id: "alerts",
     session: %{"session_id" => @session.id}
   )}
-  <div class="main__wrap">
+</header>
+
+<!-- Main Layout -->
+<div class="main-layout">
+  <aside class="sidebar">
     <.live_component
       id="nav"
       module={get_in(@config, [:components, :nav])}
@@ -20,8 +62,13 @@
       config={@config}
       session={@session}
     />
-    <div class="content">
-      {@inner_content}
-    </div>
-  </div>
-</main>
+    {live_render(@socket, LiveAdmin.Components.Nav.Jobs,
+      sticky: true,
+      id: "jobs",
+      session: %{"session_id" => @session.id}
+    )}
+  </aside>
+  <main class="content">
+    {@inner_content}
+  </main>
+</div>
