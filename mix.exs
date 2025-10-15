@@ -44,6 +44,7 @@ defmodule LiveAdmin.MixProject do
   defp deps do
     [
       {:phoenix_view, "~> 2.0"},
+      {:phoenix, "~> 1.8"},
       {:phoenix_live_view, "~> 1.0.0"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_html_helpers, "~> 1.0"},
