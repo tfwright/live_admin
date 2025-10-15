@@ -14,9 +14,7 @@
     {csrf_meta_tag()}
     <link rel="manifest" href="/manifest.json " />
   </head>
-  <body>
-    {@inner_content}
-  </body>
+  <body>{@inner_content}</body>
   <script>
     <%= raw(render_js()) %>
   </script>
