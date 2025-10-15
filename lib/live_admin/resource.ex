@@ -38,36 +38,6 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def render(record, field, resource, assoc_resource, session, config) do
-    resource
-    |> LiveAdmin.fetch_config(:render_with, config)
-    |> case do
-      nil ->
-        if assoc_resource do
-          record_label(
-            Map.fetch!(
-              record,
-              resource.__live_admin_config__()
-              |> Keyword.fetch!(:schema)
-              |> get_assoc_name!(field)
-            ),
-            elem(assoc_resource, 1),
-            config
-          )
-        else
-          record
-          |> Map.fetch!(field)
-          |> render_field()
-        end
-
-      {m, f} ->
-        apply(m, f, [record, field, session])
-
-      f when is_atom(f) ->
-        apply(resource, f, [record, field, session])
-    end
-  end
-
   def all(keys, resource, prefix, repo) do
     key = LiveAdmin.primary_key!(resource)
 
@@ -354,17 +324,9 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  defp get_assoc_name!(schema, fk) do
+  def get_assoc_name!(schema, fk) do
     Enum.find(schema.__schema__(:associations), fn assoc_name ->
       fk == schema.__schema__(:association, assoc_name).owner_key
     end)
   end
-
-  defp render_field(val = %{}), do: Tag.content_tag(:pre, inspect(val, pretty: true))
-
-  defp render_field(val) when is_list(val),
-    do: Enum.map(val, &Tag.content_tag(:pre, inspect(&1, pretty: true)))
-
-  defp render_field(val) when is_binary(val), do: val
-  defp render_field(val), do: inspect(val)
 end

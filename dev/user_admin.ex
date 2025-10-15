@@ -6,8 +6,7 @@ defmodule DemoWeb.UserAdmin do
       components: [new: DemoWeb.CreateUserForm],
       label_with: :name,
       actions: [:deactivate, :activate, set_password: {__MODULE__, :set_password, 3}],
-      tasks: [:regenerate_passwords, {__MODULE__, :aggregate, 4}],
-      render_with: :render_field
+      tasks: [:regenerate_passwords, {__MODULE__, :aggregate, 4}]
 
   use PhoenixHTMLHelpers
 

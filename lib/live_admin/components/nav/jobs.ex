@@ -1,6 +1,8 @@
 defmodule LiveAdmin.Components.Nav.Jobs do
   use Phoenix.LiveView
 
+  import LiveAdmin
+
   require Logger
 
   @impl true
@@ -87,12 +89,23 @@ defmodule LiveAdmin.Components.Nav.Jobs do
   @impl true
   def render(assigns) do
     ~H"""
-    <%= for {_, label, progress} <- @jobs do %>
-      <div class="job__container">
-        <span class="job__label">{label}</span>
-        <div class="job__bar" style={"width: #{progress |> Kernel.*(100) |> Float.round()}%"} />
-      </div>
-    <% end %>
+    <!-- Progress Section -->
+    <div class="nav-progress-section">
+      <%= if Enum.any?(@jobs) do %>
+        <div class="nav-progress-title">{trans("Active jobs")}</div>
+        <%= for {_, label, progress} <- @jobs, percent = progress |> Kernel.*(100) |> Float.round() do %>
+          <div class="progress-item">
+            <div class="progress-header">
+              <span class="progress-label">{label}</span>
+              <span class="progress-percentage">{percent}</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar" style={"width: #{percent}%"}></div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
     """
   end
 end

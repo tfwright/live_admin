@@ -22,7 +22,7 @@ defmodule LiveAdmin.Components.Container do
   @impl true
   def mount(_params, _session, socket) do
     socket =
-      assign(socket, loading: !connected?(socket), jobs: [])
+      assign(socket, loading: !connected?(socket) |> IO.inspect(label: "LOADING"), jobs: [])
 
     if connected?(socket) do
       Process.send_after(self(), :clear_flash, 1000)
@@ -46,7 +46,7 @@ defmodule LiveAdmin.Components.Container do
         uri,
         socket = %{assigns: %{live_action: action, loading: false}}
       )
-      when action in [:edit, :view] do
+      when action in [:edit, :single] do
     socket =
       socket
       |> assign_resource_info(uri)
@@ -83,7 +83,7 @@ defmodule LiveAdmin.Components.Container do
   end
 
   @impl true
-  def handle_params(params, uri, socket = %{assigns: %{live_action: :new}}),
+  def handle_params(params, uri, socket = %{assigns: %{live_action: :create}}),
     do:
       {:noreply,
        socket
@@ -164,81 +164,15 @@ defmodule LiveAdmin.Components.Container do
     {:noreply, socket}
   end
 
-  def render(assigns = %{loading: true}), do: ~H""
-
   @impl true
+  def render(assigns = %{loading: true}), do: ~H"LOADING"
+
   def render(assigns) do
     ~H"""
-    <div class="resource__banner">
-      <h1 class="resource__title">
-        {resource_title(@resource, @config)}
-      </h1>
-
-      <div class="resource__actions">
-        <div>
-          <.link
-            navigate={route_with_params(assigns, params: [prefix: @prefix])}
-            class="resource__action--btn"
-          >
-            {trans("List")}
-          </.link>
-          <%= if LiveAdmin.fetch_config(@resource, :create_with, @config) != false do %>
-            <.link
-              navigate={route_with_params(assigns, segments: ["new"], params: [prefix: @prefix])}
-              class="resource__action--btn"
-            >
-              {trans("New")}
-            </.link>
-          <% else %>
-            <button class="resource__action--disabled" disabled="disabled">
-              {trans("New")}
-            </button>
-          <% end %>
-          <.dropdown
-            :let={task}
-            label={trans("Run task")}
-            items={get_function_keys(@resource, @config, :tasks)}
-            disabled={Enum.empty?(get_function_keys(@resource, @config, :tasks))}
-          >
-            <.task_control task={task} session={@session} resource={@resource} />
-          </.dropdown>
-          <%= if Enum.any?(@prefix_options) do %>
-            <.dropdown
-              :let={prefix}
-              id="prefix-select"
-              label={@prefix || trans("Set prefix")}
-              items={[""] ++ Enum.filter(@prefix_options, &(to_string(&1) != @prefix))}
-            >
-              <.link navigate={route_with_params(assigns, params: [prefix: prefix])}>
-                {if prefix == "", do: trans("clear"), else: prefix}
-              </.link>
-            </.dropdown>
-          <% end %>
-          <%= if LiveAdmin.use_i18n? do %>
-            <.dropdown
-              :let={locale}
-              id="locale-select"
-              label={@session.locale || "Set locale"}
-              items={
-                Enum.filter(
-                  LiveAdmin.gettext_backend().locales(),
-                  &(to_string(&1) != @session.locale)
-                )
-              }
-            >
-              <button
-                class="resource__action--link"
-                phx-click={JS.push("set_locale", value: %{locale: locale}, page_loading: true)}
-              >
-                {locale}
-              </button>
-            </.dropdown>
-          <% end %>
-        </div>
-      </div>
-    </div>
-
-    {render("#{@live_action}.html", assigns)}
+    <!-- Content Area -->
+    <main class="content">
+      {render("#{@live_action}.html", assigns)}
+    </main>
     """
   end
 
@@ -264,7 +198,7 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def render("new.html", assigns) do
+  def render("create.html", assigns) do
     ~H"""
     <.live_component
       module={@mod}
@@ -301,11 +235,11 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def render("view.html", assigns) do
+  def render("single.html", assigns) do
     ~H"""
     <.live_component
       module={@mod}
-      id="view"
+      id="single"
       record={@record}
       resource={@resource}
       resources={@resources}
@@ -441,11 +375,7 @@ defmodule LiveAdmin.Components.Container do
       class="resource__action--link"
       phx-click={
         if @modalize,
-          do:
-            JS.show(
-              to: "##{@task}-task-modal",
-              transition: {"ease-in duration-300", "opacity-0", "opacity-100"}
-            ),
+          do: JS.show(to: "##{@task}-task-modal"),
           else: JS.push("task", value: %{"name" => @task}, page_loading: true)
       }
       ,

@@ -1,13 +1,6 @@
-<main class="main__content">
-  <div class="toast__container--success">{Phoenix.Flash.get(@flash, :success)}</div>
-  <div class="toast__container--info">{Phoenix.Flash.get(@flash, :info)}</div>
-  <div class="toast__container--error">{Phoenix.Flash.get(@flash, :error)}</div>
-  {live_render(@socket, LiveAdmin.Components.Nav.Jobs,
-    sticky: true,
-    id: "jobs",
-    session: %{"session_id" => @session.id}
-  )}
-  <div class="main__wrap">
+<!-- Main Layout -->
+<div class="main-layout">
+  <aside class="sidebar">
     <.live_component
       id="nav"
       module={get_in(@config, [:components, :nav])}
@@ -20,8 +13,11 @@
       config={@config}
       session={@session}
     />
-    <div class="content">
-      {@inner_content}
-    </div>
-  </div>
-</main>
+    {live_render(@socket, LiveAdmin.Components.Nav.Jobs,
+      sticky: true,
+      id: "jobs",
+      session: %{"session_id" => @session.id}
+    )}
+  </aside>
+  {@inner_content}
+</div>

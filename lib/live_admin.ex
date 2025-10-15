@@ -29,11 +29,6 @@ defmodule LiveAdmin do
       type_doc:
         "`t:func_ref/0` returning `{records, count}` used to fetch records in LiveAdmin :list component"
     ],
-    render_with: [
-      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      type_doc:
-        "`t:func_ref/0` used to convert field values to string in LiveAdmin :list component"
-    ],
     delete_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
       type_doc: "`t:func_ref/0` or `false` to disable deleting records"

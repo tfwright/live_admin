@@ -135,65 +135,56 @@ Hooks.IndexPage = {
   mounted() {
     this.selected = [];
 
-    this.el.addEventListener("live_admin:action", (e) => {
-      if (e.target.tagName === "FORM") {
-        const params = [...new FormData(e.target)].reduce(
-          (params, [key, val]) => {
-            if (key === "args[]") {
-              return { ...params, args: [...params.args, val] };
-            } else {
-              return { ...params, [key]: val };
-            }
-          },
-          { args: [] },
-        );
+    // this.el.addEventListener("live_admin:action", (e) => {
+    //   if (e.target.tagName === "FORM") {
+    //     const params = [...new FormData(e.target)].reduce(
+    //       (params, [key, val]) => {
+    //         if (key === "args[]") {
+    //           return { ...params, args: [...params.args, val] };
+    //         } else {
+    //           return { ...params, [key]: val };
+    //         }
+    //       },
+    //       { args: [] },
+    //     );
 
-        this.pushEventTo(this.el, "action", { ...params, ids: this.selected });
-      } else {
-        this.pushEventTo(this.el, "action", {
-          name: e.target.dataset.action,
-          ids: this.selected,
-        });
-      }
-    });
+    //     this.pushEventTo(this.el, "action", { ...params, ids: this.selected });
+    //   } else {
+    //     this.pushEventTo(this.el, "action", {
+    //       name: e.target.dataset.action,
+    //       ids: this.selected,
+    //     });
+    //   }
+    // });
 
-    this.el.addEventListener("live_admin:toggle_select", (e) => {
-      if (e.target.id === "select-all") {
-        this.el
-          .querySelectorAll(".resource__select")
-          .forEach((box) => (box.checked = e.target.checked));
-      } else {
-        this.el.querySelector("#select-all").checked = false;
-      }
+    // this.el.addEventListener("live_admin:toggle_select", (e) => {
+    //   if (e.target.id === "select-all") {
+    //     this.el
+    //       .querySelectorAll(".resource__select")
+    //       .forEach((box) => (box.checked = e.target.checked));
+    //   } else {
+    //     this.el.querySelector("#select-all").checked = false;
+    //   }
 
-      this.selected = Array.from(
-        this.el.querySelectorAll("input[data-record-key]:checked"),
-        (e) => e.dataset.recordKey,
-      );
+    //   this.selected = Array.from(
+    //     this.el.querySelectorAll("input[data-record-key]:checked"),
+    //     (e) => e.dataset.recordKey,
+    //   );
 
-      if (this.selected.length > 0) {
-        document.getElementById("footer-select").style.removeProperty("display");
-        document.getElementById("footer-nav").style.display = "none";
-      } else {
-        document.getElementById("footer-nav").style.removeProperty("display");
-        document.getElementById("footer-select").style.display = "none";
-      }
-    });
+    //   if (this.selected.length > 0) {
+    //     document.getElementById("footer-select").style.removeProperty("display");
+    //     document.getElementById("footer-nav").style.display = "none";
+    //   } else {
+    //     document.getElementById("footer-nav").style.removeProperty("display");
+    //     document.getElementById("footer-select").style.display = "none";
+    //   }
+    // });
   },
   updated() {
     this.selected = [];
 
-    var clipboard = new ClipboardJS(this.el.querySelectorAll(".cell__copy"), {
-      target: function (trigger) {
-        return trigger.closest(".resource__cell").firstElementChild;
-      },
-    });
-
-    clipboard.on("success", function (e) {
-      Toastify({
-        text: e.trigger.dataset.message,
-        className: "toast__container",
-      }).showToast();
+    new ClipboardJS(this.el.querySelectorAll(".copy-icon"), {
+      target: trigger => trigger.closest("td").firstElementChild
     });
   },
 };

@@ -60,13 +60,13 @@ defmodule LiveAdmin.Router do
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
 
-      live("#{path}/new", LiveAdmin.Components.Container, :new,
-        as: :"new_#{full_path}",
+      live("#{path}/new", LiveAdmin.Components.Container, :create,
+        as: :"create_#{full_path}",
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
 
-      live("#{path}/:record_id", LiveAdmin.Components.Container, :view,
-        as: :"view_#{full_path}",
+      live("#{path}/:record_id", LiveAdmin.Components.Container, :single,
+        as: :"single_#{full_path}",
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
 
@@ -88,10 +88,10 @@ defmodule LiveAdmin.Router do
           nav: LiveAdmin.Components.Nav,
           home: LiveAdmin.Components.Home.Content,
           session: LiveAdmin.Components.Session.Content,
-          new: LiveAdmin.Components.Container.Form,
+          create: LiveAdmin.Components.Container.Form,
           edit: LiveAdmin.Components.Container.Form,
-          list: LiveAdmin.Components.Container.Index,
-          view: LiveAdmin.Components.Container.View
+          list: LiveAdmin.Components.Container.List,
+          single: LiveAdmin.Components.Container.Single
         ],
         Application.get_env(:live_admin, :components, [])
       )
@@ -104,7 +104,6 @@ defmodule LiveAdmin.Router do
         Keyword.merge(default_components, Keyword.get(opts, :components, []))
       )
       |> Keyword.put_new(:ecto_repo, Application.get_env(:live_admin, :ecto_repo))
-      |> Keyword.put_new(:render_with, Application.get_env(:live_admin, :render_with))
       |> Keyword.put_new(:delete_with, Application.get_env(:live_admin, :delete_with))
       |> Keyword.put_new(:create_with, Application.get_env(:live_admin, :create_with))
       |> Keyword.put_new(:list_with, Application.get_env(:live_admin, :list_with))

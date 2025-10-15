@@ -5,8 +5,8 @@ defmodule LiveAdmin.Components.Container.Form do
 
   import LiveAdmin.Components
   import LiveAdmin.ErrorHelpers
-  import LiveAdmin, only: [associated_resource: 4, route_with_params: 2, trans: 1]
-  import LiveAdmin.View, only: [supported_type?: 1, field_class: 1]
+  import LiveAdmin
+  import LiveAdmin.View
 
   alias __MODULE__.{ArrayInput, MapInput, SearchSelect}
   alias LiveAdmin.Resource
@@ -42,46 +42,168 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="form-page" class="view__container">
-      <.form
-        :let={f}
-        for={@changeset}
-        as={:params}
-        phx-change="validate"
-        phx-submit={@action}
-        phx-target={@myself}
-        class="resource__form"
-      >
-        <%= for {field, type, opts} <- Resource.fields(@resource, @config) do %>
-          <.field
-            field={field}
-            type={type}
-            form={f}
-            immutable={Keyword.get(opts, :immutable, false)}
-            resource={@resource}
-            resources={@resources}
-            session={@session}
-            prefix={@prefix}
-            repo={@repo}
-            config={@config}
-          />
-        <% end %>
-        <div class="form__actions">
-          <%= if assigns[:record] do %>
-            <a
-              href={route_with_params(assigns, segments: [@record])}
-              class="resource__action--secondary"
-            >
-              {trans("Cancel")}
-            </a>
-          <% end %>
-          {submit(trans("Save"),
-            class:
-              "resource__action#{if Enum.any?(@changeset.errors) || Enum.empty?(@changeset.changes), do: "--disabled", else: "--btn"}",
-            disabled: Enum.any?(@changeset.errors) || Enum.empty?(@changeset.changes)
-          )}
+    <div>
+      <div class="content-header">
+        <h1 class="content-title">
+          {resource_title(@resource, @config)}
+          <span>{record_label(@record, @resource, @config)}</span>
+        </h1>
+        <div class="contextual-actions">
+          <.link navigate={route_with_params(assigns, segments: [@record])} class="btn btn-secondary">
+            {trans("Back")}
+          </.link>
+          <button class="btn btn-danger">
+            <span>Delete</span>
+          </button>
+          <details class="btn-select">
+            <summary>Run action</summary>
+            <div class="settings-menu">
+              <%= for {action, _} <- LiveAdmin.fetch_config(@resource, :actions, @config) do %>
+                <a>{trans(humanize(action))}</a>
+              <% end %>
+            </div>
+          </details>
         </div>
-      </.form>
+      </div>
+
+      <div class="content-card">
+        <div class="card-section">
+          <div class="edit-view">
+            <form class="form-grid" onsubmit="saveEdit(event)">
+              <div class="form-field">
+                <label class="form-label" for="edit-task-name">Task Name</label>
+                <input type="text" id="edit-task-name" class="form-input" value="Database schema" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-status">Status</label>
+                <select id="edit-status" class="form-select">
+                  <option value="completed" selected>Completed</option>
+                  <option value="active">Active</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-created">Created</label>
+                <input type="date" id="edit-created" class="form-input" value="2025-09-15" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-updated">Updated</label>
+                <input type="date" id="edit-updated" class="form-input" value="2025-10-03" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-assignee">Assignee</label>
+                <input type="text" id="edit-assignee" class="form-input" value="Emily Rodriguez" />
+              </div>
+
+              <div class="form-subsection">
+                <h4 class="form-subsection-title">Contact Information</h4>
+                <div class="form-subgrid">
+                  <div class="form-field">
+                    <label class="form-label" for="edit-contact-email">Email</label>
+                    <input
+                      type="email"
+                      id="edit-contact-email"
+                      class="form-input"
+                      value="emily.rodriguez@example.com"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="edit-contact-phone">Phone</label>
+                    <input
+                      type="tel"
+                      id="edit-contact-phone"
+                      class="form-input"
+                      value="+1 (555) 123-4567"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="edit-contact-extension">Extension</label>
+                    <input type="text" id="edit-contact-extension" class="form-input" value="4521" />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="edit-contact-department">Department Contact</label>
+                    <input
+                      type="text"
+                      id="edit-contact-department"
+                      class="form-input"
+                      value="Engineering Team Lead"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label class="form-label" for="edit-due-date">Due Date</label>
+                <input type="date" id="edit-due-date" class="form-input" value="2025-10-03" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-progress">Progress</label>
+                <input
+                  type="number"
+                  id="edit-progress"
+                  class="form-input"
+                  value="100"
+                  min="0"
+                  max="100"
+                />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-priority">Priority</label>
+                <select id="edit-priority" class="form-select">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high" selected>High</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-department">Department</label>
+                <input type="text" id="edit-department" class="form-input" value="Engineering" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-budget">Budget</label>
+                <input type="text" id="edit-budget" class="form-input" value="$45,000" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-hours">Hours</label>
+                <input type="number" id="edit-hours" class="form-input" value="120" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-category">Category</label>
+                <input type="text" id="edit-category" class="form-input" value="Backend" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-tags">Tags</label>
+                <input type="text" id="edit-tags" class="form-input" value="SQL, Schema" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="edit-version">Version</label>
+                <input type="text" id="edit-version" class="form-input" value="2.1" />
+              </div>
+            </form>
+
+            <div class="detail-section">
+              <div class="form-field">
+                <label class="form-label" for="edit-description">Description</label>
+                <textarea id="edit-description" class="form-textarea">This task involves designing and implementing the complete database schema for Project Alpha. The schema has been optimized for performance and scalability, incorporating best practices for data normalization and indexing strategies.</textarea>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <div class="form-field">
+                <label class="form-label" for="edit-notes">Notes</label>
+                <textarea id="edit-notes" class="form-textarea">Schema optimized - All tables have been reviewed and optimized. Foreign key relationships established. Indexes created for frequently queried columns. Migration scripts prepared for deployment.</textarea>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+              <button type="button" class="btn btn-primary" onclick="saveEdit(event)">
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     """
   end
