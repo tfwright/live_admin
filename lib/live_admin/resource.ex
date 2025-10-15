@@ -9,11 +9,12 @@ defmodule LiveAdmin.Resource do
   > to query it, __live_admin_config__/0.
   """
 
+  require Integer
+
   import Ecto.Query
-  import LiveAdmin, only: [record_label: 3, parent_associations: 1]
+  import LiveAdmin
 
   alias Ecto.Changeset
-  alias PhoenixHTMLHelpers.Tag
 
   @doc """
   Configure a module to act as a LiveAdmin resource
@@ -23,11 +24,7 @@ defmodule LiveAdmin.Resource do
   """
   defmacro __using__(opts) do
     opts_schema =
-      LiveAdmin.base_configs_schema() ++
-        [
-          schema: [type: :atom, default: __CALLER__.module],
-          preload: [type: {:or, [:keyword_list, nil]}, default: nil]
-        ]
+      LiveAdmin.base_configs_schema() ++ [schema: [type: :atom, default: __CALLER__.module]]
 
     quote bind_quoted: [opts: opts, opts_schema: opts_schema] do
       opts = NimbleOptions.validate!(opts, opts_schema)
@@ -35,36 +32,6 @@ defmodule LiveAdmin.Resource do
       @__live_admin_config__ opts
 
       def __live_admin_config__, do: @__live_admin_config__
-    end
-  end
-
-  def render(record, field, resource, assoc_resource, session, config) do
-    resource
-    |> LiveAdmin.fetch_config(:render_with, config)
-    |> case do
-      nil ->
-        if assoc_resource do
-          record_label(
-            Map.fetch!(
-              record,
-              resource.__live_admin_config__()
-              |> Keyword.fetch!(:schema)
-              |> get_assoc_name!(field)
-            ),
-            elem(assoc_resource, 1),
-            config
-          )
-        else
-          record
-          |> Map.fetch!(field)
-          |> render_field()
-        end
-
-      {m, f} ->
-        apply(m, f, [record, field, session])
-
-      f when is_atom(f) ->
-        apply(resource, f, [record, field, session])
     end
   end
 
@@ -77,17 +44,16 @@ defmodule LiveAdmin.Resource do
     |> repo.all(prefix: prefix)
   end
 
-  def find!(key, resource, prefix, repo) do
-    find(key, resource, prefix, repo) ||
+  def find!(key, resource, prefix, repo, config) do
+    find(key, resource, prefix, repo, config) ||
       raise(Ecto.NoResultsError,
         queryable: Keyword.fetch!(resource.__live_admin_config__(), :schema)
       )
   end
 
-  def find(key, resource, prefix, repo) do
-    resource.__live_admin_config__()
-    |> Keyword.fetch!(:schema)
-    |> preload(^preloads(resource))
+  def find(key, resource, prefix, repo, config) do
+    resource
+    |> query(nil, config)
     |> repo.get(key, prefix: prefix)
   end
 
@@ -106,34 +72,30 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def query(resource, search, config) do
-    resource.__live_admin_config__()
-    |> Keyword.fetch!(:schema)
-    |> then(fn query ->
-      case search do
-        q when not is_nil(q) and byte_size(q) > 0 ->
-          apply_search(query, q, fields(resource, config))
-
-        _ ->
-          query
-      end
-    end)
-    |> preload(^preloads(resource))
-  end
-
   def list(resource, opts, session, repo, config) do
-    resource
-    |> LiveAdmin.fetch_config(:list_with, config)
-    |> case do
-      nil ->
-        build_list(resource, opts, session, repo, config)
+    opts =
+      opts
+      |> Enum.into(%{})
+      |> Map.put_new(:page, 1)
+      |> Map.put_new(:per, session.index_page_size)
+      |> Map.put_new(:sort_dir, :asc)
+      |> Map.put_new(:sort_attr, LiveAdmin.primary_key!(resource))
 
-      {mod, func_name} ->
-        apply(mod, func_name, [resource, opts, session])
+    query =
+      resource
+      |> query(opts[:search], config)
+      |> limit(^opts[:per])
+      |> offset(^((opts[:page] - 1) * opts[:per]))
+      |> order_by(^[{opts[:sort_dir], opts[:sort_attr]}])
 
-      name when is_atom(name) ->
-        apply(resource, name, [opts, session])
-    end
+    {
+      repo.all(query, prefix: opts[:prefix]),
+      repo.aggregate(
+        query |> exclude(:limit) |> exclude(:offset),
+        :count,
+        prefix: opts[:prefix]
+      )
+    }
   end
 
   def change(resource, record \\ nil, params \\ %{}, config)
@@ -233,35 +195,19 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  defp build_list(resource, opts, session, repo, config) do
-    opts =
-      opts
-      |> Enum.into(%{})
-      |> Map.put_new(:page, 1)
-      |> Map.put_new(:per, session.index_page_size)
-      |> Map.put_new(:sort_dir, :asc)
-      |> Map.put_new(:sort_attr, LiveAdmin.primary_key!(resource))
-
-    query =
-      resource
-      |> query(opts[:search], config)
-      |> limit(^opts[:per])
-      |> offset(^((opts[:page] - 1) * opts[:per]))
-      |> order_by(^[{opts[:sort_dir], opts[:sort_attr]}])
-
-    {
-      repo.all(query, prefix: opts[:prefix]),
-      repo.aggregate(
-        query |> exclude(:limit) |> exclude(:offset),
-        :count,
-        prefix: opts[:prefix]
-      )
-    }
-  end
-
   defp apply_search(query, q, fields) do
-    q
-    |> LiveAdmin.View.parse_search()
+    parts = String.split(q, ~r{([^\s]*:)}, include_captures: true, trim: true)
+
+    if parts |> Enum.count() |> Integer.is_odd() do
+      [{"*", q}]
+    else
+      parts
+      |> Enum.map(&String.trim/1)
+      |> Enum.chunk_every(2)
+      |> Enum.map(fn
+        [column, param] -> {String.replace(column, ":", ""), param}
+      end)
+    end
     |> case do
       field_queries when is_list(field_queries) ->
         field_queries
@@ -299,18 +245,25 @@ defmodule LiveAdmin.Resource do
     |> Enum.reduce(Changeset.cast(record, params, []), fn
       {field_name, {_, {Ecto.Embedded, %{cardinality: :many}}}, _}, changeset ->
         Changeset.cast_embed(changeset, field_name,
-          with: fn embed, params -> build_changeset(embed, :embed, params, config) end,
+          with: fn embed, params ->
+            build_changeset(embed, :embed, params, config)
+          end,
           sort_param: LiveAdmin.View.sort_param_name(field_name),
           drop_param: LiveAdmin.View.drop_param_name(field_name)
         )
 
       {field_name, {_, {Ecto.Embedded, %{cardinality: :one}}}, _}, changeset ->
-        if Map.get(params, to_string(field_name)) == "" do
-          Changeset.put_change(changeset, field_name, nil)
-        else
-          Changeset.cast_embed(changeset, field_name,
-            with: fn embed, params -> build_changeset(embed, :embed, params, config) end
-          )
+        cond do
+          Map.get(params, field_name |> LiveAdmin.View.drop_param_name() |> to_string()) ->
+            Changeset.put_change(changeset, field_name, nil)
+
+          Map.get(params, field_name |> LiveAdmin.View.sort_param_name() |> to_string()) ->
+            Changeset.put_change(changeset, field_name, %{})
+
+          true ->
+            Changeset.cast_embed(changeset, field_name,
+              with: fn embed, params -> build_changeset(embed, :embed, params, config) end
+            )
         end
 
       {field_name, type, opts}, changeset ->
@@ -336,35 +289,47 @@ defmodule LiveAdmin.Resource do
 
   defp parse_map_param(param), do: param
 
-  defp preloads(resource) do
-    resource.__live_admin_config__()
-    |> Keyword.fetch!(:preload)
+  def query(resource, search, config) do
+    resource
+    |> fetch_config(:query_with, config)
     |> case do
       nil ->
         resource.__live_admin_config__()
         |> Keyword.fetch!(:schema)
-        |> parent_associations()
-        |> Enum.map(& &1.field)
+        |> then(fn query ->
+          case search do
+            q when not is_nil(q) and byte_size(q) > 0 ->
+              apply_search(query, q, fields(resource, config))
 
-      {m, f, []} ->
-        apply(m, f, [resource])
+            _ ->
+              query
+          end
+        end)
 
-      preloads when is_list(preloads) ->
-        preloads
+      {m, f} ->
+        apply(m, f, [resource, search])
+
+      f when is_atom(f) ->
+        apply(resource, f, [search])
     end
   end
 
-  defp get_assoc_name!(schema, fk) do
-    Enum.find(schema.__schema__(:associations), fn assoc_name ->
-      fk == schema.__schema__(:association, assoc_name).owner_key
-    end)
+  def render(record, field, type, resource, config, session) do
+    resource
+    |> LiveAdmin.fetch_config(:render_with, config)
+    |> case do
+      nil -> record |> Map.fetch!(field) |> render(type)
+      {m, f} -> apply(m, f, [record, field, session])
+      f when is_atom(f) -> apply(resource, f, [record, field, session])
+    end
   end
 
-  defp render_field(val = %{}), do: Tag.content_tag(:pre, inspect(val, pretty: true))
-
-  defp render_field(val) when is_list(val),
-    do: Enum.map(val, &Tag.content_tag(:pre, inspect(&1, pretty: true)))
-
-  defp render_field(val) when is_binary(val), do: val
-  defp render_field(val), do: inspect(val)
+  def render(nil, _), do: ""
+  def render(val, {_, {Ecto.Embedded, _}}), do: inspect(val, pretty: true)
+  def render(val, :map), do: inspect(val, pretty: true)
+  def render(val, :date), do: Calendar.strftime(val, "%x")
+  def render(val, dt) when dt in [DateTime, NaiveDateTime], do: Calendar.strftime(val, "%c")
+  def render(val, :string), do: val
+  def render(val, {:array, inner_type}), do: Enum.map_join(val, ", ", &render(&1, inner_type))
+  def render(val, _), do: safe_render(val)
 end

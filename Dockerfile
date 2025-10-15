@@ -8,8 +8,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 WORKDIR /opt/app
 
 ADD mix.exs mix.lock ./
-RUN mix do deps.get, deps.compile
+RUN mix do deps.get, compile
 
 ADD assets assets/
-RUN npm --prefix assets install
-RUN npm --prefix assets run build
+RUN npm --prefix assets ci --force

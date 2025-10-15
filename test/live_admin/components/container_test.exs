@@ -4,7 +4,6 @@ defmodule LiveAdmin.Components.ContainerTest do
   import Phoenix.ConnTest
   import Phoenix.LiveViewTest
   import Mox
-  import Ecto.Query
 
   alias LiveAdminTest.{Post, Repo, User}
   alias LiveAdminTest.Post.Version
@@ -35,40 +34,47 @@ defmodule LiveAdmin.Components.ContainerTest do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
 
-      {:ok, view, _html} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc")
+      {:ok, view, _html} =
+        live(conn, "/user?prefix=public&per=10&page=1&sort-attr=id&sort-dir=asc")
+
+      render_async(view)
 
       %{view: view, user: user}
     end
 
     test "links to new form", %{view: view} do
-      assert {_, {:live_redirect, %{to: "/user/new"}}} =
+      assert {_, {:live_redirect, %{to: "/user/new?prefix=public"}}} =
                view
-               |> element("a[href='/user/new']")
+               |> element("a[href='/user/new?prefix=public']")
                |> render_click()
     end
 
     test "runs configured action on selected records", %{view: view, user: user} do
       view
-      |> element("#list")
-      |> render_hook("action", %{name: "user_action", ids: [user.id]})
+      |> element("tbody form")
+      |> render_change(%{record_id: user.id, selected: "t"})
+
+      view
+      |> element(".drop-link", "User action")
+      |> render_click()
 
       assert_redirect(view)
     end
 
     test "runs task", %{view: view} do
       view
-      |> element("button", "User task")
+      |> element("span", "User task")
       |> render_click()
 
-      assert_redirected(view, "/user")
+      assert_redirected(view, "/user?prefix=public")
     end
 
     test "runs task with custom arity", %{view: view} do
       view
-      |> element("#custom_arity_task-task-modal form")
+      |> element("#task-custom_arity_task-modal form")
       |> render_submit(%{name: "custom_arity_task", args: ["test"]})
 
-      assert_redirected(view, "/user")
+      assert_redirected(view, "/user?prefix=public")
     end
   end
 
@@ -76,7 +82,8 @@ defmodule LiveAdmin.Components.ContainerTest do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"})
 
-      {:ok, view, _} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc&s=fred")
+      {:ok, view, _} =
+        live(conn, "/user?prefix=public&per=10&page=1&sort-attr=id&sort-dir=asc&s=fred")
 
       %{view: view}
     end
@@ -130,14 +137,14 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "handles form change", %{view: view} do
       assert view
-             |> element(".resource__form")
+             |> element("form")
              |> render_change()
     end
 
     test "persists all form changes", %{view: view} do
       response =
         view
-        |> element(".resource__form")
+        |> element("form")
         |> render_change(%{
           "params" => %{"name" => "test name", "settings" => %{"some_option" => "test option"}}
         })
@@ -148,7 +155,7 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "creates user on form submit", %{view: view} do
       view
-      |> form(".resource__form", %{params: %{name: "test"}})
+      |> form("form", %{params: %{name: "test"}})
       |> render_submit()
 
       assert [%{}] = Repo.all(User)
@@ -163,19 +170,13 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
 
     test "includes search select field", %{view: view} do
-      assert has_element?(view, "#params_user_id_search_select")
-    end
-
-    test "search select responds to focus", %{view: view} do
-      view
-      |> element("#params_user_id")
-      |> render_focus(%{value: "xxx"})
+      assert has_element?(view, ".search-select-container")
     end
   end
 
   describe "edit resource" do
     setup %{conn: conn} do
-      user = Repo.insert!(%User{})
+      user = Repo.insert!(%User{encrypted_password: "fake"})
 
       {:ok, view, _} = live(conn, "/user/edit/#{user.id}")
 
@@ -184,14 +185,14 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "updates record on submit", %{view: view, user: user} do
       view
-      |> form(".resource__form", %{params: %{name: "test"}})
+      |> form("form", %{params: %{name: "test"}})
       |> render_submit()
 
       assert %{name: "test"} = Repo.get!(User, user.id)
     end
 
     test "disables immutable fields", %{view: view} do
-      assert has_element?(view, "textarea[name='params[encrypted_password]'][disabled]")
+      assert has_element?(view, "textarea[disabled]", "fake")
     end
   end
 
@@ -219,24 +220,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
 
     test "includes multiple embed fields", %{view: view} do
-      assert has_element?(view, ".embed__item:nth-child(2)")
-    end
-  end
-
-  describe "edit resource with map field with map value" do
-    setup %{conn: conn} do
-      user =
-        Repo.insert!(%User{
-          settings: %{metadata: %{map_key: %{}}}
-        })
-
-      {:ok, view, _} = live(conn, "/user/edit/#{user.id}")
-
-      %{view: view}
-    end
-
-    test "disables field", %{view: view} do
-      assert has_element?(view, ".resource__action--disabled")
+      assert has_element?(view, ":nth-child(2 of .embed-section)")
     end
   end
 
@@ -254,7 +238,22 @@ defmodule LiveAdmin.Components.ContainerTest do
       |> element("button", "Delete")
       |> render_click()
 
-      assert_redirected(view, "/user")
+      assert_redirected(view, "/user?prefix=public")
+    end
+  end
+
+  describe "view child resource" do
+    setup %{conn: conn} do
+      user = Repo.insert!(%User{})
+      post = Repo.insert!(%Post{title: "test", user_id: user.id})
+
+      {:ok, view, _} = live(conn, "/live_admin_test_post/#{post.post_id}")
+
+      %{view: view, post: post, user: user}
+    end
+
+    test "renders association link for belongs_to field", %{view: view, user: user} do
+      assert has_element?(view, "a.assoc-link-icon[href='/user/#{user.id}?prefix=public']")
     end
   end
 
@@ -265,29 +264,14 @@ defmodule LiveAdmin.Components.ContainerTest do
       {:ok, view, _} = live(conn, "/user/#{user.id}")
 
       view
-      |> element("#view-page")
-      |> render_hook("action", %{name: "failing_action"})
+      |> element(".drop-link", "Failing action")
+      |> render_click()
 
       %{view: view}
     end
 
-    test "pushes error", %{view: view} do
-      assert_push_event(view, "error", %{msg: _})
-    end
-  end
-
-  describe "view resource with associated resource" do
-    setup %{conn: conn} do
-      user = Repo.insert!(%User{})
-      post = Repo.insert!(%Post{title: "test", user: user})
-
-      {:ok, view, _} = live(conn, "/live_admin_test_post/#{post.post_id}")
-
-      %{view: view, user: user}
-    end
-
-    test "links to user", %{view: view, user: user} do
-      assert has_element?(view, "a[href='/user/#{user.id}']")
+    test "shows error alert", %{view: view} do
+      assert has_element?(view, ".alert-bar.error")
     end
   end
 
@@ -304,26 +288,14 @@ defmodule LiveAdmin.Components.ContainerTest do
 
     test "handles form change with custom string type", %{view: view} do
       assert view
-             |> element(".resource__form")
+             |> element("form")
              |> render_change(%{"params" => %{"custom_string_field" => "  Trimmed Value  "}})
-    end
-
-    test "creates post with trimmed custom string field on form submit", %{view: view} do
-      view
-      |> form(".resource__form", %{
-        params: %{custom_string_field: "  Test Value  ", title: "Sample Title"}
-      })
-      |> render_submit()
-
-      post = Repo.one(from(p in Post, where: p.title == "Sample Title"))
-
-      assert post.custom_string_field == "Test Value"
     end
 
     test "handles error from custom string type", %{view: view} do
       response =
         view
-        |> element(".resource__form")
+        |> element("form")
         |> render_change(%{"params" => %{"custom_string_field" => "bad string"}})
 
       assert response =~ "that was a bad string"
