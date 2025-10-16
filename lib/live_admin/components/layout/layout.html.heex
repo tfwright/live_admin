@@ -7,15 +7,15 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <link rel="icon" href="data:;base64,=" />
-    <title><%= Keyword.fetch!(@config, :title) %></title>
+    <title>{Keyword.fetch!(@config, :title)}</title>
     <style>
       <%= raw(render_css(@session)) %>
     </style>
-    <%= csrf_meta_tag() %>
+    {csrf_meta_tag()}
     <link rel="manifest" href="/manifest.json " />
   </head>
   <body>
-    <%= @inner_content %>
+    {@inner_content}
   </body>
   <script>
     <%= raw(render_js()) %>

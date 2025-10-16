@@ -25,9 +25,9 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     ~H"""
     <div>
       <%= if @selected_option do %>
-        <%= record_label(@selected_option, @resource, @config) %>
+        {record_label(@selected_option, @resource, @config)}
       <% else %>
-        <%= trans("None") %>
+        {trans("None")}
       <% end %>
     </div>
     """
@@ -41,21 +41,21 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
       phx-hook="SearchSelect"
       id={input_id(@form, @field) <> "_search_select"}
     >
-      <%= hidden_input(@form, @field,
+      {hidden_input(@form, @field,
         disabled: @disabled,
         value:
           if(@selected_option,
             do: Map.fetch!(@selected_option, LiveAdmin.primary_key!(@resource))
           ),
         id: input_id(@form, @field) <> "_hidden"
-      ) %>
+      )}
       <%= if @selected_option do %>
         <a
           href="#"
           phx-click={JS.push("select", value: %{key: nil}, target: @myself, page_loading: true)}
           class="button__remove"
         />
-        <%= record_label(@selected_option, @resource, @config) %>
+        {record_label(@selected_option, @resource, @config)}
       <% else %>
         <.dropdown
           :let={option}
@@ -69,7 +69,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
           }
         >
           <:empty_label>
-            <%= trans("No options") %>
+            {trans("No options")}
           </:empty_label>
           <:control>
             <input
@@ -94,7 +94,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
               )
             }
           >
-            <%= record_label(option, @resource, @config) %>
+            {record_label(option, @resource, @config)}
           </a>
         </.dropdown>
       <% end %>

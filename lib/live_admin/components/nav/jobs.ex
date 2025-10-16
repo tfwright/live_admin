@@ -85,7 +85,7 @@ defmodule LiveAdmin.Components.Nav.Jobs do
     ~H"""
     <%= for {_, label, progress} <- @jobs do %>
       <div class="job__container">
-        <span class="job__label"><%= label %></span>
+        <span class="job__label">{label}</span>
         <div class="job__bar" style={"width: #{progress |> Kernel.*(100) |> Float.round()}%"} />
       </div>
     <% end %>

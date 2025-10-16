@@ -24,13 +24,13 @@ defmodule LiveAdmin.Components do
         <.list items={@items} inner_block={@inner_block} />
       <% end %>
       <%= if render_slot(@control) do %>
-        <%= render_slot(@control) %>
+        {render_slot(@control)}
       <% else %>
         <button
           class={"resource__action#{if @disabled, do: "--disabled", else: "--btn"}"}
           disabled={if @disabled, do: "disabled"}
         >
-          <%= @label %>
+          {@label}
         </button>
       <% end %>
       <%= if @orientation == :down do %>
@@ -153,13 +153,13 @@ defmodule LiveAdmin.Components do
       }
       data-confirm={if @modalize, do: nil, else: "Are you sure?"}
     >
-      <%= @title %>
+      {@title}
     </button>
     <%= if @modalize do %>
       <.modal id={"#{@action}-action-modal"}>
-        <span class="modal__title"><%= @title %></span>
+        <span class="modal__title">{@title}</span>
         <%= for {_lang, doc} <- @function_docs do %>
-          <span class="docs"><%= doc %></span>
+          <span class="docs">{doc}</span>
         <% end %>
         <.form
           for={Phoenix.Component.to_form(%{})}
@@ -170,7 +170,7 @@ defmodule LiveAdmin.Components do
             <b>Arguments</b>
             <%= for num <- 1..@extra_arg_count do %>
               <div>
-                <label><%= num %></label>
+                <label>{num}</label>
                 <input type="text" name="args[]" />
               </div>
             <% end %>
@@ -192,7 +192,7 @@ defmodule LiveAdmin.Components do
       }
     >
       <div>
-        <%= render_slot(@inner_block) %>
+        {render_slot(@inner_block)}
       </div>
     </div>
     """
@@ -204,10 +204,10 @@ defmodule LiveAdmin.Components do
       <nav>
         <ul>
           <%= if Enum.empty?(@items) && assigns[:empty_label] do %>
-            <li><%= render_slot(@empty_label) %></li>
+            <li>{render_slot(@empty_label)}</li>
           <% end %>
           <%= for item <- @items do %>
-            <li><%= render_slot(@inner_block, item) %></li>
+            <li>{render_slot(@inner_block, item)}</li>
           <% end %>
         </ul>
       </nav>

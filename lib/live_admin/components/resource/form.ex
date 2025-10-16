@@ -35,7 +35,7 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def render(assigns = %{record: nil}) do
     ~H"""
-    <div><%= trans("No record found") %></div>
+    <div>{trans("No record found")}</div>
     """
   end
 
@@ -72,14 +72,14 @@ defmodule LiveAdmin.Components.Container.Form do
               href={route_with_params(assigns, segments: [@record])}
               class="resource__action--secondary"
             >
-              <%= trans("Cancel") %>
+              {trans("Cancel")}
             </a>
           <% end %>
-          <%= submit(trans("Save"),
+          {submit(trans("Save"),
             class:
               "resource__action#{if Enum.any?(@changeset.errors) || Enum.empty?(@changeset.changes), do: "--disabled", else: "--btn"}",
             disabled: Enum.any?(@changeset.errors) || Enum.empty?(@changeset.changes)
-          ) %>
+          )}
         </div>
       </.form>
     </div>
@@ -146,7 +146,7 @@ defmodule LiveAdmin.Components.Container.Form do
   def field(assigns) do
     ~H"""
     <div class={"field__group#{if @immutable, do: "--disabled"} field__#{field_class(@type)}"}>
-      <%= label(@form, @field, @field |> humanize() |> trans(), class: "field__label") %>
+      {label(@form, @field, @field |> humanize() |> trans(), class: "field__label")}
       <%= if supported_type?(@type) do %>
         <.input
           form={@form}
@@ -161,13 +161,13 @@ defmodule LiveAdmin.Components.Container.Form do
           config={@config}
         />
       <% else %>
-        <%= textarea(@form, @field,
+        {textarea(@form, @field,
           rows: 1,
           disabled: true,
           value: @form |> input_value(@field) |> inspect()
-        ) %>
+        )}
       <% end %>
-      <%= error_tag(@form, @field) %>
+      {error_tag(@form, @field)}
     </div>
     """
   end
@@ -220,11 +220,11 @@ defmodule LiveAdmin.Components.Container.Form do
         />
       <% else %>
         <div class="form__number">
-          <%= number_input(@form, @field, disabled: @disabled) %>
+          {number_input(@form, @field, disabled: @disabled)}
         </div>
       <% end %>
     <% else %>
-      <%= textarea(@form, @field, rows: 1, disabled: @disabled) %>
+      {textarea(@form, @field, rows: 1, disabled: @disabled)}
     <% end %>
     """
   end
@@ -255,7 +255,7 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp input(assigns = %{type: :string}) do
     ~H"""
-    <%= textarea(@form, @field, rows: 1, disabled: @disabled, phx_debounce: 200) %>
+    {textarea(@form, @field, rows: 1, disabled: @disabled, phx_debounce: 200)}
     """
   end
 
@@ -263,25 +263,25 @@ defmodule LiveAdmin.Components.Container.Form do
     ~H"""
     <div class="form__checkbox">
       <%= for option <- ["true", "false"] do %>
-        <%= radio_button(@form, @field, option) %>
-        <%= trans(option) %>
+        {radio_button(@form, @field, option)}
+        {trans(option)}
       <% end %>
-      <%= radio_button(@form, @field, "", checked: input_value(@form, @field) in ["", nil]) %>
-      <%= trans("nil") %>
+      {radio_button(@form, @field, "", checked: input_value(@form, @field) in ["", nil])}
+      {trans("nil")}
     </div>
     """
   end
 
   defp input(assigns = %{type: :date}) do
     ~H"""
-    <%= date_input(@form, @field, disabled: @disabled) %>
+    {date_input(@form, @field, disabled: @disabled)}
     """
   end
 
   defp input(assigns = %{type: number}) when number in [:integer, :id] do
     ~H"""
     <div class="form__number">
-      <%= number_input(@form, @field, disabled: @disabled, phx_debounce: 200) %>
+      {number_input(@form, @field, disabled: @disabled, phx_debounce: 200)}
     </div>
     """
   end
@@ -289,7 +289,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp input(assigns = %{type: :float}) do
     ~H"""
     <div class="form__number">
-      <%= number_input(@form, @field, disabled: @disabled, step: "any", phx_debounce: 200) %>
+      {number_input(@form, @field, disabled: @disabled, step: "any", phx_debounce: 200)}
     </div>
     """
   end
@@ -297,7 +297,7 @@ defmodule LiveAdmin.Components.Container.Form do
   defp input(assigns = %{type: type}) when type in [:naive_datetime, :utc_datetime] do
     ~H"""
     <div class="form__time">
-      <%= datetime_local_input(@form, @field, disabled: @disabled) %>
+      {datetime_local_input(@form, @field, disabled: @disabled)}
     </div>
     """
   end
@@ -306,7 +306,7 @@ defmodule LiveAdmin.Components.Container.Form do
     assigns = assign(assigns, :mappings, mappings)
 
     ~H"""
-    <%= select(@form, @field, [nil | Keyword.keys(@mappings)], disabled: @disabled) %>
+    {select(@form, @field, [nil | Keyword.keys(@mappings)], disabled: @disabled)}
     """
   end
 
@@ -315,9 +315,9 @@ defmodule LiveAdmin.Components.Container.Form do
 
     ~H"""
     <div class="checkbox__group">
-      <%= hidden_input(@form, @field, name: input_name(@form, @field) <> "[]", value: nil) %>
+      {hidden_input(@form, @field, name: input_name(@form, @field) <> "[]", value: nil)}
       <%= for option <- Keyword.keys(@mappings) do %>
-        <%= checkbox(@form, @field,
+        {checkbox(@form, @field,
           name: input_name(@form, @field) <> "[]",
           checked_value: option,
           value:
@@ -329,9 +329,9 @@ defmodule LiveAdmin.Components.Container.Form do
           hidden_input: false,
           disabled: @disabled,
           id: input_id(@form, @field) <> to_string(option)
-        ) %>
+        )}
         <label for={input_id(@form, @field) <> to_string(option)}>
-          <%= trans(to_string(option)) %>
+          {trans(to_string(option))}
         </label>
       <% end %>
     </div>

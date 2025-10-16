@@ -178,7 +178,7 @@ defmodule LiveAdmin.Components.Container do
     ~H"""
     <div class="resource__banner">
       <h1 class="resource__title">
-        <%= resource_title(@resource, @config) %>
+        {resource_title(@resource, @config)}
       </h1>
 
       <div class="resource__actions">
@@ -187,18 +187,18 @@ defmodule LiveAdmin.Components.Container do
             navigate={route_with_params(assigns, params: [prefix: @prefix])}
             class="resource__action--btn"
           >
-            <%= trans("List") %>
+            {trans("List")}
           </.link>
           <%= if LiveAdmin.fetch_config(@resource, :create_with, @config) != false do %>
             <.link
               navigate={route_with_params(assigns, segments: ["new"], params: [prefix: @prefix])}
               class="resource__action--btn"
             >
-              <%= trans("New") %>
+              {trans("New")}
             </.link>
           <% else %>
             <button class="resource__action--disabled" disabled="disabled">
-              <%= trans("New") %>
+              {trans("New")}
             </button>
           <% end %>
           <.dropdown
@@ -217,7 +217,7 @@ defmodule LiveAdmin.Components.Container do
               items={[""] ++ Enum.filter(@prefix_options, &(to_string(&1) != @prefix))}
             >
               <.link navigate={route_with_params(assigns, params: [prefix: prefix])}>
-                <%= if prefix == "", do: trans("clear"), else: prefix %>
+                {if prefix == "", do: trans("clear"), else: prefix}
               </.link>
             </.dropdown>
           <% end %>
@@ -237,7 +237,7 @@ defmodule LiveAdmin.Components.Container do
                 class="resource__action--link"
                 phx-click={JS.push("set_locale", value: %{locale: locale}, page_loading: true)}
               >
-                <%= locale %>
+                {locale}
               </button>
             </.dropdown>
           <% end %>
@@ -245,7 +245,7 @@ defmodule LiveAdmin.Components.Container do
       </div>
     </div>
 
-    <%= render("#{@live_action}.html", assigns) %>
+    {render("#{@live_action}.html", assigns)}
     """
   end
 
@@ -458,13 +458,13 @@ defmodule LiveAdmin.Components.Container do
       ,
       data-confirm={if @modalize, do: nil, else: "Are you sure?"}
     >
-      <%= @task |> to_string() |> humanize() %>
+      {@task |> to_string() |> humanize()}
     </button>
     <%= if @modalize do %>
       <.modal id={"#{@task}-task-modal"}>
-        <span class="modal__title"><%= @title %></span>
+        <span class="modal__title">{@title}</span>
         <%= for {_lang, doc} <- @function_docs do %>
-          <span class="docs"><%= doc %></span>
+          <span class="docs">{doc}</span>
         <% end %>
         <.form for={Phoenix.Component.to_form(%{})} phx-submit="task">
           <input type="hidden" name="name" value={@task} />
@@ -472,7 +472,7 @@ defmodule LiveAdmin.Components.Container do
             <b>Arguments</b>
             <%= for num <- 1..@extra_arg_count do %>
               <div>
-                <label><%= num %></label>
+                <label>{num}</label>
                 <input type="text" name="args[]" />
               </div>
             <% end %>

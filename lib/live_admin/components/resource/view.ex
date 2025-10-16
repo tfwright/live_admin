@@ -14,7 +14,7 @@ defmodule LiveAdmin.Components.Container.View do
   @impl true
   def render(assigns = %{record: nil}) do
     ~H"""
-    <div><%= trans("No record found") %></div>
+    <div>{trans("No record found")}</div>
     """
   end
 
@@ -32,7 +32,7 @@ defmodule LiveAdmin.Components.Container.View do
                 @resources
               ) %>
             <% label = Resource.render(@record, field, @resource, assoc_resource, @session, @config) %>
-            <dt class="field__label"><%= trans(humanize(field)) %></dt>
+            <dt class="field__label">{trans(humanize(field))}</dt>
             <dd class={"field__#{field_class(type)}"}>
               <%= if assoc_resource && Map.fetch!(@record, field) do %>
                 <.link
@@ -45,10 +45,10 @@ defmodule LiveAdmin.Components.Container.View do
                     )
                   }
                 >
-                  <%= label %>
+                  {label}
                 </.link>
               <% else %>
-                <%= label %>
+                {label}
               <% end %>
             </dd>
           <% end %>
@@ -59,7 +59,7 @@ defmodule LiveAdmin.Components.Container.View do
               navigate={route_with_params(assigns, segments: [:edit, @record])}
               class="resource__action--btn"
             >
-              <%= trans("Edit") %>
+              {trans("Edit")}
             </.link>
           <% end %>
           <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
@@ -74,7 +74,7 @@ defmodule LiveAdmin.Components.Container.View do
                 )
               }
             >
-              <%= trans("Delete") %>
+              {trans("Delete")}
             </button>
           <% end %>
           <.dropdown

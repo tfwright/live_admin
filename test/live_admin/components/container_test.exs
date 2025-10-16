@@ -44,7 +44,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     test "links to new form", %{view: view} do
       assert {_, {:live_redirect, %{to: "/user/new"}}} =
                view
-               |> element("a[href='/user/new'")
+               |> element("a[href='/user/new']")
                |> render_click()
     end
 
@@ -190,11 +190,8 @@ defmodule LiveAdmin.Components.ContainerTest do
       assert %{name: "test"} = Repo.get!(User, user.id)
     end
 
-    test "disables immutable fields", %{response: response} do
-      assert ["disabled"] ==
-               response
-               |> Floki.find("textarea[name='params[encrypted_password]']")
-               |> Floki.attribute("disabled")
+    test "disables immutable fields", %{view: view} do
+      assert has_element?(view, "textarea[name='params[encrypted_password]'][disabled]")
     end
   end
 

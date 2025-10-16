@@ -27,7 +27,7 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
       <span class="resource__action--disabled">
         <ul>
           <%= for item <- @values do %>
-            <li><%= item %></li>
+            <li>{item}</li>
           <% end %>
         </ul>
       </span>
@@ -56,12 +56,12 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
               )
             }
           />
-          <%= text_input(:form, :array,
+          {text_input(:form, :array,
             id: input_id(@form, @field) <> "_#{idx}",
             name: input_name(@form, @field) <> "[]",
             value: item,
             phx_debounce: 200
-          ) %>
+          )}
         </div>
       <% end %>
       <a

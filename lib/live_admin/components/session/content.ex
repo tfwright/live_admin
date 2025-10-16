@@ -13,7 +13,7 @@ defmodule LiveAdmin.Components.Session.Content do
     <div id="session-page" class="view__container" phx-hook="FormPage">
       <div class="resource__banner">
         <h1 class="resource__title">
-          <%= trans("Session") %>
+          {trans("Session")}
         </h1>
       </div>
 
@@ -27,27 +27,27 @@ defmodule LiveAdmin.Components.Session.Content do
         class="resource__form"
       >
         <div class="field__group--disabled">
-          <%= label(f, :id, trans("id"), class: "field__label") %>
-          <%= textarea(f, :id, rows: 1, class: "field__text", disabled: true) %>
+          {label(f, :id, trans("id"), class: "field__label")}
+          {textarea(f, :id, rows: 1, class: "field__text", disabled: true)}
         </div>
         <div class="field__group--disabled">
-          <%= label(f, :prefix, trans("prefix"), class: "field__label") %>
-          <%= textarea(f, :prefix, rows: 1, class: "field__text", disabled: true) %>
+          {label(f, :prefix, trans("prefix"), class: "field__label")}
+          {textarea(f, :prefix, rows: 1, class: "field__text", disabled: true)}
         </div>
         <div class="field__group--disabled">
-          <%= label(f, :locale, trans("locale"), class: "field__label") %>
-          <%= textarea(f, :locale, rows: 1, class: "field__text", disabled: true) %>
+          {label(f, :locale, trans("locale"), class: "field__label")}
+          {textarea(f, :locale, rows: 1, class: "field__text", disabled: true)}
         </div>
         <div class="field__group">
-          <%= label(f, :index_page_size, trans("Index page size"), class: "field__label") %>
-          <%= textarea(f, :index_page_size, rows: 1, class: "field__text") %>
+          {label(f, :index_page_size, trans("Index page size"), class: "field__label")}
+          {textarea(f, :index_page_size, rows: 1, class: "field__text")}
         </div>
         <div class="field__group">
-          <%= label(f, :metadata, trans("metadata"), class: "field__label") %>
+          {label(f, :metadata, trans("metadata"), class: "field__label")}
           <.live_component module={MapInput} id="metadata" form={f} field={:metadata} />
         </div>
         <div class="form__actions">
-          <%= submit(trans("Save"), class: "resource__action--btn") %>
+          {submit(trans("Save"), class: "resource__action--btn")}
         </div>
       </.form>
     </div>
