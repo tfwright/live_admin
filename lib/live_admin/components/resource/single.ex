@@ -182,22 +182,27 @@ defmodule LiveAdmin.Components.Container.Single do
       |> case do
         nil ->
           Map.fetch!(assigns.record, field)
+
         assoc_resource ->
-          Tag.content_tag(:a,
-          record_label(
-            Map.fetch!(
-              assigns.record,
-              assigns.resource.__live_admin_config__()
-              |> Keyword.fetch!(:schema)
-              |> LiveAdmin.Resource.get_assoc_name!(field)
+          Tag.content_tag(
+            :a,
+            record_label(
+              Map.fetch!(
+                assigns.record,
+                assigns.resource.__live_admin_config__()
+                |> Keyword.fetch!(:schema)
+                |> LiveAdmin.Resource.get_assoc_name!(field)
+              ),
+              elem(assoc_resource, 1),
+              assigns.config
             ),
-            elem(assoc_resource, 1),
-            assigns.config
-          ), href:
+            href:
               route_with_params(assigns,
                 resource_path: elem(assoc_resource, 0),
                 segments: [Map.fetch!(assigns.record, field)]
-              ), class: "resource-link")
+              ),
+            class: "resource-link"
+          )
       end
 
     {:inline, val}

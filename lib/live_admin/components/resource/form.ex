@@ -10,6 +10,7 @@ defmodule LiveAdmin.Components.Container.Form do
 
   alias __MODULE__.{ArrayInput, MapInput, SearchSelect}
   alias LiveAdmin.Resource
+  alias Phoenix.LiveView.JS
 
   @impl true
   def update(assigns = %{record: record}, socket) do
@@ -46,167 +47,88 @@ defmodule LiveAdmin.Components.Container.Form do
       <div class="content-header">
         <h1 class="content-title">
           {resource_title(@resource, @config)}
-          <span>{record_label(@record, @resource, @config)}</span>
+          <%= if assigns[:record] do %>
+            <span>{record_label(@record, @resource, @config)}</span>
+          <% else %>
+          <span>{trans("create")}</span>
+          <% end %>
         </h1>
-        <div class="contextual-actions">
-          <.link navigate={route_with_params(assigns, segments: [@record])} class="btn btn-secondary">
-            {trans("Back")}
-          </.link>
-          <button class="btn btn-danger">
-            <span>Delete</span>
-          </button>
-          <details class="btn-select">
-            <summary>Run action</summary>
-            <div class="settings-menu">
-              <%= for {action, _} <- LiveAdmin.fetch_config(@resource, :actions, @config) do %>
-                <a>{trans(humanize(action))}</a>
-              <% end %>
-            </div>
-          </details>
-        </div>
       </div>
 
       <div class="content-card">
         <div class="card-section">
           <div class="edit-view">
-            <form class="form-grid" onsubmit="saveEdit(event)">
-              <div class="form-field">
-                <label class="form-label" for="edit-task-name">Task Name</label>
-                <input type="text" id="edit-task-name" class="form-input" value="Database schema" />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-status">Status</label>
-                <select id="edit-status" class="form-select">
-                  <option value="completed" selected>Completed</option>
-                  <option value="active">Active</option>
-                  <option value="pending">Pending</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-created">Created</label>
-                <input type="date" id="edit-created" class="form-input" value="2025-09-15" />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-updated">Updated</label>
-                <input type="date" id="edit-updated" class="form-input" value="2025-10-03" />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-assignee">Assignee</label>
-                <input type="text" id="edit-assignee" class="form-input" value="Emily Rodriguez" />
-              </div>
-
-              <div class="form-subsection">
-                <h4 class="form-subsection-title">Contact Information</h4>
-                <div class="form-subgrid">
-                  <div class="form-field">
-                    <label class="form-label" for="edit-contact-email">Email</label>
-                    <input
-                      type="email"
-                      id="edit-contact-email"
-                      class="form-input"
-                      value="emily.rodriguez@example.com"
+            <.form
+              :let={f}
+              for={@changeset}
+              as={:params}
+              phx-change="validate"
+              phx-submit={@action}
+              phx-target={@myself}
+              class="form-grid"
+            >
+              <%= for {field, type, opts} <- Resource.fields(@resource, @config) do %>
+                <div class="form-field">
+                  <div class="form-label">
+                    {label(f, field, field |> humanize() |> trans())}
+                  </div>
+                  <%= if supported_type?(type) do %>
+                    <.input
+                      form={f}
+                      type={type}
+                      field={field}
+                      resource={@resource}
+                      resources={@resources}
+                      session={@session}
+                      prefix={@prefix}
+                      repo={@repo}
+                      config={@config}
+                      disabled={false}
                     />
-                  </div>
-                  <div class="form-field">
-                    <label class="form-label" for="edit-contact-phone">Phone</label>
-                    <input
-                      type="tel"
-                      id="edit-contact-phone"
-                      class="form-input"
-                      value="+1 (555) 123-4567"
-                    />
-                  </div>
-                  <div class="form-field">
-                    <label class="form-label" for="edit-contact-extension">Extension</label>
-                    <input type="text" id="edit-contact-extension" class="form-input" value="4521" />
-                  </div>
-                  <div class="form-field">
-                    <label class="form-label" for="edit-contact-department">Department Contact</label>
-                    <input
-                      type="text"
-                      id="edit-contact-department"
-                      class="form-input"
-                      value="Engineering Team Lead"
-                    />
-                  </div>
+                  <% else %>
+                    {textarea(f, field,
+                      rows: 1,
+                      disabled: true,
+                      value: f |> input_value(field) |> inspect()
+                    )}
+                  <% end %>
+                  {error_tag(f, field)}
                 </div>
-              </div>
+              <% end %>
 
-              <div class="form-field">
-                <label class="form-label" for="edit-due-date">Due Date</label>
-                <input type="date" id="edit-due-date" class="form-input" value="2025-10-03" />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-progress">Progress</label>
-                <input
-                  type="number"
-                  id="edit-progress"
-                  class="form-input"
-                  value="100"
-                  min="0"
-                  max="100"
-                />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-priority">Priority</label>
-                <select id="edit-priority" class="form-select">
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high" selected>High</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-department">Department</label>
-                <input type="text" id="edit-department" class="form-input" value="Engineering" />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-budget">Budget</label>
-                <input type="text" id="edit-budget" class="form-input" value="$45,000" />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-hours">Hours</label>
-                <input type="number" id="edit-hours" class="form-input" value="120" />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-category">Category</label>
-                <input type="text" id="edit-category" class="form-input" value="Backend" />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-tags">Tags</label>
-                <input type="text" id="edit-tags" class="form-input" value="SQL, Schema" />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="edit-version">Version</label>
-                <input type="text" id="edit-version" class="form-input" value="2.1" />
-              </div>
-            </form>
-
-            <div class="detail-section">
-              <div class="form-field">
-                <label class="form-label" for="edit-description">Description</label>
-                <textarea id="edit-description" class="form-textarea">This task involves designing and implementing the complete database schema for Project Alpha. The schema has been optimized for performance and scalability, incorporating best practices for data normalization and indexing strategies.</textarea>
-              </div>
-            </div>
-
-            <div class="detail-section">
-              <div class="form-field">
-                <label class="form-label" for="edit-notes">Notes</label>
-                <textarea id="edit-notes" class="form-textarea">Schema optimized - All tables have been reviewed and optimized. Foreign key relationships established. Indexes created for frequently queried columns. Migration scripts prepared for deployment.</textarea>
-              </div>
-            </div>
-
-            <div class="form-actions">
-              <button type="button" class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
-              <button type="button" class="btn btn-primary" onclick="saveEdit(event)">
-                Save Changes
-              </button>
-            </div>
-          </div>
+                <div class="form-actions">
+                  <.link
+                    class="btn btn-danger"
+                    data-confirm="Are you sure?"
+                    navigate={if assigns[:record], do: route_with_params(assigns, segments: [@record]), else: route_with_params(assigns)}
+                  >
+                    {trans("Cancel")}
+                  </.link>
+                  <input type="submit" class="btn btn-primary" value={trans("Save")} />
+                </div>
+            </.form>
+                </div>
         </div>
       </div>
     </div>
     """
   end
+
+
+
+  # <div class="detail-section">
+  #   <div class="form-field">
+  #     <label class="form-label" for="edit-description">Description</label>
+  #     <textarea id="edit-description" class="form-textarea">This task involves designing and implementing the complete database schema for Project Alpha. The schema has been optimized for performance and scalability, incorporating best practices for data normalization and indexing strategies.</textarea>
+  #   </div>
+  # </div>
+
+  # <div class="detail-section">
+  #   <div class="form-field">
+  #     <label class="form-label" for="edit-notes">Notes</label>
+  #     <textarea id="edit-notes" class="form-textarea">Schema optimized - All tables have been reviewed and optimized. Foreign key relationships established. Indexes created for frequently queried columns. Migration scripts prepared for deployment.</textarea>
+  #   </div>
+  # </div>
 
   @impl true
   def handle_event(
@@ -265,52 +187,23 @@ defmodule LiveAdmin.Components.Container.Form do
     {:noreply, socket}
   end
 
-  def field(assigns) do
-    ~H"""
-    <div class={"field__group#{if @immutable, do: "--disabled"} field__#{field_class(@type)}"}>
-      {label(@form, @field, @field |> humanize() |> trans(), class: "field__label")}
-      <%= if supported_type?(@type) do %>
-        <.input
-          form={@form}
-          type={@type}
-          field={@field}
-          disabled={@immutable}
-          resource={@resource}
-          resources={@resources}
-          session={@session}
-          prefix={@prefix}
-          repo={@repo}
-          config={@config}
-        />
-      <% else %>
-        {textarea(@form, @field,
-          rows: 1,
-          disabled: true,
-          value: @form |> input_value(@field) |> inspect()
-        )}
-      <% end %>
-      {error_tag(@form, @field)}
-    </div>
-    """
-  end
-
-  defp input(assigns = %{type: {_, {Ecto.Embedded, _}}}) do
-    ~H"""
-    <.embed
-      id={input_id(@form, @field)}
-      type={@type}
-      disabled={@disabled}
-      form={@form}
-      field={@field}
-      resource={@resource}
-      resources={@resource}
-      session={@session}
-      prefix={@prefix}
-      repo={@repo}
-      config={@config}
-    />
-    """
-  end
+  # defp input(assigns = %{type: {_, {Ecto.Embedded, _}}}) do
+  #   ~H"""
+  #   <.embed
+  #     id={input_id(@form, @field)}
+  #     type={@type}
+  #     disabled={@disabled}
+  #     form={@form}
+  #     field={@field}
+  #     resource={@resource}
+  #     resources={@resource}
+  #     session={@session}
+  #     prefix={@prefix}
+  #     repo={@repo}
+  #     config={@config}
+  #   />
+  #   """
+  # end
 
   defp input(assigns = %{type: id}) when id in [:id, :binary_id] do
     assigns =
@@ -327,7 +220,6 @@ defmodule LiveAdmin.Components.Container.Form do
 
     ~H"""
     <%= if @associated_resource do %>
-      <%= unless @form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(@field) do %>
         <.live_component
           module={SearchSelect}
           id={input_id(@form, @field)}
@@ -340,13 +232,10 @@ defmodule LiveAdmin.Components.Container.Form do
           repo={@repo}
           config={@config}
         />
-      <% else %>
-        <div class="form__number">
-          {number_input(@form, @field, disabled: @disabled)}
-        </div>
-      <% end %>
     <% else %>
-      {textarea(@form, @field, rows: 1, disabled: @disabled)}
+      <%= if assigns[:record] do %>
+        <textarea name={@form[@field].name} class="form-textarea" disabled={@form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(@field)}>{@form[@field].value}</textarea>
+      <% end %>
     <% end %>
     """
   end
@@ -377,50 +266,47 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp input(assigns = %{type: :string}) do
     ~H"""
-    {textarea(@form, @field, rows: 1, disabled: @disabled, phx_debounce: 200)}
+    <textarea name={@form[@field].name} class="form-textarea">{@form[@field].value}</textarea>
     """
   end
 
   defp input(assigns = %{type: :boolean}) do
     ~H"""
-    <div class="form__checkbox">
-      <%= for option <- ["true", "false"] do %>
-        {radio_button(@form, @field, option)}
-        {trans(option)}
-      <% end %>
-      {radio_button(@form, @field, "", checked: input_value(@form, @field) in ["", nil])}
-      {trans("nil")}
-    </div>
+    <div class="switch-container">
+              <input type="radio" class="switch-left" name={@form[@field].name} id={@form[@field].id <> "_left"} checked={@form[@field].value == false} value="0">
+              <input type="radio" class="switch-center"  name={@form[@field].name} id={@form[@field].id <> "_center"} checked={@form[@field].value in [nil, ""]} value="">
+              <input type="radio" class="switch-right"  name={@form[@field].name} id={@form[@field].id <> "_right"} checked={@form[@field].value == true} value="1">
+
+              <div class="switch">
+                  <div class="switch-background">
+                      <div class="bg-section left"></div>
+                      <div class="bg-section center"></div>
+                      <div class="bg-section right"></div>
+                  </div>
+                  <div class="switch-handle"></div>
+                  <label for={@form[@field].id <> "_left"} class="label-area left"></label>
+                  <label for={@form[@field].id <> "_center"} class="label-area center"></label>
+                  <label for={@form[@field].id <> "_right"} class="label-area right"></label>
+              </div>
+          </div>
     """
   end
 
   defp input(assigns = %{type: :date}) do
     ~H"""
-    {date_input(@form, @field, disabled: @disabled)}
+    <input type="date" class="form-input" name={@form[@field].name} value={@form[@field].value} />
     """
   end
 
-  defp input(assigns = %{type: number}) when number in [:integer, :id] do
+  defp input(assigns = %{type: number}) when number in [:integer, :id, :float] do
     ~H"""
-    <div class="form__number">
-      {number_input(@form, @field, disabled: @disabled, phx_debounce: 200)}
-    </div>
-    """
-  end
-
-  defp input(assigns = %{type: :float}) do
-    ~H"""
-    <div class="form__number">
-      {number_input(@form, @field, disabled: @disabled, step: "any", phx_debounce: 200)}
-    </div>
+    <input type="number" class="form-input" name={@form[@field].name} value={@form[@field].value} />
     """
   end
 
   defp input(assigns = %{type: type}) when type in [:naive_datetime, :utc_datetime] do
     ~H"""
-    <div class="form__time">
-      {datetime_local_input(@form, @field, disabled: @disabled)}
-    </div>
+    <input type="datetime-local" class="form-input" name={@form[@field].name} value={@form[@field].value} />
     """
   end
 
@@ -428,7 +314,11 @@ defmodule LiveAdmin.Components.Container.Form do
     assigns = assign(assigns, :mappings, mappings)
 
     ~H"""
-    {select(@form, @field, [nil | Keyword.keys(@mappings)], disabled: @disabled)}
+    <select name={@form[@field].name} class="form-select">
+      <%= for {k, v} <- @mappings do %>
+        <option value={k} selected={@form[@field].value == k}>{v}</option>
+      <% end %>
+    </select>
     """
   end
 
@@ -436,27 +326,17 @@ defmodule LiveAdmin.Components.Container.Form do
     assigns = assign(assigns, :mappings, mappings)
 
     ~H"""
-    <div class="checkbox__group">
-      {hidden_input(@form, @field, name: input_name(@form, @field) <> "[]", value: nil)}
-      <%= for option <- Keyword.keys(@mappings) do %>
-        {checkbox(@form, @field,
-          name: input_name(@form, @field) <> "[]",
-          checked_value: option,
-          value:
-            @form
-            |> input_value(@field)
-            |> Kernel.||([])
-            |> Enum.find(&(to_string(&1) == to_string(option))),
-          unchecked_value: "",
-          hidden_input: false,
-          disabled: @disabled,
-          id: input_id(@form, @field) <> to_string(option)
-        )}
-        <label for={input_id(@form, @field) <> to_string(option)}>
-          {trans(to_string(option))}
-        </label>
+    <select name={@form[@field].name <> "[]"} class="form-select" multiple={true}>
+      <%= for {k, v} <- @mappings do %>
+        <option value={k} selected={Enum.member?(@form[@field].value || [], k)}>{v}</option>
       <% end %>
-    </div>
+    </select>
+    """
+  end
+
+  defp input(assigns) do
+    ~H"""
+    NO INPUT
     """
   end
 

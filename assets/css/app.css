@@ -539,7 +539,7 @@
             z-index: 1000;
         }
 
-        .settings-menu a {
+        .settings-menu span {
             display: block;
             padding: 10px 16px;
             color: #1d1d1f;
@@ -1016,8 +1016,10 @@
         }
 
         .form-textarea {
-            min-height: 120px;
+            height: 39px;
+            min-height: 39px;
             resize: vertical;
+            padding: 10px 12px;
         }
 
         .form-actions {

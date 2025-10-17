@@ -18,14 +18,9 @@ defmodule LiveAdmin.Components.Home.Content do
             in the components option to a module that uses LiveComponent. LiveAdmin will render that component instead of this one in your app.
           </p>
 
-          <iframe
-            src="https://github.com/sponsors/tfwright/card"
-            title="Sponsor tfwright"
-            height="225"
-            width="600"
-            style="border: 0;"
-          >
-          </iframe>
+          <div>
+          <iframe src="https://github.com/sponsors/tfwright/button" title="Sponsor tfwright" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe>
+          </div>
         </div>
       </div>
     </div>

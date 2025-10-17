@@ -2,6 +2,10 @@
          border-bottom: 1px solid #C15846;
      }
 
+     select {
+         background-color: #fff;
+     }
+
      .btn {
          text-decoration: none;
      }
@@ -97,3 +101,156 @@
      .resource-link:hover {
          color:#333;
      }
+
+
+     .switch-container {
+               display: inline-block;
+               position: relative;
+           }
+
+           /* Hide radio buttons */
+           input[type="radio"] {
+               display: none;
+           }
+
+           .switch {
+               width: 125px;
+               height: 38px;
+               background: #fff;
+               border-radius: 5.5px;
+               position: relative;
+               cursor: pointer;
+               border: 1px solid #d2d2d7;
+               overflow: hidden;
+           }
+
+           /* Background colors for each state */
+           .switch-background {
+               position: absolute;
+               width: 300%;
+               height: 100%;
+               display: flex;
+               transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+               left: 0;
+               top: 0;
+           }
+
+           .bg-section {
+               width: 33.333%;
+               height: 100%;
+           }
+
+           /* Handle */
+           .switch-handle {
+               position: absolute;
+               top:1px;
+               width: 34px;
+               height: 34px;
+               background: white;
+               border-radius: 5.5px;
+               transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-size: 12px;
+               z-index: 2;
+               border: 1px solid #d2d2d7;
+           }
+
+           /* State transitions using radio button checked state */
+           .switch-left:checked ~ .switch .switch-background {
+               transform: translateX(1px);
+           }
+
+           .switch-left:checked ~ .switch .switch-handle {
+               transform: translateX(1px);
+           }
+
+           .switch-left:checked ~ .switch .switch-handle::before {
+               content: '';
+                    width: 16px;
+                    height: 16px;
+                    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>');
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    flex-shrink: 0;
+           }
+
+           .switch-center:checked ~ .switch .switch-background {
+               transform: translateX(-33.333%);
+           }
+
+           .switch-center:checked ~ .switch .switch-handle {
+               transform: translateX(45px);
+           }
+
+           .switch-center:checked ~ .switch .switch-handle::before {
+               content: '';
+               width: 16px;
+               height: 16px;
+                 background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>');
+                 background-size: contain;
+                 background-repeat: no-repeat;
+                 flex-shrink: 0;
+           }
+
+           .switch-right:checked ~ .switch .switch-background {
+               transform: translateX(-66.666%);
+           }
+
+           .switch-right:checked ~ .switch .switch-handle {
+               transform: translateX(88px);
+           }
+
+           .switch-right:checked ~ .switch .switch-handle::before {
+               content: '';
+               width: 16px;
+               height: 16px;
+                     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%2310b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>');
+                     background-size: contain;
+                     background-repeat: no-repeat;
+                     flex-shrink: 0;
+           }
+
+
+           .switch-left:checked ~ .labels .label-left,
+           .switch-center:checked ~ .labels .label-center,
+           .switch-right:checked ~ .labels .label-right {
+               color: #333;
+               font-weight: 600;
+               transform: scale(1.1);
+           }
+
+           /* Clickable label areas */
+           .label-area {
+               position: absolute;
+               height: 35px;
+               width: 33.333px;
+               top: 0;
+               cursor: pointer;
+               z-index: 3;
+           }
+
+           .label-area.left {
+               left: 0;
+           }
+
+           .label-area.center {
+               left: 33.333px;
+           }
+
+           .label-area.right {
+               right: 0;
+           }
+
+           *:disabled {
+            opacity:.5;
+           }
+
+           select[multiple]{
+               height:39px;
+           }
+
+           select[multiple]:focus-within {
+               height:100px;
+           }

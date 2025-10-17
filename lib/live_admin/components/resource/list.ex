@@ -52,14 +52,19 @@ defmodule LiveAdmin.Components.Container.List do
           <span>list</span>
         </h1>
         <div class="contextual-actions">
-          <button class="btn btn-primary">
-            <span>Create</span>
-          </button>
+          <.link
+            navigate={route_with_params(assigns, segments: ["new"], params: [prefix: @prefix])}
+            class="btn btn-primary"
+          >
+            {trans("Create")}
+          </.link>
           <details class="btn-select">
             <summary>Run task</summary>
             <div class="settings-menu">
               <%= for task <- get_function_keys(@resource, @config, :tasks) do %>
-                <a>{trans(humanize(task))}</a>
+                <span phx-click={JS.push("task", value: %{"name" => task}, page_loading: true)}>
+                  {trans(humanize(task))}
+                </span>
               <% end %>
             </div>
           </details>
@@ -126,45 +131,45 @@ defmodule LiveAdmin.Components.Container.List do
                         <td><input type="checkbox" class="row-checkbox" /></td>
                         <%= for {field, type, _} <- Resource.fields(@resource, @config), val = record |> Map.fetch!(field) |> safe_render() do %>
                           <% assoc_resource =
-                                              LiveAdmin.associated_resource(
-                                                LiveAdmin.fetch_config(@resource, :schema, @config),
-                                                field,
-                                                @resources
-                                              ) %>
+                            LiveAdmin.associated_resource(
+                              LiveAdmin.fetch_config(@resource, :schema, @config),
+                              field,
+                              @resources
+                            ) %>
                           <td>
                             <span class="cell-content">
-                            <%= cond do %>
-                            <% record |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) -> %>
-                              <a
-                                class="resource-link"
-                                href={route_with_params(assigns, segments: [record])}
-                              >
-                                {val}
-                              </a>
-                            <% !!assoc_resource && val != "" -> %>
-                              <a
-                                class="resource-link"
-                                href={
-                                  route_with_params(assigns,
-                                    resource_path: elem(assoc_resource, 0),
-                                    segments: [Map.fetch!(record, field)]
-                                  )
-                                }
-                              >
-                              {   record_label(
-                                Map.fetch!(
-                                  record,
-                                  @resource.__live_admin_config__()
-                                  |> Keyword.fetch!(:schema)
-                                  |> LiveAdmin.Resource.get_assoc_name!(field)
-                                ),
-                                elem(assoc_resource,1),
-                                @config
-                              )}
-                              </a>
-                              <% true -> %>
-                                {val}
-                            <% end %>
+                              <%= cond do %>
+                                <% record |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) -> %>
+                                  <a
+                                    class="resource-link"
+                                    href={route_with_params(assigns, segments: [record])}
+                                  >
+                                    {val}
+                                  </a>
+                                <% !!assoc_resource && val != "" -> %>
+                                  <a
+                                    class="resource-link"
+                                    href={
+                                      route_with_params(assigns,
+                                        resource_path: elem(assoc_resource, 0),
+                                        segments: [Map.fetch!(record, field)]
+                                      )
+                                    }
+                                  >
+                                    {record_label(
+                                      Map.fetch!(
+                                        record,
+                                        @resource.__live_admin_config__()
+                                        |> Keyword.fetch!(:schema)
+                                        |> LiveAdmin.Resource.get_assoc_name!(field)
+                                      ),
+                                      elem(assoc_resource, 1),
+                                      @config
+                                    )}
+                                  </a>
+                                <% true -> %>
+                                  {val}
+                              <% end %>
                             </span>
                             <!-- Modal -->
                             <div class="modal" id={"modal-#{record_id}-#{field}"}>
