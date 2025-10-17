@@ -998,6 +998,7 @@
         .form-input,
         .form-select,
         .form-textarea {
+            width:100%;
             padding: 10px 12px;
             border: 1px solid #d2d2d7;
             border-radius: 6px;

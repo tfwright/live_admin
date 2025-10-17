@@ -22,7 +22,7 @@ defmodule LiveAdmin.Components.Container do
   @impl true
   def mount(_params, _session, socket) do
     socket =
-      assign(socket, loading: !connected?(socket) |> IO.inspect(label: "LOADING"), jobs: [])
+      assign(socket, loading: !connected?(socket), jobs: [])
 
     if connected?(socket) do
       Process.send_after(self(), :clear_flash, 1000)

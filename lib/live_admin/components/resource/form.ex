@@ -50,7 +50,7 @@ defmodule LiveAdmin.Components.Container.Form do
           <%= if assigns[:record] do %>
             <span>{record_label(@record, @resource, @config)}</span>
           <% else %>
-          <span>{trans("create")}</span>
+            <span>{trans("create")}</span>
           <% end %>
         </h1>
       </div>
@@ -67,7 +67,7 @@ defmodule LiveAdmin.Components.Container.Form do
               phx-target={@myself}
               class="form-grid"
             >
-              <%= for {field, type, opts} <- Resource.fields(@resource, @config) do %>
+              <%= for {field, type, opts} <- Resource.fields(@resource, @config), f.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) |> Kernel.not() do %>
                 <div class="form-field">
                   <div class="form-label">
                     {label(f, field, field |> humanize() |> trans())}
@@ -96,25 +96,27 @@ defmodule LiveAdmin.Components.Container.Form do
                 </div>
               <% end %>
 
-                <div class="form-actions">
-                  <.link
-                    class="btn btn-danger"
-                    data-confirm="Are you sure?"
-                    navigate={if assigns[:record], do: route_with_params(assigns, segments: [@record]), else: route_with_params(assigns)}
-                  >
-                    {trans("Cancel")}
-                  </.link>
-                  <input type="submit" class="btn btn-primary" value={trans("Save")} />
-                </div>
+              <div class="form-actions">
+                <.link
+                  class="btn btn-danger"
+                  data-confirm="Are you sure?"
+                  navigate={
+                    if assigns[:record],
+                      do: route_with_params(assigns, segments: [@record]),
+                      else: route_with_params(assigns)
+                  }
+                >
+                  {trans("Cancel")}
+                </.link>
+                <input type="submit" class="btn btn-primary" value={trans("Save")} />
+              </div>
             </.form>
-                </div>
+          </div>
         </div>
       </div>
     </div>
     """
   end
-
-
 
   # <div class="detail-section">
   #   <div class="form-field">
@@ -220,22 +222,20 @@ defmodule LiveAdmin.Components.Container.Form do
 
     ~H"""
     <%= if @associated_resource do %>
-        <.live_component
-          module={SearchSelect}
-          id={input_id(@form, @field)}
-          form={@form}
-          field={@field}
-          disabled={@disabled}
-          resource={@associated_resource}
-          session={@session}
-          prefix={@prefix}
-          repo={@repo}
-          config={@config}
-        />
+      <.live_component
+        module={SearchSelect}
+        id={input_id(@form, @field)}
+        form={@form}
+        field={@field}
+        disabled={@disabled}
+        resource={@associated_resource}
+        session={@session}
+        prefix={@prefix}
+        repo={@repo}
+        config={@config}
+      />
     <% else %>
-      <%= if assigns[:record] do %>
-        <textarea name={@form[@field].name} class="form-textarea" disabled={@form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(@field)}>{@form[@field].value}</textarea>
-      <% end %>
+      <input type="number" class="form-input" name={@form[@field].name} value={@form[@field].value} />
     <% end %>
     """
   end
@@ -273,22 +273,43 @@ defmodule LiveAdmin.Components.Container.Form do
   defp input(assigns = %{type: :boolean}) do
     ~H"""
     <div class="switch-container">
-              <input type="radio" class="switch-left" name={@form[@field].name} id={@form[@field].id <> "_left"} checked={@form[@field].value == false} value="0">
-              <input type="radio" class="switch-center"  name={@form[@field].name} id={@form[@field].id <> "_center"} checked={@form[@field].value in [nil, ""]} value="">
-              <input type="radio" class="switch-right"  name={@form[@field].name} id={@form[@field].id <> "_right"} checked={@form[@field].value == true} value="1">
+      <input
+        type="radio"
+        class="switch-left"
+        name={@form[@field].name}
+        id={@form[@field].id <> "_left"}
+        checked={@form[@field].value == false}
+        value="0"
+      />
+      <input
+        type="radio"
+        class="switch-center"
+        name={@form[@field].name}
+        id={@form[@field].id <> "_center"}
+        checked={@form[@field].value in [nil, ""]}
+        value=""
+      />
+      <input
+        type="radio"
+        class="switch-right"
+        name={@form[@field].name}
+        id={@form[@field].id <> "_right"}
+        checked={@form[@field].value == true}
+        value="1"
+      />
 
-              <div class="switch">
-                  <div class="switch-background">
-                      <div class="bg-section left"></div>
-                      <div class="bg-section center"></div>
-                      <div class="bg-section right"></div>
-                  </div>
-                  <div class="switch-handle"></div>
-                  <label for={@form[@field].id <> "_left"} class="label-area left"></label>
-                  <label for={@form[@field].id <> "_center"} class="label-area center"></label>
-                  <label for={@form[@field].id <> "_right"} class="label-area right"></label>
-              </div>
-          </div>
+      <div class="switch">
+        <div class="switch-background">
+          <div class="bg-section left"></div>
+          <div class="bg-section center"></div>
+          <div class="bg-section right"></div>
+        </div>
+        <div class="switch-handle"></div>
+        <label for={@form[@field].id <> "_left"} class="label-area left"></label>
+        <label for={@form[@field].id <> "_center"} class="label-area center"></label>
+        <label for={@form[@field].id <> "_right"} class="label-area right"></label>
+      </div>
+    </div>
     """
   end
 
@@ -306,7 +327,12 @@ defmodule LiveAdmin.Components.Container.Form do
 
   defp input(assigns = %{type: type}) when type in [:naive_datetime, :utc_datetime] do
     ~H"""
-    <input type="datetime-local" class="form-input" name={@form[@field].name} value={@form[@field].value} />
+    <input
+      type="datetime-local"
+      class="form-input"
+      name={@form[@field].name}
+      value={@form[@field].value}
+    />
     """
   end
 

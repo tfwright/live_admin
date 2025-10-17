@@ -14,8 +14,24 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     socket =
       socket
       |> assign(assigns)
-      |> assign(options: [])
       |> assign_selected_option(input_value(form, field))
+      |> assign_async(
+        [:options],
+        fn ->
+          options =
+            assigns.resource
+            |> Resource.list(
+              [prefix: assigns.prefix],
+              assigns.session,
+              assigns.repo,
+              assigns.config
+            )
+            |> elem(0)
+
+          {:ok, %{options: options}}
+        end,
+        reset: true
+      )
 
     {:ok, socket}
   end
@@ -37,66 +53,54 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   def render(assigns) do
     ~H"""
     <div
-      class="search_select"
+      class={"search-select-container #{if @options.loading, do: "loading"}"}
       phx-hook="SearchSelect"
-      id={input_id(@form, @field) <> "_search_select"}
+      id={@form[@field].id <> "_search_select"}
     >
-      {hidden_input(@form, @field,
-        disabled: @disabled,
-        value:
+      <input
+        type="hidden"
+        value={
           if(@selected_option,
             do: Map.fetch!(@selected_option, LiveAdmin.primary_key!(@resource))
-          ),
-        id: input_id(@form, @field) <> "_hidden"
-      )}
+          )
+        }
+        name={@form[@field].name}
+      />
       <%= if @selected_option do %>
-        <a
-          href="#"
-          phx-click={JS.push("select", value: %{key: nil}, target: @myself, page_loading: true)}
-          class="button__remove"
-        />
-        {record_label(@selected_option, @resource, @config)}
-      <% else %>
-        <.dropdown
-          :let={option}
-          id={input_id(@form, @field) <> "_dropdown"}
-          label="Select"
-          items={
-            Enum.filter(
-              @options,
-              &(Map.fetch!(&1, LiveAdmin.primary_key!(@resource)) != input_value(@form, @field))
-            )
-          }
+        <button
+          type="button"
+          phx-click={JS.push("select", value: %{key: nil}, target: @myself)}
+          class="btn"
         >
-          <:empty_label>
-            {trans("No options")}
-          </:empty_label>
-          <:control>
-            <input
-              type="text"
-              id={input_id(@form, @field)}
-              disabled={@disabled}
-              placeholder={trans("Search")}
-              autocomplete="off"
-              phx-focus="load_options"
-              phx-keyup="load_options"
-              phx-target={@myself}
-              phx-debounce={200}
-            />
-          </:control>
-          <a
-            href="#"
-            phx-click={
-              JS.push("select",
-                value: %{key: Map.fetch!(option, LiveAdmin.primary_key!(@resource))},
-                target: @myself,
-                page_loading: true
-              )
-            }
-          >
-            {record_label(option, @resource, @config)}
-          </a>
-        </.dropdown>
+          {record_label(@selected_option, @resource, @config)}
+        </button>
+      <% else %>
+        <input
+          type="text"
+          class="form-input"
+          phx-keyup="load_options"
+          phx-target={@myself}
+          phx-debounce={200}
+        />
+        <ul class="select-options">
+          <li class="spinner" />
+          <%= if @options.ok? do %>
+            <%= for record <- @options.result do %>
+              <li phx-click={
+                JS.push("select",
+                  value: %{key: Map.fetch!(record, LiveAdmin.primary_key!(@resource))},
+                  target: @myself,
+                  loading: "#" <> @form[@field].id <> "_search_select"
+                )
+              }>
+                {record_label(record, @resource, @config)}
+              </li>
+            <% end %>
+            <%= if Enum.empty?(@options.result) do %>
+              <li>{trans("No options")}</li>
+            <% end %>
+          <% end %>
+        </ul>
       <% end %>
     </div>
     """
@@ -108,17 +112,27 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
         %{"value" => q},
         socket = %{assigns: %{resource: resource, session: session, config: config}}
       ) do
-    options =
-      resource
-      |> Resource.list(
-        [search: q, prefix: socket.assigns.prefix],
-        session,
-        socket.assigns.repo,
-        config
-      )
-      |> elem(0)
+    socket =
+      assign_async(
+        socket,
+        [:options],
+        fn ->
+          options =
+            resource
+            |> Resource.list(
+              [search: q, prefix: socket.assigns.prefix],
+              session,
+              socket.assigns.repo,
+              config
+            )
+            |> elem(0)
 
-    {:noreply, assign(socket, :options, options)}
+          {:ok, %{options: options}}
+        end,
+        reset: true
+      )
+
+    {:noreply, socket}
   end
 
   def handle_event("select", %{"key" => key}, socket) do

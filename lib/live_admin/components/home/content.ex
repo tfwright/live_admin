@@ -19,7 +19,14 @@ defmodule LiveAdmin.Components.Home.Content do
           </p>
 
           <div>
-          <iframe src="https://github.com/sponsors/tfwright/button" title="Sponsor tfwright" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe>
+            <iframe
+              src="https://github.com/sponsors/tfwright/button"
+              title="Sponsor tfwright"
+              height="32"
+              width="114"
+              style="border: 0; border-radius: 6px;"
+            >
+            </iframe>
           </div>
         </div>
       </div>

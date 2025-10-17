@@ -254,3 +254,69 @@
            select[multiple]:focus-within {
                height:100px;
            }
+
+           /*search select*/
+           .search-select-container {
+             position: relative;
+             width:100%;
+           }
+
+           .select-filter {
+             width: 100%;
+             padding: 10px;
+             border: 1px solid #ccc;
+             border-radius: 4px;
+             box-sizing: border-box;
+           }
+
+           .select-options {
+             display: none;
+             position: absolute;
+             top: 120%;
+             left: 0;
+             right: 0;
+             border: 1px solid #ccc;
+             border-radius: 4px;
+             background-color: white;
+             list-style: none;
+             margin: 0;
+             padding: 0;
+             max-height: 150px;
+             overflow-y: auto;
+             z-index: 1;
+           }
+
+           .search-select-container:focus-within .select-options {
+             display: block;
+           }
+
+           .search-select-container .select-options:active, .search-select-container .select-options:focus {
+             display: block;
+           }
+
+           .select-options li {
+             padding: 10px;
+             cursor: pointer;
+           }
+
+           .select-options li:hover {
+             background-color: #f0f0f0;
+           }
+
+           .search-select-container[class$='loading'] {
+               opacity:.5;
+           }
+
+           input[class$='loading'] {
+               opacity:.5;
+               background-color: darkgray;
+               border:0;
+           }
+
+           input[class$='loading'] + .select-options {
+               content: '';
+           }
+
+           button[class$='loading'] {
+               opacity:.5;
+           }
