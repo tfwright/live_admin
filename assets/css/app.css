@@ -786,6 +786,10 @@
             line-height: 1.4;
         }
 
+        .cell-content * {
+            display: inline-block;
+        }
+
         .task-name-link {
             color: var(--accent-color);
             text-decoration: none;
@@ -1095,7 +1099,7 @@
             display:inline-block;
         }
 
-        .detail-field-value .btn {
+        .detail-field-value .btn, .cell-content .btn {
             padding:4px;
             margin:2px;
             cursor:default;
@@ -1118,4 +1122,6 @@
             border-radius: 8px;
             line-height: 1.6;
             color: #515154;
+            white-space: pre;
+            overflow:scroll;
         }

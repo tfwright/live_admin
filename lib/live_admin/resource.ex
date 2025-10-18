@@ -353,6 +353,7 @@ defmodule LiveAdmin.Resource do
     end
   end
 
+  def render(nil, _, _, _), do: ""
   def render(val, field, {_, {Ecto.Embedded, _}}, _), do: inspect(val, pretty: true)
   def render(val, field, :map, _), do: inspect(val, pretty: true)
   def render(val, field, {_, {Ecto.Enum, _}}, _), do: Tag.content_tag(:span, val, class: "btn btn-secondary")
@@ -368,15 +369,13 @@ defmodule LiveAdmin.Resource do
   def render(val, field, {:array, inner_type}, _), do: Enum.map_join(val, ", ", &render(&1, nil, inner_type, nil))
   def render(val, _, _, _), do: safe_render(val)
 
-
-
   defp safe_render(val) do
     to_string(val)
   rescue
     e -> inspect(val, pretty: true)
   end
 
-  def get_assoc_name!(schema, fk) do
+  defp get_assoc_name!(schema, fk) do
     Enum.find(schema.__schema__(:associations), fn assoc_name ->
       fk == schema.__schema__(:association, assoc_name).owner_key
     end)

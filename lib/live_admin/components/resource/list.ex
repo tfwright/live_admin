@@ -129,48 +129,9 @@ defmodule LiveAdmin.Components.Container.List do
                     <%= for record <- elem(@records.result, 0), record_id = Map.fetch!(record, LiveAdmin.primary_key!(@resource)) do %>
                       <tr>
                         <td><input type="checkbox" class="row-checkbox" /></td>
-                        <%= for {field, type, _} <- Resource.fields(@resource, @config), val = record |> Map.fetch!(field) |> safe_render() do %>
-                          <% assoc_resource =
-                            LiveAdmin.associated_resource(
-                              LiveAdmin.fetch_config(@resource, :schema, @config),
-                              field,
-                              @resources
-                            ) %>
+                        <%= for {field, type, _} <- Resource.fields(@resource, @config), {:ok, val} = Map.fetch(record, field) do %>
                           <td>
-                            <span class="cell-content">
-                              <%= cond do %>
-                                <% record |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) -> %>
-                                  <a
-                                    class="resource-link"
-                                    href={route_with_params(assigns, segments: [record])}
-                                  >
-                                    {val}
-                                  </a>
-                                <% !!assoc_resource && val != "" -> %>
-                                  <a
-                                    class="resource-link"
-                                    href={
-                                      route_with_params(assigns,
-                                        resource_path: elem(assoc_resource, 0),
-                                        segments: [Map.fetch!(record, field)]
-                                      )
-                                    }
-                                  >
-                                    {record_label(
-                                      Map.fetch!(
-                                        record,
-                                        @resource.__live_admin_config__()
-                                        |> Keyword.fetch!(:schema)
-                                        |> LiveAdmin.Resource.get_assoc_name!(field)
-                                      ),
-                                      elem(assoc_resource, 1),
-                                      @config
-                                    )}
-                                  </a>
-                                <% true -> %>
-                                  {val}
-                              <% end %>
-                            </span>
+                            <span class="cell-content">{Resource.render(val, field, type, assigns)}</span>
                             <!-- Modal -->
                             <div class="modal" id={"modal-#{record_id}-#{field}"}>
                               <div
@@ -190,7 +151,7 @@ defmodule LiveAdmin.Components.Container.List do
                                 </div>
                                 <div class="modal-body">
                                   <div class="detail-section-content">
-                                    {val}
+                                    {inspect(val, pretty: true)}
                                   </div>
                                 </div>
                               </div>
