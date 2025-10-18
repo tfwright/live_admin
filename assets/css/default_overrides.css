@@ -311,6 +311,7 @@
                opacity:.5;
                background-color: darkgray;
                border:0;
+               pointer-events: none;
            }
 
            input[class$='loading'] + .select-options {
@@ -319,4 +320,47 @@
 
            button[class$='loading'] {
                opacity:.5;
+           }
+
+
+           .array-input-wrapper {
+               border: 1px solid #e2e8f0;
+               border-radius: 8px;
+               padding: 2px;
+               display: flex;
+               flex-wrap: wrap;
+               gap: 8px;
+               min-height: 39px;
+               transition: border-color 0.2s;
+           }
+
+           .array-input-wrapper:focus-within {
+               border-color: var(--accent-color);
+               background: white;
+           }
+
+           .array-input-wrapper .btn {
+               height:32px;
+               padding: 0 10px;
+           }
+
+           @keyframes slideIn {
+               from {
+                   opacity: 0;
+                   transform: scale(0.8);
+               }
+               to {
+                   opacity: 1;
+                   transform: scale(1);
+               }
+           }
+
+           .array-input-wrapper input {
+               border: none;
+               outline: none;
+               flex: 1;
+               min-width: 120px;
+               font-size: 14px;
+               padding: 6px;
+               background: transparent;
            }

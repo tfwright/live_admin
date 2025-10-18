@@ -67,7 +67,7 @@ defmodule LiveAdmin.Components.Container.Form do
               phx-target={@myself}
               class="form-grid"
             >
-              <%= for {field, type, opts} <- Resource.fields(@resource, @config), f.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) |> Kernel.not() do %>
+              <%= for {field, type, opts} <- Resource.fields(@resource, @config), editable_inline?(f, field, type) do %>
                 <div class="form-field">
                   <div class="form-label">
                     {label(f, field, field |> humanize() |> trans())}
@@ -118,19 +118,14 @@ defmodule LiveAdmin.Components.Container.Form do
     """
   end
 
-  # <div class="detail-section">
-  #   <div class="form-field">
-  #     <label class="form-label" for="edit-description">Description</label>
-  #     <textarea id="edit-description" class="form-textarea">This task involves designing and implementing the complete database schema for Project Alpha. The schema has been optimized for performance and scalability, incorporating best practices for data normalization and indexing strategies.</textarea>
-  #   </div>
-  # </div>
+  defp editable_inline?(form, field, type) when type in [:id, :binary_id],
+    do: form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) |> Kernel.not()
 
-  # <div class="detail-section">
-  #   <div class="form-field">
-  #     <label class="form-label" for="edit-notes">Notes</label>
-  #     <textarea id="edit-notes" class="form-textarea">Schema optimized - All tables have been reviewed and optimized. Foreign key relationships established. Indexes created for frequently queried columns. Migration scripts prepared for deployment.</textarea>
-  #   </div>
-  # </div>
+  defp editable_inline?(form, _, {_, {Ecto.Embedded, _}}), do: false
+
+  defp editable_inline?(form, _, :map), do: false
+
+  defp editable_inline?(_, _, _), do: true
 
   @impl true
   def handle_event(
@@ -188,24 +183,6 @@ defmodule LiveAdmin.Components.Container.Form do
 
     {:noreply, socket}
   end
-
-  # defp input(assigns = %{type: {_, {Ecto.Embedded, _}}}) do
-  #   ~H"""
-  #   <.embed
-  #     id={input_id(@form, @field)}
-  #     type={@type}
-  #     disabled={@disabled}
-  #     form={@form}
-  #     field={@field}
-  #     resource={@resource}
-  #     resources={@resource}
-  #     session={@session}
-  #     prefix={@prefix}
-  #     repo={@repo}
-  #     config={@config}
-  #   />
-  #   """
-  # end
 
   defp input(assigns = %{type: id}) when id in [:id, :binary_id] do
     assigns =
@@ -310,6 +287,18 @@ defmodule LiveAdmin.Components.Container.Form do
         <label for={@form[@field].id <> "_right"} class="label-area right"></label>
       </div>
     </div>
+    """
+  end
+
+  defp input(assigns = %{type: {:array, :string}}) do
+    ~H"""
+    <.live_component
+      module={ArrayInput}
+      id={input_id(@form, @field)}
+      form={@form}
+      field={@field}
+      disabled={@disabled}
+    />
     """
   end
 

@@ -88,12 +88,18 @@ Hooks.SearchSelect = {
 
 Hooks.ArrayInput = {
   mounted() {
-    this.handleEvent("change", () => {
-      this.el
-        .querySelector("input")
-        .dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
-    });
+    this.el.querySelector("input").addEventListener("input", e => e.stopPropagation());
+
+    this.el.addEventListener("keydown", e => {
+       if (e.key === "Enter") {
+         e.target.blur()
+         e.preventDefault();
+       }
+     });
   },
+  updated() {
+    this.el.querySelector("input").addEventListener("input", e => e.stopPropagation());
+  }
 };
 
 Hooks.MapInput = {
