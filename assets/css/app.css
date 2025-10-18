@@ -9,6 +9,10 @@
             background: #f5f5f7;
             color: #1d1d1f;
             --accent-color: #6B46C1;
+            padding-top: 64px;
+        }
+
+        body:has(.alert-bar) {
             padding-top: 112px;
         }
 
@@ -140,10 +144,14 @@
             padding: 24px 0 180px 0;
             position: fixed;
             left: 0;
-            top: 112px;
+            top: 64px;
             bottom: 0;
             overflow-y: auto;
             z-index: 10;
+        }
+
+        body:has(.alert-bar) .sidebar {
+            top: 112px;
         }
 
         .nav-section {
@@ -1078,6 +1086,19 @@
         .detail-field-value {
             font-size: 16px;
             color: #1d1d1f;
+            max-height: calc(1lh * 3);
+            overflow: hidden;
+        }
+
+
+        .detail-field-value * {
+            display:inline-block;
+        }
+
+        .detail-field-value .btn {
+            padding:4px;
+            margin:2px;
+            cursor:default;
         }
 
         .detail-section {

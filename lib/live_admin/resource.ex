@@ -10,7 +10,7 @@ defmodule LiveAdmin.Resource do
   """
 
   import Ecto.Query
-  import LiveAdmin, only: [record_label: 3, parent_associations: 1]
+  import LiveAdmin
 
   alias Ecto.Changeset
   alias PhoenixHTMLHelpers.Tag
@@ -322,6 +322,58 @@ defmodule LiveAdmin.Resource do
       preloads when is_list(preloads) ->
         preloads
     end
+  end
+
+  def render(val, field, type, assigns = %{record: record, resource: resource})
+      when type in [:id, :binary_id] do
+    resource.__live_admin_config__()
+    |> Keyword.fetch!(:schema)
+    |> LiveAdmin.associated_resource(field, assigns.resources)
+    |> case do
+      nil ->
+        ""
+
+      assoc_resource ->
+        Tag.content_tag(
+          :a,
+          record_label(
+            Map.fetch!(
+              record,
+              resource.__live_admin_config__()
+              |> Keyword.fetch!(:schema)
+              |> LiveAdmin.Resource.get_assoc_name!(field)
+            ),
+            elem(assoc_resource, 1),
+            assigns.config
+          ),
+          href:
+            route_with_params(assigns, resource_path: elem(assoc_resource, 0), segments: [val]),
+          class: "resource-link"
+        )
+    end
+  end
+
+  def render(val, field, {_, {Ecto.Embedded, _}}, _), do: inspect(val, pretty: true)
+  def render(val, field, :map, _), do: inspect(val, pretty: true)
+  def render(val, field, {_, {Ecto.Enum, _}}, _), do: Tag.content_tag(:span, val, class: "btn btn-secondary")
+  def render(val, field, :date, _), do: Calendar.strftime(val, "%x")
+  def render(val, _, id, _) when id in [:id, :binary_id], do: Tag.content_tag(:pre, val)
+
+  def render(val, field, dt, _) when dt in [DateTime, NaiveDateTime],
+    do: Calendar.strftime(val, "%c")
+
+  def render(val, field, :string, _), do: val
+  def render(val, field, {:array, {_, {Ecto.Enum, _}}}, _), do: Enum.map(val, &Tag.content_tag(:span, &1, class: "btn btn-secondary"))
+  def render(val, field, {:array, {_, {Ecto.Embedded, _}}}, _), do: inspect(val, pretty: true)
+  def render(val, field, {:array, inner_type}, _), do: Enum.map_join(val, ", ", &render(&1, nil, inner_type, nil))
+  def render(val, _, _, _), do: safe_render(val)
+
+
+
+  defp safe_render(val) do
+    to_string(val)
+  rescue
+    e -> inspect(val, pretty: true)
   end
 
   def get_assoc_name!(schema, fk) do

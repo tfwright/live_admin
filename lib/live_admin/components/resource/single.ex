@@ -19,15 +19,6 @@ defmodule LiveAdmin.Components.Container.Single do
 
   @impl true
   def render(assigns) do
-    fields =
-      assigns.resource
-      |> Resource.fields(assigns.config)
-      |> Enum.map(fn {field, type, _} ->
-        {field, render(field, type, assigns)}
-      end)
-
-    assigns = assign(assigns, :fields, fields)
-
     ~H"""
     <div>
       <div class="content-header">
@@ -62,26 +53,22 @@ defmodule LiveAdmin.Components.Container.Single do
         <div class="card-section">
           <div class="detail-view active">
             <div class="detail-grid">
-              <%= for {field, {:inline, val}} <- @fields do %>
+              <%= for {field, type, _} <- Resource.fields(@resource, @config), renderable?(type), val = Map.fetch!(@record, field) do %>
                 <div class="detail-field">
                   <div class="detail-field-label">{trans(humanize(field))}</div>
-                  <div class="detail-field-value">{val}</div>
+                  <div class="detail-field-value">{Resource.render(val, field, type, val)}</div>
                 </div>
               <% end %>
             </div>
-
-            <%= for {field, {:block, val}} <- @fields do %>
-              <div class="detail-section">
-                <h3 class="detail-section-title">{trans(humanize(field))}</h3>
-                <div class="detail-section-content">{val}</div>
-              </div>
-            <% end %>
           </div>
         </div>
       </div>
     </div>
     """
   end
+
+  defp renderable?({_, {Ecto.Embedded, _}}), do: false
+  defp renderable?(_), do: true
 
   @impl true
   def handle_event(
@@ -169,78 +156,5 @@ defmodule LiveAdmin.Components.Container.Single do
       end
 
     {:noreply, socket}
-  end
-
-  defp render(field, type, assigns) when type in [:id, :binary_id] do
-    val =
-      assigns.resource
-      |> LiveAdmin.fetch_config(:schema, assigns.config)
-      |> LiveAdmin.associated_resource(
-        field,
-        assigns.resources
-      )
-      |> case do
-        nil ->
-          Map.fetch!(assigns.record, field)
-
-        assoc_resource ->
-          Tag.content_tag(
-            :a,
-            record_label(
-              Map.fetch!(
-                assigns.record,
-                assigns.resource.__live_admin_config__()
-                |> Keyword.fetch!(:schema)
-                |> LiveAdmin.Resource.get_assoc_name!(field)
-              ),
-              elem(assoc_resource, 1),
-              assigns.config
-            ),
-            href:
-              route_with_params(assigns,
-                resource_path: elem(assoc_resource, 0),
-                segments: [Map.fetch!(assigns.record, field)]
-              ),
-            class: "resource-link"
-          )
-      end
-
-    {:inline, val}
-  end
-
-  defp render(field, {_, {Ecto.Embedded, _}}, %{record: record}),
-    do: {:block, record |> Map.fetch!(field) |> safe_render()}
-
-  defp render(field, :map, %{record: record}),
-    do: {:block, record |> Map.fetch!(field) |> safe_render()}
-
-  defp render(field, _, %{record: record}) do
-    record
-    |> Map.fetch!(field)
-    |> case do
-      string when is_binary(string) and byte_size(string) < 255 ->
-        {:inline, string}
-
-      list when is_list(list) ->
-        {:inline, safe_render(list)}
-
-      other ->
-        other
-        |> inspect()
-        |> case do
-          string when byte_size(string) < 255 -> {:inline, string}
-          string -> {:block, string}
-        end
-    end
-  end
-
-  defp safe_render(nil), do: ""
-
-  defp safe_render(list) when is_list(list), do: inspect(list, pretty: true)
-
-  defp safe_render(val) do
-    to_string(val)
-  rescue
-    e -> inspect(val, pretty: true)
   end
 end

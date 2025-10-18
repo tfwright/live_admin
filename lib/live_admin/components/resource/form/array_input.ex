@@ -43,8 +43,12 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
     <div class="array-input-wrapper" phx-hook="ArrayInput" id={@form[@field].id <> "_array_input"}>
       <%= for {item, idx} <- Enum.with_index(@values) do %>
         <input type="hidden" name={@form[@field].name <> "[]"} value={item} />
-        <button type="button" class="btn" phx-click={JS.push("remove", value: %{idx: idx}, target: @myself)}>
-        {item}
+        <button
+          type="button"
+          class="btn"
+          phx-click={JS.push("remove", value: %{idx: idx}, target: @myself)}
+        >
+          {item}
         </button>
       <% end %>
       <input
@@ -54,11 +58,19 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
         phx-key="Enter"
         phx-target={@myself}
         placeholder={trans("Add") <> "..."}
-        />
-        <svg class="return-icon"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="9 10 4 15 9 20"></polyline>
-                                <path d="M20 4v7a4 4 0 0 1-4 4H4"></path>
-                            </svg>
+      />
+      <svg
+        class="return-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="9 10 4 15 9 20"></polyline>
+        <path d="M20 4v7a4 4 0 0 1-4 4H4"></path>
+      </svg>
     </div>
     """
   end

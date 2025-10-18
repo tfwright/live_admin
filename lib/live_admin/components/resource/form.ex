@@ -67,34 +67,34 @@ defmodule LiveAdmin.Components.Container.Form do
               phx-target={@myself}
             >
               <div class="form-grid">
-              <%= for {field, type, opts} <- Resource.fields(@resource, @config), editable_inline?(f, field, type) do %>
+                <%= for {field, type, opts} <- Resource.fields(@resource, @config), editable_inline?(f, field, type) do %>
                   <div class={"form-field #{if f.errors[field], do: "error"}"}>
-                  <div class="form-label">
-                    {label(f, field, field |> humanize() |> trans())}
+                    <div class="form-label">
+                      {label(f, field, field |> humanize() |> trans())}
+                    </div>
+                    <%= if supported_type?(type) do %>
+                      <.input
+                        form={f}
+                        type={type}
+                        field={field}
+                        resource={@resource}
+                        resources={@resources}
+                        session={@session}
+                        prefix={@prefix}
+                        repo={@repo}
+                        config={@config}
+                        disabled={false}
+                      />
+                    <% else %>
+                      {textarea(f, field,
+                        rows: 1,
+                        disabled: true,
+                        value: f |> input_value(field) |> inspect()
+                      )}
+                    <% end %>
+                    {error_tag(f, field)}
                   </div>
-                  <%= if supported_type?(type) do %>
-                    <.input
-                      form={f}
-                      type={type}
-                      field={field}
-                      resource={@resource}
-                      resources={@resources}
-                      session={@session}
-                      prefix={@prefix}
-                      repo={@repo}
-                      config={@config}
-                      disabled={false}
-                    />
-                  <% else %>
-                    {textarea(f, field,
-                      rows: 1,
-                      disabled: true,
-                      value: f |> input_value(field) |> inspect()
-                    )}
-                  <% end %>
-                  {error_tag(f, field)}
-                </div>
-              <% end %>
+                <% end %>
               </div>
               <div class="form-actions">
                 <.link
