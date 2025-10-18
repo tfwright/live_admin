@@ -355,6 +355,15 @@
                }
            }
 
+           @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                    }
+                    to {
+                        opacity: 0.5;
+                    }
+                }
+
            .array-input-wrapper input {
                border: none;
                outline: none;
@@ -364,3 +373,31 @@
                padding: 6px;
                background: transparent;
            }
+
+           .array-input-wrapper input:not(:placeholder-shown) + .return-icon {
+               display:block;
+           }
+
+           .return-icon {
+                    display: none;
+                    width: 20px;
+                    height: 20px;
+                    opacity: 0.5;
+                    transition: opacity 0.2s;
+                    animation: fadeIn 0.2s ease-out;
+                    margin:5px;
+                }
+
+                .form-field .error {
+                    color:#C15846;
+                    font-size:10px;
+                    font-weight: bold;
+                }
+
+                .error input {
+                    background:#fef2f2;
+                }
+
+                .error textarea {
+                    background:#fef2f2;
+                }

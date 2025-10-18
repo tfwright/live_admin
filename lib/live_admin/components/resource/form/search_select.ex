@@ -3,7 +3,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   import Phoenix.HTML.Form
   use PhoenixHTMLHelpers
 
-  import LiveAdmin, only: [record_label: 3, trans: 1]
+  import LiveAdmin
   import LiveAdmin.Components
 
   alias Phoenix.LiveView.JS
@@ -81,6 +81,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
           phx-keyup="load_options"
           phx-target={@myself}
           phx-debounce={200}
+          placeholder={trans("Search") <> "..."}
         />
         <ul class="select-options">
           <li class="spinner" />

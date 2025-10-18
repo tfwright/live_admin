@@ -539,7 +539,7 @@
             z-index: 1000;
         }
 
-        .settings-menu span {
+        .settings-menu a {
             display: block;
             padding: 10px 16px;
             color: #1d1d1f;

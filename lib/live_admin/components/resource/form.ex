@@ -65,10 +65,10 @@ defmodule LiveAdmin.Components.Container.Form do
               phx-change="validate"
               phx-submit={@action}
               phx-target={@myself}
-              class="form-grid"
             >
+              <div class="form-grid">
               <%= for {field, type, opts} <- Resource.fields(@resource, @config), editable_inline?(f, field, type) do %>
-                <div class="form-field">
+                  <div class={"form-field #{if f.errors[field], do: "error"}"}>
                   <div class="form-label">
                     {label(f, field, field |> humanize() |> trans())}
                   </div>
@@ -95,7 +95,7 @@ defmodule LiveAdmin.Components.Container.Form do
                   {error_tag(f, field)}
                 </div>
               <% end %>
-
+              </div>
               <div class="form-actions">
                 <.link
                   class="btn btn-danger"
