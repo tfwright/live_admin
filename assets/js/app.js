@@ -2,7 +2,6 @@ import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import ClipboardJS from "clipboard";
-import Toastify from "toastify-js";
 import topbar from "topbar";
 
 topbar.config({
@@ -12,18 +11,6 @@ topbar.config({
 });
 window.addEventListener("phx:page-loading-start", (info) => topbar.show());
 window.addEventListener("phx:page-loading-stop", () => topbar.hide());
-window.addEventListener("phx:success", (e) => {
-  Toastify({
-    text: e.detail.msg,
-    className: "toast__container--success",
-  }).showToast();
-});
-window.addEventListener("phx:error", (e) => {
-  Toastify({
-    text: e.detail.msg,
-    className: "toast__container--error",
-  }).showToast();
-});
 
 let Hooks = {};
 

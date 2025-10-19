@@ -3,8 +3,6 @@ defmodule LiveAdmin.Components.Nav.Jobs do
 
   import LiveAdmin
 
-  require Logger
-
   @impl true
   def mount(_, %{"session_id" => session_id}, socket) do
     if connected?(socket) do
@@ -25,12 +23,6 @@ defmodule LiveAdmin.Components.Nav.Jobs do
         end
       end)
     end)
-  end
-
-  @impl true
-  def handle_info(info = {:announce, %{message: message, type: type}}, socket) do
-    Logger.debug("ANNOUNCE: #{inspect(info)}")
-    {:noreply, push_event(socket, type, %{msg: message})}
   end
 
   @impl true

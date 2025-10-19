@@ -35,25 +35,11 @@
       <% end %>
     </div>
   </div>
-  <%= for type <- [:info, :error, :success], content = Phoenix.Flash.get(@flash, type), !is_nil(content)  do %>
-    <div class={"alert-bar #{type}"}>
-      <div class="alert-content">
-        <svg
-          class="alert-icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          onclick="document.getElementById('alert-bar').classList.add('hidden'); document.body.style.paddingTop = '64px'; document.querySelector('.sidebar').style.top = '64px';"
-          title="Close alert"
-        >
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-        <span class="alert-message">{}</span>
-      </div>
-    </div>
-  <% end %>
+  {live_render(@socket, LiveAdmin.Components.AlertBar,
+    sticky: true,
+    id: "alerts",
+    session: %{"session_id" => @session.id}
+  )}
 </header>
 
 <!-- Main Layout -->
