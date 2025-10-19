@@ -130,11 +130,11 @@ defmodule LiveAdmin.Components.Container.List do
                       <tr>
                         <td><input type="checkbox" class="row-checkbox" /></td>
                         <%= for {field, type, _} <- Resource.fields(@resource, @config), {:ok, val} = Map.fetch(record, field) do %>
-                          <td>
+                          <td class="table-cell">
                             <span class="cell-content">
-                              {Resource.render(val, field, type, assigns)}
+                              {Resource.render(val, record, field, type, assigns)}
                             </span>
-                            <.field_icons
+                            <.expand_modal
                               record={record}
                               resource={@resource}
                               field={field}

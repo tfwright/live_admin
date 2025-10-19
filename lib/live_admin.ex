@@ -278,6 +278,8 @@ defmodule LiveAdmin do
     end
   end
 
+  def safe_render(val) when is_list(val), do: inspect(val, pretty: true)
+
   def safe_render(val) do
     to_string(val)
   rescue

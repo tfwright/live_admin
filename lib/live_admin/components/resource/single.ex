@@ -56,7 +56,17 @@ defmodule LiveAdmin.Components.Container.Single do
               <%= for {field, type, _} <- Resource.fields(@resource, @config), renderable?(type), val = Map.fetch!(@record, field) do %>
                 <div class="detail-field">
                   <div class="detail-field-label">{trans(humanize(field))}</div>
-                  <div class="detail-field-value">{Resource.render(val, field, type, val)}</div>
+                  <div class="detail-field-value">
+                    <span>
+                      {Resource.render(val, @record, field, type, val)}
+                    </span>
+                    <.expand_modal
+                      record={@record}
+                      resource={@resource}
+                      field={field}
+                      config={@config}
+                    />
+                  </div>
                 </div>
               <% end %>
             </div>

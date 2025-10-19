@@ -673,45 +673,53 @@
             vertical-align: top;
         }
 
-        .data-table td:not(:first-child):hover .copy-icon {
-            opacity: 1;
-        }
-
-        .copy-icon {
-            position: absolute;
-            right: 4px;
-            bottom: 6px;
-            width: 14px;
-            height: 14px;
-            opacity: 0;
-            transition: opacity 0.2s;
-            cursor: pointer;
-            color: #86868b;
-        }
-
-        .copy-icon:hover {
-            color: var(--accent-color);
-        }
-
         .expand-icon {
-            position: absolute;
-            right: 24px;
-            bottom: 6px;
-            width: 14px;
-            height: 14px;
-            opacity: 0;
+            position:absolute;
+            right: 2px;
+            bottom: 2px;
             transition: opacity 0.2s;
             cursor: pointer;
             color: #86868b;
+            background:#eee;
+            z-index:10;
+            padding:2px;
+            border-radius:2px;
+            display:none;
         }
 
         .expand-icon:hover {
-            color: var(--accent-color);
+            color: #515154;
+
         }
 
-        .data-table td:not(:first-child):hover .expand-icon {
-            opacity: 1;
+        .table-cell:hover .expand-icon, .detail-field-value:hover  .expand-icon {
+            display:flex;
         }
+
+        .copy-icon {
+            position:absolute;
+            right: 6px;
+            bottom: 6px;
+            transition: opacity 0.2s;
+            cursor: pointer;
+            color: #86868b;
+            background:#eee;
+            z-index:100;
+            padding:2px;
+            border-radius:2px;
+            display:flex;
+            width: 20px;
+        }
+
+        .copy-icon:hover {
+            color: #515154;
+
+        }
+
+        .modal-body:hover .copy-icon {
+            display:flex;
+        }
+
 
         /* Modal */
         .modal {
@@ -781,6 +789,7 @@
         .modal-body {
             color: #515154;
             line-height: 1.6;
+            position:relative;
         }
 
         .cell-content {
@@ -1100,12 +1109,14 @@
             font-size: 16px;
             color: #1d1d1f;
             max-height: calc(1lh * 3);
+            min-height: 1.5lh;
             overflow: hidden;
+            display: flex;
+            position:relative;
         }
 
-
-        .detail-field-value * {
-            display:inline-block;
+        .detail-field-value > span {
+            display:flex;
         }
 
         .detail-field-value .btn, .cell-content .btn {
@@ -1133,4 +1144,5 @@
             color: #515154;
             overflow:scroll;
             white-space: pre-wrap;
+            text-align:center;
         }

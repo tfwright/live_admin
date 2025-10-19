@@ -124,6 +124,12 @@ Hooks.ViewPage = {
   },
 };
 
+Hooks.CopyField = {
+  mounted() {
+    new ClipboardJS(this.el.querySelectorAll('[data-clipboard-target]'))
+  },
+}
+
 Hooks.IndexPage = {
   mounted() {
     this.selected = [];
@@ -175,10 +181,6 @@ Hooks.IndexPage = {
   },
   updated() {
     this.selected = [];
-
-    new ClipboardJS(this.el.querySelectorAll(".copy-icon"), {
-      target: trigger => trigger.closest("td").firstElementChild
-    });
   },
 };
 

@@ -45,38 +45,6 @@
          max-width: 100%;
      }
 
-     .field-value-icons {
-       position: absolute;
-       bottom: 2px;
-       right: 2px;
-       gap: 4px;
-       z-index: 1;
-       height:20px;
-       width:36px;
-       background:#eee;
-       padding:2px;
-       border-radius: 4px;
-       border:1px;
-       display:none;
-     }
-
-     td:not(:first-child):hover .field-value-icons {
-        display:flex;
-     }
-
-     .expand-icon, .copy-icon {
-         display:inline-block;
-         position:relative;
-         width: 14px;
-         height: 14px;
-         opacity: 0;
-         transition: opacity 0.2s;
-         cursor: pointer;
-         color: #86868b;
-         bottom:0;
-         right:0;
-     }
-
      .modal-content {
          min-width: 50%;
      }
