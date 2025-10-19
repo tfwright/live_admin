@@ -58,7 +58,7 @@ defmodule LiveAdmin.Components.Container.Single do
         <div class="card-section">
           <div class="detail-view active">
             <div class="detail-grid">
-              <%= for {field, type, _} <- Resource.fields(@resource, @config), renderable?(type), val = Map.fetch!(@record, field) do %>
+              <%= for {field, type, _} <- Resource.fields(@resource, @config), renderable?(type), {:ok, val} = Map.fetch(@record, field) do %>
                 <div class="detail-field">
                   <div class="detail-field-label">{trans(humanize(field))}</div>
                   <div class="detail-field-value">
