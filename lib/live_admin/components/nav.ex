@@ -114,7 +114,7 @@ defmodule LiveAdmin.Components.Nav do
         <%= if match?({_key, _resource}, parent) do %>
           <.link
             navigate={route_with_params(assigns, resource_path: elem(parent, 0))}
-            class="nav-item"
+            class={"nav-item #{if elem(parent, 1) == @current_resource, do: "active"}"}
           >
             {resource_title(elem(parent, 1), @config)}
           </.link>

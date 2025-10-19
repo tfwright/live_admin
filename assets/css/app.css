@@ -17,7 +17,6 @@ body {
     /* Background Colors */
     --bg-light: #f5f5f7;
     --bg-white: #fff;
-    --bg-gray: #f5f5f7;
     --bg-medium: #e8e8ed;
 
     /* Border Colors */
@@ -259,13 +258,14 @@ body:has(.alert-bar) .sidebar {
 }
 
 .nav-item:hover {
-    background: var(--bg-gray);
+    background: var(--bg-light);
 }
 
 .nav-item.active {
-    background: var(--bg-medium);
+    background: var(--bg-light);
     font-weight: 500;
     border-left: 3px solid var(--accent-color);
+    color: var(--accent-color) !important;
 }
 
 .nav-icon {
@@ -303,7 +303,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .nav-toggle-label:hover {
-    background: var(--bg-gray);
+    background: var(--bg-light);
 }
 
 .nav-toggle-label.active {
@@ -554,7 +554,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .btn-secondary:hover {
-    background: var(--bg-gray);
+    background: var(--bg-light);
 }
 
 .btn-select {
@@ -571,11 +571,11 @@ body:has(.alert-bar) .sidebar {
 }
 
 .btn-select:hover {
-    background: var(--bg-gray);
+    background: var(--bg-light);
 }
 
 .btn-select[open] {
-    background: var(--bg-gray);
+    background: var(--bg-light);
 }
 
 .btn-select summary {
@@ -629,7 +629,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .settings-menu a:hover, .settings-menu span:hover {
-    background: var(--bg-gray);
+    background: var(--bg-light);
 }
 
 .btn-icon {
@@ -683,7 +683,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .data-table th {
-    background: var(--bg-gray);
+    background: var(--bg-light);
     padding: 12px 16px;
     text-align: left;
     font-weight: 600;
@@ -840,7 +840,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .modal-close:hover {
-    background: var(--bg-gray);
+    background: var(--bg-light);
     color: var(--text-primary);
 }
 
@@ -883,7 +883,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .data-table tr:hover {
-    background: var(--bg-gray);
+    background: var(--bg-light);
 }
 
 .row-checkbox {
@@ -970,7 +970,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .pagination-btn:hover:not(:disabled) {
-    background: var(--bg-gray);
+    background: var(--bg-light);
     border-color: var(--accent-color);
 }
 
@@ -991,7 +991,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .pagination-info-btn:hover {
-    background: var(--bg-gray);
+    background: var(--bg-light);
     border-color: var(--accent-color);
 }
 
@@ -1121,7 +1121,7 @@ body:has(.alert-bar) .sidebar {
 
 .form-subsection {
     grid-column: 1 / -1;
-    background: var(--bg-gray);
+    background: var(--bg-light);
     padding: 24px;
     border-radius: 8px;
     margin-bottom: 16px;
@@ -1195,7 +1195,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .detail-section-content {
-    background: var(--bg-gray);
+    background: var(--bg-light);
     padding: 16px;
     border-radius: 8px;
     line-height: 1.6;
