@@ -99,7 +99,7 @@ Hooks.MapInput = {
   },
 };
 
-Hooks.ViewPage = {
+Hooks.Actions = {
   mounted() {
     this.el.addEventListener("live_admin:action", (e) => {
       if (e.target.tagName === "FORM") {

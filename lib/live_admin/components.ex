@@ -13,17 +13,17 @@ defmodule LiveAdmin.Components do
       assign(
         assigns,
         :id,
-        "#{Map.fetch!(assigns.record, LiveAdmin.primary_key!(assigns.resource))}-#{assigns.field}"
+        "field-expand-" <> "#{Map.fetch!(assigns.record, LiveAdmin.primary_key!(assigns.resource))}-#{assigns.field}"
       )
 
     ~H"""
-    <div id={"field-expand-" <> @id} phx-hook="CopyField">
-      <.modal id={@id}>
+    <div id={@id} phx-hook="CopyField">
+      <.modal id={@id <> "-modal"}>
         <:title>{record_label(@record, @resource, @config)}<span>{@field}</span></:title>
         <div class="detail-section-content">{@record |> Map.fetch!(@field) |> safe_render()}</div>
         <span
           class="copy-icon"
-          data-clipboard-target={"#field-expand-#{@id} .detail-section-content"}
+          data-clipboard-target={"##{@id}-modal .detail-section-content"}
         >
           <svg
             viewBox="0 0 24 24"
@@ -38,7 +38,7 @@ defmodule LiveAdmin.Components do
       </.modal>
       <span
         class="expand-icon"
-        phx-click={JS.show(to: "#modal-" <> @id, display: "flex")}
+        phx-click={JS.show(to: "##{@id}-modal", display: "flex")}
       >
         <svg
           width="14"
@@ -81,13 +81,12 @@ defmodule LiveAdmin.Components do
     """
   end
 
-
   def modal(assigns) do
     ~H"""
-    <div class="modal" id={"modal-" <> @id}>
+    <div class="modal" id={@id}>
       <div
         class="modal-content"
-        phx-click-away={JS.hide(to: "#modal-" <> @id)}
+        phx-click-away={JS.hide(to: "#" <> @id)}
       >
         <div class="modal-header">
           <h3 class="modal-title">
@@ -95,7 +94,7 @@ defmodule LiveAdmin.Components do
           </h3>
           <button
             class="modal-close"
-            phx-click={JS.hide(to: "#modal-" <> @id)}
+            phx-click={JS.hide(to: "#" <> @id)}
           >
             &times;
           </button>
