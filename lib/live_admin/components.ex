@@ -13,7 +13,8 @@ defmodule LiveAdmin.Components do
       assign(
         assigns,
         :id,
-        "field-expand-" <> "#{Map.fetch!(assigns.record, LiveAdmin.primary_key!(assigns.resource))}-#{assigns.field}"
+        "field-expand-" <>
+          "#{Map.fetch!(assigns.record, LiveAdmin.primary_key!(assigns.resource))}-#{assigns.field}"
       )
 
     ~H"""
@@ -103,6 +104,53 @@ defmodule LiveAdmin.Components do
           {render_slot(@inner_block)}
         </div>
       </div>
+    </div>
+    """
+  end
+
+  def function_control(assigns) do
+    assigns = assign(assigns, :modalize, assigns.extra_arg_count > 0 || Enum.any?(assigns.docs))
+
+    ~H"""
+    <div>
+      <%= if @modalize do %>
+        <.modal id={"#{@type}-#{@name}-modal"}>
+          <:title>{@name |> to_string() |> humanize()}</:title>
+          <.form
+            for={Phoenix.Component.to_form(%{})}
+            phx-submit={@type}
+            class="form-line"
+          >
+            <%= for {_lang, doc} <- @docs do %>
+              <div class="docs">{doc}</div>
+            <% end %>
+            <input type="hidden" name="name" value={@name} />
+            <%= if @extra_arg_count > 0 do %>
+              <h2 class="form-title">{trans("Arguments")}</h2>
+              <%= for num <- 1..@extra_arg_count do %>
+                <div class="form-group">
+                  <label>{num}</label>
+                  <textarea class="form-textarea" name="args[]" required></textarea>
+                </div>
+              <% end %>
+            <% end %>
+            <div class="button-group">
+              <button type="submit" class="btn btn-primary">{trans("Submit")}</button>
+              <button type="button" class="btn btn-danger">{trans("Cancel")}</button>
+            </div>
+          </.form>
+        </.modal>
+      <% end %>
+      <span
+        phx-click={
+          if @modalize,
+            do: JS.show(to: "##{@type}-#{@name}-modal", display: "flex"),
+            else: JS.push(@type, value: %{"name" => @name}, page_loading: true)
+        }
+        data-confirm={if @modalize, do: nil, else: trans("Are you sure you?")}
+      >
+        {trans(humanize(@name))}
+      </span>
     </div>
     """
   end

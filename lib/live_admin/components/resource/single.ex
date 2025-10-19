@@ -41,47 +41,13 @@ defmodule LiveAdmin.Components.Container.Single do
           <details class="btn-select" phx-hook="Actions" id="actions-control">
             <summary>Run action</summary>
             <div class="settings-menu">
-              <%= for {action, _} <- LiveAdmin.fetch_config(@resource, :actions, @config), {name, _, _, arity, docs} = LiveAdmin.fetch_function(@resource, @session, :actions, action), extra_arg_count = (arity - 2), {:ok, modalize} = {:ok, extra_arg_count > 0 || Enum.any?(docs)} do %>
-                <%= if modalize do %>
-                  <.modal id={"#{action}-modal"}>
-                    <:title>{name |> to_string() |> humanize()}</:title>
-                    <.form
-                      for={Phoenix.Component.to_form(%{})}
-                      phx-submit={
-                        JS.dispatch("phx:page-loading-start") |> JS.dispatch("live_admin:action") |> JS.hide(to: "##{action}-modal")
-                      }
-                      class="form-line"
-                    >
-                      <%= for {_lang, doc} <- docs do %>
-                        <div class="docs">{doc}</div>
-                      <% end %>
-                      <input type="hidden" name="name" value={action} />
-                      <%= if extra_arg_count > 0 do %>
-                        <h2 class="form-title">Arguments</h2>
-                        <%= for num <- 1..extra_arg_count do %>
-                          <div class="form-group">
-                              <label>{num}</label>
-                              <textarea class="form-textarea" name="args[]" required></textarea>
-                          </div>
-                        <% end %>
-                      <% end %>
-                      <div class="button-group">
-                          <button type="submit" class="btn btn-primary">Submit</button>
-                          <button type="button" class="btn btn-danger">Cancel</button>
-                      </div>
-                    </.form>
-                  </.modal>
-                <% end %>
-                <span
-                  phx-click={
-                    if modalize,
-                      do: JS.show(to: "##{action}-modal", display: "flex"),
-                      else: JS.dispatch("live_admin:action")
-                  }
-                  data-confirm={if modalize, do: nil, else: trans("Are you sure you?")}
-                >
-                  {trans(humanize(action))}
-                </span>
+              <%= for action <- get_function_keys(@resource, @config, :actions), {name, _, _, arity, docs} = LiveAdmin.fetch_function(@resource, @session, :actions, action) do %>
+                <.function_control
+                  name={action}
+                  type="action"
+                  extra_arg_count={arity - 2}
+                  docs={docs}
+                />
               <% end %>
             </div>
           </details>
@@ -149,55 +115,6 @@ defmodule LiveAdmin.Components.Container.Single do
             msg: trans("Delete failed!")
           })
       end
-
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_event(
-        "action",
-        params = %{"name" => action},
-        socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo, session: session}}
-      ) do
-    record =
-      socket.assigns[:record] || Resource.find!(params["id"], resource, prefix, repo)
-
-    {_, m, f, _, _} =
-      LiveAdmin.fetch_function(resource, session, :actions, String.to_existing_atom(action))
-
-    socket =
-      case apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", [])) do
-        {:ok, record} ->
-          LiveAdmin.PubSub.broadcast(
-            session.id,
-            {:announce,
-             %{
-               message:
-                 trans("%{name} action succeeded", inter: [name: action]),
-               type: :success
-             }}
-          )
-
-          assign(socket, :record, record)
-
-
-
-        {:error, error} ->
-          push_event(
-            socket,
-            "error",
-            %{
-              msg:
-                trans("%{action} failed: %{error}",
-                  inter: [
-                    action: action,
-                    error: error
-                  ]
-                )
-            }
-          )
-      end
-      |> push_event("page-loading-stop", %{})
 
     {:noreply, socket}
   end

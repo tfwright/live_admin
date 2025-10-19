@@ -99,31 +99,6 @@ Hooks.MapInput = {
   },
 };
 
-Hooks.Actions = {
-  mounted() {
-    this.el.addEventListener("live_admin:action", (e) => {
-      if (e.target.tagName === "FORM") {
-        const params = [...new FormData(e.target)].reduce(
-          (params, [key, val]) => {
-            if (key === "args[]") {
-              return { ...params, args: [...params.args, val] };
-            } else {
-              return { ...params, [key]: val };
-            }
-          },
-          { args: [] },
-        );
-
-        e.target.reset();
-
-        this.pushEventTo(this.el, "action", params);
-      } else {
-        this.pushEventTo(this.el, "action", { name: e.target.dataset.action });
-      }
-    });
-  },
-};
-
 Hooks.CopyField = {
   mounted() {
     new ClipboardJS(this.el.querySelectorAll('[data-clipboard-target]'))

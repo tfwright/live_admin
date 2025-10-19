@@ -83,20 +83,23 @@ defmodule LiveAdmin.Components.Container do
 
   @impl true
   def handle_event(
-        "task",
+        function,
         params = %{"name" => name},
         socket = %{
           assigns: %{session: session, resource: resource, config: config}
         }
-      ) do
+      ) when function in ["task", "action"] do
     {_, m, f, _, _} =
-      LiveAdmin.fetch_function(resource, session, :tasks, String.to_existing_atom(name))
+      LiveAdmin.fetch_function(resource, session, :"#{function}s", String.to_existing_atom(name))
 
     args = [session | Map.get(params, "args", [])]
 
-    search = Map.get(socket.assigns, :search)
+    object = case function do
+      "task" -> Resource.query(resource, Map.get(socket.assigns, :search), config)
+      "action" -> socket.assigns.record
+    end
 
-    task =
+    job =
       Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, fn ->
         try do
           case apply(m, f, [Resource.query(resource, search, config) | args]) do
@@ -134,7 +137,7 @@ defmodule LiveAdmin.Components.Container do
 
     LiveAdmin.PubSub.update_job(session.id, task.pid, progress: 0, label: name)
 
-    {:noreply, push_navigate(socket, to: route_with_params(socket.assigns))}
+    {:noreply, push_navigate(socket, to: route_with_params(socket.assigns, segments: [Map.get(socket.assigns, :record)]))}
   end
 
   @impl true
@@ -341,56 +344,5 @@ defmodule LiveAdmin.Components.Container do
           )
       )
     end
-  end
-
-  defp task_control(assigns) do
-    {name, _, _, arity, docs} =
-      LiveAdmin.fetch_function(assigns.resource, assigns.session, :tasks, assigns.task)
-
-    extra_arg_count = arity - 2
-
-    assigns =
-      assign(assigns,
-        extra_arg_count: extra_arg_count,
-        function_docs: docs,
-        modalize: extra_arg_count > 0 or Enum.any?(docs),
-        title: name |> to_string() |> humanize()
-      )
-
-    ~H"""
-    <button
-      class="resource__action--link"
-      phx-click={
-        if @modalize,
-          do: JS.show(to: "##{@task}-task-modal"),
-          else: JS.push("task", value: %{"name" => @task}, page_loading: true)
-      }
-      ,
-      data-confirm={if @modalize, do: nil, else: "Are you sure?"}
-    >
-      {@task |> to_string() |> humanize()}
-    </button>
-    <%= if @modalize do %>
-      <.modal id={"#{@task}-task-modal"}>
-        <span class="modal__title">{@title}</span>
-        <%= for {_lang, doc} <- @function_docs do %>
-          <span class="docs">{doc}</span>
-        <% end %>
-        <.form for={Phoenix.Component.to_form(%{})} phx-submit="task">
-          <input type="hidden" name="name" value={@task} />
-          <%= if @extra_arg_count > 0 do %>
-            <b>Arguments</b>
-            <%= for num <- 1..@extra_arg_count do %>
-              <div>
-                <label>{num}</label>
-                <input type="text" name="args[]" />
-              </div>
-            <% end %>
-          <% end %>
-          <input type="submit" value="Execute" />
-        </.form>
-      </.modal>
-    <% end %>
-    """
   end
 end
