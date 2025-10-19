@@ -17,18 +17,17 @@ defmodule LiveAdmin.Components.Home.Content do
             To use your own component, set the value of <code>:home</code>
             in the components option to a module that uses LiveComponent. LiveAdmin will render that component instead of this one in your app.
           </p>
-
-          <div>
-            <iframe
-              src="https://github.com/sponsors/tfwright/button"
-              title="Sponsor tfwright"
-              height="32"
-              width="114"
-              style="border: 0; border-radius: 6px;"
-            >
-            </iframe>
-          </div>
         </div>
+      </div>
+      <div style="display:flex;margin:20px auto;">
+        <iframe
+          src="https://github.com/sponsors/tfwright/button"
+          title="Sponsor tfwright"
+          height="32"
+          width="114"
+          style="border: 0; border-radius: 6px;"
+        >
+        </iframe>
       </div>
     </div>
     """

@@ -16,6 +16,10 @@
             padding-top: 112px;
         }
 
+        p {
+            margin: 1lh 0;
+        }
+
         /* Header */
         .header {
             background: #fff;
