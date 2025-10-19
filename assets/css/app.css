@@ -781,8 +781,6 @@
         .modal-body {
             color: #515154;
             line-height: 1.6;
-            white-space: pre-wrap;
-            word-wrap: break-word;
         }
 
         .cell-content {
@@ -1133,6 +1131,6 @@
             border-radius: 8px;
             line-height: 1.6;
             color: #515154;
-            white-space: pre;
             overflow:scroll;
+            white-space: pre-wrap;
         }

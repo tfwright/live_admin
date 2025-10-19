@@ -46,13 +46,13 @@ defmodule LiveAdmin.Components.AlertBar do
 
   @impl true
   def handle_event("dismiss", _, socket) do
-    {:noreply, update(socket, :alerts, & Enum.drop(&1, 1))}
+    {:noreply, update(socket, :alerts, &Enum.drop(&1, 1))}
   end
 
   @impl true
   def handle_info(info = {:announce, %{message: message, type: type}}, socket) do
     Logger.debug("ANNOUNCE: #{inspect(info)}")
-    {:noreply, update(socket, :alerts, &  [{message, type} | &1])}
+    {:noreply, update(socket, :alerts, &[{message, type} | &1])}
   end
 
   def handle_info(_, socket), do: {:noreply, socket}

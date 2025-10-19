@@ -131,88 +131,15 @@ defmodule LiveAdmin.Components.Container.List do
                         <td><input type="checkbox" class="row-checkbox" /></td>
                         <%= for {field, type, _} <- Resource.fields(@resource, @config), {:ok, val} = Map.fetch(record, field) do %>
                           <td>
-                            <span class="cell-content">{Resource.render(val, field, type, assigns)}</span>
-                            <!-- Modal -->
-                            <div class="modal" id={"modal-#{record_id}-#{field}"}>
-                              <div
-                                class="modal-content"
-                                phx-click-away={JS.hide(to: "#modal-#{record_id}-#{field}")}
-                              >
-                                <div class="modal-header">
-                                  <h3 class="modal-title">
-                                    {record_label(record, @resource, @config)} > {field}
-                                  </h3>
-                                  <button
-                                    class="modal-close"
-                                    phx-click={JS.hide(to: "#modal-#{record_id}-#{field}")}
-                                  >
-                                    &times;
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  <div class="detail-section-content">
-                                    {inspect(val, pretty: true)}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="cell-icons">
-                              <span
-                                class="expand-icon"
-                                phx-click={
-                                  JS.show(to: "#modal-#{record_id}-#{field}", display: "flex")
-                                }
-                              >
-                                <svg
-                                  width="14"
-                                  height="14"
-                                  viewBox="0 0 14 14"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M6 6L2 2M2 2L2 4M2 2L4 2"
-                                    stroke="currentColor"
-                                    stroke-width="1"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                  />
-                                  <path
-                                    d="M8 6L12 2M12 2L12 4M12 2L10 2"
-                                    stroke="currentColor"
-                                    stroke-width="1"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                  />
-                                  <path
-                                    d="M6 8L2 12M2 12L2 10M2 12L4 12"
-                                    stroke="currentColor"
-                                    stroke-width="1"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                  />
-                                  <path
-                                    d="M8 8L12 12M12 12L12 10M12 12L10 12"
-                                    stroke="currentColor"
-                                    stroke-width="1"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                  />
-                                </svg>
-                              </span>
-                              <span class="copy-icon">
-                                <svg
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="2"
-                                  title="Copy to clipboard"
-                                >
-                                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                                </svg>
-                              </span>
-                            </div>
+                            <span class="cell-content">
+                              {Resource.render(val, field, type, assigns)}
+                            </span>
+                            <.field_icons
+                              record={record}
+                              resource={@resource}
+                              field={field}
+                              config={@config}
+                            />
                           </td>
                         <% end %>
                       </tr>

@@ -356,7 +356,10 @@ defmodule LiveAdmin.Resource do
   def render(nil, _, _, _), do: ""
   def render(val, field, {_, {Ecto.Embedded, _}}, _), do: inspect(val, pretty: true)
   def render(val, field, :map, _), do: inspect(val, pretty: true)
-  def render(val, field, {_, {Ecto.Enum, _}}, _), do: Tag.content_tag(:span, val, class: "btn btn-secondary")
+
+  def render(val, field, {_, {Ecto.Enum, _}}, _),
+    do: Tag.content_tag(:span, val, class: "btn btn-secondary")
+
   def render(val, field, :date, _), do: Calendar.strftime(val, "%x")
   def render(val, _, id, _) when id in [:id, :binary_id], do: Tag.content_tag(:pre, val)
 
@@ -364,16 +367,16 @@ defmodule LiveAdmin.Resource do
     do: Calendar.strftime(val, "%c")
 
   def render(val, field, :string, _), do: val
-  def render(val, field, {:array, {_, {Ecto.Enum, _}}}, _), do: Enum.map(val, &Tag.content_tag(:span, &1, class: "btn btn-secondary"))
-  def render(val, field, {:array, {_, {Ecto.Embedded, _}}}, _), do: inspect(val, pretty: true)
-  def render(val, field, {:array, inner_type}, _), do: Enum.map_join(val, ", ", &render(&1, nil, inner_type, nil))
-  def render(val, _, _, _), do: safe_render(val)
 
-  defp safe_render(val) do
-    to_string(val)
-  rescue
-    e -> inspect(val, pretty: true)
-  end
+  def render(val, field, {:array, {_, {Ecto.Enum, _}}}, _),
+    do: Enum.map(val, &Tag.content_tag(:span, &1, class: "btn btn-secondary"))
+
+  def render(val, field, {:array, {_, {Ecto.Embedded, _}}}, _), do: inspect(val, pretty: true)
+
+  def render(val, field, {:array, inner_type}, _),
+    do: Enum.map_join(val, ", ", &render(&1, nil, inner_type, nil))
+
+  def render(val, _, _, _), do: safe_render(val)
 
   defp get_assoc_name!(schema, fk) do
     Enum.find(schema.__schema__(:associations), fn assoc_name ->

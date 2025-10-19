@@ -20,38 +20,34 @@ defmodule LiveAdmin.Components.Session.Content do
       <div class="content-card">
         <div class="card-section">
           <div class="edit-view">
-          <.form
-            :let={f}
-            for={@changeset}
-            as={:session}
-            phx-submit={:save}
-            phx-target={@myself}
-            phx-change={:validate}
-          >
+            <.form
+              :let={f}
+              for={@changeset}
+              as={:session}
+              phx-submit={:save}
+              phx-target={@myself}
+              phx-change={:validate}
+            >
               <div class="form-grid">
-                  <div class="form-field">
-                    <div class="form-label">{trans("ID")}
-                    </div>
-                    <textarea name={f[:id].name} class="form-textarea" disabled>{f[:id].value}</textarea>
-                  </div>
+                <div class="form-field">
+                  <div class="form-label">{trans("ID")}</div>
+                  <textarea name={f[:id].name} class="form-textarea" disabled>{f[:id].value}</textarea>
+                </div>
 
-                  <div class="form-field">
-                    <div class="form-label">{trans("Locale")}
-                    </div>
-                    <textarea name={f[:locale].name} class="form-textarea" disabled>{f[:locale].value}</textarea>
-                  </div>
+                <div class="form-field">
+                  <div class="form-label">{trans("Locale")}</div>
+                  <textarea name={f[:locale].name} class="form-textarea" disabled>{f[:locale].value}</textarea>
+                </div>
 
-                  <div class="form-field">
-                    <div class="form-label">{trans("Metadata")}
-                    </div>
-                    <textarea name={f[:metadata].name} class="form-textarea" disabled>{inspect(f[:metadata].value, pretty: true)}</textarea>
-                  </div>
+                <div class="form-field">
+                  <div class="form-label">{trans("Metadata")}</div>
+                  <textarea name={f[:metadata].name} class="form-textarea" disabled>{inspect(f[:metadata].value, pretty: true)}</textarea>
+                </div>
 
-                  <div class="form-field">
-                    <div class="form-label">{trans("Index page size")}
-                    </div>
-                    <textarea name={f[:index_page_size].name} class="form-textarea">{f[:index_page_size].value}</textarea>
-                  </div>
+                <div class="form-field">
+                  <div class="form-label">{trans("Index page size")}</div>
+                  <textarea name={f[:index_page_size].name} class="form-textarea">{f[:index_page_size].value}</textarea>
+                </div>
               </div>
               <div class="form-actions">
                 <input type="submit" class="btn btn-primary" value={trans("Save")} />
@@ -70,7 +66,6 @@ defmodule LiveAdmin.Components.Session.Content do
   #       {trans("Session")}
   #     </h1>
   #   </div>
-
 
   #     <div class="field__group--disabled">
 

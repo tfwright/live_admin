@@ -204,11 +204,11 @@ defmodule DemoWeb.PostsAdmin.Home do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex h-full items-center justify-center">
-      <div class="w-1/2">
-        This is only for managing posts
+    <main class="content">
+      <div class="content-header">
+        Posts demo
       </div>
-    </div>
+    </main>
     """
   end
 end
@@ -219,11 +219,11 @@ defmodule DemoWeb.Extra do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex h-full items-center justify-center">
-      <div class="w-1/2">
-        This is an extra page
+    <main class="content">
+      <div class="content-header">
+      Extra page
       </div>
-    </div>
+    </main>
     """
   end
 end

@@ -45,7 +45,7 @@
          max-width: 100%;
      }
 
-     .cell-icons {
+     .field-value-icons {
        position: absolute;
        bottom: 2px;
        right: 2px;
@@ -60,7 +60,7 @@
        display:none;
      }
 
-     .data-table td:not(:first-child):hover .cell-icons {
+     td:not(:first-child):hover .field-value-icons {
         display:flex;
      }
 
@@ -81,7 +81,7 @@
          min-width: 50%;
      }
 
-     h1 > span {
+     h1 > span, h3 > span {
          opacity: .5;
      }
 

@@ -277,4 +277,10 @@ defmodule LiveAdmin do
       {:error, _} -> %{}
     end
   end
+
+  def safe_render(val) do
+    to_string(val)
+  rescue
+    e -> inspect(val, pretty: true)
+  end
 end
