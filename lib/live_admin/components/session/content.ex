@@ -60,38 +60,6 @@ defmodule LiveAdmin.Components.Session.Content do
     """
   end
 
-  # <div id="session-page" class="view__container" phx-hook="FormPage">
-  #   <div class="resource__banner">
-  #     <h1 class="resource__title">
-  #       {trans("Session")}
-  #     </h1>
-  #   </div>
-
-  #     <div class="field__group--disabled">
-
-  #     </div>
-  #     <div class="field__group--disabled">
-  #       {label(f, :prefix, trans("prefix"), class: "field__label")}
-  #       {textarea(f, :prefix, rows: 1, class: "field__text", disabled: true)}
-  #     </div>
-  #     <div class="field__group--disabled">
-  #       {label(f, :locale, trans("locale"), class: "field__label")}
-  #       {textarea(f, :locale, rows: 1, class: "field__text", disabled: true)}
-  #     </div>
-  #     <div class="field__group">
-  #       {label(f, :index_page_size, trans("Index page size"), class: "field__label")}
-  #       {textarea(f, :index_page_size, rows: 1, class: "field__text")}
-  #     </div>
-  #     <div class="field__group">
-  #       {label(f, :metadata, trans("metadata"), class: "field__label")}
-  #       <.live_component module={MapInput} id="metadata" form={f} field={:metadata} />
-  #     </div>
-  #     <div class="form__actions">
-  #       {submit(trans("Save"), class: "resource__action--btn")}
-  #     </div>
-  #   </.form>
-  # </div>
-
   @impl true
   def handle_event("validate", %{"session" => params}, socket = %{assigns: %{}}) do
     changeset =
