@@ -6,6 +6,8 @@ defmodule LiveAdmin.Components.Container.List do
   import LiveAdmin.Components
   import LiveAdmin.View
 
+  require Logger
+
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
 
@@ -14,6 +16,7 @@ defmodule LiveAdmin.Components.Container.List do
     socket =
       socket
       |> assign(assigns)
+      |> assign_new(:selected, fn -> [] end)
       |> assign(search: assigns.search || "")
       |> assign_async(
         [:records],
@@ -49,7 +52,7 @@ defmodule LiveAdmin.Components.Container.List do
       <div class="content-header">
         <h1 class="content-title">
           {resource_title(@resource, @config)}
-          <span>list</span>
+          <span>{trans("List")}</span>
         </h1>
         <div class="contextual-actions">
           <.link
@@ -58,16 +61,46 @@ defmodule LiveAdmin.Components.Container.List do
           >
             {trans("Create")}
           </.link>
-          <details class="btn-select">
-            <summary>Run task</summary>
-            <div class="settings-menu">
-              <%= for task <- get_function_keys(@resource, @config, :tasks) do %>
-                <span phx-click={JS.push("task", value: %{"name" => task}, page_loading: true)}>
-                  {trans(humanize(task))}
-                </span>
-              <% end %>
-            </div>
-          </details>
+          <%= if Enum.any?(@selected) && LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
+            <button
+              class="btn btn-danger"
+              data-confirm="Are you sure?"
+              phx-click={
+                JS.push("action",
+                  value: %{name: "delete"},
+                  page_loading: true,
+                  target: @myself
+                )
+              }
+            >
+              {trans("Delete")}
+            </button>
+            <details class="btn-select" phx-hook="Actions" id="actions-control">
+              <summary>Run action</summary>
+              <div class="settings-menu">
+                <%= for action <- get_function_keys(@resource, @config, :actions), {name, _, _, arity, docs} = LiveAdmin.fetch_function(@resource, @session, :actions, action) do %>
+                  <.function_control
+                    name={action}
+                    type="action"
+                    extra_arg_count={arity - 2}
+                    docs={docs}
+                    target={@myself}
+                  />
+                <% end %>
+              </div>
+            </details>
+          <% else %>
+            <details class="btn-select">
+              <summary>Run task</summary>
+              <div class="settings-menu">
+                <%= for task <- get_function_keys(@resource, @config, :tasks) do %>
+                  <span phx-click={JS.push("task", value: %{"name" => task}, page_loading: true)}>
+                    {trans(humanize(task))}
+                  </span>
+                <% end %>
+              </div>
+            </details>
+          <% end %>
         </div>
       </div>
 
@@ -128,7 +161,17 @@ defmodule LiveAdmin.Components.Container.List do
                   <%= if @records.ok? do %>
                     <%= for record <- elem(@records.result, 0), record_id = Map.fetch!(record, LiveAdmin.primary_key!(@resource)) do %>
                       <tr>
-                        <td><input type="checkbox" class="row-checkbox" /></td>
+                        <td>
+                          <form phx-change="toggle_select" phx-debounce={500} phx-target={@myself}>
+                            <input
+                              type="checkbox"
+                              class="row-checkbox"
+                              name="selected"
+                              checked={Enum.member?(@selected, record_id)}
+                            />
+                            <input type="hidden" name="record_id" value={record_id} />
+                          </form>
+                        </td>
                         <%= for {field, type, _} <- Resource.fields(@resource, @config), {:ok, val} = Map.fetch(record, field) do %>
                           <td class="table-cell">
                             <span class="cell-content">
@@ -243,6 +286,99 @@ defmodule LiveAdmin.Components.Container.List do
   end
 
   @impl true
+  def handle_event(
+        "task",
+        params = %{"name" => name},
+        socket = %{
+          assigns: %{session: session, resource: resource, config: config}
+        }
+      ) do
+    {_, m, f, _, _} =
+      LiveAdmin.fetch_function(resource, session, :task, String.to_existing_atom(name))
+
+    args = [session | Map.get(params, "args", [])]
+
+    job =
+      Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, fn ->
+        try do
+          case apply(m, f, [
+                 Resource.query(resource, Map.get(socket.assigns, :search), config) | args
+               ]) do
+            {:ok, message} ->
+              LiveAdmin.PubSub.announce(session.id, :success, message)
+
+            {:error, message} ->
+              LiveAdmin.PubSub.announce(session.id, :error, message)
+          end
+        rescue
+          error ->
+            Logger.error(inspect(error))
+
+            LiveAdmin.PubSub.announce(
+              session.id,
+              :error,
+              trans("Task %{name} failed", inter: [name: name])
+            )
+        after
+          LiveAdmin.PubSub.update_job(session.id, self(), progress: 1)
+        end
+      end)
+
+    LiveAdmin.PubSub.update_job(session.id, job.pid, progress: 0, label: name)
+
+    {:noreply, push_navigate(socket, to: route_with_params(socket.assigns))}
+  end
+
+  @impl true
+  def handle_event(
+        "action",
+        params = %{"name" => name},
+        socket = %{assigns: %{resource: resource, session: session, prefix: prefix, repo: repo}}
+      ) do
+    {_, m, f, _, _} =
+      LiveAdmin.fetch_function(resource, session, :actions, String.to_existing_atom(name))
+
+    job =
+      Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, fn ->
+        socket.assigns.selected
+        |> Enum.with_index()
+        |> Enum.each(fn {id, idx} ->
+          try do
+            id
+            |> Resource.find(resource, prefix, repo)
+            |> case do
+              nil -> nil
+              record -> apply(m, f, [record, session] ++ Map.get(params, "args", []))
+            end
+
+            LiveAdmin.PubSub.update_job(session.id, self(),
+              progress: idx / Enum.count(socket.assigns.selected),
+              label: name
+            )
+          rescue
+            error -> Logger.error(inspect(error))
+          after
+            LiveAdmin.PubSub.update_job(session.id, self(), progress: 1)
+          end
+        end)
+      end)
+
+    LiveAdmin.PubSub.update_job(session.id, job.pid, progress: 0, label: to_string(name))
+
+    {:noreply, push_navigate(socket, to: route_with_params(socket.assigns))}
+  end
+
+  def handle_event("toggle_select", params = %{"record_id" => id}, socket) do
+    socket =
+      if Map.has_key?(params, "selected") do
+        update(socket, :selected, &[id | &1])
+      else
+        update(socket, :selected, &List.delete(&1, id))
+      end
+
+    {:noreply, socket}
+  end
+
   def handle_event("go", %{"page" => page, "per" => per}, socket = %{assigns: assigns}) do
     {:noreply,
      push_patch(socket,
@@ -253,7 +389,6 @@ defmodule LiveAdmin.Components.Container.List do
      )}
   end
 
-  @impl true
   def handle_event("add_filter", _, socket = %{assigns: assigns}) do
     new_search =
       socket.assigns.search
@@ -272,7 +407,6 @@ defmodule LiveAdmin.Components.Container.List do
      )}
   end
 
-  @impl true
   def handle_event("remove_filter", %{"index" => i}, socket = %{assigns: assigns}) do
     new_search =
       socket.assigns.search
@@ -291,7 +425,6 @@ defmodule LiveAdmin.Components.Container.List do
      )}
   end
 
-  @impl true
   def handle_event("update_filters", %{"filters" => filter_params}, socket = %{assigns: assigns}) do
     new_search =
       filter_params
@@ -312,7 +445,6 @@ defmodule LiveAdmin.Components.Container.List do
      )}
   end
 
-  @impl true
   def handle_event(
         "action",
         params = %{"name" => name, "ids" => ids},
@@ -426,25 +558,30 @@ defmodule LiveAdmin.Components.Container.List do
           end)
           |> case do
             0 ->
-              {:success,
-               trans("%{name} action run successfully on %{count} records",
-                 inter: [name: name, count: length(records)]
-               )}
+              LiveAdmin.PubSub.announce(
+                session.id,
+                :success,
+                trans("%{name} action run successfully on %{count} records",
+                  inter: [name: name, count: length(records)]
+                )
+              )
 
             error_count ->
-              {:error,
-               trans(
-                 "%{name} action failed on %{error_count} records (%{success_count} succeeeded)",
-                 inter: [
-                   name: name,
-                   error_count: error_count,
-                   success_count: length(records) - error_count
-                 ]
-               )}
+              LiveAdmin.PubSub.announce(
+                session.id,
+                :error,
+                trans(
+                  "%{name} action failed on %{error_count} records (%{success_count} succeeeded)",
+                  inter: [
+                    name: name,
+                    error_count: error_count,
+                    success_count: length(records) - error_count
+                  ]
+                )
+              )
           end
 
-        LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: pid, progress: 1}})
-        LiveAdmin.PubSub.broadcast(session.id, {:announce, %{message: message, type: type}})
+        LiveAdmin.PubSub.update_job(session.id, pid, progress: 1)
       end,
       timeout: :infinity
     )

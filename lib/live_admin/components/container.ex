@@ -22,7 +22,7 @@ defmodule LiveAdmin.Components.Container do
   @impl true
   def mount(_params, _session, socket) do
     socket =
-      assign(socket, loading: !connected?(socket), jobs: [])
+      assign(socket, loading: !connected?(socket))
 
     {:ok, socket}
   end
@@ -81,66 +81,6 @@ defmodule LiveAdmin.Components.Container do
 
   def handle_params(_, _, socket), do: {:noreply, socket}
 
-  @impl true
-  def handle_event(
-        function,
-        params = %{"name" => name},
-        socket = %{
-          assigns: %{session: session, resource: resource, config: config}
-        }
-      ) when function in ["task", "action"] do
-    {_, m, f, _, _} =
-      LiveAdmin.fetch_function(resource, session, :"#{function}s", String.to_existing_atom(name))
-
-    args = [session | Map.get(params, "args", [])]
-
-    object = case function do
-      "task" -> Resource.query(resource, Map.get(socket.assigns, :search), config)
-      "action" -> socket.assigns.record
-    end
-
-    job =
-      Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, fn ->
-        try do
-          case apply(m, f, [Resource.query(resource, search, config) | args]) do
-            {:ok, message} ->
-              LiveAdmin.PubSub.announce(
-                session.id,
-                :success,
-                trans("Task %{name} succeeded: '%{message}'",
-                  inter: [name: name, message: message]
-                )
-              )
-
-            {:error, message} ->
-              LiveAdmin.PubSub.announce(
-                session.id,
-                :error,
-                trans("Task %{name} failed: '%{message}'",
-                  inter: [name: name, message: message]
-                )
-              )
-          end
-        rescue
-          error ->
-            Logger.error(inspect(error))
-
-            LiveAdmin.PubSub.announce(
-              session.id,
-              :error,
-              trans("Task %{name} failed", inter: [name: name])
-            )
-        after
-          LiveAdmin.PubSub.update_job(session.id, self(), progress: 1)
-        end
-      end)
-
-    LiveAdmin.PubSub.update_job(session.id, task.pid, progress: 0, label: name)
-
-    {:noreply, push_navigate(socket, to: route_with_params(socket.assigns, segments: [Map.get(socket.assigns, :record)]))}
-  end
-
-  @impl true
   def handle_event("set_locale", %{"locale" => locale}, socket) do
     new_session = Map.put(socket.assigns.session, :locale, locale)
 

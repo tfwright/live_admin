@@ -119,6 +119,7 @@ defmodule LiveAdmin.Components do
           <.form
             for={Phoenix.Component.to_form(%{})}
             phx-submit={@type}
+            phx-target={assigns[:target]}
             class="form-line"
           >
             <%= for {_lang, doc} <- @docs do %>

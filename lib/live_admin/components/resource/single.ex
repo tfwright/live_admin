@@ -35,9 +35,21 @@ defmodule LiveAdmin.Components.Container.Single do
               {trans("Edit")}
             </.link>
           <% end %>
-          <button class="btn btn-danger">
-            <span>Delete</span>
-          </button>
+          <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
+            <button
+              class="btn btn-danger"
+              data-confirm="Are you sure?"
+              phx-click={
+                JS.push("delete",
+                  value: %{key: Map.fetch!(@record, LiveAdmin.primary_key!(@resource))},
+                  page_loading: true,
+                  target: @myself
+                )
+              }
+            >
+              {trans("Delete")}
+            </button>
+          <% end %>
           <details class="btn-select" phx-hook="Actions" id="actions-control">
             <summary>Run action</summary>
             <div class="settings-menu">
@@ -47,6 +59,7 @@ defmodule LiveAdmin.Components.Container.Single do
                   type="action"
                   extra_arg_count={arity - 2}
                   docs={docs}
+                  target={@myself}
                 />
               <% end %>
             </div>
@@ -114,6 +127,47 @@ defmodule LiveAdmin.Components.Container.Single do
           push_event(socket, "error", %{
             msg: trans("Delete failed!")
           })
+      end
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "action",
+        params = %{"name" => name},
+        socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo, session: session}}
+      ) do
+    record =
+      socket.assigns[:record] || Resource.find!(params["id"], resource, prefix, repo)
+
+    {_, m, f, _, _} =
+      LiveAdmin.fetch_function(resource, session, :actions, String.to_existing_atom(name))
+
+    socket =
+      case apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", [])) do
+        {:ok, record} ->
+          LiveAdmin.PubSub.broadcast(
+            session.id,
+            {:announce,
+             %{
+               message: trans("Action %{name} succeeded", inter: [name: name]),
+               type: :success
+             }}
+          )
+
+          assign(socket, :record, record)
+
+        {:error, error} ->
+          LiveAdmin.PubSub.broadcast(
+            session.id,
+            {:announce,
+             %{
+               message:
+                 trans("Action %{name} failed: %{error}", inter: [name: name, error: error]),
+               type: :error
+             }}
+          )
       end
 
     {:noreply, socket}

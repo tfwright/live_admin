@@ -50,7 +50,7 @@ defmodule LiveAdmin.Components.Container.Form do
           <%= if assigns[:record] do %>
             <span>{record_label(@record, @resource, @config)}</span>
           <% else %>
-            <span>{trans("create")}</span>
+            <span>{trans("Create")}</span>
           <% end %>
         </h1>
       </div>
