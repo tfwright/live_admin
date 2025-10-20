@@ -77,19 +77,33 @@ p {
     margin: 1lh 0;
 }
 
-h1[class$='title'] {
+h1[class$='title'], h3[class$='title'], h3[class$='title'] {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color:var(--accent-hover);
+    font-size: 16px;
+    opacity:.75;
+}
+
+h1[class$='title'] {
+    font-size: 16px;
+}
+
+h2[class$='title'] {
+    font-size: 14px;
+}
+
+ h3[class$='title'] {
     font-size: 12px;
 }
 
 h1 span,h2 span,h3 span {
     display:block;
-    font-size: 3em;
+    font-size: 2.5em;
     color:var(--text-primary);
     text-transform: none;
+    opacity:1;
 }
 
 /* Header */
@@ -1198,27 +1212,17 @@ body:has(.alert-bar) .sidebar {
     cursor: default;
 }
 
-.detail-section {
-    margin-bottom: 32px;
-}
-
-.detail-section-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 16px;
-    color: var(--text-primary);
-}
-
-.detail-section-content {
+.expand-content {
     background: var(--bg-light);
     padding: 16px;
     border-radius: 8px;
     line-height: 1.6;
     color: var(--text-secondary);
     overflow: scroll;
-    white-space: pre-wrap;
-    text-align: center;
+    white-space: pre;
+    font-family: monospace;
 }
+
 .form-line .form-title {
            font-size: 16px;
            font-weight: 600;

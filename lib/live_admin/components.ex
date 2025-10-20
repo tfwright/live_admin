@@ -21,10 +21,10 @@ defmodule LiveAdmin.Components do
     <div id={@id} phx-hook="CopyField">
       <.modal id={@id <> "-modal"}>
         <:title>{record_label(@record, @resource, @config)}<span>{@field}</span></:title>
-        <div class="detail-section-content">{@record |> Map.fetch!(@field) |> safe_render()}</div>
+        <div class="expand-content">{@record |> Map.fetch!(@field) |> safe_render()}</div>
         <span
           class="copy-icon"
-          data-clipboard-target={"##{@id}-modal .detail-section-content"}
+          data-clipboard-target={"##{@id}-modal .expand-content"}
         >
           <svg
             viewBox="0 0 24 24"
