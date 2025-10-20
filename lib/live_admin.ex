@@ -126,6 +126,9 @@ defmodule LiveAdmin do
     key
   end
 
+  def announce(message, type, session),
+    do: LiveAdmin.PubSub.broadcast(session.id, {:announce, %{message: message, type: type}})
+
   def route_with_params(assigns, parts \\ []) do
     resource_path = parts[:resource_path] || assigns.key
 

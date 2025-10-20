@@ -80,10 +80,9 @@ defmodule LiveAdmin.Components.Session.Content do
 
     LiveAdmin.session_store().persist!(session)
 
-    {:noreply,
-     socket
-     |> assign(:changeset, Changeset.change(session))
-     |> push_event("success", %{msg: "Changes successfully saved"})}
+    LiveAdmin.announce(trans("Session updated"), :success, session)
+
+    {:noreply, assign(socket, :changeset, Changeset.change(session))}
   end
 
   defp parse_map_param(param = %{}) do
