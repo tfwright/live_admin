@@ -57,8 +57,7 @@ body {
 
     /* Opacity Values */
     --opacity-disabled: 0.4;
-    --opacity-muted: 0.5;
-    --opacity-hover: 0.7;
+    --opacity-muted: 0.7;
 
     /* Shadow */
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
@@ -893,18 +892,6 @@ body:has(.alert-bar) .sidebar {
 
 .cell-content * {
     display: inline-block;
-}
-
-.task-name-link {
-    color: var(--accent-color);
-    text-decoration: none;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.task-name-link:hover {
-    opacity: var(--opacity-hover);
-    text-decoration: underline;
 }
 
 .data-table tr:last-child td {
