@@ -48,8 +48,9 @@ body {
     --info-hover: #1e40af;
 
     /* Status Colors - Warning/Pending */
-    --warning-bg: #fef3c7;
-    --warning-color: #92400e;
+    --warning-bg: #fff1e5;
+    --warning-color: #e53e3e;
+    --warning-hover: #c53030;
 
     /* Purple Selection States */
     --purple-50: #f3e8ff;
@@ -1125,13 +1126,15 @@ body:has(.alert-bar) .sidebar {
     min-height: 39px;
     resize: vertical;
     padding: 10px 12px;
+    max-width: 30vw;
 }
 
 .form-actions {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    padding-top: 24px;
+    margin-top: 24px;
+    padding-top: 16px;
     border-top: 2px solid var(--border-medium);
 }
 
@@ -1288,17 +1291,13 @@ body:has(.alert-bar) .sidebar {
        }
 
        .btn-danger {
-           background: #C15846;
-           color:#fff;
-       }
-
-       .btn-danger {
-           background: #C15846;
-           color:#fff;
+           background-color: var(--warning-color);
+           color:var(--warning-bg);
+           border:solid 1px var(--warning-color);
        }
 
        .btn-danger:hover {
-           background: indianred;
+           background-color: var(--warning-hover);
        }
 
        .nav-subitems .nav-icon {
@@ -1642,3 +1641,142 @@ body:has(.alert-bar) .sidebar {
                   .error textarea {
                       background:#fef2f2;
                   }
+
+
+
+                     .embed-container {
+                       display: flex;
+                       flex-direction: column;
+                       gap: 30px;
+                     }
+
+                     .remove-icon {
+                       position: absolute;
+                       top: 6px;
+                       left: 6px;
+                       width: 24px;
+                       height: 24px;
+                       cursor: pointer;
+                       color: #e53e3e;
+                       transition: color 0.2s, opacity 0.2s;
+                       background: none;
+                       border: none;
+                       padding: 0;
+                       opacity: var(--opacity-muted);
+                     }
+
+                     .remove-icon:hover {
+                       color: #c53030;
+                       opacity: 1;
+                     }
+
+                     .remove-icon svg {
+                       width: 100%;
+                       height: 100%;
+                     }
+
+                     .embed-section-wrapper {
+                       margin-bottom: 15px;
+                     }
+
+                     .embed-section-title-wrapper {
+                       margin-bottom: 15px;
+                     }
+
+
+                     .embed-section {
+                          background: #f7f7f7;
+                          padding: 25px;
+                          padding-top: 50px;
+                          border-radius: 8px;
+                          position: relative;
+                          margin-bottom: 15px;
+                        }
+
+                        .add-section-btn {
+                          margin-top: 0;
+                          width: 100%;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          gap: 8px;
+                          padding: 16px;
+                          background: var(--bg-white);
+                          color: #2d3748;
+                          border: 1px dashed var(--border-medium);
+                          border-radius: 8px;
+                          font-size: 15px;
+                          font-weight: 600;
+                          cursor: pointer;
+                          transition: all 0.2s;
+                        }
+
+                        .add-section-btn:hover {
+                          border-style: solid;
+                        }
+
+
+                        .embed-section.odd {
+                              position: relative;
+                              background: #fff;
+                              border-radius: 6px;
+                              border: 1px solid #cbd5e0;
+                              transition: border-color 0.2s;
+                            }
+
+                            .embed.subsection:hover {
+                              border-color: #a0aec0;
+                            }
+
+                            .embed-section:has(.remove-icon.phx-click-loading) {
+                                opacity:var(--opacity-disabled);
+                                pointer-events: none;
+                            }
+
+                            .drag-icon {
+                                  position: absolute;
+                                  top: 6px;
+                                  right: 6px;
+                                  width: 28px;
+                                  height: 28px;
+                                  cursor: grab;
+                                  color: #718096;
+                                  transition: color 0.2s;
+                                  background: none;
+                                  border: none;
+                                  padding: 0;
+                                }
+
+                                .drag-icon:active {
+                                  cursor: grabbing;
+                                }
+
+                                .drag-icon:hover {
+                                  color: #4a5568;
+                                }
+
+                                .drag-icon svg {
+                                  width: 100%;
+                                  height: 100%;
+                                }
+
+                                .dragging {
+                                    opacity: 0.5;
+                                    transform: scale(0.95);
+                                    transition: transform 0.2s, opacity 0.2s;
+                                  }
+
+                                  .drop-zone {
+                                      height: 60px;
+                                      margin: 10px 0;
+                                      border: 2px dashed #4299e1;
+                                      border-radius: 8px;
+                                      background: #ebf8ff;
+                                      align-items: center;
+                                      justify-content: center;
+                                      color: #4299e1;
+                                      font-weight: 500;
+                                      font-size: 14px;
+                                      display:none;
+                                      opacity: var(--opacity-muted);
+                                    }

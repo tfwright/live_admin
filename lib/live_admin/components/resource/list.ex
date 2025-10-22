@@ -75,7 +75,7 @@ defmodule LiveAdmin.Components.Container.List do
             >
               {trans("Delete")}
             </button>
-            <details class="btn-select" phx-hook="Actions" id="actions-control">
+            <details class="btn-select" id="actions-control">
               <summary>Run action</summary>
               <div class="settings-menu">
                 <%= for action <- get_function_keys(@resource, @config, :actions), {name, _, _, arity, docs} = LiveAdmin.fetch_function(@resource, @session, :actions, action) do %>

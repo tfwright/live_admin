@@ -9,6 +9,7 @@ defmodule LiveAdmin.Components.Container.Form do
   import LiveAdmin.View
 
   alias __MODULE__.{ArrayInput, MapInput, SearchSelect}
+  alias Ecto.Changeset
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
 
@@ -43,7 +44,7 @@ defmodule LiveAdmin.Components.Container.Form do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div phx-hook="Form" id="form-page">
       <div class="content-header">
         <h1 class="content-title">
           {resource_title(@resource, @config)}
@@ -66,36 +67,18 @@ defmodule LiveAdmin.Components.Container.Form do
               phx-submit={@action}
               phx-target={@myself}
             >
-              <div class="form-grid">
-                <%= for {field, type, opts} <- Resource.fields(@resource, @config), editable_inline?(f, field, type) do %>
-                  <div class={"form-field #{if f.errors[field], do: "error"}"}>
-                    <div class="form-label">
-                      {label(f, field, field |> humanize() |> trans())}
-                    </div>
-                    <%= if supported_type?(type) do %>
-                      <.input
-                        form={f}
-                        type={type}
-                        field={field}
-                        resource={@resource}
-                        resources={@resources}
-                        session={@session}
-                        prefix={@prefix}
-                        repo={@repo}
-                        config={@config}
-                        disabled={false}
-                      />
-                    <% else %>
-                      {textarea(f, field,
-                        rows: 1,
-                        disabled: true,
-                        value: f |> input_value(field) |> inspect()
-                      )}
-                    <% end %>
-                    {error_tag(f, field)}
-                  </div>
-                <% end %>
-              </div>
+              <.form_grid
+                form={f}
+                resource={@resource}
+                resources={@resources}
+                session={@session}
+                prefix={@prefix}
+                repo={@repo}
+                config={@config}
+                fields={Resource.fields(@resource, @config)}
+                target={@myself}
+              />
+
               <div class="form-actions">
                 <.link
                   class="btn btn-danger"
@@ -117,15 +100,6 @@ defmodule LiveAdmin.Components.Container.Form do
     </div>
     """
   end
-
-  defp editable_inline?(form, field, type) when type in [:id, :binary_id],
-    do: form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) |> Kernel.not()
-
-  defp editable_inline?(form, _, {_, {Ecto.Embedded, _}}), do: false
-
-  defp editable_inline?(form, _, :map), do: false
-
-  defp editable_inline?(_, _, _), do: true
 
   @impl true
   def handle_event(
@@ -184,175 +158,46 @@ defmodule LiveAdmin.Components.Container.Form do
     {:noreply, socket}
   end
 
-  defp input(assigns = %{type: id}) when id in [:id, :binary_id] do
-    assigns =
-      assign(
-        assigns,
-        :associated_resource,
-        associated_resource(
-          LiveAdmin.fetch_config(assigns.resource, :schema, assigns.session),
-          assigns.field,
-          assigns.resources,
-          :resource
-        )
-      )
+  def handle_event("add_embed", params = %{"field" => field}, socket) do
+    field = String.to_existing_atom(field)
 
-    ~H"""
-    <%= if @associated_resource do %>
-      <.live_component
-        module={SearchSelect}
-        id={input_id(@form, @field)}
-        form={@form}
-        field={@field}
-        disabled={@disabled}
-        resource={@associated_resource}
-        session={@session}
-        prefix={@prefix}
-        repo={@repo}
-        config={@config}
-      />
-    <% else %>
-      <input type="number" class="form-input" name={@form[@field].name} value={@form[@field].value} />
-    <% end %>
-    """
+    changeset =
+      socket.assigns.changeset
+      |> Changeset.get_change(field)
+      |> case do
+        nil ->
+          Changeset.put_change(socket.assigns.changeset, field, %{})
+
+        val when is_list(val) ->
+          Changeset.update_change(
+            socket.assigns.changeset,
+            field,
+            &List.insert_at(&1, -1, %{})
+          )
+      end
+
+    {:noreply, assign(socket, :changeset, changeset)}
   end
 
-  defp input(assigns = %{type: {:array, :string}}) do
-    ~H"""
-    <.live_component
-      module={ArrayInput}
-      id={input_id(@form, @field)}
-      form={@form}
-      field={@field}
-      disabled={@disabled}
-    />
-    """
-  end
+  def handle_event("remove_embed", params = %{"field" => field}, socket) do
+    field = String.to_existing_atom(field)
 
-  defp input(assigns = %{type: :map}) do
-    ~H"""
-    <.live_component
-      module={MapInput}
-      id={input_id(@form, @field)}
-      form={@form}
-      field={@field}
-      disabled={@disabled}
-    />
-    """
-  end
+    changeset =
+      socket.assigns.changeset
+      |> Changeset.get_change(field)
+      |> case do
+        val when is_list(val) ->
+          Changeset.update_change(
+            socket.assigns.changeset,
+            field,
+            &List.delete_at(&1, params |> Map.fetch!("index") |> String.to_integer())
+          )
 
-  defp input(assigns = %{type: :string}) do
-    ~H"""
-    <textarea name={@form[@field].name} class="form-textarea">{@form[@field].value}</textarea>
-    """
-  end
+        _ ->
+          Changeset.put_change(socket.assigns.changeset, field, nil)
+      end
 
-  defp input(assigns = %{type: :boolean}) do
-    ~H"""
-    <div class="switch-container">
-      <input
-        type="radio"
-        class="switch-left"
-        name={@form[@field].name}
-        id={@form[@field].id <> "_left"}
-        checked={@form[@field].value == false}
-        value="0"
-      />
-      <input
-        type="radio"
-        class="switch-center"
-        name={@form[@field].name}
-        id={@form[@field].id <> "_center"}
-        checked={@form[@field].value in [nil, ""]}
-        value=""
-      />
-      <input
-        type="radio"
-        class="switch-right"
-        name={@form[@field].name}
-        id={@form[@field].id <> "_right"}
-        checked={@form[@field].value == true}
-        value="1"
-      />
-
-      <div class="switch">
-        <div class="switch-background">
-          <div class="bg-section left"></div>
-          <div class="bg-section center"></div>
-          <div class="bg-section right"></div>
-        </div>
-        <div class="switch-handle"></div>
-        <label for={@form[@field].id <> "_left"} class="label-area left"></label>
-        <label for={@form[@field].id <> "_center"} class="label-area center"></label>
-        <label for={@form[@field].id <> "_right"} class="label-area right"></label>
-      </div>
-    </div>
-    """
-  end
-
-  defp input(assigns = %{type: {:array, :string}}) do
-    ~H"""
-    <.live_component
-      module={ArrayInput}
-      id={input_id(@form, @field)}
-      form={@form}
-      field={@field}
-      disabled={@disabled}
-    />
-    """
-  end
-
-  defp input(assigns = %{type: :date}) do
-    ~H"""
-    <input type="date" class="form-input" name={@form[@field].name} value={@form[@field].value} />
-    """
-  end
-
-  defp input(assigns = %{type: number}) when number in [:integer, :id, :float] do
-    ~H"""
-    <input type="number" class="form-input" name={@form[@field].name} value={@form[@field].value} />
-    """
-  end
-
-  defp input(assigns = %{type: type}) when type in [:naive_datetime, :utc_datetime] do
-    ~H"""
-    <input
-      type="datetime-local"
-      class="form-input"
-      name={@form[@field].name}
-      value={@form[@field].value}
-    />
-    """
-  end
-
-  defp input(assigns = %{type: {_, {Ecto.Enum, %{mappings: mappings}}}}) do
-    assigns = assign(assigns, :mappings, mappings)
-
-    ~H"""
-    <select name={@form[@field].name} class="form-select">
-      <%= for {k, v} <- @mappings do %>
-        <option value={k} selected={@form[@field].value == k}>{v}</option>
-      <% end %>
-    </select>
-    """
-  end
-
-  defp input(assigns = %{type: {:array, {_, {Ecto.Enum, %{mappings: mappings}}}}}) do
-    assigns = assign(assigns, :mappings, mappings)
-
-    ~H"""
-    <select name={@form[@field].name <> "[]"} class="form-select" multiple={true}>
-      <%= for {k, v} <- @mappings do %>
-        <option value={k} selected={Enum.member?(@form[@field].value || [], k)}>{v}</option>
-      <% end %>
-    </select>
-    """
-  end
-
-  defp input(assigns) do
-    ~H"""
-    NO INPUT
-    """
+    {:noreply, assign(socket, :changeset, changeset)}
   end
 
   defp validate(resource, changeset, params, session, config) do

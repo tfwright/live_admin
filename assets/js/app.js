@@ -14,82 +14,62 @@ window.addEventListener("phx:page-loading-stop", () => topbar.hide());
 
 let Hooks = {};
 
-Hooks.EmbedComponent = {
+Hooks.Form = {
   mounted() {
-    this.el.addEventListener("live_admin:move_embed", (e) => {
-      const embedEl = e.target.parentElement;
-      const indexEl = embedEl.querySelector(".embed__index");
-      const fieldEl = embedEl.parentElement;
+    this.el.addEventListener('dragstart', (e) => {
+      e.target.classList.add('dragging');
 
-      const newIndex = +indexEl.value + +e.target.dataset.dir;
-      indexEl.value = newIndex;
+      for (const btn of this.el.querySelectorAll('.add-section-btn')) {
+        btn.style.setProperty('display', 'none');
+      };
 
-      const targetEl = fieldEl.querySelectorAll(".embed__index")[newIndex];
-      targetEl.value = +targetEl.value + +e.target.dataset.dir * -1;
+      for (const zone of this.el.querySelectorAll(`.drop-zone:not([data-idx="${e.target.dataset.idx}"]):not([data-idx="${(+e.target.dataset.idx)+1}"])`)) {
+        zone.style.setProperty('display', 'flex');
+      };
 
-      indexEl.dispatchEvent(
-        new Event("input", { bubbles: true, cancelable: true }),
-      );
+      e.dataTransfer.setData('text/plain', e.target.dataset.idx);
     });
 
-    this.el.addEventListener("live_admin:embed_add", (e) => {
-      const sortInput = e.target.previousElementSibling;
-      sortInput.checked = true;
-      sortInput.dispatchEvent(
-        new Event("input", { bubbles: true, cancelable: true }),
-      );
-    });
 
-    this.el.addEventListener("live_admin:embed_drop", (e) => {
-      e.target.parentElement.classList.add("hidden");
-      const deleteInput = e.target.previousElementSibling;
-      deleteInput.checked = true;
-      deleteInput.dispatchEvent(
-        new Event("input", { bubbles: true, cancelable: true }),
-      );
-    });
+  this.el.addEventListener('dragend', (e) => {
+    e.target.classList.remove('dragging');
 
-    this.el.addEventListener("live_admin:embed_delete", (e) => {
-      e.target.parentElement.classList.add("hidden");
+    for (const btn of this.el.querySelectorAll('.add-section-btn')) {
+      btn.style.removeProperty('display');
+    };
 
-      const deleteInput = e.target
-        .closest(".embed__group")
-        .querySelector('input[value=""]');
-      deleteInput.disabled = false;
-      deleteInput.dispatchEvent(
-        new Event("input", { bubbles: true, cancelable: true }),
-      );
-    });
-  },
-};
+    for (const zone of this.el.querySelectorAll('.drop-zone')) {
+      zone.style.removeProperty('display');
+    };
+  });
+
+  this.el.addEventListener("dragover", e => {
+    if (e.target.classList.contains('drop-zone')) {
+      e.target.style.setProperty('opacity', 1);
+      e.preventDefault();
+    }
+  });
+
+  this.el.addEventListener("dragleave", e => {
+    if (e.target.classList.contains('drop-zone')) {
+      e.target.style.removeProperty('opacity');
+      e.preventDefault();
+    }
+  });
+
+  this.el.addEventListener("drop", e => {
+     if (e.target.classList.contains('drop-zone')) {
+       e.preventDefault();
+       const embed = e.target.parentNode.querySelector(`.embed-section[data-idx="${e.dataTransfer.getData("text/plain")}"]`)
+       e.target.after(embed);
+
+      this.el.querySelector("input").dispatchEvent(new Event("change", { bubbles: true, cancelable: true }));
+    };
+  });
+  }
+}
 
 Hooks.SearchSelect = {
-  mounted() {
-    this.handleEvent("change", () => {
-      this.el
-        .querySelector("input")
-        .dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
-    });
-  },
-};
-
-Hooks.ArrayInput = {
-  mounted() {
-    this.el.querySelector("input").addEventListener("input", e => e.stopPropagation());
-
-    this.el.addEventListener("keydown", e => {
-       if (e.key === "Enter") {
-         e.target.blur()
-         e.preventDefault();
-       }
-     });
-  },
-  updated() {
-    this.el.querySelector("input").addEventListener("input", e => e.stopPropagation());
-  }
-};
-
-Hooks.MapInput = {
   mounted() {
     this.handleEvent("change", () => {
       this.el

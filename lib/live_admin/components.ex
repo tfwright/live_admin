@@ -4,9 +4,300 @@ defmodule LiveAdmin.Components do
 
   import Phoenix.HTML.Form
   import LiveAdmin
+  import LiveAdmin.View, only: [supported_type?: 1]
 
   alias LiveAdmin.Components.Container.Form
   alias Phoenix.LiveView.JS
+  alias LiveAdmin.Resource
+
+  def form_grid(assigns) do
+    ~H"""
+    <div>
+      <div class="form-grid">
+        <%= for {field, type, opts} <- @fields, editable_inline?(@form, field, type) do %>
+          <div class={"form-field #{if @form.errors[field], do: "error"}"}>
+            <div class="form-label">
+              {label(@form, field, field |> humanize() |> trans())}
+            </div>
+            <%= if supported_type?(type) do %>
+              <.input
+                form={@form}
+                type={type}
+                field={field}
+                resource={@resource}
+                resources={@resources}
+                session={@session}
+                prefix={@prefix}
+                repo={@repo}
+                config={@config}
+                disabled={false}
+              />
+            <% else %>
+              {textarea(@form, field,
+                rows: 1,
+                disabled: true,
+                value: @form[field]
+              )}
+            <% end %>
+            <span phx-feedback-for={@form[field].name} class="error-message"></span>
+          </div>
+        <% end %>
+      </div>
+      <%= for {embed, {_,{Ecto.Embedded, %{cardinality: cardinality, related: schema}}}, opts} <- @fields, {_, val} = Ecto.Changeset.fetch_field(@form.source, embed) do %>
+        <div class="embed-container">
+          <div class="embed-section-wrapper">
+            <div class="embed-section-title-wrapper">
+              <h2 class="embed-section-title">{embed |> humanize() |> trans()}</h2>
+            </div>
+            <%= if val do %>
+              <.inputs_for :let={embed_form} field={@form[embed]} skip_hidden={true}>
+                <%= if sortable?(val) do %>
+                  <div class="drop-zone" data-idx={embed_form.index}>{trans("Move here")}</div>
+                <% end %>
+                <div class={"embed-section #{if assigns[:cycle], do: "odd"}"} draggable={if sortable?(val), do: "true"} data-idx={embed_form.index}>
+                  <%= if sortable?(val) do %>
+                    <input type="hidden" name={@form[LiveAdmin.View.sort_param_name(embed)].name <> "[]"} value={embed_form.index} />
+                  <% end %>
+                  <button
+                    type="button"
+                    class="remove-icon"
+                    name={@form[LiveAdmin.View.drop_param_name(embed)].name <> if cardinality == :one, do: "", else: "[]"}
+                    value={if cardinality == :one, do: "", else: embed_form.index}
+                    phx-click={JS.dispatch("change")}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="15" y1="9" x2="9" y2="15"></line>
+                      <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                  </button>
+                  <%= if sortable?(val) do %>
+                  <button type="button" class="drag-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                      <line x1="3" y1="9" x2="21" y2="9"></line>
+                                      <line x1="3" y1="15" x2="21" y2="15"></line>
+                                    </svg>
+                                  </button>
+                                  <% end %>
+                  <.form_grid
+                    form={embed_form}
+                    resource={@resource}
+                    resources={@resources}
+                    session={@session}
+                    prefix={@prefix}
+                    repo={@repo}
+                    config={@config}
+                    fields={
+                      Enum.map(schema.__schema__(:fields), &{&1, schema.__schema__(:type, &1), []})
+                    }
+                    target={@target}
+                    cycle={!assigns[:cycle]}
+                  />
+                </div>
+                <%= if sortable?(val) && embed_form.index + 1 == length(val)  do %>
+                  <div class="drop-zone" data-idx={length(val)}>{trans("Move here")}</div>
+                <% end %>
+              </.inputs_for>
+            <% end %>
+          </div>
+        </div>
+        <%= if cardinality == :many || is_nil(Ecto.Changeset.fetch_field!(@form.source, embed)) do %>
+          <button
+            type="button"
+            class="add-section-btn"
+            name={@form[LiveAdmin.View.sort_param_name(embed)].name <> if cardinality == :one, do: "", else: "[]"}
+            value="new"
+            phx-click={JS.dispatch("change")}
+            phx-target={@target}
+          >
+            <span>+</span>
+            {embed |> humanize() |> trans()}
+          </button>
+        <% end %>
+      <% end %>
+    </div>
+    """
+  end
+
+  defp sortable?(val) when is_list(val) and length(val) > 1, do: true
+  defp sortable?(_), do: false
+
+
+  defp editable_inline?(form, field, type) when type in [:id, :binary_id],
+    do: form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) |> Kernel.not()
+
+  defp editable_inline?(form, _, {_, {Ecto.Embedded, _}}), do: false
+
+  defp editable_inline?(form, _, :map), do: false
+
+  defp editable_inline?(_, _, _), do: true
+
+  defp input(assigns = %{type: id}) when id in [:id, :binary_id] do
+    assigns =
+      assign(
+        assigns,
+        :associated_resource,
+        associated_resource(
+          LiveAdmin.fetch_config(assigns.resource, :schema, assigns.session),
+          assigns.field,
+          assigns.resources,
+          :resource
+        )
+      )
+
+    ~H"""
+    <%= if @associated_resource do %>
+      <.live_component
+        module={SearchSelect}
+        id={input_id(@form, @field)}
+        form={@form}
+        field={@field}
+        disabled={@disabled}
+        resource={@associated_resource}
+        session={@session}
+        prefix={@prefix}
+        repo={@repo}
+        config={@config}
+      />
+    <% else %>
+      <input type="number" class="form-input" name={@form[@field].name} value={@form[@field].value} />
+    <% end %>
+    """
+  end
+
+  defp input(assigns = %{type: {:array, :string}}) do
+    ~H"""
+    <.live_component
+      module={ArrayInput}
+      id={input_id(@form, @field)}
+      form={@form}
+      field={@field}
+      disabled={@disabled}
+    />
+    """
+  end
+
+  defp input(assigns = %{type: :string}) do
+    ~H"""
+    <textarea name={@form[@field].name} class="form-textarea" phx-debounce={500}>{@form[@field].value}</textarea>
+    """
+  end
+
+  defp input(assigns = %{type: :boolean}) do
+    ~H"""
+    <div class="switch-container">
+      <input
+        type="radio"
+        class="switch-left"
+        name={@form[@field].name}
+        id={@form[@field].id <> "_left"}
+        checked={@form[@field].value == false}
+        value="0"
+      />
+      <input
+        type="radio"
+        class="switch-center"
+        name={@form[@field].name}
+        id={@form[@field].id <> "_center"}
+        checked={@form[@field].value in [nil, ""]}
+        value=""
+      />
+      <input
+        type="radio"
+        class="switch-right"
+        name={@form[@field].name}
+        id={@form[@field].id <> "_right"}
+        checked={@form[@field].value == true}
+        value="1"
+      />
+
+      <div class="switch">
+        <div class="switch-background">
+          <div class="bg-section left"></div>
+          <div class="bg-section center"></div>
+          <div class="bg-section right"></div>
+        </div>
+        <div class="switch-handle"></div>
+        <label for={@form[@field].id <> "_left"} class="label-area left"></label>
+        <label for={@form[@field].id <> "_center"} class="label-area center"></label>
+        <label for={@form[@field].id <> "_right"} class="label-area right"></label>
+      </div>
+    </div>
+    """
+  end
+
+  defp input(assigns = %{type: {:array, :string}}) do
+    ~H"""
+    <.live_component
+      module={ArrayInput}
+      id={input_id(@form, @field)}
+      form={@form}
+      field={@field}
+      disabled={@disabled}
+    />
+    """
+  end
+
+  defp input(assigns = %{type: :date}) do
+    ~H"""
+    <input type="date" class="form-input" name={@form[@field].name} value={@form[@field].value} />
+    """
+  end
+
+  defp input(assigns = %{type: number}) when number in [:integer, :id, :float] do
+    ~H"""
+    <input type="number" class="form-input" name={@form[@field].name} value={@form[@field].value} />
+    """
+  end
+
+  defp input(assigns = %{type: type}) when type in [:naive_datetime, :utc_datetime] do
+    ~H"""
+    <input
+      type="datetime-local"
+      class="form-input"
+      name={@form[@field].name}
+      value={@form[@field].value}
+    />
+    """
+  end
+
+  defp input(assigns = %{type: {_, {Ecto.Enum, %{mappings: mappings}}}}) do
+    assigns = assign(assigns, :mappings, mappings)
+
+    ~H"""
+    <select name={@form[@field].name} class="form-select">
+      <%= for {k, v} <- @mappings do %>
+        <option value={k} selected={@form[@field].value == k}>{v}</option>
+      <% end %>
+    </select>
+    """
+  end
+
+  defp input(assigns = %{type: {:array, {_, {Ecto.Enum, %{mappings: mappings}}}}}) do
+    assigns = assign(assigns, :mappings, mappings)
+
+    ~H"""
+    <select name={@form[@field].name <> "[]"} class="form-select" multiple={true}>
+      <%= for {k, v} <- @mappings do %>
+        <option value={k} selected={Enum.member?(@form[@field].value || [], k)}>{v}</option>
+      <% end %>
+    </select>
+    """
+  end
+
+  defp input(assigns) do
+    ~H"""
+    NO INPUT
+    """
+  end
 
   def expand_modal(assigns) do
     assigns =
