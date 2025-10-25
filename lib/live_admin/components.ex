@@ -54,9 +54,17 @@ defmodule LiveAdmin.Components do
                 <%= if sortable?(val) do %>
                   <div class="drop-zone" data-idx={embed_form.index}>{trans("Move here")}</div>
                 <% end %>
-                <div class={"embed-section #{if assigns[:cycle], do: "odd"}"} draggable={if sortable?(val), do: "true"} data-idx={embed_form.index}>
+                <div
+                  class={"embed-section #{if assigns[:cycle], do: "odd"}"}
+                  draggable={if sortable?(val), do: "true"}
+                  data-idx={embed_form.index}
+                >
                   <%= if sortable?(val) do %>
-                    <input type="hidden" name={@form[LiveAdmin.View.sort_param_name(embed)].name <> "[]"} value={embed_form.index} />
+                    <input
+                      type="hidden"
+                      name={@form[LiveAdmin.View.sort_param_name(embed)].name <> "[]"}
+                      value={embed_form.index}
+                    />
                   <% end %>
                   <button
                     type="button"
@@ -80,13 +88,21 @@ defmodule LiveAdmin.Components do
                     </svg>
                   </button>
                   <%= if sortable?(val) do %>
-                  <button type="button" class="drag-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                      <line x1="3" y1="9" x2="21" y2="9"></line>
-                                      <line x1="3" y1="15" x2="21" y2="15"></line>
-                                    </svg>
-                                  </button>
-                                  <% end %>
+                    <button type="button" class="drag-icon">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="3" y1="15" x2="21" y2="15"></line>
+                      </svg>
+                    </button>
+                  <% end %>
                   <.form_grid
                     form={embed_form}
                     resource={@resource}
@@ -129,7 +145,6 @@ defmodule LiveAdmin.Components do
 
   defp sortable?(val) when is_list(val) and length(val) > 1, do: true
   defp sortable?(_), do: false
-
 
   defp editable_inline?(form, field, type) when type in [:id, :binary_id],
     do: form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) |> Kernel.not()
@@ -300,19 +315,11 @@ defmodule LiveAdmin.Components do
   end
 
   def expand_modal(assigns) do
-    assigns =
-      assign(
-        assigns,
-        :id,
-        "field-expand-" <>
-          "#{Map.fetch!(assigns.record, LiveAdmin.primary_key!(assigns.resource))}-#{assigns.field}"
-      )
-
     ~H"""
     <div id={@id} phx-hook="CopyField">
       <.modal id={@id <> "-modal"}>
-        <:title>{record_label(@record, @resource, @config)}<span>{@field}</span></:title>
-        <div class="expand-content">{@record |> Map.fetch!(@field) |> safe_render()}</div>
+        <:title>{@title}<span>{@field}</span></:title>
+        <div class="expand-content">{safe_render(@value)}</div>
         <span
           class="copy-icon"
           data-clipboard-target={"##{@id}-modal .expand-content"}

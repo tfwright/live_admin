@@ -20,7 +20,7 @@ defmodule LiveAdmin.Components.Container.Single do
   @impl true
   def render(assigns) do
     ~H"""
-    <div>
+    <div id="single-page" phx-hook="Single">
       <div class="content-header">
         <h1 class="content-title">
           {resource_title(@resource, @config)}
@@ -68,29 +68,80 @@ defmodule LiveAdmin.Components.Container.Single do
       </div>
 
       <div class="content-card">
-        <div class="card-section">
-          <div class="detail-view active">
-            <div class="detail-grid">
-              <%= for {field, type, _} <- Resource.fields(@resource, @config), renderable?(type), {:ok, val} = Map.fetch(@record, field) do %>
-                <div class="detail-field">
-                  <div class="detail-field-label">{trans(humanize(field))}</div>
-                  <div class="detail-field-value">
-                    <span>
-                      {Resource.render(val, @record, field, type, val)}
-                    </span>
-                    <.expand_modal
-                      record={@record}
-                      resource={@resource}
-                      field={field}
-                      config={@config}
-                    />
-                  </div>
-                </div>
-              <% end %>
+        <.detail_view
+          id="main"
+          fields={Resource.fields(@resource, @config)}
+          record={@record}
+          title={record_label(@record, @resource, @config)}
+        />
+      </div>
+    </div>
+    """
+  end
+
+  attr(:last, :integer, default: 0)
+  attr(:current, :integer, default: 0)
+
+  def detail_view(assigns) do
+    assigns =
+      assign(
+        assigns,
+        :embeds,
+        Enum.filter(assigns.fields, fn
+          {field, {_, {Ecto.Embedded, _}}, _} -> Map.fetch!(assigns.record, field)
+          _ -> false
+        end)
+      )
+
+    ~H"""
+    <div class="detail-view" id={if @id != "main", do: "#{@id}_#{@current}", else: "main"}>
+      <%= if @id == "main" || Enum.any?(@embeds) || @last > 0 do %>
+        <div class="tabs">
+          <%= if @id == "main" do %>
+            <a href="#main" id="main-link"></a>
+          <% end %>
+          <%= for {field, _, _} <- @embeds do %>
+            <a href={"##{@id}_#{field}_0"}>{trans(humanize(field))}</a>
+          <% end %>
+          <%= if @last > 0 do %>
+            <%= for n <- 0..@last do %>
+              <a href={"##{@id}_#{n}"}>{n}</a>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+      <div class="card-section">
+        <div class="detail-grid">
+          <%= for {field, type, _} <- @fields, renderable?(type), {:ok, val} = Map.fetch(@record, field) do %>
+            <div class="detail-field">
+              <div class="detail-field-label">{trans(humanize(field))}</div>
+              <div class="detail-field-value">
+                <span>
+                  {Resource.render(val, @record, field, type, val)}
+                </span>
+                <.expand_modal
+                  id={"#{@id}-#{field}-#{@current}-expand"}
+                  title={@title}
+                  field={field}
+                  value={val}
+                />
+              </div>
             </div>
-          </div>
+          <% end %>
         </div>
       </div>
+      <%= for {field, {_, {_, %{related: schema}}}, _} <- @embeds, embed = Map.fetch!(@record, field), list = List.wrap(embed) do %>
+        <%= for {record, index} <- Enum.with_index(list) do %>
+          <.detail_view
+            id={"#{@id}_#{field}"}
+            fields={Enum.map(schema.__schema__(:fields), &{&1, schema.__schema__(:type, &1), []})}
+            record={record}
+            title={trans(humanize(field))}
+            current={index}
+            last={Enum.count(list) - 1}
+          />
+        <% end %>
+      <% end %>
     </div>
     """
   end

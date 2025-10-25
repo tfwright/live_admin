@@ -269,7 +269,9 @@ defmodule LiveAdmin.Resource do
     |> Enum.reduce(Changeset.cast(record, params, []), fn
       {field_name, {_, {Ecto.Embedded, %{cardinality: :many}}}, _}, changeset ->
         Changeset.cast_embed(changeset, field_name,
-          with: fn embed, params -> build_changeset(embed, :embed, params |> IO.inspect(label: "embed params"), config) end,
+          with: fn embed, params ->
+            build_changeset(embed, :embed, params |> IO.inspect(label: "embed params"), config)
+          end,
           sort_param: LiveAdmin.View.sort_param_name(field_name),
           drop_param: LiveAdmin.View.drop_param_name(field_name)
         )
@@ -279,7 +281,7 @@ defmodule LiveAdmin.Resource do
           Map.get(params, field_name |> LiveAdmin.View.drop_param_name() |> to_string()) ->
             Changeset.put_change(changeset, field_name, nil)
 
-          Map.get(params, field_name |> LiveAdmin.View.sort_param_name |> to_string()) ->
+          Map.get(params, field_name |> LiveAdmin.View.sort_param_name() |> to_string()) ->
             Changeset.put_change(changeset, field_name, %{})
 
           true ->

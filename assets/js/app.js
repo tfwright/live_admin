@@ -14,6 +14,47 @@ window.addEventListener("phx:page-loading-stop", () => topbar.hide());
 
 let Hooks = {};
 
+Hooks.Single = {
+  setTab(el) {
+    const urlHash = window.location.hash || '#main';
+
+    for (tabLink of el.querySelectorAll('.tabs a')) {
+      const target = tabLink.getAttribute('href');
+      if (target === urlHash) {
+        tabLink.classList.add('active');
+      } else if (tabLink.getAttribute('href') !== "#main" && el.querySelector(target).querySelector(urlHash) || (el.querySelector(target).parentNode === el.querySelector(urlHash).parentElement && !tabLink.parentNode.querySelector(`:scope > a[href="${urlHash}"]`))) {
+        console.log(tabLink, "active parent link")
+        tabLink.classList.add('active');
+      } else {
+        tabLink.classList.remove('active');
+      };
+    };
+
+    const currentTabContent = el.querySelector(urlHash)
+
+    for (const fieldSet of el.querySelectorAll('.card-section')) {
+      if (fieldSet.parentNode === currentTabContent) {
+        fieldSet.style.removeProperty('display')
+      } else {
+        fieldSet.style.setProperty('display', 'none');
+      }
+    };
+
+    for (const tabContent of currentTabContent.parentNode.querySelectorAll('.detail-view')) {
+      if (tabContent === currentTabContent) {
+        tabContent.style.removeProperty('display');
+      } else {
+       tabContent.style.setProperty('display', 'none');
+      }
+    };
+  },
+  mounted() {
+    this.setTab(this.el);
+
+    window.addEventListener('hashchange', () => this.setTab(this.el));
+  },
+}
+
 Hooks.Form = {
   mounted() {
     this.el.addEventListener('dragstart', (e) => {

@@ -178,10 +178,10 @@ defmodule LiveAdmin.Components.Container.List do
                               {Resource.render(val, record, field, type, assigns)}
                             </span>
                             <.expand_modal
-                              record={record}
-                              resource={@resource}
+                              id={"expand-#{record_id}-#{field}"}
+                              title={record_label(record, @resource, @config)}
+                              value={val}
                               field={field}
-                              config={@config}
                             />
                           </td>
                         <% end %>
