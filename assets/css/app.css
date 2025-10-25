@@ -1133,7 +1133,6 @@ body:has(.alert-bar) .sidebar {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    margin-top: 24px;
     padding-top: 16px;
     border-top: 2px solid var(--border-medium);
 }
