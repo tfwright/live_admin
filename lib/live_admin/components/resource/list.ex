@@ -138,7 +138,20 @@ defmodule LiveAdmin.Components.Container.List do
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th><input type="checkbox" class="row-checkbox" title="Select all" /></th>
+                    <th>
+                      <form phx-change="toggle_select" phx-debounce={500} phx-target={@myself}>
+                        <input
+                          type="checkbox"
+                          class="row-checkbox"
+                          title="Select all"
+                          name="all"
+                          checked={
+                            @records.ok? &&
+                              Enum.count(@selected) == Enum.count(elem(@records.result, 0))
+                          }
+                        />
+                      </form>
+                    </th>
                     <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
                       <th class={sort_class(field, @sort_attr, @sort_dir)}>
                         <.link patch={
@@ -383,6 +396,16 @@ defmodule LiveAdmin.Components.Container.List do
     {:noreply, socket}
   end
 
+  def handle_event("toggle_select", params, socket) do
+    records =
+      case params["all"] do
+        "on" -> socket.assigns.records.result |> elem(0) |> Enum.map(& &1.id)
+        _ -> []
+      end
+
+    {:noreply, assign(socket, :selected, records)}
+  end
+
   def handle_event("go", %{"page" => page, "per" => per}, socket = %{assigns: assigns}) do
     {:noreply,
      push_patch(socket,
@@ -447,150 +470,6 @@ defmodule LiveAdmin.Components.Container.List do
            params: list_link_params(assigns, search: new_search)
          )
      )}
-  end
-
-  def handle_event(
-        "action",
-        params = %{"name" => name, "ids" => ids},
-        socket = %{
-          assigns: %{
-            session: session,
-            resource: resource,
-            repo: repo,
-            config: config
-          }
-        }
-      ) do
-    task_def =
-      if name == "delete" do
-        {"delete", Resource, :delete, [resource, session, repo, config]}
-      else
-        {label, mod, func, _, _} =
-          LiveAdmin.fetch_function(
-            resource,
-            session,
-            :actions,
-            String.to_existing_atom(name)
-          )
-
-        {label, mod, func, [session | Map.get(params, "args", [])]}
-      end
-
-    socket =
-      socket
-      |> handle_action(name, ids, task_def)
-      |> push_navigate(
-        to: route_with_params(socket.assigns, params: list_link_params(socket.assigns))
-      )
-
-    {:noreply, socket}
-  end
-
-  defp handle_action(
-         socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo, config: config}},
-         name,
-         [id],
-         {_, mod, func, args}
-       ) do
-    record = Resource.find(id, resource, prefix, repo)
-
-    apply(mod, func, [record | args])
-    |> case do
-      {:ok, record} ->
-        put_flash(
-          socket,
-          :success,
-          trans(
-            "%{name} action succeeded on %{resource} %{label}",
-            inter: [
-              name: name,
-              resource: resource_title(resource, config),
-              label: record_label(record, resource, config)
-            ]
-          )
-        )
-
-      {:error, message} ->
-        put_flash(
-          socket,
-          :error,
-          trans(
-            "%{name} action failed on %{resource} %{label}: '%{message}'",
-            inter: [
-              name: name,
-              message: message,
-              resource: resource_title(resource, config),
-              label: record_label(record, resource, config)
-            ]
-          )
-        )
-    end
-  end
-
-  defp handle_action(
-         socket = %{assigns: %{session: session, prefix: prefix, resource: resource, repo: repo}},
-         name,
-         ids,
-         {label, mod, func, args}
-       ) do
-    Task.Supervisor.async_nolink(
-      LiveAdmin.Task.Supervisor,
-      fn ->
-        pid = self()
-
-        LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: pid, progress: 0, label: label}})
-
-        records = Resource.all(ids, resource, prefix, repo)
-
-        {type, message} =
-          records
-          |> Enum.with_index()
-          |> Enum.reduce(0, fn {record, i}, failed_count ->
-            try do
-              case apply(mod, func, [record | args]) do
-                {:ok, _} -> failed_count
-                {:error, _} -> failed_count + 1
-              end
-            rescue
-              _ -> failed_count + 1
-            after
-              LiveAdmin.PubSub.broadcast(
-                session.id,
-                {:job, %{pid: pid, progress: (i + 1) / length(records)}}
-              )
-            end
-          end)
-          |> case do
-            0 ->
-              LiveAdmin.PubSub.announce(
-                session.id,
-                :success,
-                trans("%{name} action run successfully on %{count} records",
-                  inter: [name: name, count: length(records)]
-                )
-              )
-
-            error_count ->
-              LiveAdmin.PubSub.announce(
-                session.id,
-                :error,
-                trans(
-                  "%{name} action failed on %{error_count} records (%{success_count} succeeeded)",
-                  inter: [
-                    name: name,
-                    error_count: error_count,
-                    success_count: length(records) - error_count
-                  ]
-                )
-              )
-          end
-
-        LiveAdmin.PubSub.update_job(session.id, pid, progress: 1)
-      end,
-      timeout: :infinity
-    )
-
-    socket
   end
 
   defp list_link_params(assigns, overrides \\ []) do
