@@ -444,7 +444,7 @@ defmodule LiveAdmin.Components do
         phx-click={
           if @modalize,
             do: JS.show(to: "##{@type}-#{@name}-modal", display: "flex"),
-            else: JS.push(@type, value: %{"name" => @name}, page_loading: true)
+            else: JS.push(@type, value: %{"name" => @name}, page_loading: true, target: @target)
         }
         data-confirm={if @modalize, do: nil, else: trans("Are you sure you?")}
       >
