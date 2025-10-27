@@ -93,10 +93,14 @@ defmodule LiveAdmin.Components.Container.List do
             <details class="btn-select">
               <summary>Run task</summary>
               <div class="settings-menu">
-                <%= for task <- get_function_keys(@resource, @config, :tasks) do %>
-                  <span phx-click={JS.push("task", value: %{"name" => task}, page_loading: true)}>
-                    {trans(humanize(task))}
-                  </span>
+                <%= for task <- get_function_keys(@resource, @config, :tasks), {name, _, _, arity, docs} = LiveAdmin.fetch_function(@resource, @session, :tasks, task) do %>
+                  <.function_control
+                    name={task}
+                    type="task"
+                    extra_arg_count={arity - 2}
+                    docs={docs}
+                    target={@myself}
+                  />
                 <% end %>
               </div>
             </details>
@@ -294,7 +298,7 @@ defmodule LiveAdmin.Components.Container.List do
         }
       ) do
     {_, m, f, _, _} =
-      LiveAdmin.fetch_function(resource, session, :task, String.to_existing_atom(name))
+      LiveAdmin.fetch_function(resource, session, :tasks, String.to_existing_atom(name))
 
     args = [session | Map.get(params, "args", [])]
 
