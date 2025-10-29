@@ -350,10 +350,25 @@ defmodule LiveAdmin.Components.Container.List do
   def handle_event(
         "action",
         params = %{"name" => name},
-        socket = %{assigns: %{resource: resource, session: session, prefix: prefix, repo: repo}}
+        socket = %{
+          assigns: %{
+            resource: resource,
+            session: session,
+            prefix: prefix,
+            repo: repo,
+            config: config
+          }
+        }
       ) do
-    {_, m, f, _, _} =
-      LiveAdmin.fetch_function(resource, session, :actions, String.to_existing_atom(name))
+    {m, f, a} =
+      if name == "delete" do
+        {Resource, :delete, [resource, session, repo, config]}
+      else
+        {_, m, f, _, _} =
+          LiveAdmin.fetch_function(resource, session, :actions, String.to_existing_atom(name))
+
+        {m, f, [session | Map.get(params, "args", [])]}
+      end
 
     job =
       Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, fn ->
@@ -365,7 +380,7 @@ defmodule LiveAdmin.Components.Container.List do
             |> Resource.find(resource, prefix, repo)
             |> case do
               nil -> nil
-              record -> apply(m, f, [record, session] ++ Map.get(params, "args", []))
+              record -> apply(m, f, [record | a])
             end
 
             LiveAdmin.PubSub.update_job(session.id, self(),
@@ -373,11 +388,27 @@ defmodule LiveAdmin.Components.Container.List do
               label: name
             )
           rescue
-            error -> Logger.error(inspect(error))
+            error ->
+              Logger.error(inspect(error))
+
+              LiveAdmin.PubSub.broadcast(
+                session.id,
+                {:announce,
+                 %{
+                   message:
+                     trans("%{name} encountered an error and stopped", inter: [name: name]),
+                   type: :error
+                 }}
+              )
           after
             LiveAdmin.PubSub.update_job(session.id, self(), progress: 1)
           end
         end)
+
+        LiveAdmin.PubSub.broadcast(
+          session.id,
+          {:announce, %{message: trans("%{name} succeeded", inter: [name: name]), type: :success}}
+        )
       end)
 
     LiveAdmin.PubSub.update_job(session.id, job.pid, progress: 0, label: to_string(name))

@@ -167,17 +167,20 @@ defmodule LiveAdmin.Components.Container.Single do
       |> Resource.delete(resource, session, socket.assigns.repo, config)
       |> case do
         {:ok, record} ->
-          socket
-          |> put_flash(
-            :info,
-            trans("Deleted %{label}", inter: [label: record_label(record, resource, config)])
+          LiveAdmin.PubSub.broadcast(
+            session.id,
+            {:announce, %{message: trans("Record deleted"), type: :success}}
           )
-          |> push_navigate(to: route_with_params(socket.assigns))
+
+          push_navigate(socket, to: route_with_params(socket.assigns))
 
         {:error, _} ->
-          push_event(socket, "error", %{
-            msg: trans("Delete failed!")
-          })
+          LiveAdmin.PubSub.broadcast(
+            session.id,
+            {:announce, %{message: trans("Record deleted"), type: :success}}
+          )
+
+          socket
       end
 
     {:noreply, socket}
