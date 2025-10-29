@@ -8,7 +8,7 @@ defmodule LiveAdmin.Components.Container.Form do
   import LiveAdmin
   import LiveAdmin.View
 
-  alias __MODULE__.{ArrayInput, MapInput, SearchSelect}
+  alias __MODULE__.{ArrayInput, SearchSelect}
   alias Ecto.Changeset
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS

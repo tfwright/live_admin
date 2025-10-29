@@ -8,7 +8,6 @@ defmodule LiveAdmin.Components.Container.Single do
 
   alias LiveAdmin.Resource
   alias Phoenix.LiveView.JS
-  alias PhoenixHTMLHelpers.Tag
 
   @impl true
   def render(assigns = %{record: nil}) do
@@ -81,7 +80,11 @@ defmodule LiveAdmin.Components.Container.Single do
 
   attr(:last, :integer, default: 0)
   attr(:current, :integer, default: 0)
-
+  attr(:id, :string, required: true)
+  attr(:record, :map, required: true)
+  attr(:title, :string, required: true)
+  attr(:fields, :any, default: [])
+  attr(:embeds, :any, default: [])
   def detail_view(assigns) do
     assigns =
       assign(

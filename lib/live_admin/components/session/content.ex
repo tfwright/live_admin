@@ -5,7 +5,6 @@ defmodule LiveAdmin.Components.Session.Content do
   import LiveAdmin
 
   alias Ecto.Changeset
-  alias LiveAdmin.Components.Container.Form.MapInput
 
   @impl true
   def render(assigns) do

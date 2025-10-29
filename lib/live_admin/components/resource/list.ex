@@ -30,11 +30,7 @@ defmodule LiveAdmin.Components.Container.List do
               assigns.config
             )
 
-          if Enum.any?(records) do
-            {:ok, %{records: {records, count}}}
-          else
-            {:error, :no_results}
-          end
+          {:ok, %{records: {records, count}}}
         end,
         reset: true
       )
@@ -134,160 +130,130 @@ defmodule LiveAdmin.Components.Container.List do
                 />
               </form>
             </div>
-            <div class="table-container">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>
-                      <form phx-change="toggle_select" phx-debounce={500} phx-target={@myself}>
-                        <input
-                          type="checkbox"
-                          class="row-checkbox"
-                          title="Select all"
-                          name="all"
-                          checked={
-                            @records.ok? &&
-                              Enum.count(@selected) == Enum.count(elem(@records.result, 0))
-                          }
-                        />
-                      </form>
-                    </th>
-                    <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
-                      <th class={sort_class(field, @sort_attr, @sort_dir)}>
-                        <.link patch={
+            <%= if @records.loading || (@records.ok? && elem(@records.result, 1) > 0) do %>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>
+                        <form phx-change="toggle_select" phx-debounce={500} phx-target={@myself}>
+                          <input
+                            type="checkbox"
+                            class="row-checkbox"
+                            title="Select all"
+                            name="all"
+                            checked={
+                              @records.ok? &&
+                                Enum.count(@selected) == Enum.count(elem(@records.result, 0))
+                            }
+                          />
+                        </form>
+                      </th>
+                      <%= for {field, _, _} <- Resource.fields(@resource, @config) do %>
+                        <th class={sort_class(field, @sort_attr, @sort_dir)}>
+                          <.link patch={
+                            route_with_params(
+                              assigns,
+                              params:
+                                list_link_params(assigns,
+                                  sort_attr: field,
+                                  sort_dir:
+                                    if(field == @sort_attr,
+                                      do: Enum.find([:asc, :desc], &(&1 != @sort_dir)),
+                                      else: @sort_dir
+                                    )
+                                )
+                            )
+                          }>
+                            {trans(humanize(field))}
+                          </.link>
+                        </th>
+                      <% end %>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <%= if @records.ok? do %>
+                      <%= for record <- elem(@records.result, 0), record_id = Map.fetch!(record, LiveAdmin.primary_key!(@resource)) do %>
+                        <tr>
+                          <td>
+                            <form phx-change="toggle_select" phx-debounce={500} phx-target={@myself}>
+                              <input
+                                type="checkbox"
+                                class="row-checkbox"
+                                name="selected"
+                                checked={Enum.member?(@selected, record_id)}
+                              />
+                              <input type="hidden" name="record_id" value={record_id} />
+                            </form>
+                          </td>
+                          <%= for {field, type, _} <- Resource.fields(@resource, @config), {:ok, val} = Map.fetch(record, field) do %>
+                            <td class="table-cell">
+                              <span class="cell-content">
+                                {Resource.render(val, record, field, type, assigns)}
+                              </span>
+                              <.expand_modal
+                                id={"expand-#{record_id}-#{field}"}
+                                title={record_label(record, @resource, @config)}
+                                value={val}
+                                field={field}
+                              />
+                            </td>
+                          <% end %>
+                        </tr>
+                      <% end %>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+              <%= if @records.ok? do %>
+                <div class="pagination">
+                  <div class="pagination-controls">
+                    <%= if @page > 1 do %>
+                      <.link
+                        patch={
                           route_with_params(
                             assigns,
-                            params:
-                              list_link_params(assigns,
-                                sort_attr: field,
-                                sort_dir:
-                                  if(field == @sort_attr,
-                                    do: Enum.find([:asc, :desc], &(&1 != @sort_dir)),
-                                    else: @sort_dir
-                                  )
-                              )
+                            params: list_link_params(assigns, page: @page - 1)
                           )
-                        }>
-                          {trans(humanize(field))}
-                        </.link>
-                      </th>
+                        }
+                        class="btn pagination-info-btn"
+                      >
+                        Back
+                      </.link>
                     <% end %>
-                  </tr>
-                </thead>
-                <tbody>
-                  <%= if @records.ok? do %>
-                    <%= for record <- elem(@records.result, 0), record_id = Map.fetch!(record, LiveAdmin.primary_key!(@resource)) do %>
-                      <tr>
-                        <td>
-                          <form phx-change="toggle_select" phx-debounce={500} phx-target={@myself}>
-                            <input
-                              type="checkbox"
-                              class="row-checkbox"
-                              name="selected"
-                              checked={Enum.member?(@selected, record_id)}
-                            />
-                            <input type="hidden" name="record_id" value={record_id} />
-                          </form>
-                        </td>
-                        <%= for {field, type, _} <- Resource.fields(@resource, @config), {:ok, val} = Map.fetch(record, field) do %>
-                          <td class="table-cell">
-                            <span class="cell-content">
-                              {Resource.render(val, record, field, type, assigns)}
-                            </span>
-                            <.expand_modal
-                              id={"expand-#{record_id}-#{field}"}
-                              title={record_label(record, @resource, @config)}
-                              value={val}
-                              field={field}
-                            />
-                          </td>
-                        <% end %>
-                      </tr>
+                    <.link class="btn pagination-info-btn">
+                      {min((@page - 1) * @per + 1, elem(@records.result, 1))}-{min(
+                        @page * @per,
+                        elem(@records.result, 1)
+                      )}/{elem(@records.result, 1)}
+                    </.link>
+                    <%= if @page < (@records.result |> elem(1)) / @per do %>
+                      <.link
+                        patch={
+                          route_with_params(
+                            assigns,
+                            params: list_link_params(assigns, page: @page + 1)
+                          )
+                        }
+                        class="btn pagination-info-btn"
+                      >
+                        Next
+                      </.link>
                     <% end %>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
-
-            <%= if @records.ok? do %>
-              <div class="pagination">
-                <div class="pagination-controls">
-                  <%= if @page > 1 do %>
-                    <.link
-                      patch={
-                        route_with_params(
-                          assigns,
-                          params: list_link_params(assigns, page: @page - 1)
-                        )
-                      }
-                      class="btn pagination-info-btn"
-                    >
-                      Back
-                    </.link>
-                  <% end %>
-                  <.link class="btn pagination-info-btn">
-                    {min((@page - 1) * @per + 1, elem(@records.result, 1))}-{min(
-                      @page * @per,
-                      elem(@records.result, 1)
-                    )}/{elem(@records.result, 1)}
-                  </.link>
-                  <%= if @page < (@records.result |> elem(1)) / @per do %>
-                    <.link
-                      patch={
-                        route_with_params(
-                          assigns,
-                          params: list_link_params(assigns, page: @page + 1)
-                        )
-                      }
-                      class="btn pagination-info-btn"
-                    >
-                      Next
-                    </.link>
-                  <% end %>
+                  </div>
                 </div>
-              </div>
+              <% end %>
+            <% else %>
+              <%= if elem(@records.result, 1) == 0 do %>
+                <.error title="No results", details="Check search value and selected prefix" />
+                <% else %>
+                <.error title="Could not load results", details="Try again and if error continues check logs" />
+                <% end %>
             <% end %>
           </div>
         </div>
       </div>
     </div>
-    """
-  end
-
-  defp safe_render(nil), do: ""
-
-  defp safe_render(list) when is_list(list), do: inspect(list, pretty: true)
-
-  defp safe_render(val) do
-    to_string(val)
-  rescue
-    e -> inspect(val, pretty: true)
-  end
-
-  defp list_error(assigns = %{failed: {:error, :no_results}}) do
-    ~H"""
-    <div class="list__error">
-      {trans("No results for this page with current filters.")}
-      <p>
-        <button
-          class="resource__action--btn"
-          phx-click={
-            JS.show(
-              to: "#settings-modal",
-              transition: {"ease-in duration-300", "opacity-0", "opacity-100"}
-            )
-          }
-        >
-          {trans("Edit view")}
-        </button>
-      </p>
-    </div>
-    """
-  end
-
-  defp list_error(assigns) do
-    ~H"""
-    {trans("Error")}
     """
   end
 
@@ -509,11 +475,4 @@ defmodule LiveAdmin.Components.Container.List do
     |> Enum.into([])
     |> Keyword.merge(overrides)
   end
-
-  defp type_to_css_class({_, {type, _}}), do: type_to_css_class(type)
-  defp type_to_css_class({:array, {_, {type, _}}}), do: {:array, type} |> type_to_css_class()
-  defp type_to_css_class({:array, type}), do: "array.#{type}" |> type_to_css_class()
-
-  defp type_to_css_class(type),
-    do: type |> to_string() |> Phoenix.Naming.underscore() |> String.replace("/", "_")
 end
