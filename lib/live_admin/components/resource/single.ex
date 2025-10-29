@@ -100,7 +100,7 @@ defmodule LiveAdmin.Components.Container.Single do
           <%= if @id == "main" do %>
             <a href="#main" id="main-link"></a>
           <% end %>
-          <%= for {field, _, _} <- @embeds do %>
+          <%= for {field, _, _} <- @embeds, @record |> Map.fetch!(field) |> List.wrap() |> Enum.any? do %>
             <a href={"##{@id}_#{field}_0"}>{trans(humanize(field))}</a>
           <% end %>
           <%= if @last > 0 do %>

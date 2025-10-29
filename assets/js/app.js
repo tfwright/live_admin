@@ -23,7 +23,6 @@ Hooks.Single = {
       if (target === urlHash) {
         tabLink.classList.add('active');
       } else if (tabLink.getAttribute('href') !== "#main" && el.querySelector(target).querySelector(urlHash) || (el.querySelector(target).parentNode === el.querySelector(urlHash).parentElement && !tabLink.parentNode.querySelector(`:scope > a[href="${urlHash}"]`))) {
-        console.log(tabLink, "active parent link")
         tabLink.classList.add('active');
       } else {
         tabLink.classList.remove('active');
