@@ -6,18 +6,11 @@ defmodule LiveAdmin.Components.Container do
 
   import LiveAdmin,
     only: [
-      resource_title: 2,
       route_with_params: 1,
-      route_with_params: 2,
-      trans: 1,
-      trans: 2
+      route_with_params: 2
     ]
 
-  import LiveAdmin.Components
-  import LiveAdmin.View, only: [get_function_keys: 3]
-
   alias LiveAdmin.Resource
-  alias Phoenix.LiveView.JS
 
   @impl true
   def mount(_params, _session, socket) do
@@ -81,6 +74,7 @@ defmodule LiveAdmin.Components.Container do
 
   def handle_params(_, _, socket), do: {:noreply, socket}
 
+  @impl true
   def handle_event("set_locale", %{"locale" => locale}, socket) do
     new_session = Map.put(socket.assigns.session, :locale, locale)
 

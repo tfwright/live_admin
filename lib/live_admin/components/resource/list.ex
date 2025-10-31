@@ -76,7 +76,7 @@ defmodule LiveAdmin.Components.Container.List do
               <div class="settings-menu">
                 <%= for action <- get_function_keys(@resource, @config, :actions), {name, _, _, arity, docs} = LiveAdmin.fetch_function(@resource, @session, :actions, action) do %>
                   <.function_control
-                    name={action}
+                    name={name}
                     type="action"
                     extra_arg_count={arity - 2}
                     docs={docs}
@@ -91,7 +91,7 @@ defmodule LiveAdmin.Components.Container.List do
               <div class="settings-menu">
                 <%= for task <- get_function_keys(@resource, @config, :tasks), {name, _, _, arity, docs} = LiveAdmin.fetch_function(@resource, @session, :tasks, task) do %>
                   <.function_control
-                    name={task}
+                    name={name}
                     type="task"
                     extra_arg_count={arity - 2}
                     docs={docs}

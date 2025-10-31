@@ -1,17 +1,12 @@
 defmodule LiveAdmin.Components.Container.Form do
   use Phoenix.LiveComponent
-  import Phoenix.HTML.Form
   use PhoenixHTMLHelpers
 
   import LiveAdmin.Components
-  import LiveAdmin.ErrorHelpers
   import LiveAdmin
-  import LiveAdmin.View
 
-  alias __MODULE__.{ArrayInput, SearchSelect}
   alias Ecto.Changeset
   alias LiveAdmin.Resource
-  alias Phoenix.LiveView.JS
 
   @impl true
   def update(assigns = %{record: record}, socket) do
@@ -164,7 +159,7 @@ defmodule LiveAdmin.Components.Container.Form do
     {:noreply, socket}
   end
 
-  def handle_event("add_embed", params = %{"field" => field}, socket) do
+  def handle_event("add_embed", %{"field" => field}, socket) do
     field = String.to_existing_atom(field)
 
     changeset =

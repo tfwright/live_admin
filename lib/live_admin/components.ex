@@ -6,9 +6,7 @@ defmodule LiveAdmin.Components do
   import LiveAdmin
   import LiveAdmin.View, only: [supported_type?: 1]
 
-  alias LiveAdmin.Components.Container.Form
   alias Phoenix.LiveView.JS
-  alias LiveAdmin.Resource
 
   def form_grid(assigns) do
     ~H"""
@@ -149,9 +147,9 @@ defmodule LiveAdmin.Components do
   defp editable_inline?(form, field, type) when type in [:id, :binary_id],
     do: form.data |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) |> Kernel.not()
 
-  defp editable_inline?(form, _, {_, {Ecto.Embedded, _}}), do: false
+  defp editable_inline?(_, _, {_, {Ecto.Embedded, _}}), do: false
 
-  defp editable_inline?(form, _, :map), do: false
+  defp editable_inline?(_, _, :map), do: false
 
   defp editable_inline?(_, _, _), do: true
 
@@ -246,18 +244,6 @@ defmodule LiveAdmin.Components do
         <label for={@form[@field].id <> "_right"} class="label-area right"></label>
       </div>
     </div>
-    """
-  end
-
-  defp input(assigns = %{type: {:array, :string}}) do
-    ~H"""
-    <.live_component
-      module={ArrayInput}
-      id={input_id(@form, @field)}
-      form={@form}
-      field={@field}
-      disabled={@disabled}
-    />
     """
   end
 

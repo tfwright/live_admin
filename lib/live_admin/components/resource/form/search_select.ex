@@ -4,7 +4,6 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   use PhoenixHTMLHelpers
 
   import LiveAdmin
-  import LiveAdmin.Components
 
   alias Phoenix.LiveView.JS
   alias LiveAdmin.Resource
@@ -111,7 +110,15 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   def handle_event(
         "load_options",
         %{"value" => q},
-        socket = %{assigns: %{resource: resource, session: session, config: config}}
+        socket = %{
+          assigns: %{
+            resource: resource,
+            session: session,
+            config: config,
+            prefix: prefix,
+            repo: repo
+          }
+        }
       ) do
     socket =
       assign_async(
@@ -120,12 +127,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
         fn ->
           options =
             resource
-            |> Resource.list(
-              [search: q, prefix: socket.assigns.prefix],
-              session,
-              socket.assigns.repo,
-              config
-            )
+            |> Resource.list([search: q, prefix: prefix], session, repo, config)
             |> elem(0)
 
           {:ok, %{options: options}}
