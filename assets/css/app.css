@@ -412,25 +412,6 @@ body:has(.alert-bar) .sidebar {
     font-size: 12px;
 }
 
-.nav-sub-subitems {
-    padding-left: 16px;
-}
-
-.nav-sub-subitem {
-    padding: 8px 24px;
-    color: var(--text-secondary);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 16px;
-    transition: color 0.2s;
-}
-
-.nav-sub-subitem:hover {
-    color: var(--accent-color);
-}
-
 /* Progress Section */
 .nav-progress-section {
     position: absolute;
