@@ -85,6 +85,7 @@ defmodule LiveAdmin.Components.Container.Single do
   attr(:title, :string, required: true)
   attr(:fields, :any, default: [])
   attr(:embeds, :any, default: [])
+
   def detail_view(assigns) do
     assigns =
       assign(
@@ -169,7 +170,7 @@ defmodule LiveAdmin.Components.Container.Single do
       |> Resource.find!(resource, socket.assigns.prefix, socket.assigns.repo)
       |> Resource.delete(resource, session, socket.assigns.repo, config)
       |> case do
-        {:ok, record} ->
+        :ok ->
           LiveAdmin.PubSub.broadcast(
             session.id,
             {:announce, %{message: trans("Record deleted"), type: :success}}
@@ -177,10 +178,10 @@ defmodule LiveAdmin.Components.Container.Single do
 
           push_navigate(socket, to: route_with_params(socket.assigns))
 
-        {:error, _} ->
+        {:error, message} ->
           LiveAdmin.PubSub.broadcast(
             session.id,
-            {:announce, %{message: trans("Record deleted"), type: :success}}
+            {:announce, %{message: message, type: :error}}
           )
 
           socket
@@ -208,22 +209,17 @@ defmodule LiveAdmin.Components.Container.Single do
             session.id,
             {:announce,
              %{
-               message: trans("Action %{name} succeeded", inter: [name: name]),
+               message: trans("%{name} succeeded", inter: [name: name]),
                type: :success
              }}
           )
 
           assign(socket, :record, record)
 
-        {:error, error} ->
+        {:error, message} ->
           LiveAdmin.PubSub.broadcast(
             session.id,
-            {:announce,
-             %{
-               message:
-                 trans("Action %{name} failed: %{error}", inter: [name: name, error: error]),
-               type: :error
-             }}
+            {:announce, %{message: message, type: :error}}
           )
       end
 

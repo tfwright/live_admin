@@ -317,19 +317,19 @@ defmodule LiveAdmin.Components do
   def error(assigns) do
     ~H"""
     <div class="error">
-                <div class="error-header">
-                    <div class="error-icon">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="10" stroke="#ef4444" stroke-width="2"></circle>
-                            <path d="M12 8V12" stroke="#ef4444" stroke-width="2" stroke-linecap="round"></path>
-                            <circle cx="12" cy="16" r="1" fill="#ef4444"></circle>
-                        </svg>
-                    </div>
-                    <h3>{@title}</h3>
-                </div>
+      <div class="error-header">
+        <div class="error-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="#ef4444" stroke-width="2"></circle>
+            <path d="M12 8V12" stroke="#ef4444" stroke-width="2" stroke-linecap="round"></path>
+            <circle cx="12" cy="16" r="1" fill="#ef4444"></circle>
+          </svg>
+        </div>
+        <h3>{@title}</h3>
+      </div>
 
-                <p class="error-message">{@details}</p>
-            </div>
+      <p class="error-message">{@details}</p>
+    </div>
     """
   end
 

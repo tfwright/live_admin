@@ -245,10 +245,14 @@ defmodule LiveAdmin.Components.Container.List do
               <% end %>
             <% else %>
               <%= if elem(@records.result, 1) == 0 do %>
-                <.error title="No results", details="Check search value and selected prefix" />
-                <% else %>
-                <.error title="Could not load results", details="Try again and if error continues check logs" />
-                <% end %>
+                <.error title="No results" , details="Check search value and selected prefix" />
+              <% else %>
+                <.error
+                  title="Could not load results"
+                  ,
+                  details="Try again and if error continues check logs"
+                />
+              <% end %>
             <% end %>
           </div>
         </div>
