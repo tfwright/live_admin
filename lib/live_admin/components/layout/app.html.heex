@@ -4,8 +4,8 @@
     <div class="logo">{Keyword.fetch!(@config, :title)}</div>
     <div class="user-menu">
       <%= if assigns[:prefix_options] do %>
-        <details class="btn-select" id="prefix-select">
-          <summary>{@session.prefix || "No tenant selected"}</summary>
+        <details class="btn-select" id="prefix-select" phx-click-away={Phoenix.LiveView.JS.remove_attribute("open", to: "#prefix-select")}>
+          <summary>{if @session.prefix, do: "prefix: #{@session.prefix}", else: "No prefix selected"}</summary>
           <div class="settings-menu">
             <%= for prefix <- Map.get(assigns, :prefix_options, []) do %>
               <.link navigate={LiveAdmin.route_with_params(assigns, params: [prefix: prefix])}>
@@ -17,8 +17,8 @@
       <% end %>
 
       <%= if LiveAdmin.use_i18n? do %>
-        <details class="btn-select">
-          <summary>{@session.locale || "No locale selected"}</summary>
+        <details class="btn-select" id="locale-select" phx-click-away={Phoenix.LiveView.JS.remove_attribute("open", to: "#locale-select")}>
+          <summary>{if @session.locale, do: "locale: #{@session.locale}", else: "No locale selected"}</summary>
           <div class="settings-menu">
             <%= for locale <- LiveAdmin.gettext_backend().locales() do %>
               <a phx-click={
