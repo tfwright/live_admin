@@ -14,6 +14,22 @@ window.addEventListener("phx:page-loading-stop", () => topbar.hide());
 
 let Hooks = {};
 
+Hooks.ArrayInput = {
+  mounted() {
+    this.el.querySelector("input").addEventListener("input", e => e.stopPropagation());
+
+    this.el.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.target.blur()
+        e.preventDefault();
+      }
+    });
+  },
+  updated() {
+    this.el.querySelector("input").addEventListener("input", e => e.stopPropagation());
+  }
+};
+
 Hooks.Single = {
   setTab(el) {
     const urlHash = window.location.hash || '#main';

@@ -1510,10 +1510,15 @@ body:has(.alert-bar) .sidebar {
                  opacity:.5;
              }
 
+             .search-select-container[class$='loading'] input, .search-select-container[class$='loading'] button {
+                 opacity:.5;
+                 background-color: darkgray;
+                 pointer-events: none;
+             }
+
              input[class$='loading'] {
                  opacity:.5;
                  background-color: darkgray;
-                 border:0;
                  pointer-events: none;
              }
 
@@ -1523,6 +1528,8 @@ body:has(.alert-bar) .sidebar {
 
              button[class$='loading'] {
                  opacity:.5;
+                 background-color: darkgray;
+                 pointer-events: none;
              }
 
 
@@ -1591,17 +1598,17 @@ body:has(.alert-bar) .sidebar {
                       margin:5px;
                   }
 
-                  .form-field .error {
+                  .form-field.error .error-message  {
                       color:#C15846;
                       font-size:10px;
                       font-weight: bold;
                   }
 
-                  .error input {
+                  .form-field.error input {
                       background:#fef2f2;
                   }
 
-                  .error textarea {
+                  .form-field.error textarea {
                       background:#fef2f2;
                   }
 
@@ -1808,7 +1815,7 @@ body:has(.alert-bar) .sidebar {
 
 
 
-                                        .error {
+                                        .error-box {
                                                     display: flex;
                                                     flex-direction: column;
                                                     align-items: center;

@@ -7,6 +7,8 @@ defmodule LiveAdmin.Components do
   import LiveAdmin.View, only: [supported_type?: 1]
 
   alias Phoenix.LiveView.JS
+  alias LiveAdmin.Components.Container.Form.{ArrayInput, SearchSelect}
+
 
   def form_grid(assigns) do
     ~H"""
@@ -37,7 +39,7 @@ defmodule LiveAdmin.Components do
                 value: @form[field]
               )}
             <% end %>
-            <span phx-feedback-for={@form[field].name} class="error-message"></span>
+            <span class="error-message"><%= Enum.map_join(@form[field].errors, ", ", & elem(&1, 0)) %></span>
           </div>
         <% end %>
       </div>
@@ -154,36 +156,43 @@ defmodule LiveAdmin.Components do
   defp editable_inline?(_, _, _), do: true
 
   defp input(assigns = %{type: id}) when id in [:id, :binary_id] do
-    assigns =
-      assign(
-        assigns,
-        :associated_resource,
+    assoc_resource =
         associated_resource(
           LiveAdmin.fetch_config(assigns.resource, :schema, assigns.session),
           assigns.field,
           assigns.resources,
           :resource
         )
-      )
 
-    ~H"""
-    <%= if @associated_resource do %>
+    if assoc_resource do
+      value = assigns.form[assigns.field].value
+
+      selected_option =
+        case value do
+          empty when empty in [nil, ""] ->
+            {nil, nil}
+          key ->
+            assoc_record = LiveAdmin.Resource.find!(key, assoc_resource, assigns.prefix, assigns.repo)
+            {key, record_label(assoc_record, assoc_resource, assigns.config)}
+        end
+
+      assigns = assign(assigns, selected_option: selected_option, resource: assoc_resource)
+
+      ~H"""
       <.live_component
         module={SearchSelect}
-        id={input_id(@form, @field)}
-        form={@form}
-        field={@field}
+        id={@form[@field].id}
+        name={@form[@field].name}
         disabled={@disabled}
-        resource={@associated_resource}
-        session={@session}
-        prefix={@prefix}
-        repo={@repo}
-        config={@config}
+        selected_option={@selected_option}
+        options={{__MODULE__, :search_select_options, [@resource, @prefix, @session, @repo, @config]}}
       />
-    <% else %>
+      """
+    else
+      ~H"""
       <input type="number" class="form-input" name={@form[@field].name} value={@form[@field].value} />
-    <% end %>
-    """
+      """
+    end
   end
 
   defp input(assigns = %{type: {:array, :string}}) do
@@ -302,7 +311,7 @@ defmodule LiveAdmin.Components do
 
   def error(assigns) do
     ~H"""
-    <div class="error">
+    <div class="error-box">
       <div class="error-header">
         <div class="error-icon">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -457,5 +466,12 @@ defmodule LiveAdmin.Components do
       </span>
     </div>
     """
+  end
+
+  def search_select_options(_q, resource, prefix, session, repo, config) do
+    resource
+    |> LiveAdmin.Resource.list([prefix: prefix], session, repo, config)
+    |> elem(0)
+    |> Enum.map(& {Map.fetch!(&1, LiveAdmin.primary_key!(resource)), record_label(&1, resource, config)})
   end
 end
