@@ -627,6 +627,8 @@ body:has(.alert-bar) .sidebar {
     min-width: 200px;
     padding: 8px 0;
     z-index: 1000;
+    max-height: 30vh;
+    overflow-y: scroll;
 }
 
 .settings-menu > a, .settings-menu > span {
