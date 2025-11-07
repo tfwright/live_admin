@@ -49,20 +49,24 @@ defmodule LiveAdmin.Components.Container.Single do
               {trans("Delete")}
             </button>
           <% end %>
-          <details class="btn-select" id="actions-control">
-            <summary>Run action</summary>
-            <div class="settings-menu">
-              <%= for action <- get_function_keys(@resource, @config, :actions), {name, _, _, arity, docs} = LiveAdmin.fetch_function(@resource, @session, :actions, action) do %>
-                <.function_control
-                  name={name}
-                  type="action"
-                  extra_arg_count={arity - 2}
-                  docs={docs}
-                  target={@myself}
-                />
-              <% end %>
-            </div>
-          </details>
+          <.drop_down
+            :let={action}
+            id="action-select"
+            items={
+              @resource
+              |> get_function_keys(@config, :actions)
+              |> Enum.map(&LiveAdmin.fetch_function(@resource, @session, :actions, &1))
+            }
+            label={trans("Run action")}
+          >
+            <.function_control
+              name={elem(action, 0)}
+              type="action"
+              extra_arg_count={elem(action, 3) - 2}
+              docs={elem(action, 4)}
+              target={@myself}
+            />
+          </.drop_down>
         </div>
       </div>
 

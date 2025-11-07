@@ -4,11 +4,30 @@ defmodule LiveAdmin.Components do
 
   import Phoenix.HTML.Form
   import LiveAdmin
-  import LiveAdmin.View, only: [supported_type?: 1]
 
   alias Phoenix.LiveView.JS
   alias LiveAdmin.Components.Container.Form.{ArrayInput, SearchSelect}
 
+  attr(:id, :string, required: true)
+  attr(:label, :string, required: true)
+  attr(:items, :list, required: true)
+
+  def drop_down(assigns) do
+    ~H"""
+    <details
+      class="btn-select"
+      id={@id}
+      phx-click-away={Phoenix.LiveView.JS.remove_attribute("open", to: "##{@id}")}
+    >
+      <summary>{@label}</summary>
+      <div class="settings-menu">
+        <%= for item <- @items do %>
+          {render_slot(@inner_block, item)}
+        <% end %>
+      </div>
+    </details>
+    """
+  end
 
   def form_grid(assigns) do
     ~H"""
@@ -39,7 +58,9 @@ defmodule LiveAdmin.Components do
                 value: @form[field]
               )}
             <% end %>
-            <span class="error-message"><%= Enum.map_join(@form[field].errors, ", ", & elem(&1, 0)) %></span>
+            <span class="error-message">
+              {Enum.map_join(@form[field].errors, ", ", &elem(&1, 0))}
+            </span>
           </div>
         <% end %>
       </div>
@@ -157,12 +178,12 @@ defmodule LiveAdmin.Components do
 
   defp input(assigns = %{type: id}) when id in [:id, :binary_id] do
     assoc_resource =
-        associated_resource(
-          LiveAdmin.fetch_config(assigns.resource, :schema, assigns.session),
-          assigns.field,
-          assigns.resources,
-          :resource
-        )
+      associated_resource(
+        LiveAdmin.fetch_config(assigns.resource, :schema, assigns.session),
+        assigns.field,
+        assigns.resources,
+        :resource
+      )
 
     if assoc_resource do
       value = assigns.form[assigns.field].value
@@ -171,8 +192,11 @@ defmodule LiveAdmin.Components do
         case value do
           empty when empty in [nil, ""] ->
             {nil, nil}
+
           key ->
-            assoc_record = LiveAdmin.Resource.find!(key, assoc_resource, assigns.prefix, assigns.repo)
+            assoc_record =
+              LiveAdmin.Resource.find!(key, assoc_resource, assigns.prefix, assigns.repo)
+
             {key, record_label(assoc_record, assoc_resource, assigns.config)}
         end
 
@@ -455,6 +479,7 @@ defmodule LiveAdmin.Components do
         </.modal>
       <% end %>
       <span
+        class="function-link"
         phx-click={
           if @modalize,
             do: JS.show(to: "##{@type}-#{@name}-modal", display: "flex"),
@@ -472,6 +497,26 @@ defmodule LiveAdmin.Components do
     resource
     |> LiveAdmin.Resource.list([prefix: prefix], session, repo, config)
     |> elem(0)
-    |> Enum.map(& {Map.fetch!(&1, LiveAdmin.primary_key!(resource)), record_label(&1, resource, config)})
+    |> Enum.map(
+      &{Map.fetch!(&1, LiveAdmin.primary_key!(resource)), record_label(&1, resource, config)}
+    )
   end
+
+  @supported_primitive_types [
+    :string,
+    :boolean,
+    :date,
+    :integer,
+    :naive_datetime,
+    :utc_datetime,
+    :id,
+    :binary_id,
+    :float
+  ]
+  def supported_type?(type) when type in @supported_primitive_types, do: true
+  def supported_type?(:map), do: true
+  def supported_type?({:array, _}), do: true
+  def supported_type?({_, {Ecto.Embedded, _}}), do: true
+  def supported_type?({_, {Ecto.Enum, _}}), do: true
+  def supported_type?(_), do: false
 end

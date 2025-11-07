@@ -4,6 +4,7 @@ defmodule LiveAdmin.View do
 
   require Integer
 
+  import LiveAdmin.Components
   import Phoenix.HTML
 
   js_path = Path.join(__DIR__, "../../dist/js/app.js")
@@ -19,18 +20,6 @@ defmodule LiveAdmin.View do
   @default_css_overrides File.read!(default_css_overrides_path)
 
   @env Mix.env()
-
-  @supported_primitive_types [
-    :string,
-    :boolean,
-    :date,
-    :integer,
-    :naive_datetime,
-    :utc_datetime,
-    :id,
-    :binary_id,
-    :float
-  ]
 
   embed_templates("components/layout/*")
 
@@ -48,20 +37,6 @@ defmodule LiveAdmin.View do
 
   def sort_param_name(field), do: :"#{field}_sort"
   def drop_param_name(field), do: :"#{field}_drop"
-
-  def field_class(type) when type in @supported_primitive_types, do: to_string(type)
-  def field_class(:map), do: "map"
-  def field_class({:array, _}), do: "array"
-  def field_class({_, {Ecto.Embedded, _}}), do: "embed"
-  def field_class({_, {Ecto.Enum, _}}), do: "enum"
-  def field_class(_), do: "other"
-
-  def supported_type?(type) when type in @supported_primitive_types, do: true
-  def supported_type?(:map), do: true
-  def supported_type?({:array, _}), do: true
-  def supported_type?({_, {Ecto.Embedded, _}}), do: true
-  def supported_type?({_, {Ecto.Enum, _}}), do: true
-  def supported_type?(_), do: false
 
   def parse_search(q) do
     parts = String.split(q, ~r{([^\s]*:)}, include_captures: true, trim: true)

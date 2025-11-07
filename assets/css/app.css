@@ -631,7 +631,7 @@ body:has(.alert-bar) .sidebar {
     overflow-y: scroll;
 }
 
-.settings-menu > a, .settings-menu > span {
+.settings-menu > * {
     display: block;
     padding: 10px 16px;
     color: var(--text-primary);
@@ -640,8 +640,14 @@ body:has(.alert-bar) .sidebar {
     transition: background 0.2s;
 }
 
-.settings-menu > a:hover, .settings-menu > span:hover {
+.settings-menu > *:hover {
     background: var(--bg-light);
+}
+
+.function-link {
+    display:inline-block;
+    width:100%;
+    height:100%;
 }
 
 .btn-icon {

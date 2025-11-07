@@ -97,7 +97,10 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   def handle_event("select", %{"key" => key}, socket) do
     socket =
       socket
-      |> assign(:selected_option, Enum.find(socket.assigns.options.result, {nil, nil}, fn {k, _} -> k == key end))
+      |> assign(
+        :selected_option,
+        Enum.find(socket.assigns.options.result, {nil, nil}, fn {k, _} -> k == key end)
+      )
       |> push_event("change", %{})
 
     {:noreply, socket}
