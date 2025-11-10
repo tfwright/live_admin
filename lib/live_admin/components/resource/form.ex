@@ -86,7 +86,12 @@ defmodule LiveAdmin.Components.Container.Form do
                 >
                   {trans("Cancel")}
                 </.link>
-                <input type="submit" class="btn btn-primary" value={trans("Save")} />
+                <input
+                  type="submit"
+                  class="btn btn-primary"
+                  value={trans("Save")}
+                  disabled={Enum.any?(@changeset.errors)}
+                />
               </div>
             </.form>
           </div>
