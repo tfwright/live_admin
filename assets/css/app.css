@@ -1291,6 +1291,11 @@ body:has(.alert-bar) .sidebar {
 
        .cell-content {
            max-width: 100%;
+           padding:2px;
+       }
+
+       .cell-content * {
+           display:inline;
        }
 
        .modal-content {
