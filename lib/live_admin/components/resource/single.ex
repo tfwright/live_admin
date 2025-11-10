@@ -174,7 +174,7 @@ defmodule LiveAdmin.Components.Container.Single do
       |> Resource.find!(resource, socket.assigns.prefix, socket.assigns.repo)
       |> Resource.delete(resource, session, socket.assigns.repo, config)
       |> case do
-        :ok ->
+        {:ok, _record} ->
           LiveAdmin.PubSub.broadcast(
             session.id,
             {:announce, %{message: trans("Record deleted"), type: :success}}
