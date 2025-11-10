@@ -1526,13 +1526,11 @@ body:has(.alert-bar) .sidebar {
 
              .search-select-container[class$='loading'] input, .search-select-container[class$='loading'] button {
                  opacity:.5;
-                 background-color: darkgray;
                  pointer-events: none;
              }
 
              input[class$='loading'] {
                  opacity:.5;
-                 background-color: darkgray;
                  pointer-events: none;
              }
 
@@ -1542,7 +1540,6 @@ body:has(.alert-bar) .sidebar {
 
              button[class$='loading'] {
                  opacity:.5;
-                 background-color: darkgray;
                  pointer-events: none;
              }
 
