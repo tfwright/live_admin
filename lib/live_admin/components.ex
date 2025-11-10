@@ -64,103 +64,124 @@ defmodule LiveAdmin.Components do
           </div>
         <% end %>
       </div>
-      <%= for {embed, {_,{Ecto.Embedded, %{cardinality: cardinality, related: schema}}}, opts} <- @fields, {_, val} = Ecto.Changeset.fetch_field(@form.source, embed) do %>
-        <div class="embed-container">
-          <div class="embed-section-wrapper">
-            <div class="embed-section-title-wrapper">
-              <h2 class="embed-section-title">{embed |> humanize() |> trans()}</h2>
-            </div>
-            <%= if val do %>
-              <.inputs_for :let={embed_form} field={@form[embed]} skip_hidden={true}>
-                <%= if sortable?(val) do %>
-                  <div class="drop-zone" data-idx={embed_form.index}>{trans("Move here")}</div>
-                <% end %>
-                <div
-                  class={"embed-section #{if assigns[:cycle], do: "odd"}"}
-                  draggable={if sortable?(val), do: "true"}
-                  data-idx={embed_form.index}
-                >
-                  <%= if sortable?(val) do %>
-                    <input
-                      type="hidden"
-                      name={@form[LiveAdmin.View.sort_param_name(embed)].name <> "[]"}
-                      value={embed_form.index}
-                    />
-                  <% end %>
-                  <button
-                    type="button"
-                    class="remove-icon"
-                    name={@form[LiveAdmin.View.drop_param_name(embed)].name <> if cardinality == :one, do: "", else: "[]"}
-                    value={if cardinality == :one, do: "", else: embed_form.index}
-                    phx-click={JS.dispatch("change")}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="15" y1="9" x2="9" y2="15"></line>
-                      <line x1="9" y1="9" x2="15" y2="15"></line>
-                    </svg>
-                  </button>
-                  <%= if sortable?(val) do %>
-                    <button type="button" class="drag-icon">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <line x1="3" y1="9" x2="21" y2="9"></line>
-                        <line x1="3" y1="15" x2="21" y2="15"></line>
-                      </svg>
-                    </button>
-                  <% end %>
-                  <.form_grid
-                    form={embed_form}
-                    resource={@resource}
-                    resources={@resources}
-                    session={@session}
-                    prefix={@prefix}
-                    repo={@repo}
-                    config={@config}
-                    fields={
-                      Enum.map(schema.__schema__(:fields), &{&1, schema.__schema__(:type, &1), []})
-                    }
-                    target={@target}
-                    cycle={!assigns[:cycle]}
-                  />
-                </div>
-                <%= if sortable?(val) && embed_form.index + 1 == length(val)  do %>
-                  <div class="drop-zone" data-idx={length(val)}>{trans("Move here")}</div>
-                <% end %>
-              </.inputs_for>
-            <% end %>
-          </div>
-        </div>
-        <%= if cardinality == :many || is_nil(Ecto.Changeset.fetch_field!(@form.source, embed)) do %>
-          <button
-            type="button"
-            class="add-section-btn"
-            name={@form[LiveAdmin.View.sort_param_name(embed)].name <> if cardinality == :one, do: "", else: "[]"}
-            value="new"
-            phx-click={JS.dispatch("change")}
-            phx-target={@target}
-          >
-            <span>+</span>
-            {embed |> humanize() |> trans()}
-          </button>
-        <% end %>
+      <%= for {field, {_,{Ecto.Embedded, embed}}, opts} <- @fields, {_, val} = Ecto.Changeset.fetch_field(@form.source, field) do %>
+        <.embed_form
+          field={field}
+          embed={embed}
+          form={@form}
+          value={val}
+          resource={@resource}
+          resources={@resources}
+          config={@config}
+          session={@session}
+          prefix={@prefix}
+          repo={@repo}
+          target={@target}
+        />
       <% end %>
     </div>
+    """
+  end
+
+  def embed_form(assigns) do
+    ~H"""
+    <div class="embed-container">
+      <div class="embed-section-wrapper">
+        <div class="embed-section-title-wrapper">
+          <h2 class="embed-section-title">{@field |> humanize() |> trans()}</h2>
+        </div>
+        <%= if @value do %>
+          <.inputs_for :let={embed_form} field={@form[@field]} skip_hidden={true}>
+            <%= if sortable?(@value) do %>
+              <div class="drop-zone" data-idx={embed_form.index}>{trans("Move here")}</div>
+            <% end %>
+            <div
+              class={"embed-section #{if assigns[:cycle], do: "odd"}"}
+              draggable={if sortable?(@value), do: "true"}
+              data-idx={embed_form.index}
+            >
+              <%= if sortable?(@value) do %>
+                <input
+                  type="hidden"
+                  name={@form[LiveAdmin.View.sort_param_name(@field)].name <> "[]"}
+                  value={embed_form.index}
+                />
+              <% end %>
+              <button
+                type="button"
+                class="remove-icon"
+                name={@form[LiveAdmin.View.drop_param_name(@field)].name <> if @embed.cardinality == :one, do: "", else: "[]"}
+                value={if @embed.cardinality == :one, do: "", else: embed_form.index}
+                phx-click={JS.dispatch("change")}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              </button>
+              <%= if sortable?(@value) do %>
+                <button type="button" class="drag-icon">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                  </svg>
+                </button>
+              <% end %>
+              <.form_grid
+                form={embed_form}
+                resource={@resource}
+                resources={@resources}
+                session={@session}
+                prefix={@prefix}
+                repo={@repo}
+                config={@config}
+                fields={
+                  Enum.map(
+                    @embed.related.__schema__(:fields),
+                    &{&1, @embed.related.__schema__(:type, &1), []}
+                  )
+                }
+                target={@target}
+                cycle={!assigns[:cycle]}
+              />
+            </div>
+            <%= if sortable?(@value) && embed_form.index + 1 == length(@value)  do %>
+              <div class="drop-zone" data-idx={length(@value)}>{trans("Move here")}</div>
+            <% end %>
+          </.inputs_for>
+        <% end %>
+      </div>
+    </div>
+    <%= if @embed.cardinality == :many || is_nil(Ecto.Changeset.fetch_field!(@form.source, @field)) do %>
+      <button
+        type="button"
+        class="add-section-btn"
+        name={@form[LiveAdmin.View.sort_param_name(@field)].name <> if @embed.cardinality == :one, do: "", else: "[]"}
+        value="new"
+        phx-click={JS.dispatch("change")}
+        phx-target={@target}
+      >
+        <span>+</span>
+        {@field |> humanize() |> trans()}
+      </button>
+    <% end %>
     """
   end
 
