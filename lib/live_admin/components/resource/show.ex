@@ -1,4 +1,4 @@
-defmodule LiveAdmin.Components.Container.Single do
+defmodule LiveAdmin.Components.Container.Show do
   use Phoenix.LiveComponent
   use PhoenixHTMLHelpers
 
@@ -19,7 +19,7 @@ defmodule LiveAdmin.Components.Container.Single do
   @impl true
   def render(assigns) do
     ~H"""
-    <div id="single-page" phx-hook="Single">
+    <div id="show-page" phx-hook="Show">
       <div class="content-header">
         <h1 class="content-title">
           {resource_title(@resource, @config)}

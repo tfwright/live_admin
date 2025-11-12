@@ -30,7 +30,7 @@ Hooks.ArrayInput = {
   }
 };
 
-Hooks.Single = {
+Hooks.Show = {
   setTab(el) {
     const urlHash = window.location.hash || '#main';
 

@@ -1,4 +1,4 @@
-defmodule LiveAdmin.Components.Container.List do
+defmodule LiveAdmin.Components.Container.Index do
   use Phoenix.LiveComponent
   use PhoenixHTMLHelpers
 
@@ -24,7 +24,7 @@ defmodule LiveAdmin.Components.Container.List do
           {records, count} =
             Resource.list(
               assigns.resource,
-              list_link_params(assigns),
+              index_link_params(assigns),
               assigns.session,
               assigns.repo,
               assigns.config
@@ -48,7 +48,7 @@ defmodule LiveAdmin.Components.Container.List do
       <div class="content-header">
         <h1 class="content-title">
           {resource_title(@resource, @config)}
-          <span>{trans("List")}</span>
+          <span>{trans("Index")}</span>
         </h1>
         <div class="contextual-actions">
           <.link
@@ -165,7 +165,7 @@ defmodule LiveAdmin.Components.Container.List do
                             route_with_params(
                               assigns,
                               params:
-                                list_link_params(assigns,
+                                index_link_params(assigns,
                                   sort_attr: field,
                                   sort_dir:
                                     if(field == @sort_attr,
@@ -223,7 +223,7 @@ defmodule LiveAdmin.Components.Container.List do
                         patch={
                           route_with_params(
                             assigns,
-                            params: list_link_params(assigns, page: @page - 1)
+                            params: index_link_params(assigns, page: @page - 1)
                           )
                         }
                         class="btn pagination-info-btn"
@@ -242,7 +242,7 @@ defmodule LiveAdmin.Components.Container.List do
                         patch={
                           route_with_params(
                             assigns,
-                            params: list_link_params(assigns, page: @page + 1)
+                            params: index_link_params(assigns, page: @page + 1)
                           )
                         }
                         class="btn pagination-info-btn"
@@ -277,7 +277,7 @@ defmodule LiveAdmin.Components.Container.List do
      push_patch(socket,
        to:
          route_with_params(socket.assigns,
-           params: list_link_params(assigns, search: query)
+           params: index_link_params(assigns, search: query)
          )
      )}
   end
@@ -422,7 +422,7 @@ defmodule LiveAdmin.Components.Container.List do
      push_patch(socket,
        to:
          route_with_params(socket.assigns,
-           params: list_link_params(assigns, page: page, per: per)
+           params: index_link_params(assigns, page: page, per: per)
          )
      )}
   end
@@ -440,7 +440,7 @@ defmodule LiveAdmin.Components.Container.List do
      push_patch(socket,
        to:
          route_with_params(socket.assigns,
-           params: list_link_params(assigns, search: new_search)
+           params: index_link_params(assigns, search: new_search)
          )
      )}
   end
@@ -458,7 +458,7 @@ defmodule LiveAdmin.Components.Container.List do
      push_patch(socket,
        to:
          route_with_params(socket.assigns,
-           params: list_link_params(assigns, search: new_search)
+           params: index_link_params(assigns, search: new_search)
          )
      )}
   end
@@ -478,12 +478,12 @@ defmodule LiveAdmin.Components.Container.List do
      push_patch(socket,
        to:
          route_with_params(socket.assigns,
-           params: list_link_params(assigns, search: new_search)
+           params: index_link_params(assigns, search: new_search)
          )
      )}
   end
 
-  defp list_link_params(assigns, overrides \\ []) do
+  defp index_link_params(assigns, overrides \\ []) do
     assigns
     |> Map.take([:search, :page, :sort_attr, :sort_dir, :prefix, :per])
     |> Enum.into([])

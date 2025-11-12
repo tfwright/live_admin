@@ -3,7 +3,7 @@ defmodule DemoWeb.UserAdmin do
       schema: Demo.Accounts.User,
       hidden_fields: [:private_data],
       immutable_fields: [:encrypted_password, :inserted_at],
-      components: [new: DemoWeb.CreateUserForm],
+      components: [create: DemoWeb.CreateUserForm],
       label_with: :name,
       actions: [:deactivate, :activate, set_password: {__MODULE__, :set_password, 3}],
       tasks: [:regenerate_passwords, {__MODULE__, :aggregate, 4}]

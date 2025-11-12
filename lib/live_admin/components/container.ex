@@ -26,7 +26,7 @@ defmodule LiveAdmin.Components.Container do
         uri,
         socket = %{assigns: %{live_action: action, loading: false}}
       )
-      when action in [:edit, :single] do
+      when action in [:edit, :show] do
     socket =
       socket
       |> assign_resource_info(uri)
@@ -48,7 +48,7 @@ defmodule LiveAdmin.Components.Container do
   end
 
   @impl true
-  def handle_params(params, uri, socket = %{assigns: %{live_action: :list, loading: false}}) do
+  def handle_params(params, uri, socket = %{assigns: %{live_action: :index, loading: false}}) do
     socket =
       socket
       |> assign(search: params["s"])
@@ -95,16 +95,16 @@ defmodule LiveAdmin.Components.Container do
     ~H"""
     <!-- Content Area -->
     <main class="content">
-      {render("#{@live_action}.html", assigns)}
+      {render(@live_action, assigns)}
     </main>
     """
   end
 
-  def render("list.html", assigns) do
+  def render(:index, assigns) do
     ~H"""
     <.live_component
       module={@mod}
-      id="list"
+      id="index"
       key={@key}
       resource={@resource}
       page={@page}
@@ -122,7 +122,7 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def render("create.html", assigns) do
+  def render(:create, assigns) do
     ~H"""
     <.live_component
       module={@mod}
@@ -140,7 +140,7 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def render("edit.html", assigns) do
+  def render(:edit, assigns) do
     ~H"""
     <.live_component
       module={@mod}
@@ -159,11 +159,11 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def render("single.html", assigns) do
+  def render(:show, assigns) do
     ~H"""
     <.live_component
       module={@mod}
-      id="single"
+      id="show"
       record={@record}
       resource={@resource}
       resources={@resources}
