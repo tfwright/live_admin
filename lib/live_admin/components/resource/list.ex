@@ -196,15 +196,15 @@ defmodule LiveAdmin.Components.Container.List do
                               <input type="hidden" name="record_id" value={record_id} />
                             </form>
                           </td>
-                          <%= for {field, type, _} <- Resource.fields(@resource, @config), {:ok, val} = Map.fetch(record, field) do %>
+                          <%= for {field, type, _} <- Resource.fields(@resource, @config) do %>
                             <td class="table-cell">
                               <span class="cell-content">
-                                {Resource.render(val, record, field, type, assigns)}
+                                {Resource.render(record, field, type, @resource, @config, @session)}
                               </span>
                               <.expand_modal
                                 id={"expand-#{record_id}-#{field}"}
                                 title={record_label(record, @resource, @config)}
-                                value={val}
+                                value={Map.fetch!(record, field)}
                                 field={field}
                               />
                             </td>

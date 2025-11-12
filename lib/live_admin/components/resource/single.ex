@@ -120,18 +120,18 @@ defmodule LiveAdmin.Components.Container.Single do
       <% end %>
       <div class="card-section">
         <div class="detail-grid">
-          <%= for {field, type, _} <- @fields, renderable?(type), {:ok, val} = Map.fetch(@record, field) do %>
+          <%= for {field, type, _} <- @fields, renderable?(type) do %>
             <div class="detail-field">
               <div class="detail-field-label">{trans(humanize(field))}</div>
               <div class="detail-field-value">
                 <span>
-                  {Resource.render(val, @record, field, type, val)}
+                  {Resource.render(@record, field, type, @resource, @config, @session)}
                 </span>
                 <.expand_modal
                   id={"#{@id}-#{field}-#{@current}-expand"}
                   title={@title}
                   field={field}
-                  value={val}
+                  value={Map.fetch!(@record, field)}
                 />
               </div>
             </div>

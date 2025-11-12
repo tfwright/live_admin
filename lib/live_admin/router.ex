@@ -104,6 +104,7 @@ defmodule LiveAdmin.Router do
         Keyword.merge(default_components, Keyword.get(opts, :components, []))
       )
       |> Keyword.put_new(:ecto_repo, Application.get_env(:live_admin, :ecto_repo))
+      |> Keyword.put_new(:render_with, Application.get_env(:live_admin, :render_with))
       |> Keyword.put_new(:delete_with, Application.get_env(:live_admin, :delete_with))
       |> Keyword.put_new(:create_with, Application.get_env(:live_admin, :create_with))
       |> Keyword.put_new(:list_with, Application.get_env(:live_admin, :list_with))

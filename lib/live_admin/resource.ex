@@ -331,61 +331,24 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def render(val, record, field, type, assigns = %{resource: resource})
-      when type in [:id, :binary_id] do
-    cond do
-      assoc_resource =
-          resource.__live_admin_config__()
-          |> Keyword.fetch!(:schema)
-          |> LiveAdmin.associated_resource(field, assigns.resources) ->
-        Tag.content_tag(
-          :a,
-          record_label(
-            Map.fetch!(
-              record,
-              resource.__live_admin_config__()
-              |> Keyword.fetch!(:schema)
-              |> get_assoc_name!(field)
-            ),
-            elem(assoc_resource, 1),
-            assigns.config
-          ),
-          href:
-            route_with_params(assigns, resource_path: elem(assoc_resource, 0), segments: [val]),
-          class: "resource-link"
-        )
-
-      record |> Ecto.primary_key() |> Keyword.keys() |> Enum.member?(field) ->
-        Tag.content_tag(:a, val,
-          href: route_with_params(assigns, segments: [record]),
-          class: "resource-link"
-        )
+  def render(record, field, type, resource, config, session) do
+    resource
+    |> LiveAdmin.fetch_config(:render_with, config)
+    |> case do
+      nil -> record |> Map.fetch!(field) |> render(type)
+      {m, f} -> apply(m, f, [record, field, session])
+      f when is_atom(f) -> apply(resource, f, [record, field, session])
     end
   end
 
-  def render(nil, _, _, _, _), do: ""
-  def render(val, _, _, {_, {Ecto.Embedded, _}}, _), do: inspect(val, pretty: true)
-  def render(val, _, _, :map, _), do: inspect(val, pretty: true)
-
-  def render(val, _, _, {_, {Ecto.Enum, _}}, _),
-    do: Tag.content_tag(:span, val, class: "btn btn-secondary")
-
-  def render(val, _, _, :date, _), do: Calendar.strftime(val, "%x")
-
-  def render(val, _, _, dt, _) when dt in [DateTime, NaiveDateTime],
-    do: Calendar.strftime(val, "%c")
-
-  def render(val, _, _, :string, _), do: val
-
-  def render(val, _, _, {:array, {_, {Ecto.Enum, _}}}, _),
-    do: Enum.map(val, &Tag.content_tag(:span, &1, class: "btn btn-secondary"))
-
-  def render(val, _, _, {:array, {_, {Ecto.Embedded, _}}}, _), do: inspect(val, pretty: true)
-
-  def render(val, record, _, {:array, inner_type}, _),
-    do: Enum.map_join(val, ", ", &render(&1, record, nil, inner_type, nil))
-
-  def render(val, _, _, _, _), do: safe_render(val)
+  def render(nil, _), do: ""
+  def render(val, {_, {Ecto.Embedded, _}}), do: inspect(val, pretty: true)
+  def render(val, :map), do: inspect(val, pretty: true)
+  def render(val, :date), do: Calendar.strftime(val, "%x")
+  def render(val, dt) when dt in [DateTime, NaiveDateTime], do: Calendar.strftime(val, "%c")
+  def render(val, :string), do: val
+  def render(val, {:array, inner_type}), do: Enum.map_join(val, ", ", &render(&1, inner_type))
+  def render(val, _), do: safe_render(val)
 
   defp get_assoc_name!(schema, fk) do
     Enum.find(schema.__schema__(:associations), fn assoc_name ->
