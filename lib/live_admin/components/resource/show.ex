@@ -76,6 +76,9 @@ defmodule LiveAdmin.Components.Container.Show do
           fields={Resource.fields(@resource, @config)}
           record={@record}
           title={record_label(@record, @resource, @config)}
+          resource={@resource}
+          config={@config}
+          session={@session}
         />
       </div>
     </div>
@@ -147,6 +150,9 @@ defmodule LiveAdmin.Components.Container.Show do
             title={trans(humanize(field))}
             current={index}
             last={Enum.count(list) - 1}
+            resource={@resource}
+            config={@config}
+            session={@session}
           />
         <% end %>
       <% end %>
