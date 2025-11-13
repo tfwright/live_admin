@@ -196,9 +196,18 @@ defmodule LiveAdmin.Components.Container.Index do
                               <input type="hidden" name="record_id" value={record_id} />
                             </form>
                           </td>
-                          <%= for {field, type, _} <- Resource.fields(@resource, @config) do %>
+                          <td class="table-cell">
+                            <span pclass="cell-content">
+                              <.link class="resource-link" navigate={
+                                LiveAdmin.route_with_params(assigns, segments: [record])
+                              }>
+                                {record_id}
+                              </.link>
+                            </span>
+                          </td>
+                          <%= for {field, type, _} <- Resource.fields(@resource, @config), field != LiveAdmin.primary_key!(@resource) do %>
                             <td class="table-cell">
-                              <span class="cell-content">
+                              <span pclass="cell-content">
                                 {Resource.render(record, field, type, @resource, @config, @session)}
                               </span>
                               <.expand_modal
