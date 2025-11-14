@@ -191,16 +191,17 @@ defmodule LiveAdmin.Components.Container.Index do
                                 type="checkbox"
                                 class="row-checkbox"
                                 name="selected"
-                                checked={Enum.member?(@selected, record_id)}
+                                checked={Enum.member?(@selected, to_string(record_id))}
                               />
                               <input type="hidden" name="record_id" value={record_id} />
                             </form>
                           </td>
                           <td class="table-cell">
                             <span pclass="cell-content">
-                              <.link class="resource-link" navigate={
-                                LiveAdmin.route_with_params(assigns, segments: [record])
-                              }>
+                              <.link
+                                class="resource-link"
+                                navigate={LiveAdmin.route_with_params(assigns, segments: [record])}
+                              >
                                 {record_id}
                               </.link>
                             </span>
@@ -419,7 +420,7 @@ defmodule LiveAdmin.Components.Container.Index do
   def handle_event("toggle_select", params, socket) do
     records =
       case params["all"] do
-        "on" -> socket.assigns.records.result |> elem(0) |> Enum.map(& &1.id)
+        "on" -> socket.assigns.records.result |> elem(0) |> Enum.map(&to_string(&1.id))
         _ -> []
       end
 
