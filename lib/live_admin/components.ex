@@ -169,7 +169,7 @@ defmodule LiveAdmin.Components do
         <% end %>
       </div>
     </div>
-    <%= if @embed.cardinality == :many || is_nil(Ecto.Changeset.fetch_field!(@form.source, @field)) do %>
+    <%= if @embed.cardinality == :many || (@form[@field].value in ["", nil]) do %>
       <button
         type="button"
         class="add-section-btn"
