@@ -514,9 +514,9 @@ defmodule LiveAdmin.Components do
     """
   end
 
-  def search_select_options(_q, resource, prefix, session, repo, config) do
+  def search_select_options(q, resource, prefix, session, repo, config) do
     resource
-    |> LiveAdmin.Resource.list([prefix: prefix], session, repo, config)
+    |> LiveAdmin.Resource.list([prefix: prefix, search: q], session, repo, config)
     |> elem(0)
     |> Enum.map(
       &{Map.fetch!(&1, LiveAdmin.primary_key!(resource)), record_label(&1, resource, config)}

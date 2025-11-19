@@ -10,6 +10,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     socket =
       socket
       |> assign(Map.delete(assigns, :options))
+      |> assign(:initial_options, options)
       |> assign_async([:options], fn -> {:ok, %{options: load_options(options)}} end, reset: true)
 
     {:ok, socket}
@@ -82,7 +83,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   end
 
   @impl true
-  def handle_event("load_options", %{"value" => q}, socket = %{assigns: %{options: options}}) do
+  def handle_event("load_options", %{"value" => q}, socket = %{assigns: %{initial_options: options}}) do
     socket =
       assign_async(
         socket,
