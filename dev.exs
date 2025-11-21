@@ -204,11 +204,11 @@ defmodule DemoWeb.PostsAdmin.Home do
   @impl true
   def render(assigns) do
     ~H"""
-    <main class="content">
+    <div>
       <div class="content-header">
         Posts demo
       </div>
-    </main>
+    </div>
     """
   end
 end
@@ -219,11 +219,11 @@ defmodule DemoWeb.Extra do
   @impl true
   def render(assigns) do
     ~H"""
-    <main class="content">
+    <div>
       <div class="content-header">
       Extra page
       </div>
-    </main>
+    </div>
     """
   end
 end

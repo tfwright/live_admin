@@ -268,7 +268,7 @@ defmodule LiveAdmin.Components.ContainerTest do
       {:ok, view, _} = live(conn, "/user/#{user.id}")
 
       view
-      |> element("#view-page")
+      |> element("#show-page")
       |> render_hook("action", %{name: "failing_action"})
 
       %{view: view}

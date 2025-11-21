@@ -83,7 +83,11 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   end
 
   @impl true
-  def handle_event("load_options", %{"value" => q}, socket = %{assigns: %{initial_options: options}}) do
+  def handle_event(
+        "load_options",
+        %{"value" => q},
+        socket = %{assigns: %{initial_options: options}}
+      ) do
     socket =
       assign_async(
         socket,

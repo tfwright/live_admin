@@ -93,10 +93,7 @@ defmodule LiveAdmin.Components.Container do
 
   def render(assigns) do
     ~H"""
-    <!-- Content Area -->
-    <main class="content">
-      {render(@live_action, assigns)}
-    </main>
+    {render(@live_action, assigns)}
     """
   end
 

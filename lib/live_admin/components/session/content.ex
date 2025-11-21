@@ -9,7 +9,7 @@ defmodule LiveAdmin.Components.Session.Content do
   @impl true
   def render(assigns) do
     ~H"""
-    <main class="content">
+    <div>
       <div class="content-header">
         <h1 class="content-title">
           {trans("Session")}
@@ -55,7 +55,7 @@ defmodule LiveAdmin.Components.Session.Content do
           </div>
         </div>
       </div>
-    </main>
+    </div>
     """
   end
 
