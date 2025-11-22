@@ -73,43 +73,47 @@ defmodule LiveAdmin.Components.Container.Index do
                 {trans("Delete")}
               </button>
             <% end %>
-            <.drop_down
-              :let={action}
-              id="action-select"
-              items={
-                @resource
-                |> get_function_keys(@config, :actions)
-                |> Enum.map(&LiveAdmin.fetch_function(@resource, @session, :actions, &1))
-              }
-              label={trans("Run action")}
-            >
-              <.function_control
-                name={elem(action, 0)}
-                type="action"
-                extra_arg_count={elem(action, 3) - 2}
-                docs={elem(action, 4)}
-                target={@myself}
-              />
-            </.drop_down>
+            <%= if Enum.any?(LiveAdmin.fetch_config(@resource, :actions, @config)) do %>
+              <.drop_down
+                :let={action}
+                id="action-select"
+                items={
+                  @resource
+                  |> get_function_keys(@config, :actions)
+                  |> Enum.map(&LiveAdmin.fetch_function(@resource, @session, :actions, &1))
+                }
+                label={trans("Run action")}
+              >
+                <.function_control
+                  name={elem(action, 0)}
+                  type="action"
+                  extra_arg_count={elem(action, 3) - 2}
+                  docs={elem(action, 4)}
+                  target={@myself}
+                />
+              </.drop_down>
+            <% end %>
           <% else %>
-            <.drop_down
-              :let={task}
-              id="task-select"
-              items={
-                @resource
-                |> get_function_keys(@config, :tasks)
-                |> Enum.map(&LiveAdmin.fetch_function(@resource, @session, :tasks, &1))
-              }
-              label={trans("Run task")}
-            >
-              <.function_control
-                name={elem(task, 0)}
-                type="task"
-                extra_arg_count={elem(task, 3) - 2}
-                docs={elem(task, 4)}
-                target={@myself}
-              />
-            </.drop_down>
+            <%= if Enum.any?(LiveAdmin.fetch_config(@resource, :tasks, @config)) do %>
+              <.drop_down
+                :let={task}
+                id="task-select"
+                items={
+                  @resource
+                  |> get_function_keys(@config, :tasks)
+                  |> Enum.map(&LiveAdmin.fetch_function(@resource, @session, :tasks, &1))
+                }
+                label={trans("Run task")}
+              >
+                <.function_control
+                  name={elem(task, 0)}
+                  type="task"
+                  extra_arg_count={elem(task, 3) - 2}
+                  docs={elem(task, 4)}
+                  target={@myself}
+                />
+              </.drop_down>
+            <% end %>
           <% end %>
         </div>
       </div>
