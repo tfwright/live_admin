@@ -108,7 +108,7 @@ defmodule LiveAdmin.Components.Container.Show do
 
     ~H"""
     <div class="detail-view" id={if @id != "main", do: "#{@id}_#{@current}", else: "main"}>
-      <%= if @id == "main" || Enum.any?(@embeds) || @last > 0 do %>
+      <%= if Enum.any?(@embeds) || @last > 0 do %>
         <div class="tabs">
           <%= if @id == "main" do %>
             <a href="#main" id="main-link"></a>
