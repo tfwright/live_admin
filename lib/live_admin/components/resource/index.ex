@@ -586,49 +586,50 @@ defmodule LiveAdmin.Components.Container.Index do
       fn ->
         pid = self()
 
-        LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: pid, progress: 0, label: label}})
+        LiveAdmin.PubSub.update_job(session.id, pid, progress: 0, label: label)
 
         records = Resource.all(ids, resource, prefix, repo)
 
-        {type, message} =
-          records
-          |> Enum.with_index()
-          |> Enum.reduce(0, fn {record, i}, failed_count ->
-            try do
-              case apply(mod, func, [record | args]) do
-                {:ok, _} -> failed_count
-                {:error, _} -> failed_count + 1
-              end
-            rescue
-              _ -> failed_count + 1
-            after
-              LiveAdmin.PubSub.broadcast(
-                session.id,
-                {:job, %{pid: pid, progress: (i + 1) / length(records)}}
-              )
+        records
+        |> Enum.with_index()
+        |> Enum.reduce(0, fn {record, i}, failed_count ->
+          try do
+            case apply(mod, func, [record | args]) do
+              {:ok, _} -> failed_count
+              {:error, _} -> failed_count + 1
             end
-          end)
-          |> case do
-            0 ->
-              {:success,
-               trans("%{name} action run successfully on %{count} records",
-                 inter: [name: name, count: length(records)]
-               )}
-
-            error_count ->
-              {:error,
-               trans(
-                 "%{name} action failed on %{error_count} records (%{success_count} succeeeded)",
-                 inter: [
-                   name: name,
-                   error_count: error_count,
-                   success_count: length(records) - error_count
-                 ]
-               )}
+          rescue
+            _ -> failed_count + 1
+          after
+            LiveAdmin.PubSub.update_job(session.id, pid, progress: (i + 1) / length(records))
           end
+        end)
+        |> case do
+          0 ->
+            LiveAdmin.PubSub.announce(
+              session.id,
+              :success,
+              trans("%{name} action run successfully on %{count} records",
+                inter: [name: name, count: length(records)]
+              )
+            )
 
-        LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: pid, progress: 1}})
-        LiveAdmin.PubSub.broadcast(session.id, {:announce, %{message: message, type: type}})
+          error_count ->
+            LiveAdmin.PubSub.announce(
+              session.id,
+              :error,
+              trans(
+                "%{name} action failed on %{error_count} records (%{success_count} succeeeded)",
+                inter: [
+                  name: name,
+                  error_count: error_count,
+                  success_count: length(records) - error_count
+                ]
+              )
+            )
+        end
+
+        LiveAdmin.PubSub.update_job(session.id, pid, progress: 1)
       end,
       timeout: :infinity
     )

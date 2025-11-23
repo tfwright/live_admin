@@ -78,7 +78,11 @@ defmodule LiveAdmin.Components.Nav.Jobs do
   end
 
   @impl true
-  def handle_info(_, socket), do: {:noreply, socket}
+  def handle_info(data, socket) do
+    Logger.warning("Unhandled broadcast: #{inspect(data)}")
+
+    {:noreply, socket}
+  end
 
   @impl true
   def render(assigns) do

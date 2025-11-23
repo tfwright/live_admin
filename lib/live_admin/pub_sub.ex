@@ -10,6 +10,9 @@ defmodule LiveAdmin.PubSub do
   """
 
   @type session_id :: String.t()
+  @type status :: :error | :success | :info
+  @type message :: String.t()
+  @type data :: Keyword.t()
 
   @spec broadcast(session_id, {atom(), map()}) :: :ok
   @spec broadcast({atom(), map()}) :: :ok
@@ -22,8 +25,24 @@ defmodule LiveAdmin.PubSub do
       if(session_id, do: "session:#{session_id}", else: "all"),
       event
     )
+  end
 
-    :ok
+  @spec announce(session_id, status, message) :: :ok
+  @spec announce(status, message) :: :ok
+  @doc """
+    Add a message with status to alerts
+  """
+  def announce(session_id \\ nil, status, message) do
+    broadcast(session_id, {:announce, %{message: message, type: status}})
+  end
+
+  @spec update_job(session_id, pid, data) :: :ok
+  @spec update_job(pid, data) :: :ok
+  @doc """
+    Update job progress
+  """
+  def update_job(session_id \\ nil, pid, data) do
+    broadcast(session_id, {:job, Enum.into(data, %{pid: pid})})
   end
 
   @spec subscribe(session_id) :: :ok

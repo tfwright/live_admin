@@ -114,45 +114,38 @@ defmodule LiveAdmin.Components.Container do
         try do
           case apply(m, f, [Resource.query(resource, search, config) | args]) do
             {:ok, message} ->
-              LiveAdmin.PubSub.broadcast(
+              LiveAdmin.PubSub.announce(
                 session.id,
-                {:announce,
-                 %{
-                   message:
-                     trans("Task %{name} succeeded: '%{message}'",
-                       inter: [name: name, message: message]
-                     )
-                 }, type: :success}
+                :success,
+                trans("Task %{name} succeeded: '%{message}'",
+                  inter: [name: name, message: message]
+                )
               )
 
             {:error, message} ->
-              LiveAdmin.PubSub.broadcast(
+              LiveAdmin.PubSub.announce(
                 session.id,
-                {:announce,
-                 %{
-                   message:
-                     trans("Task %{name} failed: '%{message}'",
-                       inter: [name: name, message: message]
-                     ),
-                   type: :error
-                 }}
+                :error,
+                trans("Task %{name} failed: '%{message}'",
+                  inter: [name: name, message: message]
+                )
               )
           end
         rescue
           error ->
             Logger.error(inspect(error))
 
-            LiveAdmin.PubSub.broadcast(
+            LiveAdmin.PubSub.announce(
               session.id,
-              {:announce,
-               %{message: trans("Task %{name} failed", inter: [name: name]), type: :error}}
+              :error,
+              trans("Task %{name} failed", inter: [name: name])
             )
         after
-          LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: self(), progress: 1}})
+          LiveAdmin.PubSub.update_job(session.id, self(), progress: 1)
         end
       end)
 
-    LiveAdmin.PubSub.broadcast(session.id, {:job, %{pid: task.pid, progress: 0, label: name}})
+    LiveAdmin.PubSub.update_job(session.id, task.pid, progress: 0, label: name)
 
     {:noreply, push_navigate(socket, to: route_with_params(socket.assigns))}
   end
