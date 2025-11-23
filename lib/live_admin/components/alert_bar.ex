@@ -20,20 +20,30 @@ defmodule LiveAdmin.Components.AlertBar do
     ~H"""
     <div id="alert-bar">
       <%= for {{alert, type}, index} <- Enum.with_index(@alerts) do %>
-        <div class={"alert-bar #{type}"} style={"z-index:-#{index}"}>
+        <div class={"alert-bar #{type}"}>
           <div class="alert-content">
-            <svg
-              class="alert-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              phx-click={JS.push("dismiss", loading: "#alert-bar")}
-              title="Close alert"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
+            <%= if index == 0 && Enum.count(@alerts) > 1 do %>
+              <div
+                class="alert-count"
+                phx-click={JS.push("dismiss", loading: "#alert-bar", value: %{index: index})}
+              >
+                {Enum.count(@alerts)}
+              </div>
+            <% else %>
+              <svg
+                class="alert-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                phx-click={JS.push("dismiss", loading: "#alert-bar", value: %{index: index})}
+                title="Close alert"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            <% end %>
+
             <span class="alert-message">{alert}</span>
           </div>
         </div>
@@ -43,9 +53,11 @@ defmodule LiveAdmin.Components.AlertBar do
   end
 
   @impl true
-  def handle_event("dismiss", _, socket) do
-    {:noreply, update(socket, :alerts, &Enum.drop(&1, 1))}
-  end
+  def handle_event("dismiss", %{"index" => 0}, socket),
+    do: {:noreply, assign(socket, :alerts, [])}
+
+  def handle_event("dismiss", %{"index" => index}, socket),
+    do: {:noreply, update(socket, :alerts, &List.delete_at(&1, index))}
 
   @impl true
   def handle_info(info = {:announce, %{message: message, type: type}}, socket) do

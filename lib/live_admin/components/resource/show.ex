@@ -183,17 +183,19 @@ defmodule LiveAdmin.Components.Container.Show do
       |> Resource.delete(resource, session, socket.assigns.repo, config)
       |> case do
         {:ok, _record} ->
-          LiveAdmin.PubSub.broadcast(
+          LiveAdmin.PubSub.announce(
             session.id,
-            {:announce, %{message: trans("Record deleted"), type: :success}}
+            :success,
+            trans("Record deleted")
           )
 
           push_navigate(socket, to: route_with_params(socket.assigns))
 
         {:error, message} ->
-          LiveAdmin.PubSub.broadcast(
+          LiveAdmin.PubSub.announce(
             session.id,
-            {:announce, %{message: message, type: :error}}
+            :error,
+            message
           )
 
           socket
@@ -217,21 +219,19 @@ defmodule LiveAdmin.Components.Container.Show do
     socket =
       case apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", [])) do
         {:ok, record} ->
-          LiveAdmin.PubSub.broadcast(
+          LiveAdmin.PubSub.announce(
             session.id,
-            {:announce,
-             %{
-               message: trans("%{name} succeeded", inter: [name: name]),
-               type: :success
-             }}
+            :success,
+            trans("%{name} succeeded", inter: [name: name])
           )
 
           assign(socket, :record, record)
 
         {:error, message} ->
-          LiveAdmin.PubSub.broadcast(
+          LiveAdmin.PubSub.announce(
             session.id,
-            {:announce, %{message: message, type: :error}}
+            :error,
+            message
           )
       end
 

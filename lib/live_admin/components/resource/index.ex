@@ -385,23 +385,20 @@ defmodule LiveAdmin.Components.Container.Index do
             error ->
               Logger.error(inspect(error))
 
-              LiveAdmin.PubSub.broadcast(
+              LiveAdmin.PubSub.announce(
                 session.id,
-                {:announce,
-                 %{
-                   message:
-                     trans("%{name} encountered an error and stopped", inter: [name: name]),
-                   type: :error
-                 }}
+                :error,
+                trans("%{name} encountered an error and stopped", inter: [name: name])
               )
           after
             LiveAdmin.PubSub.update_job(session.id, self(), progress: 1)
           end
         end)
 
-        LiveAdmin.PubSub.broadcast(
+        LiveAdmin.PubSub.announce(
           session.id,
-          {:announce, %{message: trans("%{name} complete", inter: [name: name]), type: :info}}
+          :info,
+          trans("%{name} complete", inter: [name: name])
         )
       end)
 

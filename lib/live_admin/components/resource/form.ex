@@ -123,9 +123,10 @@ defmodule LiveAdmin.Components.Container.Form do
     socket =
       case Resource.create(resource, params, session, repo, config) do
         {:ok, _} ->
-          LiveAdmin.PubSub.broadcast(
+          LiveAdmin.PubSub.announce(
             session.id,
-            {:announce, %{message: trans("Record added"), type: :success}}
+            :success,
+            trans("Record added")
           )
 
           push_navigate(socket,
@@ -152,7 +153,8 @@ defmodule LiveAdmin.Components.Container.Form do
         {:ok, _} ->
           LiveAdmin.PubSub.broadcast(
             session.id,
-            {:announce, %{message: trans("Changes saved"), type: :success}}
+            :success,
+            trans("Changes saved")
           )
 
           push_navigate(socket, to: route_with_params(socket.assigns, segments: [record]))
