@@ -17,12 +17,10 @@ defmodule LiveAdmin.Components.AlertBar do
 
   @impl true
   def render(assigns) do
-    assigns = assign(assigns, :current_alert, List.last(assigns.alerts))
-
     ~H"""
     <div id="alert-bar">
-      <%= if @current_alert do %>
-        <div class={"alert-bar #{elem(@current_alert, 1)}"}>
+      <%= for {{alert, type}, index} <- Enum.with_index(@alerts) do %>
+        <div class={"alert-bar #{type}"} style={"z-index:-#{index}"}>
           <div class="alert-content">
             <svg
               class="alert-icon"
@@ -36,7 +34,7 @@ defmodule LiveAdmin.Components.AlertBar do
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
-            <span class="alert-message">{elem(@current_alert, 0)}</span>
+            <span class="alert-message">{alert}</span>
           </div>
         </div>
       <% end %>
