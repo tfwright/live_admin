@@ -789,7 +789,7 @@ body:has(.alert-bar) .sidebar {
     color: var(--text-secondary);
     position: relative;
     max-width: 250px;
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 .data-table td:first-child {
