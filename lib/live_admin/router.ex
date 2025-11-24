@@ -55,18 +55,18 @@ defmodule LiveAdmin.Router do
     quote bind_quoted: [path: path, resource_mod: resource_mod] do
       full_path = Path.join(@base_path, path)
 
-      live(path, LiveAdmin.Components.Container, :list,
-        as: :"list_#{full_path}",
+      live(path, LiveAdmin.Components.Container, :index,
+        as: :"index_#{full_path}",
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
 
-      live("#{path}/new", LiveAdmin.Components.Container, :new,
-        as: :"new_#{full_path}",
+      live("#{path}/new", LiveAdmin.Components.Container, :create,
+        as: :"create_#{full_path}",
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
 
-      live("#{path}/:record_id", LiveAdmin.Components.Container, :view,
-        as: :"view_#{full_path}",
+      live("#{path}/:record_id", LiveAdmin.Components.Container, :show,
+        as: :"show_#{full_path}",
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
 
@@ -88,10 +88,10 @@ defmodule LiveAdmin.Router do
           nav: LiveAdmin.Components.Nav,
           home: LiveAdmin.Components.Home.Content,
           session: LiveAdmin.Components.Session.Content,
-          new: LiveAdmin.Components.Container.Form,
+          create: LiveAdmin.Components.Container.Form,
           edit: LiveAdmin.Components.Container.Form,
-          list: LiveAdmin.Components.Container.Index,
-          view: LiveAdmin.Components.Container.View
+          index: LiveAdmin.Components.Container.Index,
+          show: LiveAdmin.Components.Container.Show
         ],
         Application.get_env(:live_admin, :components, [])
       )

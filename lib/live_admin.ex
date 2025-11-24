@@ -14,10 +14,10 @@ defmodule LiveAdmin do
         nav: [type: :atom],
         home: [type: :atom],
         session: [type: :atom],
-        new: [type: :atom],
+        create: [type: :atom],
         edit: [type: :atom],
-        list: [type: :atom],
-        view: [type: :atom]
+        index: [type: :atom],
+        show: [type: :atom]
       ]
     ],
     ecto_repo: [
@@ -27,12 +27,11 @@ defmodule LiveAdmin do
     list_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
       type_doc:
-        "`t:func_ref/0` returning `{records, count}` used to fetch records in LiveAdmin :list component"
+        "`t:func_ref/0` returning `{records, count}` used to fetch records in Index component"
     ],
     render_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      type_doc:
-        "`t:func_ref/0` used to convert field values to string in LiveAdmin :list component"
+      type_doc: "`t:func_ref/0` used to convert field values to strings when rendering"
     ],
     delete_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
@@ -130,6 +129,9 @@ defmodule LiveAdmin do
 
     key
   end
+
+  def announce(message, type, session),
+    do: LiveAdmin.PubSub.broadcast(session.id, {:announce, %{message: message, type: type}})
 
   def route_with_params(assigns, parts \\ []) do
     resource_path = parts[:resource_path] || assigns.key
@@ -281,5 +283,13 @@ defmodule LiveAdmin do
     else
       {:error, _} -> %{}
     end
+  end
+
+  def safe_render(val) when is_list(val), do: inspect(val, pretty: true)
+
+  def safe_render(val) do
+    to_string(val)
+  rescue
+    _ -> inspect(val, pretty: true)
   end
 end

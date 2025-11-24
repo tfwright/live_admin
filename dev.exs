@@ -17,22 +17,20 @@ Application.put_env(:live_admin, DemoWeb.Endpoint,
   check_origin: false,
   watchers: [
     npm: ["run", "watch", cd: "assets"],
-    npx: [
-      "tailwindcss",
-      "--input=css/app.css",
-      "--output=../dist/css/app.css",
-      "--postcss",
-      "--watch",
-      cd: "assets"
-    ],
-    npx: [
-      "tailwindcss",
-      "--input=css/default_overrides.css",
-      "--output=../dist/css/default_overrides.css",
-      "--postcss",
-      "--watch",
-      cd: "assets"
-    ]
+      npx: [
+        "postcss",
+        "css/app.css",
+        "--output=../dist/css/app.css",
+        "--watch",
+        cd: "assets"
+      ],
+      npx: [
+        "postcss",
+        "css/default_overrides.css",
+        "--output=../dist/css/default_overrides.css",
+        "--watch",
+        cd: "assets"
+      ]
   ],
   live_reload: [
     patterns: [
@@ -206,9 +204,9 @@ defmodule DemoWeb.PostsAdmin.Home do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex h-full items-center justify-center">
-      <div class="w-1/2">
-        This is only for managing posts
+    <div>
+      <div class="content-header">
+        Posts demo
       </div>
     </div>
     """
@@ -221,9 +219,9 @@ defmodule DemoWeb.Extra do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex h-full items-center justify-center">
-      <div class="w-1/2">
-        This is an extra page
+    <div>
+      <div class="content-header">
+      Extra page
       </div>
     </div>
     """

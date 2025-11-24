@@ -10,7 +10,7 @@ defmodule LiveAdmin.Resource do
   """
 
   import Ecto.Query
-  import LiveAdmin, only: [record_label: 3, parent_associations: 1]
+  import LiveAdmin
 
   alias Ecto.Changeset
   alias PhoenixHTMLHelpers.Tag
@@ -35,36 +35,6 @@ defmodule LiveAdmin.Resource do
       @__live_admin_config__ opts
 
       def __live_admin_config__, do: @__live_admin_config__
-    end
-  end
-
-  def render(record, field, resource, assoc_resource, session, config) do
-    resource
-    |> LiveAdmin.fetch_config(:render_with, config)
-    |> case do
-      nil ->
-        if assoc_resource do
-          record_label(
-            Map.fetch!(
-              record,
-              resource.__live_admin_config__()
-              |> Keyword.fetch!(:schema)
-              |> get_assoc_name!(field)
-            ),
-            elem(assoc_resource, 1),
-            config
-          )
-        else
-          record
-          |> Map.fetch!(field)
-          |> render_field()
-        end
-
-      {m, f} ->
-        apply(m, f, [record, field, session])
-
-      f when is_atom(f) ->
-        apply(resource, f, [record, field, session])
     end
   end
 
@@ -299,18 +269,25 @@ defmodule LiveAdmin.Resource do
     |> Enum.reduce(Changeset.cast(record, params, []), fn
       {field_name, {_, {Ecto.Embedded, %{cardinality: :many}}}, _}, changeset ->
         Changeset.cast_embed(changeset, field_name,
-          with: fn embed, params -> build_changeset(embed, :embed, params, config) end,
+          with: fn embed, params ->
+            build_changeset(embed, :embed, params |> IO.inspect(label: "embed params"), config)
+          end,
           sort_param: LiveAdmin.View.sort_param_name(field_name),
           drop_param: LiveAdmin.View.drop_param_name(field_name)
         )
 
       {field_name, {_, {Ecto.Embedded, %{cardinality: :one}}}, _}, changeset ->
-        if Map.get(params, to_string(field_name)) == "" do
-          Changeset.put_change(changeset, field_name, nil)
-        else
-          Changeset.cast_embed(changeset, field_name,
-            with: fn embed, params -> build_changeset(embed, :embed, params, config) end
-          )
+        cond do
+          Map.get(params, field_name |> LiveAdmin.View.drop_param_name() |> to_string()) ->
+            Changeset.put_change(changeset, field_name, nil)
+
+          Map.get(params, field_name |> LiveAdmin.View.sort_param_name() |> to_string()) ->
+            Changeset.put_change(changeset, field_name, %{})
+
+          true ->
+            Changeset.cast_embed(changeset, field_name,
+              with: fn embed, params -> build_changeset(embed, :embed, params, config) end
+            )
         end
 
       {field_name, type, opts}, changeset ->
@@ -354,17 +331,28 @@ defmodule LiveAdmin.Resource do
     end
   end
 
+  def render(record, field, type, resource, config, session) do
+    resource
+    |> LiveAdmin.fetch_config(:render_with, config)
+    |> case do
+      nil -> record |> Map.fetch!(field) |> render(type)
+      {m, f} -> apply(m, f, [record, field, session])
+      f when is_atom(f) -> apply(resource, f, [record, field, session])
+    end
+  end
+
+  def render(nil, _), do: ""
+  def render(val, {_, {Ecto.Embedded, _}}), do: inspect(val, pretty: true)
+  def render(val, :map), do: inspect(val, pretty: true)
+  def render(val, :date), do: Calendar.strftime(val, "%x")
+  def render(val, dt) when dt in [DateTime, NaiveDateTime], do: Calendar.strftime(val, "%c")
+  def render(val, :string), do: val
+  def render(val, {:array, inner_type}), do: Enum.map_join(val, ", ", &render(&1, inner_type))
+  def render(val, _), do: safe_render(val)
+
   defp get_assoc_name!(schema, fk) do
     Enum.find(schema.__schema__(:associations), fn assoc_name ->
       fk == schema.__schema__(:association, assoc_name).owner_key
     end)
   end
-
-  defp render_field(val = %{}), do: Tag.content_tag(:pre, inspect(val, pretty: true))
-
-  defp render_field(val) when is_list(val),
-    do: Enum.map(val, &Tag.content_tag(:pre, inspect(&1, pretty: true)))
-
-  defp render_field(val) when is_binary(val), do: val
-  defp render_field(val), do: inspect(val)
 end
