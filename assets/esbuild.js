@@ -17,6 +17,9 @@ let opts = {
   logLevel: 'info',
   target: 'es2016',
   outdir: '../dist/js',
+  define: {
+     'process.env.LATENCY_SIM': process.env.LATENCY_SIM || 0,
+   },
 }
 if (mode === 'watch') {
   opts = {
