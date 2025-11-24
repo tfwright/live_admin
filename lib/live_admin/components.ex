@@ -494,7 +494,6 @@ defmodule LiveAdmin.Components do
             <% end %>
             <div class="button-group">
               <button type="submit" class="btn btn-primary">{trans("Submit")}</button>
-              <button type="button" class="btn btn-danger">{trans("Cancel")}</button>
             </div>
           </.form>
         </.modal>
