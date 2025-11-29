@@ -268,7 +268,7 @@ defmodule LiveAdmin.Components.Container.Index do
                 </div>
               <% end %>
             <% else %>
-              <%= if elem(@records.result, 1) == 0 do %>
+              <%= if @records.ok? && elem(@records.result, 1) == 0 do %>
                 <.error title="No results" , details="Check search value and selected prefix" />
               <% else %>
                 <.error
