@@ -20,7 +20,7 @@ defmodule LiveAdmin.Components do
       phx-click-away={Phoenix.LiveView.JS.remove_attribute("open", to: "##{@id}")}
     >
       <summary>{@label}</summary>
-      <div class="settings-menu">
+      <div class="drop-menu">
         <%= for item <- @items do %>
           {render_slot(@inner_block, item)}
         <% end %>
@@ -499,7 +499,7 @@ defmodule LiveAdmin.Components do
         </.modal>
       <% end %>
       <span
-        class="function-link"
+        class="drop-link"
         phx-click={
           if @modalize,
             do: JS.show(to: "##{@type}-#{@name}-modal", display: "flex"),

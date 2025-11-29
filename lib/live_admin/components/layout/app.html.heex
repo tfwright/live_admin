@@ -9,7 +9,10 @@
           items={Map.get(assigns, :prefix_options, [])}
           label={if @session.prefix, do: "prefix: #{@session.prefix}", else: "No prefix selected"}
         >
-          <.link navigate={LiveAdmin.route_with_params(assigns, params: [prefix: prefix])}>
+          <.link
+            navigate={LiveAdmin.route_with_params(assigns, params: [prefix: prefix])}
+            class="drop-link"
+          >
             {prefix}
           </.link>
         </.drop_down>
@@ -22,12 +25,15 @@
           items={LiveAdmin.gettext_backend().locales()}
           label={if @session.locale, do: "locale: #{@session.locale}", else: "No locale selected"}
         >
-          <a phx-click={
-            Phoenix.LiveView.JS.push("set_locale",
-              value: %{locale: locale},
-              page_loading: true
-            )
-          }>
+          <a
+            phx-click={
+              Phoenix.LiveView.JS.push("set_locale",
+                value: %{locale: locale},
+                page_loading: true
+              )
+            }
+            class="drop-link"
+          >
             {locale}
           </a>
         </.drop_down>
