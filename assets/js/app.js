@@ -211,7 +211,7 @@ liveSocket.connect();
 
 if (ENV == "dev") {
   liveSocket.enableDebug();
-  liveSocket.enableLatencySim(200 + Math.floor(Math.random() * 1500));
+  liveSocket.enableLatencySim(process.env.LATENCY_SIM);
 }
 
 window.liveSocket = liveSocket;
