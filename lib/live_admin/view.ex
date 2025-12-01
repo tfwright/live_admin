@@ -16,12 +16,15 @@ defmodule LiveAdmin.View do
   @external_resource default_css_overrides_path
 
   @app_js File.read!(js_path)
+
   @app_css File.read!(css_path)
   @default_css_overrides File.read!(default_css_overrides_path)
 
   @env Mix.env()
 
   embed_templates("components/layout/*")
+
+  def __mix_recompile__?, do: Path.join(__DIR__, "../../dist/js/app.js") |> File.read!() != @app_js
 
   def render("layout.html", assigns), do: layout(assigns)
 

@@ -20,7 +20,7 @@ defmodule LiveAdmin.Components.AlertBar do
     ~H"""
     <div id="alert-bar">
       <%= for {{alert, type}, index} <- Enum.with_index(@alerts) do %>
-        <div class={"alert-bar #{type}"}>
+        <div class={"alert-bar #{type}"} id={"alert-#{index}"} phx-hook=".AlertItem" data-index={index} data-type={type}>
           <div class="alert-content">
             <%= if index == 0 && Enum.count(@alerts) > 1 do %>
               <div
@@ -42,6 +42,7 @@ defmodule LiveAdmin.Components.AlertBar do
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
+              <div></div>
             <% end %>
 
             <span class="alert-message">{alert}</span>
@@ -49,6 +50,17 @@ defmodule LiveAdmin.Components.AlertBar do
         </div>
       <% end %>
     </div>
+    <script :type={Phoenix.LiveView.ColocatedHook} name=".AlertItem">
+      export default {
+        mounted() {
+          setTimeout(() => {
+            if (this.el.dataset['type'] != 'error') {
+              this.pushEvent('dismiss', {index: parseInt(this.el.dataset['index'])});
+            }
+          }, 3000);
+        }
+      }
+    </script>
     """
   end
 

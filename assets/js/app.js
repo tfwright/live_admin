@@ -3,6 +3,7 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import ClipboardJS from "clipboard";
 import topbar from "topbar";
+import {hooks as colocatedHooks} from "phoenix-colocated/live_admin";
 
 topbar.config({
   barColors: { 0: "rgb(67, 56, 202)" },
@@ -199,7 +200,7 @@ let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
-  hooks: Hooks,
+  hooks: {...Hooks, ...colocatedHooks},
   params: { _csrf_token: csrfToken },
 });
 
