@@ -13,7 +13,6 @@ defmodule LiveAdmin.Resource do
   import LiveAdmin
 
   alias Ecto.Changeset
-  alias PhoenixHTMLHelpers.Tag
 
   @doc """
   Configure a module to act as a LiveAdmin resource
@@ -349,10 +348,4 @@ defmodule LiveAdmin.Resource do
   def render(val, :string), do: val
   def render(val, {:array, inner_type}), do: Enum.map_join(val, ", ", &render(&1, inner_type))
   def render(val, _), do: safe_render(val)
-
-  defp get_assoc_name!(schema, fk) do
-    Enum.find(schema.__schema__(:associations), fn assoc_name ->
-      fk == schema.__schema__(:association, assoc_name).owner_key
-    end)
-  end
 end

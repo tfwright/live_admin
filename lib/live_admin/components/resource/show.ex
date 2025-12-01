@@ -91,9 +91,12 @@ defmodule LiveAdmin.Components.Container.Show do
   attr(:current, :integer, default: 0)
   attr(:id, :string, required: true)
   attr(:record, :map, required: true)
+  attr(:resource, :map, required: true)
   attr(:title, :string, required: true)
   attr(:fields, :any, default: [])
   attr(:embeds, :any, default: [])
+  attr(:session, LiveAdmin.Session, required: true)
+  attr(:config, :list, required: true)
 
   def detail_view(assigns) do
     assigns =

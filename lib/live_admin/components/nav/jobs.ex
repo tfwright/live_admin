@@ -1,6 +1,8 @@
 defmodule LiveAdmin.Components.Nav.Jobs do
   use Phoenix.LiveView
 
+  require Logger
+
   import LiveAdmin
 
   @impl true

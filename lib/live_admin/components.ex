@@ -11,6 +11,7 @@ defmodule LiveAdmin.Components do
   attr(:id, :string, required: true)
   attr(:label, :string, required: true)
   attr(:items, :list, required: true)
+  slot(:inner_block)
 
   def drop_down(assigns) do
     ~H"""

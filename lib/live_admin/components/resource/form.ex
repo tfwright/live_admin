@@ -151,7 +151,7 @@ defmodule LiveAdmin.Components.Container.Form do
       Resource.update(record, resource, params, session, config)
       |> case do
         {:ok, _} ->
-          LiveAdmin.PubSub.broadcast(
+          LiveAdmin.PubSub.announce(
             session.id,
             :success,
             trans("Changes saved")
