@@ -369,6 +369,7 @@ body:has(.alert-bar) .sidebar {
     gap: 12px;
     transition: background 0.2s;
     cursor: pointer;
+    user-select: none;
 }
 
 .nav-toggle-label:hover {
@@ -384,11 +385,10 @@ body:has(.alert-bar) .sidebar {
 .nav-subitems {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease-out;
 }
 
 .nav-toggle-input:checked + .nav-toggle-label + .nav-subitems {
-    max-height: 500px;
+    max-height: none;
 }
 
 .nav-toggle-input:checked + .nav-toggle-label .nav-item-expand {
@@ -410,10 +410,6 @@ body:has(.alert-bar) .sidebar {
 .nav-subitems .nav-subitems {
     padding-left: 16px;
     max-height: 0;
-}
-
-.nav-subitems .nav-toggle-input:checked + .nav-toggle-label + .nav-subitems {
-    max-height: 300px;
 }
 
 /* Third level items (leaf nodes without expand arrows) */
