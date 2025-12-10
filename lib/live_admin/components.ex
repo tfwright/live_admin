@@ -261,14 +261,15 @@ defmodule LiveAdmin.Components do
 
   defp input(assigns = %{type: :boolean}) do
     ~H"""
+    <% normalize_value(:boolean, @form[@field].value) %>
     <div class="switch-container">
       <input
         type="radio"
         class="switch-left"
         name={@form[@field].name}
         id={@form[@field].id <> "_left"}
-        checked={@form[@field].value == false}
-        value="0"
+        checked={normalize_value("checkbox", @form[@field].value) == false}
+        value="false"
       />
       <input
         type="radio"
@@ -283,8 +284,8 @@ defmodule LiveAdmin.Components do
         class="switch-right"
         name={@form[@field].name}
         id={@form[@field].id <> "_right"}
-        checked={@form[@field].value == true}
-        value="1"
+        checked={normalize_value("checkbox", @form[@field].value) == true}
+        value="true"
       />
 
       <div class="switch">
