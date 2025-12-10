@@ -330,6 +330,7 @@ defmodule LiveAdmin.Components do
 
     ~H"""
     <select name={@form[@field].name} class="form-select">
+      <option value="" />
       <%= for {k, v} <- @mappings do %>
         <option value={k} selected={@form[@field].value == k}>{v}</option>
       <% end %>

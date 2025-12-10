@@ -54,7 +54,7 @@ defmodule LiveAdmin.Components.AlertBar do
       export default {
         mounted() {
           setTimeout(() => {
-            if (this.el.dataset['type'] != 'error') {
+            if (this.el.dataset['type'] !== 'error') {
               this.pushEvent('dismiss', {index: parseInt(this.el.dataset['index'])});
             }
           }, 3000);
