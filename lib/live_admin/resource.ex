@@ -9,6 +9,8 @@ defmodule LiveAdmin.Resource do
   > to query it, __live_admin_config__/0.
   """
 
+  require Integer
+
   import Ecto.Query
   import LiveAdmin
 
@@ -22,11 +24,7 @@ defmodule LiveAdmin.Resource do
   """
   defmacro __using__(opts) do
     opts_schema =
-      LiveAdmin.base_configs_schema() ++
-        [
-          schema: [type: :atom, default: __CALLER__.module],
-          preload: [type: {:or, [:keyword_list, nil]}, default: nil]
-        ]
+      LiveAdmin.base_configs_schema() ++ [schema: [type: :atom, default: __CALLER__.module]]
 
     quote bind_quoted: [opts: opts, opts_schema: opts_schema] do
       opts = NimbleOptions.validate!(opts, opts_schema)
@@ -56,7 +54,6 @@ defmodule LiveAdmin.Resource do
   def find(key, resource, prefix, repo) do
     resource.__live_admin_config__()
     |> Keyword.fetch!(:schema)
-    |> preload(^preloads(resource))
     |> repo.get(key, prefix: prefix)
   end
 
@@ -75,34 +72,30 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  def query(resource, search, config) do
-    resource.__live_admin_config__()
-    |> Keyword.fetch!(:schema)
-    |> then(fn query ->
-      case search do
-        q when not is_nil(q) and byte_size(q) > 0 ->
-          apply_search(query, q, fields(resource, config))
-
-        _ ->
-          query
-      end
-    end)
-    |> preload(^preloads(resource))
-  end
-
   def list(resource, opts, session, repo, config) do
-    resource
-    |> LiveAdmin.fetch_config(:list_with, config)
-    |> case do
-      nil ->
-        build_list(resource, opts, session, repo, config)
+    opts =
+      opts
+      |> Enum.into(%{})
+      |> Map.put_new(:page, 1)
+      |> Map.put_new(:per, session.index_page_size)
+      |> Map.put_new(:sort_dir, :asc)
+      |> Map.put_new(:sort_attr, LiveAdmin.primary_key!(resource))
 
-      {mod, func_name} ->
-        apply(mod, func_name, [resource, opts, session])
+    query =
+      resource
+      |> query(opts[:search], config)
+      |> limit(^opts[:per])
+      |> offset(^((opts[:page] - 1) * opts[:per]))
+      |> order_by(^[{opts[:sort_dir], opts[:sort_attr]}])
 
-      name when is_atom(name) ->
-        apply(resource, name, [opts, session])
-    end
+    {
+      repo.all(query, prefix: opts[:prefix]),
+      repo.aggregate(
+        query |> exclude(:limit) |> exclude(:offset),
+        :count,
+        prefix: opts[:prefix]
+      )
+    }
   end
 
   def change(resource, record \\ nil, params \\ %{}, config)
@@ -202,35 +195,19 @@ defmodule LiveAdmin.Resource do
     end
   end
 
-  defp build_list(resource, opts, session, repo, config) do
-    opts =
-      opts
-      |> Enum.into(%{})
-      |> Map.put_new(:page, 1)
-      |> Map.put_new(:per, session.index_page_size)
-      |> Map.put_new(:sort_dir, :asc)
-      |> Map.put_new(:sort_attr, LiveAdmin.primary_key!(resource))
-
-    query =
-      resource
-      |> query(opts[:search], config)
-      |> limit(^opts[:per])
-      |> offset(^((opts[:page] - 1) * opts[:per]))
-      |> order_by(^[{opts[:sort_dir], opts[:sort_attr]}])
-
-    {
-      repo.all(query, prefix: opts[:prefix]),
-      repo.aggregate(
-        query |> exclude(:limit) |> exclude(:offset),
-        :count,
-        prefix: opts[:prefix]
-      )
-    }
-  end
-
   defp apply_search(query, q, fields) do
-    q
-    |> LiveAdmin.View.parse_search()
+    parts = String.split(q, ~r{([^\s]*:)}, include_captures: true, trim: true)
+
+    if parts |> Enum.count() |> Integer.is_odd() do
+      [{"*", q}]
+    else
+      parts
+      |> Enum.map(&String.trim/1)
+      |> Enum.chunk_every(2)
+      |> Enum.map(fn
+        [column, param] -> {String.replace(column, ":", ""), param}
+      end)
+    end
     |> case do
       field_queries when is_list(field_queries) ->
         field_queries
@@ -312,21 +289,28 @@ defmodule LiveAdmin.Resource do
 
   defp parse_map_param(param), do: param
 
-  defp preloads(resource) do
-    resource.__live_admin_config__()
-    |> Keyword.fetch!(:preload)
+  def query(resource, search, config) do
+    resource
+    |> fetch_config(:query_with, config)
     |> case do
       nil ->
         resource.__live_admin_config__()
         |> Keyword.fetch!(:schema)
-        |> parent_associations()
-        |> Enum.map(& &1.field)
+        |> then(fn query ->
+          case search do
+            q when not is_nil(q) and byte_size(q) > 0 ->
+              apply_search(query, q, fields(resource, config))
 
-      {m, f, []} ->
-        apply(m, f, [resource])
+            _ ->
+              query
+          end
+        end)
 
-      preloads when is_list(preloads) ->
-        preloads
+      {m, f} ->
+        apply(m, f, [resource, search])
+
+      f when is_atom(f) ->
+        apply(resource, f, [search])
     end
   end
 

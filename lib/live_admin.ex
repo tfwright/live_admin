@@ -24,10 +24,9 @@ defmodule LiveAdmin do
       type: :atom,
       type_doc: "Ecto Repo used to query resource"
     ],
-    list_with: [
+    query_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      type_doc:
-        "`t:func_ref/0` returning `{records, count}` used to fetch records in Index component"
+      type_doc: "`t:func_ref/0` returning an Ecto queryable"
     ],
     render_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},

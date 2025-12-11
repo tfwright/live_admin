@@ -2,8 +2,6 @@ defmodule LiveAdmin.View do
   use Phoenix.Component
   use PhoenixHTMLHelpers
 
-  require Integer
-
   import LiveAdmin.Components
   import Phoenix.HTML
 
@@ -24,7 +22,8 @@ defmodule LiveAdmin.View do
 
   embed_templates("components/layout/*")
 
-  def __mix_recompile__?, do: Path.join(__DIR__, "../../dist/js/app.js") |> File.read!() != @app_js
+  def __mix_recompile__?,
+    do: Path.join(__DIR__, "../../dist/js/app.js") |> File.read!() != @app_js
 
   def render("layout.html", assigns), do: layout(assigns)
 
@@ -40,21 +39,6 @@ defmodule LiveAdmin.View do
 
   def sort_param_name(field), do: :"#{field}_sort"
   def drop_param_name(field), do: :"#{field}_drop"
-
-  def parse_search(q) do
-    parts = String.split(q, ~r{([^\s]*:)}, include_captures: true, trim: true)
-
-    if parts |> Enum.count() |> Integer.is_odd() do
-      [{"*", q}]
-    else
-      parts
-      |> Enum.map(&String.trim/1)
-      |> Enum.chunk_every(2)
-      |> Enum.map(fn
-        [column, param] -> {String.replace(column, ":", ""), param}
-      end)
-    end
-  end
 
   def get_function_keys(resource, config, function) do
     resource

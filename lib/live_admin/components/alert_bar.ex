@@ -20,7 +20,13 @@ defmodule LiveAdmin.Components.AlertBar do
     ~H"""
     <div id="alert-bar">
       <%= for {{alert, type}, index} <- Enum.with_index(@alerts) do %>
-        <div class={"alert-bar #{type}"} id={"alert-#{index}"} phx-hook=".AlertItem" data-index={index} data-type={type}>
+        <div
+          class={"alert-bar #{type}"}
+          id={"alert-#{index}"}
+          phx-hook=".AlertItem"
+          data-index={index}
+          data-type={type}
+        >
           <div class="alert-content">
             <%= if index == 0 && Enum.count(@alerts) > 1 do %>
               <div

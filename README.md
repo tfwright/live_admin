@@ -77,7 +77,7 @@ every aspect of a particular resource view, like the edit form.
 
 * `actions` - functions that operate on a specific record
 * `tasks` - functions that operate on a resource as a whole
-* `list_with` - function used to fetch records
+* `query_with` - function used to fetch a batch of records
 * `render_with` - function used to encode field values in views
 * `create_with` - function used to insert a record
 * `update_with` - function used to update a record

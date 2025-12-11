@@ -297,13 +297,10 @@ defmodule LiveAdmin.Components.Container.Index do
   end
 
   @impl true
-  def handle_event(
-        "task",
-        params = %{"name" => name},
-        socket = %{
-          assigns: %{session: session, resource: resource, config: config}
-        }
-      ) do
+  def handle_event("task", params = %{"name" => name}, socket) do
+    session = socket.assigns.session
+    resource = socket.assigns.resource
+
     {_, m, f, _, _} =
       LiveAdmin.fetch_function(resource, session, :tasks, String.to_existing_atom(name))
 
@@ -313,7 +310,7 @@ defmodule LiveAdmin.Components.Container.Index do
       Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, fn ->
         try do
           case apply(m, f, [
-                 Resource.query(resource, Map.get(socket.assigns, :search), config) | args
+                 Resource.query(resource, socket.assigns.search, socket.assigns.config) | args
                ]) do
             {:ok, message} ->
               LiveAdmin.PubSub.announce(session.id, :success, message)
@@ -434,62 +431,6 @@ defmodule LiveAdmin.Components.Container.Index do
        to:
          route_with_params(socket.assigns,
            params: index_link_params(assigns, page: page, per: per)
-         )
-     )}
-  end
-
-  def handle_event("add_filter", _, socket = %{assigns: assigns}) do
-    new_search =
-      socket.assigns.search
-      |> LiveAdmin.View.parse_search()
-      |> Enum.concat([{"*", "_"}])
-      |> Enum.map_join(" ", fn
-        {field, param} -> "#{field}:#{param}"
-      end)
-
-    {:noreply,
-     push_patch(socket,
-       to:
-         route_with_params(socket.assigns,
-           params: index_link_params(assigns, search: new_search)
-         )
-     )}
-  end
-
-  def handle_event("remove_filter", %{"index" => i}, socket = %{assigns: assigns}) do
-    new_search =
-      socket.assigns.search
-      |> LiveAdmin.View.parse_search()
-      |> List.delete_at(i)
-      |> Enum.map_join(" ", fn
-        {field, param} -> "#{field}:#{param}"
-      end)
-
-    {:noreply,
-     push_patch(socket,
-       to:
-         route_with_params(socket.assigns,
-           params: index_link_params(assigns, search: new_search)
-         )
-     )}
-  end
-
-  def handle_event("update_filters", %{"filters" => filter_params}, socket = %{assigns: assigns}) do
-    new_search =
-      filter_params
-      |> Map.values()
-      |> Enum.filter(fn p -> p["param"] != "" end)
-      |> Enum.map_join(" ", fn
-        %{"field" => "any", "param" => param} -> "*:#{param}"
-        %{"field" => field, "param" => param} -> "#{field}:#{param}"
-        {field, param} -> "#{field}:#{param}"
-      end)
-
-    {:noreply,
-     push_patch(socket,
-       to:
-         route_with_params(socket.assigns,
-           params: index_link_params(assigns, search: new_search)
          )
      )}
   end
