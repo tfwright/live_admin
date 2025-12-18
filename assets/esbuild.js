@@ -18,12 +18,11 @@ let opts = {
   target: 'es2016',
   outdir: '../dist/js',
   define: {
-     'process.env.LATENCY_SIM': process.env.LATENCY_SIM || 0,
+     'process.env.LATENCY_SIM': process.env.LATENCY_SIM || "0",
    },
 }
 if (mode === 'watch') {
   opts = {
-    watch: true,
     sourcemap: 'inline',
     ...opts
   }
@@ -35,13 +34,13 @@ if (mode === 'release') {
   }
 }
 
-// Start esbuild with previously defined options
-// Stop the watcher when STDIN gets closed (no zombies please!)
-esbuild.build(opts).then((result) => {
+;(async () => {
+  const context = await esbuild.context(opts)
+
   if (mode === 'watch') {
-    process.stdin.pipe(process.stdout)
-    process.stdin.on('end', () => { result.stop() })
+    context.watch()
+  } else {
+    await context.rebuild()
+    context.dispose()
   }
-}).catch((error) => {
-  process.exit(1)
-})
+})()
