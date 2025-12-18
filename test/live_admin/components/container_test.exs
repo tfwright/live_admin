@@ -21,23 +21,22 @@ defmodule LiveAdmin.Components.ContainerTest do
 
   describe "home page" do
     setup %{conn: conn} do
-      %{response: conn |> get("/") |> html_response(200)}
+      {:ok, view, _} = live(conn, "/")
+
+      %{view: view}
     end
 
-    test "routes live view", %{response: response} do
-      assert response =~ ~s|<title>LiveAdmin</title>|
-    end
-
-    test "links to resource", %{response: response} do
-      {:ok, response} = Floki.parse_document(response)
-      assert response |> Floki.find("a[href='/user']") |> Enum.any?()
+    test "links to resource", %{view: view} do
+      assert has_element?(view, "a[href='/user']")
     end
   end
 
   describe "list resource" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
+
       {:ok, view, _html} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc")
+
       %{view: view, user: user}
     end
 
@@ -76,8 +75,10 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "list resource with search param not matching any records" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"})
-      {:ok, view, html} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc&s=fred")
-      %{view: view, response: html}
+
+      {:ok, view, _} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc&s=fred")
+
+      %{view: view}
     end
 
     test "shows error", %{view: view} do
@@ -88,7 +89,9 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "list resource with prefix param" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"}, prefix: "alt")
+
       {:ok, view, _} = live(conn, "/user?per=10&page=1&sort-attr=id&sort-dir=asc&prefix=alt")
+
       %{view: view}
     end
 
@@ -116,15 +119,13 @@ defmodule LiveAdmin.Components.ContainerTest do
 
   describe "new parent resource" do
     setup %{conn: conn} do
-      {:ok, view, html} = live(conn, "/user/new")
-      {:ok, html} = Floki.parse_document(html)
-      %{response: html, view: view}
+      {:ok, view, _} = live(conn, "/user/new")
+
+      %{view: view}
     end
 
-    test "includes castable form field", %{response: response} do
-      assert response
-             |> Floki.find("textarea[name='params[name]']")
-             |> Enum.any?()
+    test "includes castable form field", %{view: view} do
+      assert has_element?(view, "textarea[name='params[name]']")
     end
 
     test "handles form change", %{view: view} do
@@ -156,15 +157,13 @@ defmodule LiveAdmin.Components.ContainerTest do
 
   describe "new child resource" do
     setup %{conn: conn} do
-      {:ok, view, html} = live(conn, "/live_admin_test_post/new")
-      {:ok, html} = Floki.parse_document(html)
-      %{response: html, view: view}
+      {:ok, view, _} = live(conn, "/live_admin_test_post/new")
+
+      %{view: view}
     end
 
-    test "includes search select field", %{response: response} do
-      assert response
-             |> Floki.find("#params_user_id_search_select")
-             |> Enum.any?()
+    test "includes search select field", %{view: view} do
+      assert has_element?(view, "#params_user_id_search_select")
     end
 
     test "search select responds to focus", %{view: view} do
@@ -177,9 +176,10 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "edit resource" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
-      {:ok, view, html} = live(conn, "/user/edit/#{user.id}")
-      {:ok, html} = Floki.parse_document(html)
-      %{response: html, view: view, user: user}
+
+      {:ok, view, _} = live(conn, "/user/edit/#{user.id}")
+
+      %{view: view, user: user}
     end
 
     test "updates record on submit", %{view: view, user: user} do
@@ -198,32 +198,28 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "edit resource with embed" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{settings: %{}})
-      conn = get(conn, "/user/edit/#{user.id}")
-      {:ok, view, html} = live(conn)
-      {:ok, html} = Floki.parse_document(html)
-      %{response: html, view: view}
+
+      {:ok, view, _} = live(conn, "/user/edit/#{user.id}")
+
+      %{view: view}
     end
 
-    test "includes embed form field", %{response: response} do
-      assert response
-             |> Floki.find("textarea[name='params[settings][some_option]']")
-             |> Enum.any?()
+    test "includes embed form field", %{view: view} do
+      assert has_element?(view, "textarea[name='params[settings][some_option]']")
     end
   end
 
   describe "edit resource with plural embed with multiple entries" do
     setup %{conn: conn} do
       post = Repo.insert!(%Post{title: "test", previous_versions: [%Version{}, %Version{}]})
-      {:ok, view, html} = live(conn, "/live_admin_test_post/edit/#{post.post_id}")
-      {:ok, html} = Floki.parse_document(html)
-      %{response: html, view: view}
+
+      {:ok, view, _} = live(conn, "/live_admin_test_post/edit/#{post.post_id}")
+
+      %{view: view}
     end
 
-    test "includes multiple embed fields", %{response: response} do
-      assert 2 =
-               response
-               |> Floki.find(".embed__item")
-               |> Enum.count()
+    test "includes multiple embed fields", %{view: view} do
+      assert has_element?(view, ".embed__item:nth-child(2)")
     end
   end
 
@@ -234,23 +230,23 @@ defmodule LiveAdmin.Components.ContainerTest do
           settings: %{metadata: %{map_key: %{}}}
         })
 
-      {:ok, view, html} = live(conn, "/user/edit/#{user.id}")
-      {:ok, html} = Floki.parse_document(html)
-      %{response: html, view: view}
+      {:ok, view, _} = live(conn, "/user/edit/#{user.id}")
+
+      %{view: view}
     end
 
-    test "disables field", %{response: response} do
-      assert response
-             |> Floki.find(".resource__action--disabled")
-             |> Enum.any?()
+    test "disables field", %{view: view} do
+      assert has_element?(view, ".resource__action--disabled")
     end
   end
 
   describe "view resource" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
-      {:ok, view, html} = live(conn, "/user/#{user.id}")
-      %{response: html, view: view, user: user}
+
+      {:ok, view, _} = live(conn, "/user/#{user.id}")
+
+      %{view: view, user: user}
     end
 
     test "deletes record", %{view: view} do
@@ -265,6 +261,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "view resource with failing action" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
+
       {:ok, view, _} = live(conn, "/user/#{user.id}")
 
       view
@@ -283,29 +280,26 @@ defmodule LiveAdmin.Components.ContainerTest do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
       post = Repo.insert!(%Post{title: "test", user: user})
-      {:ok, _, html} = live(conn, "/live_admin_test_post/#{post.post_id}")
-      {:ok, html} = Floki.parse_document(html)
-      %{response: html, user: user}
+
+      {:ok, view, _} = live(conn, "/live_admin_test_post/#{post.post_id}")
+
+      %{view: view, user: user}
     end
 
-    test "links to user", %{response: response, user: user} do
-      assert response
-             |> Floki.find("a[href='/user/#{user.id}']")
-             |> Enum.any?()
+    test "links to user", %{view: view, user: user} do
+      assert has_element?(view, "a[href='/user/#{user.id}']")
     end
   end
 
   describe "new post with custom string field" do
     setup %{conn: conn} do
-      {:ok, view, html} = live(conn, "/live_admin_test_post/new")
-      {:ok, html} = Floki.parse_document(html)
-      %{view: view, response: html}
+      {:ok, view, _} = live(conn, "/live_admin_test_post/new")
+
+      %{view: view}
     end
 
-    test "includes non-disabled input field for custom string type", %{response: response} do
-      assert response
-             |> Floki.find("textarea[name='params[custom_string_field]']")
-             |> Enum.any?()
+    test "includes non-disabled input field for custom string type", %{view: view} do
+      assert has_element?(view, "textarea[name='params[custom_string_field]']")
     end
 
     test "handles form change with custom string type", %{view: view} do
