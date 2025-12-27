@@ -201,7 +201,7 @@ defmodule LiveAdmin.Components.Container.Index do
                             </form>
                           </td>
                           <td class="table-cell">
-                            <span pclass="cell-content">
+                            <span class="cell-content">
                               <.link
                                 class="resource-link"
                                 navigate={LiveAdmin.route_with_params(assigns, segments: [record])}
@@ -212,7 +212,7 @@ defmodule LiveAdmin.Components.Container.Index do
                           </td>
                           <%= for {field, type, _} <- Resource.fields(@resource, @config), field != LiveAdmin.primary_key!(@resource) do %>
                             <td class="table-cell">
-                              <span pclass="cell-content">
+                              <span class="cell-content">
                                 {Resource.render(record, field, type, @resource, @config, @session)}
                               </span>
                               <.expand_modal
