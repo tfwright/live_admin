@@ -52,67 +52,103 @@ defmodule LiveAdmin.Components.Nav do
     assigns = assign(assigns, :nested_resources, nested_resources)
 
     ~H"""
-    <div class="nav">
-      <ul class="nav__list">
-        <li class="nav__item--group">
-          <span>
-            {Keyword.fetch!(@config, :title)}
+    <nav>
+      <div class="nav-section">
+        <div class="nav-section-title">Admin</div>
+        <.link navigate={@base_path} class="nav-item">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
           </span>
-        </li>
-        <li class="nav__item--group">
-          <.link navigate={@base_path}>{trans("Home")}</.link>
-        </li>
-        <li class="nav__item--group">
-          <.nav_group
-            items={@nested_resources}
-            base_path={@base_path}
-            current_resource={assigns[:resource]}
-            config={@config}
-          />
-        </li>
-        <%= if Enum.any?(@extra_pages) do %>
-          <li class="nav__item--group">
-            <%= for route <- @extra_pages do %>
-              <.link navigate={route.path}>
-                {humanize(route.helper)}
-              </.link>
-            <% end %>
-          </li>
-        <% end %>
-        <li class="nav__item--group">
-          <.link navigate={Path.join(@base_path, "session")}>
-            {trans("Session")}
-          </.link>
-        </li>
-      </ul>
-    </div>
+          {trans("Dashboard")}
+        </.link>
+        <.link navigate={Path.join(@base_path, "session")} class="nav-item">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </span>
+          <span>{trans("Session")}</span>
+        </.link>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Resources</div>
+        <.nav_group
+          items={@nested_resources}
+          base_path={@base_path}
+          current_resource={assigns[:resource]}
+          config={@config}
+        />
+      </div>
+      <%= if Enum.any?(@extra_pages) do %>
+        <div class="nav-section">
+          <div class="nav-section-title">Pages</div>
+          <%= for route <- @extra_pages do %>
+            <.link navigate={route.path} class="nav-item">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </span>
+              <span>{humanize(route.helper)}</span>
+            </.link>
+          <% end %>
+        </div>
+      <% end %>
+    </nav>
     """
   end
 
   defp nav_group(assigns) do
     ~H"""
-    <ul>
+    <div>
       <%= for {parent, children} <- Enum.sort(@items) do %>
         <%= if match?({_key, _resource}, parent) do %>
-          <li class={"nav__item#{if elem(parent, 1) == @current_resource, do: "--selected"}"}>
-            <.link navigate={route_with_params(assigns, resource_path: elem(parent, 0))}>
-              {resource_title(elem(parent, 1), @config)}
-            </.link>
-          </li>
+          <.link
+            navigate={route_with_params(assigns, resource_path: elem(parent, 0))}
+            class={"nav-item #{if elem(parent, 1) == @current_resource, do: "active"}"}
+          >
+            {resource_title(elem(parent, 1), @config)}
+          </.link>
         <% else %>
-          <li class="nav__item--drop">
-            <input type="checkbox" id={"menu-group-#{parent}"} checked={open?(assigns, parent)} />
-            <label for={"menu-group-#{parent}"}>{parent}</label>
+          <input
+            type="checkbox"
+            id={"#{parent}-toggle"}
+            class="nav-toggle-input"
+            checked={open?(assigns, parent)}
+          />
+          <label for={"#{parent}-toggle"} class="nav-toggle-label">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </span>
+            <span>{parent}</span>
+            <span class="nav-item-expand">▼</span>
+          </label>
+          <div class="nav-subitems">
             <.nav_group
               items={children}
               base_path={@base_path}
               current_resource={@current_resource}
               config={@config}
             />
-          </li>
+          </div>
         <% end %>
       <% end %>
-    </ul>
+    </div>
     """
   end
 
@@ -120,7 +156,7 @@ defmodule LiveAdmin.Components.Nav do
     assigns.current_resource
     |> case do
       nil ->
-        true
+        false
 
       resource ->
         resource.__live_admin_config__()

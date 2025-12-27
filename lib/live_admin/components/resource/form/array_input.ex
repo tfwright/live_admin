@@ -1,7 +1,9 @@
 defmodule LiveAdmin.Components.Container.Form.ArrayInput do
   use Phoenix.LiveComponent
-  import Phoenix.HTML.Form
   use PhoenixHTMLHelpers
+
+  import Phoenix.HTML.Form
+  import LiveAdmin
 
   alias Phoenix.LiveView.JS
 
@@ -38,49 +40,44 @@ defmodule LiveAdmin.Components.Container.Form.ArrayInput do
   @impl true
   def render(assigns) do
     ~H"""
-    <div
-      class="field__array--group"
-      phx-hook="ArrayInput"
-      id={input_id(@form, @field) <> "_array_input"}
-    >
+    <div class="array-input-wrapper" phx-hook="ArrayInput" id={@form[@field].id <> "_array_input"}>
       <%= for {item, idx} <- Enum.with_index(@values) do %>
-        <div>
-          <a
-            href="#"
-            class="button__remove"
-            phx-click={
-              JS.push("remove",
-                value: %{idx: idx},
-                target: @myself,
-                page_loading: true
-              )
-            }
-          />
-          {text_input(:form, :array,
-            id: input_id(@form, @field) <> "_#{idx}",
-            name: input_name(@form, @field) <> "[]",
-            value: item,
-            phx_debounce: 200
-          )}
-        </div>
+        <input type="hidden" name={@form[@field].name <> "[]"} value={item} />
+        <button
+          type="button"
+          class="btn"
+          phx-click={JS.push("remove", value: %{idx: idx}, target: @myself)}
+        >
+          {item}
+        </button>
       <% end %>
-      <a
-        href="#"
-        phx-click={
-          JS.push("add",
-            target: @myself,
-            page_loading: true
-          )
-        }
-        class="button__add"
+      <input
+        type="text"
+        autocomplete="off"
+        phx-keydown="add"
+        phx-key="Enter"
+        phx-target={@myself}
+        placeholder={trans("Add") <> "..."}
       />
+      <svg
+        class="return-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="9 10 4 15 9 20"></polyline>
+        <path d="M20 4v7a4 4 0 0 1-4 4H4"></path>
+      </svg>
     </div>
     """
   end
 
   @impl true
-  def handle_event("add", _params, socket) do
-    socket = assign(socket, values: socket.assigns.values ++ [""])
+  def handle_event("add", %{"value" => item}, socket) do
+    socket = assign(socket, values: socket.assigns.values ++ [item])
 
     {:noreply, socket}
   end

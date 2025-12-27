@@ -55,18 +55,18 @@ defmodule LiveAdmin.Router do
     quote bind_quoted: [path: path, resource_mod: resource_mod] do
       full_path = Path.join(@base_path, path)
 
-      live(path, LiveAdmin.Components.Container, :list,
-        as: :"list_#{full_path}",
+      live(path, LiveAdmin.Components.Container, :index,
+        as: :"index_#{full_path}",
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
 
-      live("#{path}/new", LiveAdmin.Components.Container, :new,
-        as: :"new_#{full_path}",
+      live("#{path}/new", LiveAdmin.Components.Container, :create,
+        as: :"create_#{full_path}",
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
 
-      live("#{path}/:record_id", LiveAdmin.Components.Container, :view,
-        as: :"view_#{full_path}",
+      live("#{path}/:record_id", LiveAdmin.Components.Container, :show,
+        as: :"show_#{full_path}",
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
 
@@ -88,10 +88,10 @@ defmodule LiveAdmin.Router do
           nav: LiveAdmin.Components.Nav,
           home: LiveAdmin.Components.Home.Content,
           session: LiveAdmin.Components.Session.Content,
-          new: LiveAdmin.Components.Container.Form,
+          create: LiveAdmin.Components.Container.Form,
           edit: LiveAdmin.Components.Container.Form,
-          list: LiveAdmin.Components.Container.Index,
-          view: LiveAdmin.Components.Container.View
+          index: LiveAdmin.Components.Container.Index,
+          show: LiveAdmin.Components.Container.Show
         ],
         Application.get_env(:live_admin, :components, [])
       )
@@ -107,7 +107,7 @@ defmodule LiveAdmin.Router do
       |> Keyword.put_new(:render_with, Application.get_env(:live_admin, :render_with))
       |> Keyword.put_new(:delete_with, Application.get_env(:live_admin, :delete_with))
       |> Keyword.put_new(:create_with, Application.get_env(:live_admin, :create_with))
-      |> Keyword.put_new(:list_with, Application.get_env(:live_admin, :list_with))
+      |> Keyword.put_new(:query_with, Application.get_env(:live_admin, :query_with))
       |> Keyword.put_new(:update_with, Application.get_env(:live_admin, :update_with))
       |> Keyword.put_new(:label_with, Application.get_env(:live_admin, :label_with))
       |> Keyword.put_new(:title_with, Application.get_env(:live_admin, :title_with))

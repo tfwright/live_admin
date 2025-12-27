@@ -1,21 +1,17 @@
 defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   use Phoenix.LiveComponent
-  import Phoenix.HTML.Form
-  use PhoenixHTMLHelpers
 
-  import LiveAdmin, only: [record_label: 3, trans: 1]
-  import LiveAdmin.Components
+  import LiveAdmin
 
   alias Phoenix.LiveView.JS
-  alias LiveAdmin.Resource
 
   @impl true
-  def update(assigns = %{form: form, field: field}, socket) do
+  def update(assigns = %{options: options}, socket) do
     socket =
       socket
-      |> assign(assigns)
-      |> assign(options: [])
-      |> assign_selected_option(input_value(form, field))
+      |> assign(Map.delete(assigns, :options))
+      |> assign(:initial_options, options)
+      |> assign_async([:options], fn -> {:ok, %{options: load_options(options)}} end, reset: true)
 
     {:ok, socket}
   end
@@ -25,7 +21,7 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
     ~H"""
     <div>
       <%= if @selected_option do %>
-        {record_label(@selected_option, @resource, @config)}
+        {elem(@selected_option, 1)}
       <% else %>
         {trans("None")}
       <% end %>
@@ -37,66 +33,50 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   def render(assigns) do
     ~H"""
     <div
-      class="search_select"
+      class={"search-select-container #{if @options.loading, do: "loading"}"}
       phx-hook="SearchSelect"
-      id={input_id(@form, @field) <> "_search_select"}
+      id={@id}
     >
-      {hidden_input(@form, @field,
-        disabled: @disabled,
-        value:
-          if(@selected_option,
-            do: Map.fetch!(@selected_option, LiveAdmin.primary_key!(@resource))
-          ),
-        id: input_id(@form, @field) <> "_hidden"
-      )}
-      <%= if @selected_option do %>
-        <a
-          href="#"
-          phx-click={JS.push("select", value: %{key: nil}, target: @myself, page_loading: true)}
-          class="button__remove"
-        />
-        {record_label(@selected_option, @resource, @config)}
-      <% else %>
-        <.dropdown
-          :let={option}
-          id={input_id(@form, @field) <> "_dropdown"}
-          label="Select"
-          items={
-            Enum.filter(
-              @options,
-              &(Map.fetch!(&1, LiveAdmin.primary_key!(@resource)) != input_value(@form, @field))
-            )
-          }
+      <input
+        type="hidden"
+        value={elem(@selected_option, 0)}
+        name={@name}
+      />
+      <%= if to_string(elem(@selected_option, 0)) != "" do %>
+        <button
+          type="button"
+          phx-click={JS.push("select", value: %{key: nil}, target: @myself)}
+          class="btn"
         >
-          <:empty_label>
-            {trans("No options")}
-          </:empty_label>
-          <:control>
-            <input
-              type="text"
-              id={input_id(@form, @field)}
-              disabled={@disabled}
-              placeholder={trans("Search")}
-              autocomplete="off"
-              phx-focus="load_options"
-              phx-keyup="load_options"
-              phx-target={@myself}
-              phx-debounce={200}
-            />
-          </:control>
-          <a
-            href="#"
-            phx-click={
-              JS.push("select",
-                value: %{key: Map.fetch!(option, LiveAdmin.primary_key!(@resource))},
-                target: @myself,
-                page_loading: true
-              )
-            }
-          >
-            {record_label(option, @resource, @config)}
-          </a>
-        </.dropdown>
+          {elem(@selected_option, 1)}
+        </button>
+      <% else %>
+        <input
+          type="text"
+          class="form-input"
+          phx-keyup="load_options"
+          phx-target={@myself}
+          phx-debounce={200}
+          placeholder={trans("Search") <> "..."}
+        />
+        <ul class="select-options">
+          <%= if @options.ok? do %>
+            <%= for {k, v} <- @options.result do %>
+              <li phx-click={
+                JS.push("select",
+                  value: %{key: k},
+                  target: @myself,
+                  loading: "#" <> @id
+                )
+              }>
+                {v}
+              </li>
+            <% end %>
+            <%= if Enum.empty?(@options.result) do %>
+              <li>{trans("No options")}</li>
+            <% end %>
+          <% end %>
+        </ul>
       <% end %>
     </div>
     """
@@ -106,45 +86,43 @@ defmodule LiveAdmin.Components.Container.Form.SearchSelect do
   def handle_event(
         "load_options",
         %{"value" => q},
-        socket = %{assigns: %{resource: resource, session: session, config: config}}
+        socket = %{assigns: %{initial_options: options}}
       ) do
-    options =
-      resource
-      |> Resource.list(
-        [search: q, prefix: socket.assigns.prefix],
-        session,
-        socket.assigns.repo,
-        config
+    socket =
+      assign_async(
+        socket,
+        [:options],
+        fn -> {:ok, %{options: load_options(options, q)}} end,
+        reset: true
       )
-      |> elem(0)
 
-    {:noreply, assign(socket, :options, options)}
+    {:noreply, socket}
   end
 
   def handle_event("select", %{"key" => key}, socket) do
     socket =
       socket
-      |> assign_selected_option(key)
+      |> assign(
+        :selected_option,
+        Enum.find(socket.assigns.options.result, {nil, nil}, fn {k, _} -> k == key end)
+      )
       |> push_event("change", %{})
 
     {:noreply, socket}
   end
 
-  defp assign_selected_option(socket, key) when key in [nil, ""],
-    do: assign(socket, :selected_option, nil)
+  defp load_options(options) when is_list(options), do: options |> parse_options()
+  defp load_options({m, f, a}), do: apply(m, f, [nil | a]) |> parse_options()
 
-  defp assign_selected_option(
-         socket = %{assigns: %{selected_option: %{key: selected_option_key}}},
-         key
-       )
-       when selected_option_key == key,
-       do: socket
+  defp load_options(options, q) when is_list(options),
+    do: options |> parse_options() |> filter_options(q)
 
-  defp assign_selected_option(socket, key),
-    do:
-      assign(
-        socket,
-        :selected_option,
-        Resource.find!(key, socket.assigns.resource, socket.assigns.prefix, socket.assigns.repo)
-      )
+  defp load_options({m, f, a}, q), do: m |> apply(f, [q | a]) |> parse_options()
+
+  defp parse_options(options = [{_, _} | _]), do: options
+  defp parse_options(options), do: Enum.map(options, &{&1, &1})
+
+  defp filter_options(options, q) when is_binary(q) do
+    Enum.filter(options, fn {_, label} -> String.contains?(label, q) end)
+  end
 end

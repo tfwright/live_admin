@@ -3,6 +3,8 @@ defmodule LiveAdmin.Components.Nav.Jobs do
 
   require Logger
 
+  import LiveAdmin
+
   @impl true
   def mount(_, %{"session_id" => session_id}, socket) do
     if connected?(socket) do
@@ -23,12 +25,6 @@ defmodule LiveAdmin.Components.Nav.Jobs do
         end
       end)
     end)
-  end
-
-  @impl true
-  def handle_info(info = {:announce, %{message: message, type: type}}, socket) do
-    Logger.debug("ANNOUNCE: #{inspect(info)}")
-    {:noreply, push_event(socket, type, %{msg: message})}
   end
 
   @impl true
@@ -87,12 +83,23 @@ defmodule LiveAdmin.Components.Nav.Jobs do
   @impl true
   def render(assigns) do
     ~H"""
-    <%= for {_, label, progress} <- @jobs do %>
-      <div class="job__container">
-        <span class="job__label">{label}</span>
-        <div class="job__bar" style={"width: #{progress |> Kernel.*(100) |> Float.round()}%"} />
-      </div>
-    <% end %>
+    <!-- Progress Section -->
+    <div class="nav-progress-section">
+      <%= if Enum.any?(@jobs) do %>
+        <div class="nav-progress-title">{trans("Active jobs")}</div>
+        <%= for {_, label, progress} <- @jobs, percent = progress |> Kernel.*(100) |> Float.round() do %>
+          <div class="progress-item">
+            <div class="progress-header">
+              <span class="progress-label">{label}</span>
+              <span class="progress-percentage">{percent}</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar" style={"width: #{percent}%"}></div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
     """
   end
 end

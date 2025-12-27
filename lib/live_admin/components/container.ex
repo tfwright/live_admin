@@ -6,38 +6,18 @@ defmodule LiveAdmin.Components.Container do
 
   import LiveAdmin,
     only: [
-      resource_title: 2,
       route_with_params: 1,
-      route_with_params: 2,
-      trans: 1,
-      trans: 2
+      route_with_params: 2
     ]
 
-  import LiveAdmin.Components
-  import LiveAdmin.View, only: [get_function_keys: 3]
-
   alias LiveAdmin.Resource
-  alias Phoenix.LiveView.JS
 
   @impl true
   def mount(_params, _session, socket) do
     socket =
-      assign(socket, loading: !connected?(socket), jobs: [])
-
-    if connected?(socket) do
-      Process.send_after(self(), :clear_flash, 1000)
-    end
+      assign(socket, loading: !connected?(socket))
 
     {:ok, socket}
-  end
-
-  @impl true
-  def handle_info(:clear_flash, socket) do
-    {:noreply, clear_flash(socket)}
-  end
-
-  def handle_info(_, socket) do
-    {:noreply, socket}
   end
 
   @impl true
@@ -46,7 +26,7 @@ defmodule LiveAdmin.Components.Container do
         uri,
         socket = %{assigns: %{live_action: action, loading: false}}
       )
-      when action in [:edit, :view] do
+      when action in [:edit, :show] do
     socket =
       socket
       |> assign_resource_info(uri)
@@ -59,7 +39,8 @@ defmodule LiveAdmin.Components.Container do
         id,
         socket.assigns.resource,
         socket.assigns[:prefix],
-        socket.assigns.repo
+        socket.assigns.repo,
+        socket.assigns.config
       )
 
     socket = assign(socket, record: record)
@@ -68,7 +49,7 @@ defmodule LiveAdmin.Components.Container do
   end
 
   @impl true
-  def handle_params(params, uri, socket = %{assigns: %{live_action: :list, loading: false}}) do
+  def handle_params(params, uri, socket = %{assigns: %{live_action: :index, loading: false}}) do
     socket =
       socket
       |> assign(search: params["s"])
@@ -83,7 +64,7 @@ defmodule LiveAdmin.Components.Container do
   end
 
   @impl true
-  def handle_params(params, uri, socket = %{assigns: %{live_action: :new}}),
+  def handle_params(params, uri, socket = %{assigns: %{live_action: :create}}),
     do:
       {:noreply,
        socket
@@ -93,62 +74,6 @@ defmodule LiveAdmin.Components.Container do
        |> assign_prefix(params)}
 
   def handle_params(_, _, socket), do: {:noreply, socket}
-
-  @impl true
-  def handle_event(
-        "task",
-        params = %{"name" => name},
-        socket = %{
-          assigns: %{session: session, resource: resource, config: config}
-        }
-      ) do
-    {_, m, f, _, _} =
-      LiveAdmin.fetch_function(resource, session, :tasks, String.to_existing_atom(name))
-
-    args = [session | Map.get(params, "args", [])]
-
-    search = Map.get(socket.assigns, :search)
-
-    task =
-      Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, fn ->
-        try do
-          case apply(m, f, [Resource.query(resource, search, config) | args]) do
-            {:ok, message} ->
-              LiveAdmin.PubSub.announce(
-                session.id,
-                :success,
-                trans("Task %{name} succeeded: '%{message}'",
-                  inter: [name: name, message: message]
-                )
-              )
-
-            {:error, message} ->
-              LiveAdmin.PubSub.announce(
-                session.id,
-                :error,
-                trans("Task %{name} failed: '%{message}'",
-                  inter: [name: name, message: message]
-                )
-              )
-          end
-        rescue
-          error ->
-            Logger.error(inspect(error))
-
-            LiveAdmin.PubSub.announce(
-              session.id,
-              :error,
-              trans("Task %{name} failed", inter: [name: name])
-            )
-        after
-          LiveAdmin.PubSub.update_job(session.id, self(), progress: 1)
-        end
-      end)
-
-    LiveAdmin.PubSub.update_job(session.id, task.pid, progress: 0, label: name)
-
-    {:noreply, push_navigate(socket, to: route_with_params(socket.assigns))}
-  end
 
   @impl true
   def handle_event("set_locale", %{"locale" => locale}, socket) do
@@ -164,89 +89,20 @@ defmodule LiveAdmin.Components.Container do
     {:noreply, socket}
   end
 
-  def render(assigns = %{loading: true}), do: ~H""
-
   @impl true
+  def render(assigns = %{loading: true}), do: ~H"LOADING"
+
   def render(assigns) do
     ~H"""
-    <div class="resource__banner">
-      <h1 class="resource__title">
-        {resource_title(@resource, @config)}
-      </h1>
-
-      <div class="resource__actions">
-        <div>
-          <.link
-            navigate={route_with_params(assigns, params: [prefix: @prefix])}
-            class="resource__action--btn"
-          >
-            {trans("List")}
-          </.link>
-          <%= if LiveAdmin.fetch_config(@resource, :create_with, @config) != false do %>
-            <.link
-              navigate={route_with_params(assigns, segments: ["new"], params: [prefix: @prefix])}
-              class="resource__action--btn"
-            >
-              {trans("New")}
-            </.link>
-          <% else %>
-            <button class="resource__action--disabled" disabled="disabled">
-              {trans("New")}
-            </button>
-          <% end %>
-          <.dropdown
-            :let={task}
-            label={trans("Run task")}
-            items={get_function_keys(@resource, @config, :tasks)}
-            disabled={Enum.empty?(get_function_keys(@resource, @config, :tasks))}
-          >
-            <.task_control task={task} session={@session} resource={@resource} />
-          </.dropdown>
-          <%= if Enum.any?(@prefix_options) do %>
-            <.dropdown
-              :let={prefix}
-              id="prefix-select"
-              label={@prefix || trans("Set prefix")}
-              items={[""] ++ Enum.filter(@prefix_options, &(to_string(&1) != @prefix))}
-            >
-              <.link navigate={route_with_params(assigns, params: [prefix: prefix])}>
-                {if prefix == "", do: trans("clear"), else: prefix}
-              </.link>
-            </.dropdown>
-          <% end %>
-          <%= if LiveAdmin.use_i18n? do %>
-            <.dropdown
-              :let={locale}
-              id="locale-select"
-              label={@session.locale || "Set locale"}
-              items={
-                Enum.filter(
-                  LiveAdmin.gettext_backend().locales(),
-                  &(to_string(&1) != @session.locale)
-                )
-              }
-            >
-              <button
-                class="resource__action--link"
-                phx-click={JS.push("set_locale", value: %{locale: locale}, page_loading: true)}
-              >
-                {locale}
-              </button>
-            </.dropdown>
-          <% end %>
-        </div>
-      </div>
-    </div>
-
-    {render("#{@live_action}.html", assigns)}
+    {render(@live_action, assigns)}
     """
   end
 
-  def render("list.html", assigns) do
+  def render(:index, assigns) do
     ~H"""
     <.live_component
       module={@mod}
-      id="list"
+      id="index"
       key={@key}
       resource={@resource}
       page={@page}
@@ -264,7 +120,7 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def render("new.html", assigns) do
+  def render(:create, assigns) do
     ~H"""
     <.live_component
       module={@mod}
@@ -282,7 +138,7 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def render("edit.html", assigns) do
+  def render(:edit, assigns) do
     ~H"""
     <.live_component
       module={@mod}
@@ -301,11 +157,11 @@ defmodule LiveAdmin.Components.Container do
     """
   end
 
-  def render("view.html", assigns) do
+  def render(:show, assigns) do
     ~H"""
     <.live_component
       module={@mod}
-      id="view"
+      id="show"
       record={@record}
       resource={@resource}
       resources={@resources}
@@ -420,60 +276,5 @@ defmodule LiveAdmin.Components.Container do
           )
       )
     end
-  end
-
-  defp task_control(assigns) do
-    {name, _, _, arity, docs} =
-      LiveAdmin.fetch_function(assigns.resource, assigns.session, :tasks, assigns.task)
-
-    extra_arg_count = arity - 2
-
-    assigns =
-      assign(assigns,
-        extra_arg_count: extra_arg_count,
-        function_docs: docs,
-        modalize: extra_arg_count > 0 or Enum.any?(docs),
-        title: name |> to_string() |> humanize()
-      )
-
-    ~H"""
-    <button
-      class="resource__action--link"
-      phx-click={
-        if @modalize,
-          do:
-            JS.show(
-              to: "##{@task}-task-modal",
-              transition: {"ease-in duration-300", "opacity-0", "opacity-100"}
-            ),
-          else: JS.push("task", value: %{"name" => @task}, page_loading: true)
-      }
-      ,
-      data-confirm={if @modalize, do: nil, else: "Are you sure?"}
-    >
-      {@task |> to_string() |> humanize()}
-    </button>
-    <%= if @modalize do %>
-      <.modal id={"#{@task}-task-modal"}>
-        <span class="modal__title">{@title}</span>
-        <%= for {_lang, doc} <- @function_docs do %>
-          <span class="docs">{doc}</span>
-        <% end %>
-        <.form for={Phoenix.Component.to_form(%{})} phx-submit="task">
-          <input type="hidden" name="name" value={@task} />
-          <%= if @extra_arg_count > 0 do %>
-            <b>Arguments</b>
-            <%= for num <- 1..@extra_arg_count do %>
-              <div>
-                <label>{num}</label>
-                <input type="text" name="args[]" />
-              </div>
-            <% end %>
-          <% end %>
-          <input type="submit" value="Execute" />
-        </.form>
-      </.modal>
-    <% end %>
-    """
   end
 end
