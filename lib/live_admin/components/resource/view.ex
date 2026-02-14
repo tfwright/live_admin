@@ -54,7 +54,7 @@ defmodule LiveAdmin.Components.Container.View do
           <% end %>
         </dl>
         <div class="form__actions">
-          <%= if LiveAdmin.fetch_config(@resource, :update_with, @config) != false do %>
+          <%= if LiveAdmin.fetch_config(@resource, :update_with, @config) do %>
             <.link
               navigate={route_with_params(assigns, segments: [:edit, @record])}
               class="resource__action--btn"
@@ -62,7 +62,7 @@ defmodule LiveAdmin.Components.Container.View do
               {trans("Edit")}
             </.link>
           <% end %>
-          <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
+          <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) do %>
             <button
               class="resource__action--danger"
               data-confirm="Are you sure?"
