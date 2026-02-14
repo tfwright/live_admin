@@ -293,7 +293,7 @@ defmodule LiveAdmin.Components.Container.Index do
                   items={get_function_keys(@resource, @config, :actions)}
                   disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
                 >
-                  <.action_control action={action} session={@session} resource={@resource} />
+                  <.action_control action={action} config={@config} resource={@resource} />
                 </.dropdown>
               </div>
             <% else %>
@@ -516,7 +516,7 @@ defmodule LiveAdmin.Components.Container.Index do
         {label, mod, func, _, _} =
           LiveAdmin.fetch_function(
             resource,
-            session,
+            config,
             :actions,
             String.to_existing_atom(name)
           )

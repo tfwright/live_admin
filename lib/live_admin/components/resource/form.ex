@@ -196,7 +196,7 @@ defmodule LiveAdmin.Components.Container.Form do
         assigns,
         :associated_resource,
         associated_resource(
-          LiveAdmin.fetch_config(assigns.resource, :schema, assigns.session),
+          LiveAdmin.fetch_config(assigns.resource, :schema, assigns.config),
           assigns.field,
           assigns.resources,
           :resource

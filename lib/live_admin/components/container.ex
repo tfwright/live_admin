@@ -103,7 +103,7 @@ defmodule LiveAdmin.Components.Container do
         }
       ) do
     {_, m, f, _, _} =
-      LiveAdmin.fetch_function(resource, session, :tasks, String.to_existing_atom(name))
+      LiveAdmin.fetch_function(resource, config, :tasks, String.to_existing_atom(name))
 
     args = [session | Map.get(params, "args", [])]
 
@@ -200,7 +200,7 @@ defmodule LiveAdmin.Components.Container do
             items={get_function_keys(@resource, @config, :tasks)}
             disabled={Enum.empty?(get_function_keys(@resource, @config, :tasks))}
           >
-            <.task_control task={task} session={@session} resource={@resource} />
+            <.task_control task={task} config={@config} resource={@resource} />
           </.dropdown>
           <%= if Enum.any?(@prefix_options) do %>
             <.dropdown
@@ -424,7 +424,7 @@ defmodule LiveAdmin.Components.Container do
 
   defp task_control(assigns) do
     {name, _, _, arity, docs} =
-      LiveAdmin.fetch_function(assigns.resource, assigns.session, :tasks, assigns.task)
+      LiveAdmin.fetch_function(assigns.resource, assigns.config, :tasks, assigns.task)
 
     extra_arg_count = arity - 2
 

@@ -84,7 +84,7 @@ defmodule LiveAdmin.Components.Container.View do
             items={get_function_keys(@resource, @config, :actions)}
             disabled={Enum.empty?(LiveAdmin.fetch_config(@resource, :actions, @config))}
           >
-            <.action_control action={action} session={@session} resource={@resource} target={@myself} />
+            <.action_control action={action} config={@config} resource={@resource} target={@myself} />
           </.dropdown>
         </div>
       </div>
@@ -130,13 +130,18 @@ defmodule LiveAdmin.Components.Container.View do
   def handle_event(
         "action",
         params = %{"name" => action},
-        socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo, session: session}}
+        socket = %{assigns: %{resource: resource, prefix: prefix, repo: repo}}
       ) do
     record =
       socket.assigns[:record] || Resource.find!(params["id"], resource, prefix, repo)
 
     {_, m, f, _, _} =
-      LiveAdmin.fetch_function(resource, session, :actions, String.to_existing_atom(action))
+      LiveAdmin.fetch_function(
+        resource,
+        socket.assigns.config,
+        :actions,
+        String.to_existing_atom(action)
+      )
 
     socket =
       case apply(m, f, [record, socket.assigns.session] ++ Map.get(params, "args", [])) do

@@ -125,7 +125,7 @@ defmodule LiveAdmin.Components do
 
   def action_control(assigns) do
     {name, _, _, arity, docs} =
-      LiveAdmin.fetch_function(assigns.resource, assigns.session, :actions, assigns.action)
+      LiveAdmin.fetch_function(assigns.resource, assigns.config, :actions, assigns.action)
 
     extra_arg_count = arity - 2
 

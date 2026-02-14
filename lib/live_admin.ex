@@ -106,10 +106,10 @@ defmodule LiveAdmin do
   """
   def base_configs_schema, do: @options_schema
 
-  def fetch_function(resource, session, function_type, function)
+  def fetch_function(resource, config, function_type, function)
       when function_type in [:tasks, :actions] and is_atom(function) do
     with result = {_, m, f, _} <-
-           extract_function_from_config(resource, session, function_type, function),
+           extract_function_from_config(resource, config, function_type, function),
          docs when is_map(docs) <- extract_function_docs(m, f) do
       Tuple.append(result, docs)
     end
@@ -123,7 +123,7 @@ defmodule LiveAdmin do
       )
 
   def fetch_config(resource, key, config),
-    do: Keyword.get(resource.__live_admin_config__(), key) || Keyword.fetch!(config, key)
+    do: Keyword.get(resource.__live_admin_config__(), key, Keyword.get(config, key))
 
   def primary_key!(resource) do
     [key] = Keyword.fetch!(resource.__live_admin_config__(), :schema).__schema__(:primary_key)
