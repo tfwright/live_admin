@@ -182,7 +182,7 @@ defmodule LiveAdmin.Components.Container do
           >
             {trans("List")}
           </.link>
-          <%= if LiveAdmin.fetch_config(@resource, :create_with, @config) != false do %>
+          <%= if LiveAdmin.fetch_config(@resource, :create_with, @config) do %>
             <.link
               navigate={route_with_params(assigns, segments: ["new"], params: [prefix: @prefix])}
               class="resource__action--btn"

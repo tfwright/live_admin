@@ -276,7 +276,7 @@ defmodule LiveAdmin.Components.Container.Index do
           <div>
             <%= if !assigns[:job] do %>
               <div class="table__actions">
-                <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) != false do %>
+                <%= if LiveAdmin.fetch_config(@resource, :delete_with, @config) do %>
                   <button
                     class="resource__action--danger"
                     data-action="delete"
