@@ -184,14 +184,10 @@ defmodule LiveAdmin.Components do
 
   def modal(assigns) do
     ~H"""
-    <div
-      id={@id}
-      class="modal"
-      phx-capture-click={
+    <div id={@id} class="modal">
+      <div phx-click-away={
         JS.hide(to: "##{@id}", transition: {"ease-out duration-300", "opacity-100", "opacity-0"})
-      }
-    >
-      <div>
+      }>
         {render_slot(@inner_block)}
       </div>
     </div>
