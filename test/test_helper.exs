@@ -8,7 +8,7 @@ Application.put_env(:live_admin, LiveAdminTest.Repo,
 defmodule LiveAdminTest.Repo do
   use Ecto.Repo, otp_app: :live_admin, adapter: Ecto.Adapters.Postgres
 
-  def prefixes, do: ["alt"]
+  def prefixes, do: ["public", "alt"]
 end
 
 _ = Ecto.Adapters.Postgres.storage_up(LiveAdminTest.Repo.config())
@@ -96,3 +96,5 @@ LiveAdminTest.Repo.delete_all(LiveAdminTest.Post, prefix: "alt")
 ExUnit.start()
 
 Ecto.Adapters.SQL.Sandbox.mode(LiveAdminTest.Repo, :manual)
+
+Code.ensure_loaded(LiveAdminTest.CustomStringType)
