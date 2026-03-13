@@ -59,7 +59,7 @@ If you are already [running LiveView](https://hexdocs.pm/phoenix_live_view/insta
     end
     ```
 
-4. Finally, tell LiveAdmin what Ecto repo to use to run queries in your `runtime.ex`:
+4. Finally, tell LiveAdmin what Ecto repo to use to run queries in your `runtime.exs`:
 
     ```
     config :live_admin, ecto_repo: MyApp.Repo
@@ -80,6 +80,7 @@ every aspect of a particular resource view, like the edit form.
 * `query_with` - function used to fetch a batch of records
 * `render_with` - function used to encode field values in views
 * `create_with` - function used to insert a record
+* `delete_with` - function used to delete a record
 * `update_with` - function used to update a record
 * `validate_with` - function used to validate a changeset
 * `label_with` - function used to refer to records in views
