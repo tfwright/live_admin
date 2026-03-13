@@ -1,0 +1,138 @@
+.embed-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.embed-section-wrapper {
+    margin-bottom: 15px;
+}
+
+.embed-section-title-wrapper {
+    margin-bottom: 15px;
+}
+
+.embed-section {
+    background: #f7f7f7;
+    padding: 25px;
+    padding-top: 50px;
+    border-radius: 8px;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.embed-section.odd {
+    position: relative;
+    background: #fff;
+    border-radius: 6px;
+    border: 1px solid #cbd5e0;
+    transition: border-color 0.2s;
+}
+
+.embed.subsection:hover {
+    border-color: #a0aec0;
+}
+
+.embed-section:has(.remove-icon.phx-click-loading) {
+    opacity: var(--opacity-disabled);
+    pointer-events: none;
+}
+
+.add-section-btn {
+    margin-top: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    background: var(--bg-white);
+    color: #2d3748;
+    border: 1px dashed var(--border-medium);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-section-btn:hover {
+    border-style: solid;
+}
+
+.remove-icon {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    color: #e53e3e;
+    transition:
+        color 0.2s,
+        opacity 0.2s;
+    background: none;
+    border: none;
+    padding: 0;
+    opacity: var(--opacity-muted);
+}
+
+.remove-icon:hover {
+    color: #c53030;
+    opacity: 1;
+}
+
+.remove-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.drag-icon {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    cursor: grab;
+    color: #718096;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.drag-icon:active {
+    cursor: grabbing;
+}
+
+.drag-icon:hover {
+    color: #4a5568;
+}
+
+.drag-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+    transition:
+        transform 0.2s,
+        opacity 0.2s;
+}
+
+.drop-zone {
+    height: 60px;
+    margin: 10px 0;
+    border: 2px dashed #4299e1;
+    border-radius: 8px;
+    background: #ebf8ff;
+    align-items: center;
+    justify-content: center;
+    color: #4299e1;
+    font-weight: 500;
+    font-size: 14px;
+    display: none;
+    opacity: var(--opacity-muted);
+}

@@ -1,0 +1,67 @@
+.edit-view {
+    display: block;
+}
+
+.edit-view.hidden {
+    display: none;
+}
+
+.search-select-container[class$="loading"] {
+    opacity: 0.5;
+}
+
+.search-select-container[class$="loading"] input,
+.search-select-container[class$="loading"] button {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+input[class$="loading"] {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+input[class$="loading"] + .select-options {
+    content: "";
+}
+
+button[class$="loading"] {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 0.5;
+    }
+}
+
+.spinner {
+    width: 80px;
+    height: 80px;
+    border: 8px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--border-light);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 80px auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,33 @@
+.content-card {
+    background: var(--bg-white);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.content-card:has(.tabs) {
+    padding: 0;
+}
+
+.content-card:has(.tabs) .card-section {
+    padding: 24px;
+}
+
+.card-section {
+    margin-bottom: 24px;
+}
+
+.card-section:last-child {
+    margin-bottom: 0;
+}
+
+.card-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.card-text {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}

@@ -1,0 +1,231 @@
+.sidebar {
+    width: 20vw;
+    min-width: 200px;
+    max-width: 300px;
+    background: var(--bg-white);
+    border-right: 1px solid var(--border-light);
+    padding: 24px 0 180px 0;
+    position: fixed;
+    left: 0;
+    top: var(--top-height);
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+body:has(.alert-bar) .sidebar {
+    top: 112px;
+}
+
+.nav-section {
+    margin-bottom: 32px;
+}
+
+.nav-section-title {
+    padding: 0 24px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.nav-item {
+    padding: 10px 24px;
+    color: var(--text-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.nav-item:hover {
+    background: var(--bg-light);
+}
+
+.nav-item.active {
+    background: var(--bg-light);
+    font-weight: 500;
+    border-left: 3px solid var(--accent-color);
+    color: var(--accent-color) !important;
+}
+
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.nav-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.nav-item-expand {
+    margin-left: auto;
+    opacity: var(--opacity-muted);
+    font-size: 12px;
+    transition: transform 0.2s;
+}
+
+.nav-toggle-input {
+    display: none;
+}
+
+.nav-toggle-label {
+    padding: 10px 24px;
+    color: var(--text-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.2s;
+    cursor: pointer;
+    user-select: none;
+}
+
+.nav-toggle-label:hover {
+    background: var(--bg-light);
+}
+
+.nav-toggle-label.active {
+    background: var(--bg-medium);
+    font-weight: 500;
+    border-left: 3px solid var(--accent-color);
+}
+
+.nav-subitems {
+    max-height: 0;
+    overflow: hidden;
+}
+
+.nav-toggle-input:checked + .nav-toggle-label + .nav-subitems {
+    max-height: none;
+}
+
+.nav-toggle-input:checked + .nav-toggle-label .nav-item-expand {
+    transform: rotate(180deg);
+}
+
+.nav-subitems .nav-toggle-label {
+    padding: 8px 24px;
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+.nav-subitems .nav-toggle-label:hover {
+    color: var(--accent-color);
+    background: transparent;
+}
+
+.nav-subitems .nav-subitems {
+    padding-left: 16px;
+    max-height: 0;
+}
+
+.nav-subitems .nav-subitems a {
+    padding: 8px 24px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    transition: color 0.2s;
+}
+
+.nav-subitems .nav-subitems a:hover {
+    color: var(--accent-color);
+}
+
+.nav-subitem {
+    padding: 8px 24px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    transition: color 0.2s;
+}
+
+.nav-subitem:hover {
+    color: var(--accent-color);
+}
+
+.nav-subitem .nav-item-expand {
+    opacity: var(--opacity-muted);
+    font-size: 12px;
+}
+
+.nav-subitems .nav-icon {
+    display: none;
+}
+
+.nav-progress-section {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 24px 24px;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-white);
+}
+
+.nav-progress-section:not(:has(*)) {
+    display: none;
+}
+
+.nav-progress-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+}
+
+.progress-item {
+    margin-bottom: 16px;
+}
+
+.progress-item:last-child {
+    margin-bottom: 0;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.progress-label {
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.progress-percentage {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-medium);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}

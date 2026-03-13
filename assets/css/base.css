@@ -1,0 +1,120 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: system-ui, sans-serif;
+    background: var(--bg-light);
+    color: var(--text-primary);
+
+    --accent-color: #6b46c1;
+    --accent-hover: #7c3aed;
+
+    --bg-light: #f5f5f7;
+    --bg-white: #fff;
+    --bg-medium: #e8e8ed;
+
+    --border-light: #d2d2d7;
+    --border-medium: #e8e8ed;
+
+    --text-primary: #1d1d1f;
+    --text-secondary: #515154;
+    --text-muted: #86868b;
+
+    --error-bg: #fef2f2;
+    --error-color: #dc2626;
+    --error-hover: #7f1d1d;
+
+    --success-bg: #f0fdf4;
+    --success-light: #d1fae5;
+    --success-color: #16a34a;
+    --success-dark: #065f46;
+    --success-hover: #166534;
+
+    --info-bg: #eff6ff;
+    --info-light: #dbeafe;
+    --info-color: #2563eb;
+    --info-dark: #1e40af;
+    --info-hover: #1e40af;
+
+    --warning-bg: #fff1e5;
+    --warning-color: #e53e3e;
+    --warning-hover: #c53030;
+
+    --purple-50: #f3e8ff;
+    --purple-100: #e9d5ff;
+
+    --opacity-disabled: 0.4;
+    --opacity-muted: 0.7;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+    --focus-ring: 0 0 0 3px rgba(107, 70, 193, 0.1);
+
+    --top-height: 64px;
+}
+
+body {
+    padding-top: var(--top-height);
+}
+
+body:has(.alert-bar) {
+    padding-top: 112px;
+}
+
+p {
+    margin: 1lh 0;
+}
+
+h1[class$="title"],
+h3[class$="title"],
+h3[class$="title"] {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-hover);
+    font-size: 16px;
+    opacity: 0.75;
+}
+
+h1[class$="title"] {
+    font-size: 16px;
+}
+
+h2[class$="title"] {
+    font-size: 14px;
+}
+
+h3[class$="title"] {
+    font-size: 12px;
+}
+
+h1 span,
+h2 span,
+h3 span {
+    display: block;
+    font-size: 2.5em;
+    color: var(--text-primary);
+    text-transform: none;
+    opacity: 1;
+}
+
+select {
+    background-color: #fff;
+}
+
+pre {
+    overflow: scroll;
+}
+
+th {
+    white-space: nowrap;
+}
+
+*:disabled {
+    opacity: 0.5;
+}

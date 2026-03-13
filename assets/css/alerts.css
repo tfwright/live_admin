@@ -1,0 +1,111 @@
+#alert-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+}
+
+#alert-bar:hover .alert-bar + .alert-bar {
+    top: 64px;
+    opacity: 100;
+    position: relative;
+}
+
+.alert-bar {
+    position: absolute;
+    padding: 14px 24px;
+    align-items: center;
+    justify-content: space-between;
+    border-width: 2px 0;
+    border-style: solid;
+    transition: all 0.2s ease-in-out;
+    width: 100%;
+    display: flex;
+    height: 64px;
+    z-index: 2;
+}
+
+.alert-bar + .alert-bar {
+    border-top-width: 0;
+    top: 0;
+    opacity: 0;
+    z-index: 1;
+}
+
+.alert-count {
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 50%;
+    width: 1.25lh;
+    text-align: center;
+    height: 1.25lh;
+    vertical-align: middle;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.alert-bar.error {
+    background: var(--error-bg);
+    border-color: var(--error-color);
+    color: var(--error-color);
+}
+
+.alert-bar.error:hover {
+    color: var(--error-hover);
+}
+
+.alert-bar.success {
+    background: var(--success-bg);
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.alert-bar.success:hover {
+    color: var(--success-hover);
+}
+
+.alert-bar.info {
+    background: var(--info-bg);
+    border-color: var(--info-color);
+    color: var(--info-color);
+}
+
+.alert-bar.info:hover {
+    color: var(--info-hover);
+}
+
+#alert-bar[class$="loading"] {
+    opacity: var(--opacity-muted);
+    pointer-events: none;
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.alert-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.alert-message {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.alert-close {
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 600;
+    flex-shrink: 0;
+}

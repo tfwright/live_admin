@@ -1,0 +1,63 @@
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.detail-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-field-value {
+    font-size: 16px;
+    color: var(--text-primary);
+    max-height: calc(1lh * 3);
+    min-height: 1.5lh;
+    overflow: hidden;
+    display: flex;
+    position: relative;
+}
+
+.detail-field-value > span {
+    display: flex;
+}
+
+.detail-field-value .btn {
+    padding: 4px;
+    margin: 2px;
+    cursor: default;
+}
+
+.detail-field-value:hover .assoc-link-icon {
+    display: flex;
+}
+
+.detail-field-value:hover .expand-icon {
+    display: flex;
+}
+
+.detail-subtitle + .detail-subtitle::before {
+    content: "|";
+}
+
+.expand-content {
+    background: var(--bg-light);
+    padding: 16px;
+    border-radius: 8px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    overflow: scroll;
+    white-space: pre;
+    font-family: monospace;
+}
