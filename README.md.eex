@@ -29,7 +29,7 @@ If you are already [running LiveView](https://hexdocs.pm/phoenix_live_view/insta
 1. Add to your app's `deps`:
 
     ```elixir
-    {:live_admin, "~> <%= app_version %>"}
+    {:live_admin, ">= 0.0.0"}
     ```
 
 2. Configure module(s) to act as a LiveAdmin resource:
