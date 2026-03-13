@@ -2,13 +2,14 @@ defmodule LiveAdmin do
   @moduledoc docout: [LiveAdmin.READMECompiler]
 
   @type mod_func :: {module(), :atom}
-  @type func_ref :: :atom | mod_func() | :mfa
+  @type func_ref :: atom() | mod_func()
   @type func_list :: [func_ref] | keyword(func_ref)
   @type field_list :: [:atom]
 
   @options_schema [
     components: [
       type: :non_empty_keyword_list,
+      doc: "Overrides portions of the UI with custom LiveComponent modules.",
       type_doc: "list of modules implementing LiveComponent overrides of LiveAdmin views",
       keys: [
         nav: [type: :atom],
@@ -22,49 +23,60 @@ defmodule LiveAdmin do
     ],
     ecto_repo: [
       type: :atom,
+      doc: "Required. Must be set at the application or scope level.",
       type_doc: "Ecto Repo used to query resource"
     ],
     query_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
+      doc: "Customizes how records are fetched. Receives the resource and search term and should return an Ecto queryable. Useful for adding preloads or custom search logic. When not set, uses the schema with built-in search.",
       type_doc: "`t:func_ref/0` returning an Ecto queryable"
     ],
     render_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
+      doc: "Customizes how field values are displayed. Receives the record, field name, and session. Should return a string or `Phoenix.HTML.Safe` value to render HTML. When not set, uses built-in type-based rendering.",
       type_doc: "`t:func_ref/0` used to convert field values to strings when rendering"
     ],
     delete_with: [
-      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      type_doc: "`t:func_ref/0` or `false` to disable deleting records"
+      type: {:or, [{:in, [false]}, :atom, {:tuple, [:atom, :atom]}]},
+      doc: "Customizes how records are deleted. Can be set to `false` to disable. When not set, uses `Repo.delete`.",
+      type_doc: "`t:func_ref/0` or `false`"
     ],
     create_with: [
-      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      type_doc: "`t:func_ref/0` or `false` to disable creating records"
+      type: {:or, [{:in, [false]}, :atom, {:tuple, [:atom, :atom]}]},
+      doc: "Customizes how records are created. Can be set to `false` to disable. When not set, builds a changeset that casts all fields with no validations and calls `Repo.insert`.",
+      type_doc: "`t:func_ref/0` or `false`"
     ],
     update_with: [
-      type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      type_doc: "`t:func_ref/0` or `false` to disable updating records"
+      type: {:or, [{:in, [false]}, :atom, {:tuple, [:atom, :atom]}]},
+      doc: "Customizes how records are updated. Can be set to `false` to disable. When not set, builds a changeset that casts all fields with no validations and calls `Repo.update`.",
+      type_doc: "`t:func_ref/0` or `false`"
     ],
     validate_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      type_doc:
-        "`t:func_ref/0` used to validate create/update changesets in LiveAdmin :form component"
+      doc: "Customizes how changesets are validated in create/update forms. When not set, no additional validation is applied.",
+      type_doc: "`t:func_ref/0`"
     ],
     label_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      type_doc:
-        "`t:func_ref/0` used to convert (association) record to string in LiveAdmin SearchSelect component"
+      doc: "Customizes how records are identified in the UI. When not set, uses the primary key.",
+      type_doc: "`t:func_ref/0`"
     ],
     title_with: [
       type: {:or, [:string, {:tuple, [:atom, :atom]}]},
-      type_doc: "string literal or MFA returning a string used to render LiveAdmin UI heading"
+      doc: "Customizes the heading displayed for a resource. When not set, uses the schema module name.",
+      type_doc: "string literal or `t:func_ref/0`"
     ],
     hidden_fields: [
       type: {:list, :atom},
-      type_doc: "`t:field_list/0` to be hidden from LiveView"
+      default: [],
+      doc: "Specifies fields to hide from all views.",
+      type_doc: "`t:field_list/0`"
     ],
     immutable_fields: [
       type: {:list, :atom},
-      type_doc: "`t:field_list/0` to be disabled in LiveAdmin :form component"
+      default: [],
+      doc: "Specifies fields to disable in create/update forms.",
+      type_doc: "`t:field_list/0`"
     ],
     actions: [
       type:
@@ -77,6 +89,8 @@ defmodule LiveAdmin do
             {:tuple,
              [:atom, {:or, [{:tuple, [:atom, :atom]}, {:tuple, [:atom, :atom, :integer]}]}]}
           ]}},
+      default: [],
+      doc: "Defines functions that operate on a specific record.",
       type_doc: "`t:func_list/0` taking a record, LiveAdmin session struct, and any extra args"
     ],
     tasks: [
@@ -90,8 +104,10 @@ defmodule LiveAdmin do
             {:tuple,
              [:atom, {:or, [{:tuple, [:atom, :atom]}, {:tuple, [:atom, :atom, :integer]}]}]}
           ]}},
+      default: [],
+      doc: "Defines functions that operate on a resource as a whole.",
       type_doc:
-        "`t:func_list/0` taking a query, LiveAdmin session and any extra args. The query will include any search conditions limiting results, but not pagination or order"
+        "`t:func_list/0` taking a query, LiveAdmin session, and any extra args"
     ]
   ]
   @doc """
