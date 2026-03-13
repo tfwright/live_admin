@@ -1,7 +1,7 @@
 defmodule LiveAdmin.MixProject do
   use Mix.Project
 
-  @version "0.13.0-dev"
+  @version "1.0.0-rc.1"
 
   def project do
     [
