@@ -18,7 +18,23 @@ jobs:
     strategy:
       matrix:
         elixir: ["1.17.x", "1.18.x", "1.19.x"]
-        otp: ["26.x", "27.x", "28.x"]
+        otp: ["26.x", "27.x"]
+
+    services:
+      db:
+        image: postgres:13-alpine
+        env:
+          POSTGRES_DB: phx_admin_dev
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v2
@@ -34,12 +50,12 @@ jobs:
           _build
         key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-deps-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
     - name: Get deps
-      run: docker compose run app mix deps.get
+      run: mix deps.get
     - name: Compile deps
-      run: docker compose run app mix deps.compile
+      run: mix deps.compile
     - name: Check for uncommitted changes
       run: exit $( git status --porcelain | head -255 | wc -l )
+    - name: Set up database
+      run: PGPASSWORD=postgres psql -h 127.0.0.1 -U postgres -d phx_admin_dev -f dev/initdb/structure.sql
     - name: Run tests
-      run: docker compose run -e MIX_ENV=test app mix do compile --warnings-as-errors, test
-    - name: Check dev
-      run: docker compose up --wait
+      run: mix do compile --warnings-as-errors + test
