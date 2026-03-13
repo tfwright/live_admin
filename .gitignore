@@ -37,3 +37,6 @@ live_admin-*.tar
 .DS_Store
 
 archives/
+
+# Source maps (generated in dev watch mode)
+dist/js/*.map

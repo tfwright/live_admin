@@ -23,7 +23,7 @@ let opts = {
 }
 if (mode === 'watch') {
   opts = {
-    sourcemap: 'inline',
+    sourcemap: 'external',
     ...opts
   }
 }
