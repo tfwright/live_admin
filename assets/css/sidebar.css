@@ -1,16 +1,67 @@
+.sidebar-toggle-input {
+    display: none;
+}
+
+.sidebar-toggle-label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    right: -16px;
+    bottom: 24px;
+    width: 16px;
+    height: 40px;
+    background: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.sidebar-toggle-label:hover {
+    color: var(--text-primary);
+}
+
+.sidebar-toggle-label svg {
+    transition: transform 0.2s;
+}
+
+.sidebar-toggle-input:not(:checked) ~ .main-layout .sidebar-toggle-label svg {
+    transform: rotate(180deg);
+}
+
 .sidebar {
     width: 20vw;
     min-width: 200px;
     max-width: 300px;
     background: var(--bg-white);
     border-right: 1px solid var(--border-light);
-    padding: 24px 0 180px 0;
     position: fixed;
     left: 0;
     top: var(--top-height);
     bottom: 0;
-    overflow-y: auto;
+    overflow: visible;
     z-index: 10;
+    transition: min-width 0.2s, max-width 0.2s;
+}
+
+.sidebar-content {
+    overflow-y: auto;
+    padding: 24px 0 180px 0;
+    height: 100%;
+    position: relative;
+}
+
+.sidebar-toggle-input:not(:checked) ~ .main-layout .sidebar {
+    min-width: 0;
+    max-width: 0;
+    border-right: none;
+}
+
+.sidebar-toggle-input:not(:checked) ~ .main-layout .sidebar-content {
+    overflow: hidden;
 }
 
 body:has(.alert-bar) .sidebar {

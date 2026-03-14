@@ -48,25 +48,33 @@
 </header>
 
 <!-- Main Layout -->
+<input type="checkbox" id="sidebar-toggle" class="sidebar-toggle-input" checked>
 <div class="main-layout">
   <aside class="sidebar">
-    <.live_component
-      id="nav"
-      module={get_in(@config, [:components, :nav])}
-      title={Keyword.fetch!(@config, :title)}
-      base_path={@base_path}
-      resources={@resources}
-      resource={assigns[:resource]}
-      prefix={assigns[:prefix]}
-      key={assigns[:key]}
-      config={@config}
-      session={@session}
-    />
-    {live_render(@socket, LiveAdmin.Components.Nav.Jobs,
-      sticky: true,
-      id: "jobs",
-      session: %{"session_id" => @session.id}
-    )}
+    <div class="sidebar-content">
+      <.live_component
+        id="nav"
+        module={get_in(@config, [:components, :nav])}
+        title={Keyword.fetch!(@config, :title)}
+        base_path={@base_path}
+        resources={@resources}
+        resource={assigns[:resource]}
+        prefix={assigns[:prefix]}
+        key={assigns[:key]}
+        config={@config}
+        session={@session}
+      />
+      {live_render(@socket, LiveAdmin.Components.Nav.Jobs,
+        sticky: true,
+        id: "jobs",
+        session: %{"session_id" => @session.id}
+      )}
+    </div>
+    <label for="sidebar-toggle" class="sidebar-toggle-label">
+      <svg width="10" height="18" viewBox="0 0 10 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 4L3 9L7 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </label>
   </aside>
   <main class="content">
     {@inner_content}

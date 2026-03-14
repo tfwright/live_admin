@@ -59,6 +59,12 @@
     margin-left: 20vw;
     max-width: calc(100vw - 20vw);
     box-sizing: border-box;
+    transition: margin-left 0.2s, max-width 0.2s;
+}
+
+.sidebar-toggle-input:not(:checked) ~ .main-layout .content {
+    margin-left: 0;
+    max-width: 100vw;
 }
 
 @media (min-width: 1500px) {
@@ -66,12 +72,22 @@
         margin-left: 300px;
         max-width: calc(100vw - 300px);
     }
+
+    .sidebar-toggle-input:not(:checked) ~ .main-layout .content {
+        margin-left: 0;
+        max-width: 100vw;
+    }
 }
 
 @media (max-width: 1000px) {
     .content {
         margin-left: 200px;
         max-width: calc(100vw - 200px);
+    }
+
+    .sidebar-toggle-input:not(:checked) ~ .main-layout .content {
+        margin-left: 0;
+        max-width: 100vw;
     }
 }
 
