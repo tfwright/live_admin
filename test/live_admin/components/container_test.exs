@@ -271,6 +271,7 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
 
     test "shows error alert", %{view: view} do
+      view |> find_live_child("alerts") |> render()
       assert has_element?(view, ".alert-bar.error")
     end
   end
