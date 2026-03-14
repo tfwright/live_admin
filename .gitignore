@@ -40,3 +40,5 @@ archives/
 
 # Source maps (generated in dev watch mode)
 dist/js/*.map
+
+CLAUDE.md
