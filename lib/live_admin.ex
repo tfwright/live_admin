@@ -231,6 +231,7 @@ defmodule LiveAdmin do
         |> Keyword.fetch!(:schema)
         |> Module.split()
         |> Enum.at(-1)
+        |> String.replace(~r/(?<=[a-z])(?=[A-Z])/, " ")
 
       {m, f} ->
         apply(m, f, [])

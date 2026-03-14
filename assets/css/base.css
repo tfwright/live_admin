@@ -74,7 +74,7 @@ h1[class$="title"],
 h3[class$="title"],
 h3[class$="title"] {
     font-weight: 600;
-    font-variant-caps: small-caps;
+    text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--accent-hover);
     font-size: 16px;
@@ -99,7 +99,6 @@ h3 span {
     display: block;
     font-size: 2.5em;
     color: var(--text-primary);
-    font-variant-caps: normal;
     opacity: 1;
 }
 

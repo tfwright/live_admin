@@ -90,6 +90,7 @@ body:has(.alert-bar) .sidebar {
     gap: 12px;
     transition: background 0.2s;
     cursor: pointer;
+    word-spacing: -0.25em;
 }
 
 .nav-item:hover {
