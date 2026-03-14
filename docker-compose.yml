@@ -25,5 +25,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_HOST_AUTH_METHOD: trust
     image: 'postgres:13-alpine'
+    tmpfs:
+      - /var/lib/postgresql/data
     volumes:
       - './dev/initdb:/docker-entrypoint-initdb.d'
