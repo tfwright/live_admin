@@ -165,6 +165,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "new child resource" do
     setup %{conn: conn} do
       {:ok, view, _} = live(conn, "/live_admin_test_post/new")
+      render_async(view)
 
       %{view: view}
     end
@@ -215,6 +216,7 @@ defmodule LiveAdmin.Components.ContainerTest do
       post = Repo.insert!(%Post{title: "test", previous_versions: [%Version{}, %Version{}]})
 
       {:ok, view, _} = live(conn, "/live_admin_test_post/edit/#{post.post_id}")
+      render_async(view)
 
       %{view: view}
     end
@@ -279,6 +281,7 @@ defmodule LiveAdmin.Components.ContainerTest do
   describe "new post with custom string field" do
     setup %{conn: conn} do
       {:ok, view, _} = live(conn, "/live_admin_test_post/new")
+      render_async(view)
 
       %{view: view}
     end
