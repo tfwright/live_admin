@@ -38,6 +38,13 @@ create table posts (
 
 create schema alt;
 
+create table security_settings (
+  id serial,
+  user_id uuid,
+  two_factor_enabled boolean DEFAULT false,
+  last_login_at timestamp without time zone
+);
+
 create table alt.users (
   id uuid,
   name varchar(100),
@@ -55,6 +62,13 @@ create table alt.users (
 );
 
 CREATE UNIQUE INDEX users_email_index ON alt.users USING btree (email);
+
+create table alt.security_settings (
+  id serial,
+  user_id uuid,
+  two_factor_enabled boolean DEFAULT false,
+  last_login_at timestamp without time zone
+);
 
 create table alt.user_profiles (
   id serial,

@@ -248,6 +248,7 @@ defmodule DemoWeb.Router do
 
     live_admin "/admin", title: "DevAdmin" do
       admin_resource "/users/profiles", Demo.Accounts.User.Profile
+      admin_resource "/security-settings", Demo.Accounts.SecuritySetting
       admin_resource "/users", DemoWeb.UserAdmin
       live "/extra", DemoWeb.Extra, :index, as: :extra
     end

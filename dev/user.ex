@@ -47,6 +47,18 @@ defmodule Demo.Accounts.User.Settings.Config do
   end
 end
 
+defmodule Demo.Accounts.SecuritySetting do
+  use Ecto.Schema
+  use LiveAdmin.Resource
+
+  schema "security_settings" do
+    field :two_factor_enabled, :boolean, default: false
+    field :last_login_at, :naive_datetime
+
+    belongs_to :user, Demo.Accounts.User, type: :binary_id
+  end
+end
+
 defmodule Demo.Accounts.User.Profile do
   use Ecto.Schema
   use LiveAdmin.Resource, create_with: false
