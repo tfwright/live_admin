@@ -13,18 +13,18 @@
 }
 
 .btn-primary {
-    background: var(--accent-color);
-    color: var(--bg-white);
+    background: var(--primary-dark);
+    color: var(--bg);
 }
 
 .btn-primary:hover {
-    background: var(--accent-hover);
+    background: var(--primary-medium);
 }
 
 .btn-secondary {
-    background: var(--bg-white);
-    color: var(--text-primary);
-    border: 1px solid var(--border-light);
+    background: var(--bg);
+    color: var(--text-dark);
+    border: 1px solid var(--border-medium);
 }
 
 .btn-secondary:hover {
@@ -32,24 +32,24 @@
 }
 
 .btn-danger {
-    background-color: var(--warning-color);
-    color: var(--warning-bg);
-    border: solid 1px var(--warning-color);
+    background-color: var(--danger-medium);
+    color: var(--danger-bg);
+    border: solid 1px var(--danger-medium);
 }
 
 .btn-danger:hover {
-    background-color: var(--warning-hover);
+    background-color: var(--danger-dark);
 }
 
 .btn-select {
     padding: 10px 20px;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border-medium);
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    background: var(--bg-white);
-    color: var(--text-primary);
+    background: var(--bg);
+    color: var(--text-dark);
     transition: all 0.2s;
     position: relative;
 }
@@ -81,13 +81,13 @@
     height: 0;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
-    border-top: 5px solid var(--text-primary);
+    border-top: 5px solid var(--text-dark);
     margin-left: 8px;
 }
 
 .btn-select[open] summary::after {
     border-top: none;
-    border-bottom: 5px solid var(--text-primary);
+    border-bottom: 5px solid var(--text-dark);
 }
 
 .btn-icon {
@@ -106,8 +106,8 @@
     position: absolute;
     top: calc(100% + 4px);
     right: 0;
-    background: var(--bg-white);
-    border: 1px solid var(--border-light);
+    background: var(--bg);
+    border: 1px solid var(--border-medium);
     border-radius: 8px;
     box-shadow: var(--shadow-md);
     min-width: 200px;
@@ -120,7 +120,7 @@
 .drop-link {
     display: inline-block;
     padding: 10px 16px;
-    color: var(--text-primary);
+    color: var(--text-dark);
     text-decoration: none;
     font-size: 14px;
     transition: background 0.2s;

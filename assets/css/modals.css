@@ -5,7 +5,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--bg-dark);
     z-index: 2000;
     align-items: center;
     justify-content: center;
@@ -13,7 +13,7 @@
 }
 
 .modal-content {
-    background: var(--bg-white);
+    background: var(--bg);
     border-radius: 12px;
     padding: 32px;
     max-width: 600px;
@@ -30,20 +30,20 @@
     align-items: center;
     margin-bottom: 24px;
     padding-bottom: 16px;
-    border-bottom: 2px solid var(--border-medium);
+    border-bottom: 2px solid var(--border-light);
 }
 
 .modal-title {
     font-size: 20px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-dark);
 }
 
 .modal-close {
     background: none;
     border: none;
     font-size: 28px;
-    color: var(--text-muted);
+    color: var(--text-light);
     cursor: pointer;
     padding: 0;
     width: 32px;
@@ -57,11 +57,11 @@
 
 .modal-close:hover {
     background: var(--bg-light);
-    color: var(--text-primary);
+    color: var(--text-dark);
 }
 
 .modal-body {
-    color: var(--text-secondary);
+    color: var(--text-medium);
     line-height: 1.6;
     position: relative;
 }

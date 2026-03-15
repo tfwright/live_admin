@@ -53,8 +53,8 @@ button[class$="loading"] {
 .spinner {
     width: 80px;
     height: 80px;
-    border: 8px solid rgba(255, 255, 255, 0.3);
-    border-top-color: var(--border-light);
+    border: 8px solid var(--spinner-track);
+    border-top-color: var(--border-medium);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 80px auto;

@@ -13,7 +13,7 @@
 }
 
 .embed-section {
-    background: #f7f7f7;
+    background: var(--bg-light);
     padding: 25px;
     padding-top: 50px;
     border-radius: 8px;
@@ -23,14 +23,14 @@
 
 .embed-section.odd {
     position: relative;
-    background: #fff;
+    background: var(--bg);
     border-radius: 6px;
-    border: 1px solid #cbd5e0;
+    border: 1px solid var(--border-medium);
     transition: border-color 0.2s;
 }
 
 .embed.subsection:hover {
-    border-color: #a0aec0;
+    border-color: var(--border-dark);
 }
 
 .embed-section:has(.remove-icon.phx-click-loading) {
@@ -46,9 +46,9 @@
     justify-content: center;
     gap: 8px;
     padding: 16px;
-    background: var(--bg-white);
-    color: #2d3748;
-    border: 1px dashed var(--border-medium);
+    background: var(--bg);
+    color: var(--text-dark);
+    border: 1px dashed var(--border-light);
     border-radius: 8px;
     font-size: 15px;
     font-weight: 600;
@@ -67,7 +67,7 @@
     width: 24px;
     height: 24px;
     cursor: pointer;
-    color: #e53e3e;
+    color: var(--danger-medium);
     transition:
         color 0.2s,
         opacity 0.2s;
@@ -78,7 +78,7 @@
 }
 
 .remove-icon:hover {
-    color: #c53030;
+    color: var(--danger-dark);
     opacity: 1;
 }
 
@@ -94,7 +94,7 @@
     width: 28px;
     height: 28px;
     cursor: grab;
-    color: #718096;
+    color: var(--text-light);
     transition: color 0.2s;
     background: none;
     border: none;
@@ -106,7 +106,7 @@
 }
 
 .drag-icon:hover {
-    color: #4a5568;
+    color: var(--text-medium);
 }
 
 .drag-icon svg {
@@ -125,12 +125,12 @@
 .drop-zone {
     height: 60px;
     margin: 10px 0;
-    border: 2px dashed #4299e1;
+    border: 2px dashed var(--info-medium);
     border-radius: 8px;
-    background: #ebf8ff;
+    background: var(--info-bg);
     align-items: center;
     justify-content: center;
-    color: #4299e1;
+    color: var(--info-medium);
     font-weight: 500;
     font-size: 14px;
     display: none;

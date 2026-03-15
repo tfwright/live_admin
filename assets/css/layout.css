@@ -1,6 +1,6 @@
 .header {
-    background: var(--bg-white);
-    border-bottom: 1px solid var(--border-light);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border-medium);
     position: fixed;
     top: 0;
     left: 0;
@@ -19,7 +19,7 @@
 .logo {
     font-size: 20px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-dark);
 }
 
 .user-menu {

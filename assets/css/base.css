@@ -4,47 +4,40 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: system-ui, sans-serif;
-    background: var(--bg-light);
-    color: var(--text-primary);
+:root {
+    --primary-bg: #f3e8ff;
+    --primary-light: #e9d5ff;
+    --primary-medium: #7c3aed;
+    --primary-dark: #6b46c1;
 
-    --accent-color: #6b46c1;
-    --accent-hover: #7c3aed;
+    --bg: #fff;
+    --bg-light: #f7f7f7;
+    --bg-medium: #eee;
+    --bg-dark: rgba(0, 0, 0, 0.5);
 
-    --bg-light: #f5f5f7;
-    --bg-white: #fff;
-    --bg-medium: #e8e8ed;
+    --border-light: #e5e7eb;
+    --border-medium: #d2d2d7;
+    --border-dark: #a0aec0;
 
-    --border-light: #d2d2d7;
-    --border-medium: #e8e8ed;
+    --text-dark: #1d1d1f;
+    --text-medium: #515154;
+    --text-light: #86868b;
 
-    --text-primary: #1d1d1f;
-    --text-secondary: #515154;
-    --text-muted: #86868b;
-
-    --error-bg: #fef2f2;
-    --error-color: #dc2626;
-    --error-hover: #7f1d1d;
+    --danger-bg: #fef2f2;
+    --danger-medium: #dc2626;
+    --danger-dark: #7f1d1d;
 
     --success-bg: #f0fdf4;
     --success-light: #d1fae5;
-    --success-color: #16a34a;
+    --success-medium: #16a34a;
     --success-dark: #065f46;
-    --success-hover: #166534;
 
     --info-bg: #eff6ff;
     --info-light: #dbeafe;
-    --info-color: #2563eb;
+    --info-medium: #2563eb;
     --info-dark: #1e40af;
-    --info-hover: #1e40af;
 
-    --warning-bg: #fff1e5;
-    --warning-color: #e53e3e;
-    --warning-hover: #c53030;
-
-    --purple-50: #f3e8ff;
-    --purple-100: #e9d5ff;
+    --spinner-track: rgba(255, 255, 255, 0.3);
 
     --opacity-disabled: 0.4;
     --opacity-muted: 0.7;
@@ -56,6 +49,12 @@ body {
     --focus-ring: 0 0 0 3px rgba(107, 70, 193, 0.1);
 
     --top-height: 64px;
+}
+
+body {
+    font-family: system-ui, sans-serif;
+    background: var(--bg-light);
+    color: var(--text-dark);
 }
 
 body {
@@ -76,7 +75,7 @@ h3[class$="title"] {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--accent-hover);
+    color: var(--primary-dark);
     font-size: 16px;
     opacity: 0.75;
 }
@@ -98,12 +97,12 @@ h2 span,
 h3 span {
     display: block;
     font-size: 2.5em;
-    color: var(--text-primary);
+    color: var(--text-dark);
     opacity: 1;
 }
 
 select {
-    background-color: #fff;
+    background-color: var(--bg);
 }
 
 pre {

@@ -28,12 +28,12 @@
 .error-header h3 {
     font-size: 24px;
     font-weight: 600;
-    color: #1a1a1a;
+    color: var(--text-dark);
 }
 
 .error-message {
     font-size: 15px;
-    color: #666;
+    color: var(--text-light);
     line-height: 1.6;
     max-width: 500px;
 }

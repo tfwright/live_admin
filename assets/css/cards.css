@@ -1,5 +1,5 @@
 .content-card {
-    background: var(--bg-white);
+    background: var(--bg);
     border-radius: 12px;
     padding: 24px;
     box-shadow: var(--shadow-sm);
@@ -28,6 +28,6 @@
 }
 
 .card-text {
-    color: var(--text-secondary);
+    color: var(--text-medium);
     line-height: 1.6;
 }

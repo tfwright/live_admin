@@ -46,33 +46,33 @@
 }
 
 .alert-bar.error {
-    background: var(--error-bg);
-    border-color: var(--error-color);
-    color: var(--error-color);
+    background: var(--danger-bg);
+    border-color: var(--danger-medium);
+    color: var(--danger-medium);
 }
 
 .alert-bar.error:hover {
-    color: var(--error-hover);
+    color: var(--danger-dark);
 }
 
 .alert-bar.success {
     background: var(--success-bg);
-    border-color: var(--success-color);
-    color: var(--success-color);
+    border-color: var(--success-medium);
+    color: var(--success-medium);
 }
 
 .alert-bar.success:hover {
-    color: var(--success-hover);
+    color: var(--success-dark);
 }
 
 .alert-bar.info {
     background: var(--info-bg);
-    border-color: var(--info-color);
-    color: var(--info-color);
+    border-color: var(--info-medium);
+    color: var(--info-medium);
 }
 
 .alert-bar.info:hover {
-    color: var(--info-hover);
+    color: var(--info-dark);
 }
 
 #alert-bar[class$="loading"] {

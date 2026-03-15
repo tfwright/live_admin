@@ -12,16 +12,16 @@
     bottom: 24px;
     width: 16px;
     height: 40px;
-    background: var(--bg-white);
-    border: 1px solid var(--border-light);
+    background: var(--bg);
+    border: 1px solid var(--border-medium);
     border-left: none;
     border-radius: 0 6px 6px 0;
-    color: var(--text-muted);
+    color: var(--text-light);
     transition: color 0.2s;
 }
 
 .sidebar-toggle-label:hover {
-    color: var(--text-primary);
+    color: var(--text-dark);
 }
 
 .sidebar-toggle-label svg {
@@ -36,8 +36,8 @@
     width: 20vw;
     min-width: 200px;
     max-width: 300px;
-    background: var(--bg-white);
-    border-right: 1px solid var(--border-light);
+    background: var(--bg);
+    border-right: 1px solid var(--border-medium);
     position: fixed;
     left: 0;
     top: var(--top-height);
@@ -76,14 +76,14 @@ body:has(.alert-bar) .sidebar {
     padding: 0 24px 12px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--text-light);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .nav-item {
     padding: 10px 24px;
-    color: var(--text-primary);
+    color: var(--text-dark);
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -100,8 +100,8 @@ body:has(.alert-bar) .sidebar {
 .nav-item.active {
     background: var(--bg-light);
     font-weight: 500;
-    border-left: 3px solid var(--accent-color);
-    color: var(--accent-color) !important;
+    border-left: 3px solid var(--primary-dark);
+    color: var(--primary-dark) !important;
 }
 
 .nav-icon {
@@ -129,7 +129,7 @@ body:has(.alert-bar) .sidebar {
 
 .nav-toggle-label {
     padding: 10px 24px;
-    color: var(--text-primary);
+    color: var(--text-dark);
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -146,7 +146,7 @@ body:has(.alert-bar) .sidebar {
 .nav-toggle-label.active {
     background: var(--bg-medium);
     font-weight: 500;
-    border-left: 3px solid var(--accent-color);
+    border-left: 3px solid var(--primary-dark);
 }
 
 .nav-subitems {
@@ -164,12 +164,12 @@ body:has(.alert-bar) .sidebar {
 
 .nav-subitems .nav-toggle-label {
     padding: 8px 24px;
-    color: var(--text-secondary);
+    color: var(--text-medium);
     font-size: 16px;
 }
 
 .nav-subitems .nav-toggle-label:hover {
-    color: var(--accent-color);
+    color: var(--primary-dark);
     background: transparent;
 }
 
@@ -180,7 +180,7 @@ body:has(.alert-bar) .sidebar {
 
 .nav-subitems .nav-subitems a {
     padding: 8px 24px;
-    color: var(--text-secondary);
+    color: var(--text-medium);
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -190,12 +190,12 @@ body:has(.alert-bar) .sidebar {
 }
 
 .nav-subitems .nav-subitems a:hover {
-    color: var(--accent-color);
+    color: var(--primary-dark);
 }
 
 .nav-subitem {
     padding: 8px 24px;
-    color: var(--text-secondary);
+    color: var(--text-medium);
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -205,7 +205,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .nav-subitem:hover {
-    color: var(--accent-color);
+    color: var(--primary-dark);
 }
 
 .nav-subitem .nav-item-expand {
@@ -223,8 +223,8 @@ body:has(.alert-bar) .sidebar {
     left: 0;
     right: 0;
     padding: 16px 24px 24px;
-    border-top: 1px solid var(--border-light);
-    background: var(--bg-white);
+    border-top: 1px solid var(--border-medium);
+    background: var(--bg);
 }
 
 .nav-progress-section:not(:has(*)) {
@@ -234,7 +234,7 @@ body:has(.alert-bar) .sidebar {
 .nav-progress-title {
     font-size: 12px;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--text-light);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 16px;
@@ -257,13 +257,13 @@ body:has(.alert-bar) .sidebar {
 
 .progress-label {
     font-size: 13px;
-    color: var(--text-primary);
+    color: var(--text-dark);
     font-weight: 500;
 }
 
 .progress-percentage {
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--text-light);
     font-weight: 600;
 }
 
@@ -277,7 +277,7 @@ body:has(.alert-bar) .sidebar {
 
 .progress-bar {
     height: 100%;
-    background: var(--accent-color);
+    background: var(--primary-dark);
     border-radius: 3px;
     transition: width 0.3s ease;
 }
