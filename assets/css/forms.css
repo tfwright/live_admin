@@ -163,7 +163,7 @@
     font-size: 14px;
     font-weight: 500;
     color: var(--text-medium);
-    padding-top: 2px;
+    padding-top: 7px;
     flex-shrink: 0;
     min-width: 20px;
 }
