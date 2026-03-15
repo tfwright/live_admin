@@ -13,12 +13,12 @@
 }
 
 .btn-primary {
-    background: var(--primary-dark);
+    background: var(--primary-medium);
     color: var(--bg);
 }
 
 .btn-primary:hover {
-    background: var(--primary-medium);
+    background: var(--primary-dark);
 }
 
 .btn-secondary {
