@@ -6662,7 +6662,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
           parent,
           `[${PHX_VIEW_REF}="${this.id}"][${PHX_COMPONENT}]`
         );
-        const hooks2 = dom_default.all(
+        const hooks = dom_default.all(
           parent,
           `[${this.binding(PHX_HOOK)}], [data-phx-hook]`
         );
@@ -6672,7 +6672,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
             destroyedCIDs.push(cid);
           }
         });
-        hooks2.concat(parent).forEach((hookEl) => {
+        hooks.concat(parent).forEach((hookEl) => {
           const hook = this.getHook(hookEl);
           hook && this.destroyHook(hook);
         });
@@ -8938,8 +8938,20 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
   var import_clipboard = __toESM(require_clipboard());
   var import_topbar = __toESM(require_topbar_min());
 
+  // node_modules/phoenix-colocated/live_admin/LiveAdmin.Components.AlertBar/20_6fjnua5crhwniinis3b4qltd44.js
+  var fjnua5crhwniinis3b4qltd44_default = {
+    mounted() {
+      setTimeout(() => {
+        if (this.el.dataset["type"] !== "error") {
+          this.pushEvent("dismiss", { index: parseInt(this.el.dataset["index"]) });
+        }
+      }, 3e3);
+    }
+  };
+
   // node_modules/phoenix-colocated/live_admin/index.js
-  var hooks = {};
+  var imp_nbxw623t = {};
+  imp_nbxw623t["LiveAdmin.Components.AlertBar.AlertItem"] = fjnua5crhwniinis3b4qltd44_default;
 
   // js/app.js
   import_topbar.default.config({
@@ -9072,7 +9084,7 @@ removing illegal node: "${(childNode.outerHTML || childNode.nodeValue).trim()}"
   };
   var csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
   var liveSocket = new LiveSocket2("/live", Socket, {
-    hooks: __spreadValues(__spreadValues({}, Hooks2), hooks),
+    hooks: __spreadValues(__spreadValues({}, Hooks2), imp_nbxw623t),
     params: { _csrf_token: csrfToken }
   });
   liveSocket.connect();
