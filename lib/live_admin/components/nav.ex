@@ -55,7 +55,7 @@ defmodule LiveAdmin.Components.Nav do
     <nav>
       <div class="nav-section">
         <div class="nav-section-title">Admin</div>
-        <.link navigate={@base_path} class="nav-item">
+        <.link navigate={@base_path} class={"nav-item #{if @current_view == LiveAdmin.Components.Home, do: "active"}"}>
           <span class="nav-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="7" height="7" />
@@ -66,7 +66,7 @@ defmodule LiveAdmin.Components.Nav do
           </span>
           {trans("Dashboard")}
         </.link>
-        <.link navigate={Path.join(@base_path, "session")} class="nav-item">
+        <.link navigate={Path.join(@base_path, "session")} class={"nav-item #{if @current_view == LiveAdmin.Components.Session, do: "active"}"}>
           <span class="nav-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -89,7 +89,7 @@ defmodule LiveAdmin.Components.Nav do
         <div class="nav-section">
           <div class="nav-section-title">Pages</div>
           <%= for route <- @extra_pages do %>
-            <.link navigate={route.path} class="nav-item">
+            <.link navigate={route.path} class={"nav-item #{if elem(route.metadata.phoenix_live_view, 0) == @current_view, do: "active"}"}>
               <span class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>

@@ -170,6 +170,8 @@ body:has(.alert-bar) .sidebar {
     font-size: 16px;
 }
 
+
+
 .nav-subitems .nav-toggle-label:hover {
     color: var(--primary-dark);
     background: transparent;
