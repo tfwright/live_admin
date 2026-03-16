@@ -48,27 +48,18 @@
 </header>
 
 <!-- Main Layout -->
-<input type="checkbox" id="sidebar-toggle" class="sidebar-toggle-input" checked />
+
 <div class="main-layout">
   <aside class="sidebar">
     <div class="sidebar-content">
-      <.live_component
-        id="nav"
-        module={get_in(@config, [:components, :nav])}
-        title={Keyword.fetch!(@config, :title)}
-        base_path={@base_path}
-        resources={@resources}
-        resource={assigns[:resource]}
-        current_view={@socket.view}
-        prefix={assigns[:prefix]}
-        key={assigns[:key]}
-        config={@config}
-        session={@session}
-      />
-      {live_render(@socket, LiveAdmin.Components.Nav.Jobs,
+      {live_render(@socket, LiveAdmin.Components.Nav.Wrapper,
         sticky: true,
-        id: "jobs",
-        session: %{"session_id" => @session.id}
+        id: "nav",
+        session: %{
+          "session_id" => @session.id,
+          "base_path" => @base_path,
+          "opts" => @config
+        }
       )}
     </div>
     <label for="sidebar-toggle" class="sidebar-toggle-label">

@@ -28,7 +28,7 @@
     transition: transform 0.2s;
 }
 
-.sidebar-toggle-input:not(:checked) ~ .main-layout .sidebar-toggle-label svg {
+.sidebar:has(.sidebar-toggle-input:not(:checked)) .sidebar-toggle-label svg {
     transform: rotate(180deg);
 }
 
@@ -54,13 +54,13 @@
     position: relative;
 }
 
-.sidebar-toggle-input:not(:checked) ~ .main-layout .sidebar {
+.sidebar:has(.sidebar-toggle-input:not(:checked)) {
     min-width: 0;
     max-width: 0;
     border-right: none;
 }
 
-.sidebar-toggle-input:not(:checked) ~ .main-layout .sidebar-content {
+.sidebar:has(.sidebar-toggle-input:not(:checked)) .sidebar-content {
     overflow: hidden;
 }
 

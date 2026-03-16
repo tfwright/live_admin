@@ -1,5 +1,6 @@
 defmodule LiveAdmin.Router do
   import Phoenix.Component, only: [assign: 2]
+  import Phoenix.LiveView, only: [attach_hook: 4]
 
   @doc """
   Defines a group of LiveAdmin resources that share a common path prefix, and optionally, configuration.
@@ -154,6 +155,12 @@ defmodule LiveAdmin.Router do
         {m, f} -> apply(m, f, [socket])
         _ -> socket
       end
+
+    socket =
+      attach_hook(socket, :nav_uri, :handle_params, fn _params, uri, socket ->
+        LiveAdmin.PubSub.broadcast(session_id, {:nav, %{uri: uri}})
+        {:cont, socket}
+      end)
 
     {:cont, socket}
   end
