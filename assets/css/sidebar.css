@@ -73,7 +73,7 @@ body:has(.alert-bar) .sidebar {
 }
 
 .nav-section-title {
-    padding: 0 24px 12px;
+    padding: 0 24px 12px calc(24px + 3px);
     font-size: 12px;
     font-weight: 600;
     color: var(--text-light);
@@ -83,6 +83,7 @@ body:has(.alert-bar) .sidebar {
 
 .nav-item {
     padding: 10px 24px;
+    border-left: 3px solid transparent;
     color: var(--text-dark);
     text-decoration: none;
     display: flex;
@@ -129,6 +130,7 @@ body:has(.alert-bar) .sidebar {
 
 .nav-toggle-label {
     padding: 10px 24px;
+    border-left: 3px solid transparent;
     color: var(--text-dark);
     text-decoration: none;
     display: flex;
