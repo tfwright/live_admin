@@ -2,9 +2,7 @@ Logger.configure(level: :debug)
 
 pg_url = System.get_env("PG_URL") || "postgres:postgres@127.0.0.1"
 
-Application.put_env(:live_admin, Demo.Repo,
-  url: "ecto://#{pg_url}/phx_admin_dev"
-)
+Application.put_env(:live_admin, Demo.Repo, url: "ecto://#{pg_url}/phx_admin_dev")
 
 _ = Ecto.Adapters.Postgres.storage_up(Demo.Repo.config())
 
@@ -75,11 +73,14 @@ defmodule Demo.Populator do
         posts: [
           %Demo.Posts.Post{
             title: Faker.Lorem.paragraph(1) |> String.slice(0..9),
-            categories: Ecto.Enum.values(Demo.Posts.Post, :categories) |> Enum.take(Enum.random(0..2)),
+            categories:
+              Ecto.Enum.values(Demo.Posts.Post, :categories) |> Enum.take(Enum.random(0..2)),
             tags: Faker.Lorem.words(Enum.random(0..5)),
             body: Faker.Lorem.paragraphs() |> Enum.join("\n\n"),
             disabled_user: get_user_if(:rand.uniform(2) == 1),
-            previous_versions: [%Demo.Posts.Post.Version{body: Faker.Lorem.paragraphs() |> Enum.join("\n\n")}]
+            previous_versions: [
+              %Demo.Posts.Post.Version{body: Faker.Lorem.paragraphs() |> Enum.join("\n\n")}
+            ]
           }
         ]
       }
@@ -93,7 +94,9 @@ defmodule Demo.Populator do
     Repo.delete_all(Demo.Accounts.User.Profile)
   end
 
-  defp get_user_if(true), do: from(Demo.Accounts.User, order_by: fragment("RANDOM()"), limit: 1) |> Demo.Repo.one()
+  defp get_user_if(true),
+    do: from(Demo.Accounts.User, order_by: fragment("RANDOM()"), limit: 1) |> Demo.Repo.one()
+
   defp get_user_if(false), do: nil
 end
 
@@ -123,47 +126,56 @@ defmodule DemoWeb.CreateUserForm do
 
     ~H"""
     <div>
-      <.form
-        :let={f}
-        for={@changeset}
-        as={:params}
-        phx-change="validate"
-        phx-submit="create"
-        phx-target={@myself}
-        class="resource__form"
-      >
+      <div class="content-header">
+        <h1 class="content-title">
+          User <span>Create</span>
+        </h1>
+      </div>
 
-        <div class={"field__group"}>
-          <%= label(f, :name, class: "field__label") %>
-          <%= textarea(f, :name, rows: 1, class: "field__text") %>
-          <%= error_tag(f, :name) %>
-        </div>
+      <div class="content-card">
+        <div class="card-section">
+          <div class="edit-view">
+            <.form
+              :let={f}
+              for={@changeset}
+              as={:params}
+              phx-change="validate"
+              phx-submit="create"
+              phx-target={@myself}
+            >
+              <div class="form-grid">
+                <div class={"form-field #{if f.errors[:name], do: "error"}"}>
+                  <div class="form-label">{label(f, :name)}</div>
+                  {textarea(f, :name, rows: 1, class: "form-textarea")}
+                  <span class="error-message">{error_tag(f, :name)}</span>
+                </div>
 
-        <div class={"field__group"}>
-          <%= label(f, :email, class: "field__label") %>
-          <%= textarea(f, :email, rows: 1, class: "field__text") %>
-          <%= error_tag(f, :email) %>
-        </div>
+                <div class={"form-field #{if f.errors[:email], do: "error"}"}>
+                  <div class="form-label">{label(f, :email)}</div>
+                  {textarea(f, :email, rows: 1, class: "form-textarea")}
+                  <span class="error-message">{error_tag(f, :email)}</span>
+                </div>
 
-        <div class={"field__group"}>
-          <%= label(f, :password, class: "field__label") %>
-          <%= password_input(f, :password, class: "field__text", value: input_value(f, :password)) %>
-          <%= error_tag(f, :password) %>
-        </div>
+                <div class={"form-field #{if f.errors[:password], do: "error"}"}>
+                  <div class="form-label">{label(f, :password)}</div>
+                  {password_input(f, :password, class: "form-input", value: input_value(f, :password))}
+                  <span class="error-message">{error_tag(f, :password)}</span>
+                </div>
 
-        <div class={"field__group"}>
-          <%= label(f, :password_confirmation, class: "field__label") %>
-          <%= password_input(f, :password_confirmation, class: "field__text") %>
-          <%= error_tag(f, :password_confirmation) %>
-        </div>
+                <div class={"form-field #{if f.errors[:password_confirmation], do: "error"}"}>
+                  <div class="form-label">{label(f, :password_confirmation)}</div>
+                  {password_input(f, :password_confirmation, class: "form-input")}
+                  <span class="error-message">{error_tag(f, :password_confirmation)}</span>
+                </div>
+              </div>
 
-        <div class="form__actions">
-        <%= submit("Save",
-          class: "resource__action#{if !@enabled, do: "--disabled", else: "--btn"}",
-          disabled: !@enabled
-          ) %>
+              <div class="form-actions">
+                {submit("Save", class: "btn btn-primary", disabled: !@enabled)}
+              </div>
+            </.form>
+          </div>
         </div>
-      </.form>
+      </div>
     </div>
     """
   end
@@ -193,8 +205,11 @@ defmodule DemoWeb.CreateUserForm do
       |> Ecto.Changeset.unique_constraint(:email)
       |> Demo.Repo.insert(prefix: assigns.prefix)
       |> case do
-        {:ok, _} -> push_navigate(socket, to: route_with_params(assigns, params: [prefix: assigns.prefix]))
-        {:error, changeset} -> assign(socket, changeset: changeset)
+        {:ok, _} ->
+          push_navigate(socket, to: route_with_params(assigns, params: [prefix: assigns.prefix]))
+
+        {:error, changeset} ->
+          assign(socket, changeset: changeset)
       end
 
     {:noreply, socket}
@@ -224,7 +239,7 @@ defmodule DemoWeb.Extra do
     ~H"""
     <div>
       <div class="content-header">
-      Extra page
+        Extra page
       </div>
     </div>
     """
@@ -238,24 +253,25 @@ defmodule DemoWeb.Router do
   import Phoenix.LiveView.Router
 
   pipeline :browser do
-    plug :fetch_session
+    plug(:fetch_session)
 
-    plug :user_id_stub
+    plug(:user_id_stub)
   end
+
   scope "/" do
-    pipe_through :browser
-    get "/", DemoWeb.PageController, :index
+    pipe_through(:browser)
+    get("/", DemoWeb.PageController, :index)
 
     live_admin "/admin", title: "DevAdmin" do
-      admin_resource "/users/profiles", Demo.Accounts.User.Profile
-      admin_resource "/security-settings", Demo.Accounts.SecuritySetting
-      admin_resource "/users", DemoWeb.UserAdmin
-      live "/extra", DemoWeb.Extra, :index, as: :extra
+      admin_resource("/users/profiles", Demo.Accounts.User.Profile)
+      admin_resource("/security-settings", Demo.Accounts.SecuritySetting)
+      admin_resource("/users", DemoWeb.UserAdmin)
+      live("/extra", DemoWeb.Extra, :index, as: :extra)
     end
 
     live_admin "/posts-admin", components: [home: DemoWeb.PostsAdmin.Home] do
-      admin_resource "/posts", Demo.Posts.Post
-      admin_resource "/users", DemoWeb.UserAdmin
+      admin_resource("/posts", Demo.Posts.Post)
+      admin_resource("/users", DemoWeb.UserAdmin)
     end
   end
 
@@ -267,18 +283,19 @@ end
 defmodule DemoWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :live_admin
 
-  socket "/live", Phoenix.LiveView.Socket
-  socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
+  socket("/live", Phoenix.LiveView.Socket)
+  socket("/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket)
 
-  plug Phoenix.LiveReloader
-  plug Phoenix.CodeReloader
+  plug(Phoenix.LiveReloader)
+  plug(Phoenix.CodeReloader)
 
-  plug Plug.Session,
+  plug(Plug.Session,
     store: :cookie,
     key: "_live_view_key",
     signing_salt: "/VEDsdfsffMnp5"
+  )
 
-  plug DemoWeb.Router
+  plug(DemoWeb.Router)
 end
 
 Application.put_env(:phoenix, :serve_endpoints, true)
@@ -286,7 +303,11 @@ Application.put_env(:phoenix, :serve_endpoints, true)
 Application.ensure_all_started(:os_mon)
 
 Task.async(fn ->
-  children = [Demo.Repo, DemoWeb.Endpoint, {Phoenix.PubSub, name: Demo.PubSub, adapter: Phoenix.PubSub.PG2}]
+  children = [
+    Demo.Repo,
+    DemoWeb.Endpoint,
+    {Phoenix.PubSub, name: Demo.PubSub, adapter: Phoenix.PubSub.PG2}
+  ]
 
   {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one)
 
