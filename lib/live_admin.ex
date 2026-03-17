@@ -28,32 +28,38 @@ defmodule LiveAdmin do
     ],
     query_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      doc: "Customizes how records are fetched. Receives the resource and search term and should return an Ecto queryable. Useful for adding preloads or custom search logic. When not set, uses the schema with built-in search.",
+      doc:
+        "Customizes how records are fetched. Receives the resource and search term and should return an Ecto queryable. Useful for adding preloads or custom search logic. When not set, uses the schema with built-in search.",
       type_doc: "`t:func_ref/0` returning an Ecto queryable"
     ],
     render_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      doc: "Customizes how field values are displayed. Receives the record, field name, and session. Should return a string or `Phoenix.HTML.Safe` value to render HTML. When not set, uses built-in type-based rendering.",
+      doc:
+        "Customizes how field values are displayed. Receives the record, field name, and session. Should return a string or `Phoenix.HTML.Safe` value to render HTML. When not set, uses built-in type-based rendering.",
       type_doc: "`t:func_ref/0` used to convert field values to strings when rendering"
     ],
     delete_with: [
       type: {:or, [{:in, [false]}, :atom, {:tuple, [:atom, :atom]}]},
-      doc: "Customizes how records are deleted. Can be set to `false` to disable. When not set, uses `Repo.delete`.",
+      doc:
+        "Customizes how records are deleted. Can be set to `false` to disable. When not set, uses `Repo.delete`.",
       type_doc: "`t:func_ref/0` or `false`"
     ],
     create_with: [
       type: {:or, [{:in, [false]}, :atom, {:tuple, [:atom, :atom]}]},
-      doc: "Customizes how records are created. Can be set to `false` to disable. When not set, builds a changeset that casts all fields with no validations and calls `Repo.insert`.",
+      doc:
+        "Customizes how records are created. Can be set to `false` to disable. When not set, builds a changeset that casts all fields with no validations and calls `Repo.insert`.",
       type_doc: "`t:func_ref/0` or `false`"
     ],
     update_with: [
       type: {:or, [{:in, [false]}, :atom, {:tuple, [:atom, :atom]}]},
-      doc: "Customizes how records are updated. Can be set to `false` to disable. When not set, builds a changeset that casts all fields with no validations and calls `Repo.update`.",
+      doc:
+        "Customizes how records are updated. Can be set to `false` to disable. When not set, builds a changeset that casts all fields with no validations and calls `Repo.update`.",
       type_doc: "`t:func_ref/0` or `false`"
     ],
     validate_with: [
       type: {:or, [:atom, {:tuple, [:atom, :atom]}]},
-      doc: "Customizes how changesets are validated in create/update forms. When not set, no additional validation is applied.",
+      doc:
+        "Customizes how changesets are validated in create/update forms. When not set, no additional validation is applied.",
       type_doc: "`t:func_ref/0`"
     ],
     label_with: [
@@ -63,7 +69,8 @@ defmodule LiveAdmin do
     ],
     title_with: [
       type: {:or, [:string, {:tuple, [:atom, :atom]}]},
-      doc: "Customizes the heading displayed for a resource. When not set, uses the schema module name.",
+      doc:
+        "Customizes the heading displayed for a resource. When not set, uses the schema module name.",
       type_doc: "string literal or `t:func_ref/0`"
     ],
     hidden_fields: [
@@ -106,8 +113,7 @@ defmodule LiveAdmin do
           ]}},
       default: [],
       doc: "Defines functions that operate on a resource as a whole.",
-      type_doc:
-        "`t:func_list/0` taking a query, LiveAdmin session, and any extra args"
+      type_doc: "`t:func_list/0` taking a query, LiveAdmin session, and any extra args"
     ]
   ]
   @doc """
