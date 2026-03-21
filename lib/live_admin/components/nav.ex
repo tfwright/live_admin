@@ -24,10 +24,23 @@ defmodule LiveAdmin.Components.Nav do
           !String.match?(r.helper, ~r/(home|session)/)
       end)
 
+    open_groups =
+      case assigns[:resource] do
+        nil ->
+          socket.assigns[:open_groups] || MapSet.new()
+
+        resource ->
+          resource.__live_admin_config__()
+          |> Keyword.fetch!(:schema)
+          |> Module.split()
+          |> Enum.drop(-1)
+          |> MapSet.new()
+      end
+
     socket =
       socket
       |> assign(assigns)
-      |> assign(extra_pages: extra_pages)
+      |> assign(extra_pages: extra_pages, open_groups: open_groups)
 
     {:ok, socket}
   end
@@ -88,6 +101,7 @@ defmodule LiveAdmin.Components.Nav do
           items={@nested_resources}
           base_path={@base_path}
           current_resource={assigns[:resource]}
+          open_groups={@open_groups}
           config={@config}
         />
       </div>
@@ -133,7 +147,7 @@ defmodule LiveAdmin.Components.Nav do
             type="checkbox"
             id={"#{parent}-toggle"}
             class="nav-toggle-input"
-            checked={open?(assigns, parent)}
+            checked={MapSet.member?(@open_groups, parent)}
           />
           <label for={"#{parent}-toggle"} class="nav-toggle-label">
             <span class="nav-icon">
@@ -195,6 +209,7 @@ defmodule LiveAdmin.Components.Nav do
               items={children}
               base_path={@base_path}
               current_resource={@current_resource}
+              open_groups={@open_groups}
               config={@config}
             />
           </div>
@@ -204,18 +219,4 @@ defmodule LiveAdmin.Components.Nav do
     """
   end
 
-  defp open?(assigns, schema) do
-    assigns.current_resource
-    |> case do
-      nil ->
-        false
-
-      resource ->
-        resource.__live_admin_config__()
-        |> Keyword.fetch!(:schema)
-        |> Module.split()
-        |> Enum.drop(-1)
-        |> Enum.member?(schema)
-    end
-  end
 end

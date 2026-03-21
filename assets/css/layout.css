@@ -62,7 +62,7 @@
     transition: margin-left 0.2s, max-width 0.2s;
 }
 
-.sidebar-toggle-input:not(:checked) ~ .main-layout .content {
+.main-layout:has(.sidebar-toggle-input:not(:checked)) .content {
     margin-left: 0;
     max-width: 100vw;
 }
@@ -73,7 +73,7 @@
         max-width: calc(100vw - 300px);
     }
 
-    .sidebar-toggle-input:not(:checked) ~ .main-layout .content {
+    .main-layout:has(.sidebar-toggle-input:not(:checked)) .content {
         margin-left: 0;
         max-width: 100vw;
     }
@@ -85,7 +85,7 @@
         max-width: calc(100vw - 200px);
     }
 
-    .sidebar-toggle-input:not(:checked) ~ .main-layout .content {
+    .main-layout:has(.sidebar-toggle-input:not(:checked)) .content {
         margin-left: 0;
         max-width: 100vw;
     }
