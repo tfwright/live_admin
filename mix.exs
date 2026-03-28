@@ -62,6 +62,8 @@ defmodule LiveAdmin.MixProject do
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:docout, github: "tfwright/docout", branch: "main", runtime: false, only: [:dev, :test]},
       {:dialyxir, "~> 1.2", only: :dev, runtime: false},
+      {:credo, "~> 1.7", only: :dev, runtime: false},
+      {:control, github: "tfwright/control", only: :dev, runtime: false},
       {:mox, "~> 1.0", only: :test},
       {:lazy_html, ">= 0.1.0", only: :test}
     ]
