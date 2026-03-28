@@ -30,10 +30,17 @@ defmodule LiveAdminTest.ErrorView do
   end
 end
 
+defmodule LiveAdminTest.ExtraPageLive do
+  use Phoenix.LiveView
+
+  def render(assigns), do: ~H"<div>extra page</div>"
+end
+
 defmodule LiveAdminTest.Router do
   use Phoenix.Router
 
   import LiveAdmin.Router
+  import Phoenix.LiveView.Router, only: [live: 3, live: 4]
 
   pipeline :browser do
     plug(:fetch_session)
@@ -45,6 +52,8 @@ defmodule LiveAdminTest.Router do
     live_admin "/" do
       admin_resource("/user", LiveAdminTest.User)
       admin_resource("/live_admin_test_post", LiveAdminTest.PostResource)
+      live("/my-page", LiveAdminTest.ExtraPageLive, :index, [])
+      live("/custom", LiveAdminTest.ExtraPageLive, :custom, metadata: %{link_text: "Custom Label"})
     end
   end
 end

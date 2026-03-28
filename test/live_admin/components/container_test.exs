@@ -18,6 +18,28 @@ defmodule LiveAdmin.Components.ContainerTest do
     %{conn: build_conn()}
   end
 
+  describe "nav extra page without link_text metadata" do
+    setup %{conn: conn} do
+      {:ok, view, _} = live(conn, "/")
+      %{view: view}
+    end
+
+    test "derives label from path", %{view: view} do
+      assert has_element?(view, "nav a", "My page")
+    end
+  end
+
+  describe "nav extra page with link_text metadata" do
+    setup %{conn: conn} do
+      {:ok, view, _} = live(conn, "/")
+      %{view: view}
+    end
+
+    test "uses link_text as label", %{view: view} do
+      assert has_element?(view, "nav a", "Custom Label")
+    end
+  end
+
   describe "home page" do
     setup %{conn: conn} do
       {:ok, view, _} = live(conn, "/")
