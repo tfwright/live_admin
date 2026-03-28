@@ -75,14 +75,14 @@ defmodule LiveAdmin do
     ],
     hidden_fields: [
       type: {:list, :atom},
-      default: [],
-      doc: "Specifies fields to hide from all views.",
+      doc:
+        "Specifies fields to hide from all views. When not set at the resource level, falls back to scope or global config (default: `[]`).",
       type_doc: "`t:field_list/0`"
     ],
     immutable_fields: [
       type: {:list, :atom},
-      default: [],
-      doc: "Specifies fields to disable in create/update forms.",
+      doc:
+        "Specifies fields to disable in create/update forms. When not set at the resource level, falls back to scope or global config (default: `[]`).",
       type_doc: "`t:field_list/0`"
     ],
     actions: [
@@ -96,8 +96,8 @@ defmodule LiveAdmin do
             {:tuple,
              [:atom, {:or, [{:tuple, [:atom, :atom]}, {:tuple, [:atom, :atom, :integer]}]}]}
           ]}},
-      default: [],
-      doc: "Defines functions that operate on a specific record.",
+      doc:
+        "Defines functions that operate on a specific record. When not set at the resource level, falls back to scope or global config (default: `[]`).",
       type_doc: "`t:func_list/0` taking a record, LiveAdmin session struct, and any extra args"
     ],
     tasks: [
@@ -111,8 +111,8 @@ defmodule LiveAdmin do
             {:tuple,
              [:atom, {:or, [{:tuple, [:atom, :atom]}, {:tuple, [:atom, :atom, :integer]}]}]}
           ]}},
-      default: [],
-      doc: "Defines functions that operate on a resource as a whole.",
+      doc:
+        "Defines functions that operate on a resource as a whole. When not set at the resource level, falls back to scope or global config (default: `[]`).",
       type_doc: "`t:func_list/0` taking a query, LiveAdmin session, and any extra args"
     ]
   ]
@@ -186,12 +186,10 @@ defmodule LiveAdmin do
       Enum.map(
         parts[:segments] || [],
         fn segment ->
-          cond do
-            is_struct(segment) && Phoenix.Param.impl_for(segment) ->
-              Phoenix.Param.to_param(segment)
-
-            true ->
-              to_string(segment)
+          if is_struct(segment) && Phoenix.Param.impl_for(segment) do
+            Phoenix.Param.to_param(segment)
+          else
+            to_string(segment)
           end
         end
       )

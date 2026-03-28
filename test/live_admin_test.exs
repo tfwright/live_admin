@@ -20,6 +20,26 @@ defmodule LiveAdminTest do
     end
   end
 
+  describe "fetch_config/3 for :immutable_fields when resource does not set it" do
+    setup do
+      %{result: LiveAdmin.fetch_config(LiveAdminTest.PostResource, :immutable_fields, immutable_fields: [:inserted_at])}
+    end
+
+    test "returns value from config", %{result: result} do
+      assert result == [:inserted_at]
+    end
+  end
+
+  describe "fetch_config/3 for :immutable_fields when resource sets it explicitly" do
+    setup do
+      %{result: LiveAdmin.fetch_config(LiveAdminTest.User, :immutable_fields, immutable_fields: [:inserted_at])}
+    end
+
+    test "returns resource-level value", %{result: result} do
+      assert result == [:encrypted_password]
+    end
+  end
+
   describe "record_label/2 when config uses mfa" do
     assert 1 =
              LiveAdmin.record_label(%LiveAdminTest.Post{post_id: 1}, LiveAdminTest.PostResource,
