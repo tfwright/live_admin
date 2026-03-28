@@ -1,4 +1,4 @@
-FROM hexpm/elixir:1.16.0-erlang-26.2.1-debian-bullseye-20231009-slim
+FROM hexpm/elixir:1.19.5-erlang-26.2.5-ubuntu-jammy-20251013
 
 RUN apt-get update -y && apt-get install -y build-essential git nodejs npm curl inotify-tools \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
