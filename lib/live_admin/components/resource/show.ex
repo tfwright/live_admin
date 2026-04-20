@@ -90,8 +90,8 @@ defmodule LiveAdmin.Components.Container.Show do
     """
   end
 
-  attr(:last, :integer, default: 0)
-  attr(:current, :integer, default: 0)
+  attr(:sibling_count, :integer, default: 0)
+  attr(:current_index, :integer, default: 0)
   attr(:id, :string, required: true)
   attr(:record, :map, required: true)
   attr(:resource, :map, required: true)
@@ -116,17 +116,17 @@ defmodule LiveAdmin.Components.Container.Show do
       )
 
     ~H"""
-    <div class="detail-view" id={if @id != "main", do: "#{@id}_#{@current}", else: "main"}>
-      <%= if Enum.any?(@embeds) || @last > 0 do %>
+    <div class="detail-view" id={indexed_id(@id, @current_index)}>
+      <%= if Enum.any?(@embeds) || @sibling_count > 0 do %>
         <div class="tabs">
           <%= if @id == "main" do %>
             <a href="#main" id="main-link"></a>
           <% end %>
           <%= for {field, _, _} <- @embeds, @record |> Map.fetch!(field) |> List.wrap() |> Enum.any? do %>
-            <a href={"##{@id}_#{field}_0"}>{trans(humanize(field))}</a>
+            <a href={"##{indexed_id(@id, @current_index)}_#{field}_0"}>{trans(humanize(field))}</a>
           <% end %>
-          <%= if @last > 0 do %>
-            <%= for n <- 0..@last do %>
+          <%= if @sibling_count > 0 do %>
+            <%= for n <- 0..@sibling_count do %>
               <a href={"##{@id}_#{n}"}>{n}</a>
             <% end %>
           <% end %>
@@ -184,7 +184,7 @@ defmodule LiveAdmin.Components.Container.Show do
                   </a>
                 <% end %>
                 <.expand_modal
-                  id={"#{@id}-#{field}-#{@current}-expand"}
+                  id={"#{indexed_id(@id, @current_index)}-#{field}-expand"}
                   title={@title}
                   field={field}
                   value={Map.fetch!(@record, field)}
@@ -197,12 +197,12 @@ defmodule LiveAdmin.Components.Container.Show do
       <%= for {field, {_, {_, %{related: schema}}}, _} <- @embeds, embed = Map.fetch!(@record, field), list = List.wrap(embed) do %>
         <%= for {record, index} <- Enum.with_index(list) do %>
           <.detail_view
-            id={"#{@id}_#{field}"}
+            id={"#{indexed_id(@id, @current_index)}_#{field}"}
             fields={Enum.map(schema.__schema__(:fields), &{&1, schema.__schema__(:type, &1), []})}
             record={record}
             title={trans(humanize(field))}
-            current={index}
-            last={Enum.count(list) - 1}
+            current_index={index}
+            sibling_count={Enum.count(list) - 1}
             resource={@resource}
             resources={@resources}
             base_path={@base_path}
@@ -218,6 +218,9 @@ defmodule LiveAdmin.Components.Container.Show do
 
   defp renderable?({_, {Ecto.Embedded, _}}), do: false
   defp renderable?(_), do: true
+
+  defp indexed_id("main", _), do: "main"
+  defp indexed_id(id, index), do: "#{id}_#{index}"
 
   defp assoc_resource_key(resource, field, resources, config) do
     schema = LiveAdmin.fetch_config(resource, :schema, config)

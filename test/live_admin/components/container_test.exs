@@ -266,6 +266,27 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
+  describe "view resource with plural embed containing nested plural embed" do
+    setup %{conn: conn} do
+      post =
+        Repo.insert!(%Post{
+          title: "test",
+          previous_versions: [
+            %Version{links: [%Version.Link{url: "https://a.example"}]},
+            %Version{links: [%Version.Link{url: "https://b.example"}]}
+          ]
+        })
+
+      {:ok, view, _} = live(conn, "/live_admin_test_post/#{post.post_id}")
+
+      %{view: view}
+    end
+
+    test "renders unique detail-view id for each parent's nested embed", %{view: view} do
+      assert has_element?(view, "#main_previous_versions_1_links_0")
+    end
+  end
+
   describe "view child resource" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{})
