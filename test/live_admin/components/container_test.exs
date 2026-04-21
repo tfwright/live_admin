@@ -285,6 +285,33 @@ defmodule LiveAdmin.Components.ContainerTest do
     test "renders unique detail-view id for each parent's nested embed", %{view: view} do
       assert has_element?(view, "#main_previous_versions_1_links_0")
     end
+
+    test "renders sibling navigation tab at parent level", %{view: view} do
+      assert has_element?(view, "#main > .tabs a[href=\"#main_previous_versions_1\"]")
+    end
+
+    test "does not render sibling navigation tab inside child detail-view", %{view: view} do
+      refute has_element?(
+               view,
+               "#main_previous_versions_0 > .tabs a[href=\"#main_previous_versions_1\"]"
+             )
+    end
+
+    test "renders numbered sibling tab for plural embed with single item", %{view: view} do
+      assert has_element?(
+               view,
+               "#main_previous_versions_0 > .tabs a[href=\"#main_previous_versions_0_links_0\"]",
+               "0"
+             )
+    end
+
+    test "renders embed-type tab for nested links embed", %{view: view} do
+      assert has_element?(
+               view,
+               "#main_previous_versions_0 > .tabs a[href=\"#main_previous_versions_0_links_0\"]",
+               "Links"
+             )
+    end
   end
 
   describe "view child resource" do

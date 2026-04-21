@@ -63,6 +63,14 @@ Hooks.Show = {
        tabContent.style.setProperty('display', 'none');
       }
     };
+
+    for (const tabRow of el.querySelectorAll('[data-tab-group]')) {
+      if (urlHash.startsWith(`#${tabRow.dataset.tabGroup}_`)) {
+        tabRow.style.removeProperty('display');
+      } else {
+        tabRow.style.setProperty('display', 'none');
+      }
+    };
   },
   mounted() {
     this.setTab(this.el);

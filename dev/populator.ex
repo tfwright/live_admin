@@ -28,7 +28,13 @@ defmodule Demo.Populator do
             body: Faker.Lorem.paragraphs() |> Enum.join("\n\n"),
             disabled_user: get_user_if(:rand.uniform(2) == 1),
             previous_versions: [
-              %Demo.Posts.Post.Version{body: Faker.Lorem.paragraphs() |> Enum.join("\n\n")}
+              %Demo.Posts.Post.Version{
+                body: Faker.Lorem.paragraphs() |> Enum.join("\n\n"),
+                links:
+                  Enum.map(1..Enum.random(1..3), fn _ ->
+                    %Demo.Posts.Post.Version.Link{url: Faker.Internet.url()}
+                  end)
+              }
             ]
           }
         ]
