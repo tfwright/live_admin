@@ -90,7 +90,6 @@ defmodule LiveAdmin.Components.Container.Show do
     """
   end
 
-  attr(:sibling_count, :integer, default: 0)
   attr(:current_index, :integer, default: 0)
   attr(:id, :string, required: true)
   attr(:record, :map, required: true)
@@ -117,7 +116,7 @@ defmodule LiveAdmin.Components.Container.Show do
 
     ~H"""
     <div class="detail-view" id={indexed_id(@id, @current_index)}>
-      <%= if Enum.any?(@embeds) || @sibling_count > 0 do %>
+      <%= if Enum.any?(@embeds) do %>
         <div class="tabs">
           <%= if @id == "main" do %>
             <a href="#main" id="main-link"></a>
@@ -125,12 +124,16 @@ defmodule LiveAdmin.Components.Container.Show do
           <%= for {field, _, _} <- @embeds, @record |> Map.fetch!(field) |> List.wrap() |> Enum.any? do %>
             <a href={"##{indexed_id(@id, @current_index)}_#{field}_0"}>{trans(humanize(field))}</a>
           <% end %>
-          <%= if @sibling_count > 0 do %>
-            <%= for n <- 0..@sibling_count do %>
-              <a href={"##{@id}_#{n}"}>{n}</a>
-            <% end %>
-          <% end %>
         </div>
+        <%= for {field, {_, {Ecto.Embedded, %{cardinality: :many}}}, _} <- @embeds,
+                list = Map.fetch!(@record, field),
+                Enum.any?(list) do %>
+          <div class="tabs" data-tab-group={"#{indexed_id(@id, @current_index)}_#{field}"}>
+            <%= for {_, n} <- Enum.with_index(list) do %>
+              <a href={"##{indexed_id(@id, @current_index)}_#{field}_#{n}"}>{n}</a>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
       <div class="card-section">
         <div class="detail-grid">
@@ -202,7 +205,6 @@ defmodule LiveAdmin.Components.Container.Show do
             record={record}
             title={trans(humanize(field))}
             current_index={index}
-            sibling_count={Enum.count(list) - 1}
             resource={@resource}
             resources={@resources}
             base_path={@base_path}

@@ -62,6 +62,17 @@ defmodule Demo.Posts.Post.Version do
     field :body, :string
     field :tags, {:array, :string}
 
+    embeds_many :links, __MODULE__.Link
+
     timestamps(updated_at: false)
+  end
+end
+
+defmodule Demo.Posts.Post.Version.Link do
+  use Ecto.Schema
+
+  @primary_key false
+  embedded_schema do
+    field :url, :string
   end
 end
