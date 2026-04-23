@@ -56,7 +56,7 @@ defmodule LiveAdmin.Components.Nav.Wrapper do
   def render(assigns) do
     ~H"""
     <div>
-      <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle-input" checked>
+      <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle-input" checked />
       <.live_component
         id="nav"
         module={@nav_module}

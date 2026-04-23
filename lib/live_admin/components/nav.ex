@@ -21,7 +21,10 @@ defmodule LiveAdmin.Components.Nav do
           },
           r
         ) && is_nil(r.metadata[:resource]) &&
-          elem(r.metadata.phoenix_live_view, 0) not in [LiveAdmin.Components.Home, LiveAdmin.Components.Session]
+          elem(r.metadata.phoenix_live_view, 0) not in [
+            LiveAdmin.Components.Home,
+            LiveAdmin.Components.Session
+          ]
       end)
 
     open_groups =
@@ -122,7 +125,14 @@ defmodule LiveAdmin.Components.Nav do
                   <polyline points="10 9 9 9 8 9"></polyline>
                 </svg>
               </span>
-              <span>{route.metadata[:link_text] || route.path |> String.split("/") |> List.last() |> String.replace("-", "_") |> humanize()}</span>
+              <span>
+                {route.metadata[:link_text] ||
+                  route.path
+                  |> String.split("/")
+                  |> List.last()
+                  |> String.replace("-", "_")
+                  |> humanize()}
+              </span>
             </.link>
           <% end %>
         </div>
@@ -218,5 +228,4 @@ defmodule LiveAdmin.Components.Nav do
     </div>
     """
   end
-
 end

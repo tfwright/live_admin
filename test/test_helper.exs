@@ -53,7 +53,10 @@ defmodule LiveAdminTest.Router do
       admin_resource("/user", LiveAdminTest.User)
       admin_resource("/live_admin_test_post", LiveAdminTest.PostResource)
       live("/my-page", LiveAdminTest.ExtraPageLive, :index, [])
-      live("/custom", LiveAdminTest.ExtraPageLive, :custom, metadata: %{link_text: "Custom Label"})
+
+      live("/custom", LiveAdminTest.ExtraPageLive, :custom,
+        metadata: %{link_text: "Custom Label"}
+      )
     end
   end
 end

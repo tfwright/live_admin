@@ -22,7 +22,12 @@ defmodule LiveAdminTest do
 
   describe "fetch_config/3 for :immutable_fields when resource does not set it" do
     setup do
-      %{result: LiveAdmin.fetch_config(LiveAdminTest.PostResource, :immutable_fields, immutable_fields: [:inserted_at])}
+      %{
+        result:
+          LiveAdmin.fetch_config(LiveAdminTest.PostResource, :immutable_fields,
+            immutable_fields: [:inserted_at]
+          )
+      }
     end
 
     test "returns value from config", %{result: result} do
@@ -32,7 +37,12 @@ defmodule LiveAdminTest do
 
   describe "fetch_config/3 for :immutable_fields when resource sets it explicitly" do
     setup do
-      %{result: LiveAdmin.fetch_config(LiveAdminTest.User, :immutable_fields, immutable_fields: [:inserted_at])}
+      %{
+        result:
+          LiveAdmin.fetch_config(LiveAdminTest.User, :immutable_fields,
+            immutable_fields: [:inserted_at]
+          )
+      }
     end
 
     test "returns resource-level value", %{result: result} do
