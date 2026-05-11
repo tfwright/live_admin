@@ -393,9 +393,12 @@ defmodule LiveAdmin.Components.Container.Index do
 
     job =
       Task.Supervisor.async_nolink(LiveAdmin.Task.Supervisor, fn ->
-        socket.assigns.selected
-        |> Enum.with_index()
-        |> Enum.each(fn {id, idx} ->
+        selected = socket.assigns.selected
+        total = Enum.count(selected)
+
+        selected
+        |> Enum.with_index(1)
+        |> Enum.reduce_while(:ok, fn {id, idx}, _ ->
           try do
             id
             |> Resource.find(resource, prefix, repo, config)
@@ -405,28 +408,32 @@ defmodule LiveAdmin.Components.Container.Index do
             end
 
             LiveAdmin.PubSub.update_job(session.id, self(),
-              progress: idx / Enum.count(socket.assigns.selected),
+              progress: idx / total,
               label: name
             )
+
+            {:cont, :ok}
           rescue
             error ->
               Logger.error(inspect(error))
-
-              LiveAdmin.PubSub.announce(
-                session.id,
-                :error,
-                trans("%{name} encountered an error and stopped", inter: [name: name])
-              )
-          after
-            LiveAdmin.PubSub.update_job(session.id, self(), progress: 1)
+              {:halt, :error}
           end
         end)
+        |> case do
+          :ok ->
+            LiveAdmin.PubSub.announce(
+              session.id,
+              :info,
+              trans("%{name} complete", inter: [name: name])
+            )
 
-        LiveAdmin.PubSub.announce(
-          session.id,
-          :info,
-          trans("%{name} complete", inter: [name: name])
-        )
+          :error ->
+            LiveAdmin.PubSub.announce(
+              session.id,
+              :error,
+              trans("%{name} encountered an error and stopped", inter: [name: name])
+            )
+        end
       end)
 
     LiveAdmin.PubSub.update_job(session.id, job.pid, progress: 0, label: to_string(name))
