@@ -22,6 +22,7 @@ defmodule LiveAdmin.Router do
         |> Map.fetch!(:path)
 
       @base_path Path.join(["/", current_path, unquote(path)])
+      @__live_admin_scope_opts__ unquote(opts)
 
       scope unquote(path), alias: false, as: false do
         live_session :"live_admin_#{@base_path}",
@@ -54,6 +55,14 @@ defmodule LiveAdmin.Router do
     import Phoenix.LiveView.Router, only: [live: 4]
 
     quote bind_quoted: [path: path, resource_mod: resource_mod] do
+      LiveAdmin.Router.__validate_config__!(
+        resource_mod,
+        @__live_admin_scope_opts__,
+        create_with: Application.compile_env(:live_admin, :create_with),
+        update_with: Application.compile_env(:live_admin, :update_with),
+        components: Application.compile_env(:live_admin, :components, [])
+      )
+
       full_path = Path.join(@base_path, path)
 
       live(path, LiveAdmin.Components.Container, :index,
@@ -76,6 +85,31 @@ defmodule LiveAdmin.Router do
         metadata: %{base_path: @base_path, resource: {path, resource_mod}}
       )
     end
+  end
+
+  @disabled_with_custom_component [
+    {:create_with, :create},
+    {:update_with, :edit}
+  ]
+
+  @doc false
+  def __validate_config__!(resource_mod, scope_opts, app_opts) do
+    Code.ensure_compiled!(resource_mod)
+    resource_opts = resource_mod.__live_admin_config__()
+    levels = [resource_opts, scope_opts, app_opts]
+
+    Enum.each(@disabled_with_custom_component, fn {with_key, component_key} ->
+      disabled? = Enum.any?(levels, &(Keyword.get(&1, with_key) == false))
+
+      component_set? =
+        Enum.any?(levels, &Keyword.has_key?(Keyword.get(&1, :components, []), component_key))
+
+      if disabled? and component_set? do
+        raise ArgumentError,
+              "invalid config for resource #{inspect(resource_mod)}: " <>
+                "#{with_key}: false cannot be combined with a custom :#{component_key} component"
+      end
+    end)
   end
 
   def build_session(conn, base_path, opts) do
