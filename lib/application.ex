@@ -7,7 +7,7 @@ defmodule LiveAdmin.Application do
     global_options_schema =
       LiveAdmin.base_configs_schema() ++
         [
-          css_overrides: [type: :string],
+          css_overrides: [type: {:or, [:string, {:tuple, [:atom, :atom, {:list, :any}]}]}],
           gettext_backend: [type: :atom],
           session_store: [type: :atom]
         ]
