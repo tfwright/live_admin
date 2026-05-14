@@ -1,3 +1,28 @@
+defmodule LiveAdminTest.CustomFormComponent do
+  use Phoenix.LiveComponent
+
+  def render(assigns), do: ~H"<div>custom form</div>"
+end
+
+defmodule LiveAdminTest.UserWithCustomCreate do
+  use LiveAdmin.Resource,
+    schema: LiveAdminTest.User,
+    create_with: false,
+    components: [create: LiveAdminTest.CustomFormComponent]
+end
+
+defmodule LiveAdminTest.UserWithCustomCreateOnly do
+  use LiveAdmin.Resource,
+    schema: LiveAdminTest.User,
+    components: [create: LiveAdminTest.CustomFormComponent]
+end
+
+defmodule LiveAdminTest.UserWithCustomEditOnly do
+  use LiveAdmin.Resource,
+    schema: LiveAdminTest.User,
+    components: [edit: LiveAdminTest.CustomFormComponent]
+end
+
 defmodule LiveAdminTest.User do
   use Ecto.Schema
 
