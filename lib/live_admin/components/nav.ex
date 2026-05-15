@@ -16,7 +16,7 @@ defmodule LiveAdmin.Components.Nav do
         match?(
           %{
             metadata: %{
-              phoenix_live_view: {_, _, _, %{extra: %{session: {_, _, [^base_path, _]}}}}
+              phoenix_live_view: {_, _, _, %{extra: %{session: {_, _, [^base_path, _, _]}}}}
             }
           },
           r
