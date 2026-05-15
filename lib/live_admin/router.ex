@@ -98,17 +98,17 @@ defmodule LiveAdmin.Router do
     resource_opts = resource_mod.__live_admin_config__()
     levels = [resource_opts, scope_opts, app_opts]
 
-    Enum.each(@disabled_with_custom_component, fn {with_key, component_key} ->
-      disabled? = Enum.any?(levels, &(Keyword.get(&1, with_key) == false))
+    Enum.each(levels, fn level ->
+      Enum.each(@disabled_with_custom_component, fn {with_key, component_key} ->
+        disabled? = Keyword.get(level, with_key) == false
+        component_set? = Keyword.has_key?(Keyword.get(level, :components, []), component_key)
 
-      component_set? =
-        Enum.any?(levels, &Keyword.has_key?(Keyword.get(&1, :components, []), component_key))
-
-      if disabled? and component_set? do
-        raise ArgumentError,
-              "invalid config for resource #{inspect(resource_mod)}: " <>
-                "#{with_key}: false cannot be combined with a custom :#{component_key} component"
-      end
+        if disabled? and component_set? do
+          raise ArgumentError,
+                "invalid config for resource #{inspect(resource_mod)}: " <>
+                  "#{with_key}: false cannot be combined with a custom :#{component_key} component at the same level"
+        end
+      end)
     end)
   end
 
