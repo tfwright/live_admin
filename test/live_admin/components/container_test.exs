@@ -219,6 +219,18 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
+  describe "edit resource with id that cannot be cast" do
+    setup %{conn: conn} do
+      {:ok, view, _} = live(conn, "/user/edit/not-a-number")
+
+      %{view: view}
+    end
+
+    test "renders no record found message", %{view: view} do
+      assert has_element?(view, "*", "No record found")
+    end
+  end
+
   describe "edit resource with embed" do
     setup %{conn: conn} do
       user = Repo.insert!(%User{settings: %{}})
