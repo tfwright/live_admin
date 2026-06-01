@@ -55,6 +55,8 @@ defmodule LiveAdmin.Resource do
     resource
     |> query(nil, config)
     |> repo.get(key, prefix: prefix)
+  rescue
+    Ecto.Query.CastError -> nil
   end
 
   def delete(record, resource, session, repo, config) do
