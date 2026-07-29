@@ -23,10 +23,27 @@ defmodule LiveAdmin.Router do
 
       @base_path Path.join(["/", current_path, unquote(path)])
       @__live_admin_scope_opts__ unquote(opts)
+      @__live_admin_app_config__ [
+        components: Application.compile_env(:live_admin, :components, []),
+        query_with: Application.compile_env(:live_admin, :query_with),
+        render_with: Application.compile_env(:live_admin, :render_with),
+        delete_with: Application.compile_env(:live_admin, :delete_with),
+        create_with: Application.compile_env(:live_admin, :create_with),
+        update_with: Application.compile_env(:live_admin, :update_with),
+        validate_with: Application.compile_env(:live_admin, :validate_with),
+        label_with: Application.compile_env(:live_admin, :label_with),
+        title_with: Application.compile_env(:live_admin, :title_with),
+        hidden_fields: Application.compile_env(:live_admin, :hidden_fields, []),
+        immutable_fields: Application.compile_env(:live_admin, :immutable_fields, []),
+        actions: Application.compile_env(:live_admin, :actions, []),
+        tasks: Application.compile_env(:live_admin, :tasks, [])
+      ]
 
       scope unquote(path), alias: false, as: false do
         live_session :"live_admin_#{@base_path}",
-          session: {unquote(__MODULE__), :build_session, [@base_path, unquote(opts)]},
+          session:
+            {unquote(__MODULE__), :build_session,
+             [@base_path, unquote(opts), @__live_admin_app_config__]},
           root_layout: {LiveAdmin.View, :layout},
           layout: {LiveAdmin.View, :app},
           on_mount: {unquote(__MODULE__), :assign_options} do
@@ -58,9 +75,7 @@ defmodule LiveAdmin.Router do
       LiveAdmin.Router.__validate_config__!(
         resource_mod,
         @__live_admin_scope_opts__,
-        create_with: Application.compile_env(:live_admin, :create_with),
-        update_with: Application.compile_env(:live_admin, :update_with),
-        components: Application.compile_env(:live_admin, :components, [])
+        @__live_admin_app_config__
       )
 
       full_path = Path.join(@base_path, path)
@@ -112,7 +127,7 @@ defmodule LiveAdmin.Router do
     end)
   end
 
-  def build_session(conn, base_path, opts) do
+  def build_session(conn, base_path, opts, app_config) do
     opts_schema =
       LiveAdmin.base_configs_schema() ++
         [title: [type: :string, default: "LiveAdmin"], on_mount: [type: {:tuple, [:atom, :atom]}]]
@@ -128,7 +143,7 @@ defmodule LiveAdmin.Router do
           index: LiveAdmin.Components.Container.Index,
           show: LiveAdmin.Components.Container.Show
         ],
-        Application.get_env(:live_admin, :components, [])
+        Keyword.get(app_config, :components, [])
       )
 
     opts =
@@ -139,21 +154,18 @@ defmodule LiveAdmin.Router do
         Keyword.merge(default_components, Keyword.get(opts, :components, []))
       )
       |> Keyword.put_new(:ecto_repo, Application.get_env(:live_admin, :ecto_repo))
-      |> Keyword.put_new(:render_with, Application.get_env(:live_admin, :render_with))
-      |> Keyword.put_new(:delete_with, Application.get_env(:live_admin, :delete_with))
-      |> Keyword.put_new(:create_with, Application.get_env(:live_admin, :create_with))
-      |> Keyword.put_new(:query_with, Application.get_env(:live_admin, :query_with))
-      |> Keyword.put_new(:update_with, Application.get_env(:live_admin, :update_with))
-      |> Keyword.put_new(:label_with, Application.get_env(:live_admin, :label_with))
-      |> Keyword.put_new(:title_with, Application.get_env(:live_admin, :title_with))
-      |> Keyword.put_new(:validate_with, Application.get_env(:live_admin, :validate_with))
-      |> Keyword.put_new(:hidden_fields, Application.get_env(:live_admin, :hidden_fields, []))
-      |> Keyword.put_new(
-        :immutable_fields,
-        Application.get_env(:live_admin, :immutable_fields, [])
-      )
-      |> Keyword.put_new(:actions, Application.get_env(:live_admin, :actions, []))
-      |> Keyword.put_new(:tasks, Application.get_env(:live_admin, :tasks, []))
+      |> Keyword.put_new(:render_with, Keyword.get(app_config, :render_with))
+      |> Keyword.put_new(:delete_with, Keyword.get(app_config, :delete_with))
+      |> Keyword.put_new(:create_with, Keyword.get(app_config, :create_with))
+      |> Keyword.put_new(:query_with, Keyword.get(app_config, :query_with))
+      |> Keyword.put_new(:update_with, Keyword.get(app_config, :update_with))
+      |> Keyword.put_new(:label_with, Keyword.get(app_config, :label_with))
+      |> Keyword.put_new(:title_with, Keyword.get(app_config, :title_with))
+      |> Keyword.put_new(:validate_with, Keyword.get(app_config, :validate_with))
+      |> Keyword.put_new(:hidden_fields, Keyword.get(app_config, :hidden_fields, []))
+      |> Keyword.put_new(:immutable_fields, Keyword.get(app_config, :immutable_fields, []))
+      |> Keyword.put_new(:actions, Keyword.get(app_config, :actions, []))
+      |> Keyword.put_new(:tasks, Keyword.get(app_config, :tasks, []))
 
     %{
       "session_id" => LiveAdmin.session_store().init!(conn),

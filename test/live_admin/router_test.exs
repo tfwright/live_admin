@@ -1,7 +1,61 @@
 defmodule LiveAdmin.RouterTest do
   use ExUnit.Case, async: true
 
+  import Mox
+
   alias LiveAdmin.Router
+
+  setup :verify_on_exit!
+
+  describe "build_session/4 with a compile-time resource option in app_config" do
+    setup do
+      stub_with(LiveAdminTest.MockSession, LiveAdminTest.StubSession)
+
+      session =
+        Router.build_session(
+          %Plug.Conn{},
+          "/admin",
+          [],
+          create_with: {SomeMod, :some_fun}
+        )
+
+      %{session: session}
+    end
+
+    test "resolves the option from app_config", %{session: session} do
+      assert session["opts"][:create_with] == {SomeMod, :some_fun}
+    end
+  end
+
+  describe "build_session/4 when a compile-time resource option is set in runtime Application env" do
+    setup do
+      stub_with(LiveAdminTest.MockSession, LiveAdminTest.StubSession)
+
+      Application.put_env(:live_admin, :create_with, {RuntimeMod, :runtime_fun})
+      on_exit(fn -> Application.delete_env(:live_admin, :create_with) end)
+
+      session = Router.build_session(%Plug.Conn{}, "/admin", [], [])
+
+      %{session: session}
+    end
+
+    test "ignores the runtime value", %{session: session} do
+      refute session["opts"][:create_with]
+    end
+  end
+
+  describe "build_session/4 list-typed resource options not provided in app_config" do
+    setup do
+      stub_with(LiveAdminTest.MockSession, LiveAdminTest.StubSession)
+
+      session = Router.build_session(%Plug.Conn{}, "/admin", [], [])
+      %{session: session}
+    end
+
+    test "default to an empty list", %{session: session} do
+      assert session["opts"][:hidden_fields] == []
+    end
+  end
 
   describe "create_with: false and custom :create component at the resource level" do
     test "raises ArgumentError" do

@@ -117,8 +117,13 @@ Extra options:
 
 App config can be used to set a global default to apply to all resources unless overridden in their individual config, or the LiveAdmin instance.
 
-Extra options:
+When set at the application level, resource-level keys are read at **compile time**, and must be configured in `config/config.exs` (or another compile-time config file). Setting any of them in `config/runtime.exs` (or otherwise at runtime) will raise on boot.
 
+Compile-time keys: `components`, `query_with`, `render_with`, `delete_with`, `create_with`, `update_with`, `validate_with`, `label_with`, `title_with`, `hidden_fields`, `immutable_fields`, `actions`, `tasks`
+
+Runtime keys:
+
+* `ecto_repo` - module used to execute queries (Required)
 * `session_store` - a module implementing the `LiveAdmin.Session.Store` behavior, used to persist session data (default: LiveAdmin.Session.Agent)
 * `css_overrides` - a binary or MFA identifying a function that returns CSS to be appended to app css
 * `gettext_backend` - a module implementing the [Gettext API](https://hexdocs.pm/gettext/Gettext.html#module-gettext-api) that will be used for translations
