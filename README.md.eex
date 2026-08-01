@@ -117,7 +117,7 @@ Extra options:
 
 App config can be used to set a global default to apply to all resources unless overridden in their individual config, or the LiveAdmin instance.
 
-When set at the application level, resource-level keys are read at **compile time**, and must be configured in `config/config.exs` (or another compile-time config file). Setting any of them in `config/runtime.exs` (or otherwise at runtime) will raise on boot.
+When set at the application level, resource-level keys are read at **compile time** via `Application.compile_env/2` and must be configured in `config/config.exs` (or another compile-time config file). Setting any of them in `config/runtime.exs` will cause Elixir to raise on boot due to the compile/runtime mismatch.
 
 Compile-time keys: `components`, `query_with`, `render_with`, `delete_with`, `create_with`, `update_with`, `validate_with`, `label_with`, `title_with`, `hidden_fields`, `immutable_fields`, `actions`, `tasks`
 

@@ -121,7 +121,7 @@ defmodule LiveAdmin do
 
   Used internally to validate configuration in apps using LiveAdmin.
 
-  When set at the application level, every option in this schema *except* `ecto_repo` is read at compile time. Configure them in `config/config.exs` (or another compile-time config file); setting them at runtime will raise on boot.
+  When set at the application level, every option in this schema *except* `ecto_repo` is read at compile time via `Application.compile_env/2`. Configure them in `config/config.exs` (or another compile-time config file); setting them in `config/runtime.exs` will cause Elixir to raise on boot due to the compile/runtime mismatch.
 
   Supported options:
   #{@options_schema |> NimbleOptions.new!() |> NimbleOptions.docs()}
