@@ -207,7 +207,7 @@ defmodule LiveAdmin do
            schema |> parent_associations() |> Enum.find(&(&1.owner_key == field_name)),
          config when not is_nil(config) <-
            Enum.find(resources, fn {_, resource} ->
-             Keyword.fetch!(resource.__live_admin_config__, :schema) == assoc_schema
+             Keyword.fetch!(resource.__live_admin_config__(), :schema) == assoc_schema
            end) do
       case part do
         nil -> config
