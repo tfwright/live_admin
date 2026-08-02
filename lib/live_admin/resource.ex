@@ -35,6 +35,12 @@ defmodule LiveAdmin.Resource do
     end
   end
 
+  @doc """
+  Fetches every record of `resource` whose primary key is contained in `keys`.
+
+  Records are loaded from `repo` within the given schema `prefix` (the Ecto
+  query prefix used for multi-tenancy). Returns a list of schema structs.
+  """
   def all(keys, resource, prefix, repo) do
     key = LiveAdmin.primary_key!(resource)
 
@@ -44,6 +50,9 @@ defmodule LiveAdmin.Resource do
     |> repo.all(prefix: prefix)
   end
 
+  @doc """
+  Same as `find/5`, but raises `Ecto.NoResultsError` when no record matches.
+  """
   def find!(key, resource, prefix, repo, config) do
     find(key, resource, prefix, repo, config) ||
       raise(Ecto.NoResultsError,
@@ -51,6 +60,14 @@ defmodule LiveAdmin.Resource do
       )
   end
 
+  @doc """
+  Fetches the single record of `resource` identified by primary key `key`.
+
+  The lookup runs against the query built by `query/3` (so any `query_with`
+  override is respected) within the given schema `prefix`. Returns the record,
+  or `nil` when it is not found or when `key` cannot be cast to the primary key
+  type.
+  """
   def find(key, resource, prefix, repo, config) do
     resource
     |> query(nil, config)
@@ -59,6 +76,12 @@ defmodule LiveAdmin.Resource do
     Ecto.Query.CastError -> nil
   end
 
+  @doc """
+  Deletes `record`.
+
+  When the resource configures `delete_with`, that function is invoked with
+  `record` and the current `session` instead of the default `repo.delete/1`.
+  """
   def delete(record, resource, session, repo, config) do
     resource
     |> LiveAdmin.fetch_config(:delete_with, config)
@@ -74,6 +97,21 @@ defmodule LiveAdmin.Resource do
     end
   end
 
+  @doc """
+  Lists records of `resource` for the index view.
+
+  `opts` is an enumerable that tunes the query; all keys are optional:
+
+    * `:page` - one-based page number (default `1`)
+    * `:per` - page size (defaults to the session's `index_page_size`)
+    * `:sort_attr` - field to order by (defaults to the primary key)
+    * `:sort_dir` - `:asc` or `:desc` (default `:asc`)
+    * `:search` - search string passed to `query/3`
+    * `:prefix` - schema prefix to query within
+
+  Returns a `{records, total_count}` tuple, where `total_count` ignores
+  pagination so it reflects the full result set.
+  """
   def list(resource, opts, session, repo, config) do
     opts =
       opts
@@ -100,6 +138,14 @@ defmodule LiveAdmin.Resource do
     }
   end
 
+  @doc """
+  Builds an `Ecto.Changeset` for `resource`.
+
+  Pass an existing `record` to build an update changeset, or omit it (or pass
+  `nil`) to build a changeset over a new struct for creation. `params` are cast
+  according to the resource's editable fields, skipping `immutable_fields` and
+  handling embeds. This drives the create and edit forms.
+  """
   def change(resource, record \\ nil, params \\ %{}, config)
 
   def change(resource, record, params, config) when is_struct(record) do
@@ -113,6 +159,13 @@ defmodule LiveAdmin.Resource do
     |> build_changeset(resource, params, config)
   end
 
+  @doc """
+  Creates a new record of `resource` from `params`.
+
+  When the resource configures `create_with`, that function is invoked with
+  `params` and the current `session`. Otherwise a changeset built by `change/4`
+  is inserted via `repo`, within the session's prefix.
+  """
   def create(resource, params, session, repo, config) do
     resource
     |> LiveAdmin.fetch_config(:create_with, config)
@@ -130,6 +183,13 @@ defmodule LiveAdmin.Resource do
     end
   end
 
+  @doc """
+  Updates `record` with `params`.
+
+  When the resource configures `update_with`, that function is invoked with
+  `record`, `params`, and the current `session`. Otherwise a changeset built by
+  `change/4` is persisted via the resource's configured `ecto_repo`.
+  """
   def update(record, resource, params, session, config) do
     resource
     |> LiveAdmin.fetch_config(:update_with, config)
@@ -149,6 +209,14 @@ defmodule LiveAdmin.Resource do
     end
   end
 
+  @doc """
+  Runs validation for `changeset` and marks it with the `:validate` action.
+
+  When the resource configures `validate_with`, that function receives the
+  `changeset` and current `session` and returns the changeset to use; otherwise
+  the changeset is returned unchanged. Setting the `:validate` action lets the
+  form surface errors without attempting to persist.
+  """
   def validate(changeset, resource, session, config) do
     resource
     |> LiveAdmin.fetch_config(:validate_with, config)
@@ -160,6 +228,14 @@ defmodule LiveAdmin.Resource do
     |> Map.put(:action, :validate)
   end
 
+  @doc """
+  Returns the displayable fields of `resource`.
+
+  Each entry is a `{field_name, native_type, opts}` tuple, where `native_type`
+  is the underlying Ecto type (custom types are resolved to the type they cast
+  to) and `opts` carries `immutable: boolean`. Fields listed in the resource's
+  `hidden_fields` are excluded, and those in `immutable_fields` are flagged.
+  """
   def fields(resource, config) do
     schema = Keyword.fetch!(resource.__live_admin_config__(), :schema)
     hidden_fields = LiveAdmin.fetch_config(resource, :hidden_fields, config)
@@ -291,6 +367,15 @@ defmodule LiveAdmin.Resource do
 
   defp parse_map_param(param), do: param
 
+  @doc """
+  Builds the base `Ecto.Query` used to list and look up records of `resource`.
+
+  When the resource configures `query_with`, that function is invoked with the
+  `resource` and `search` term and its result is used as-is. Otherwise the
+  resource's schema is queried directly; a non-empty `search` string is applied
+  across the resource's fields, supporting both `term` (all fields) and
+  `field:term` (single field) syntax.
+  """
   def query(resource, search, config) do
     resource
     |> fetch_config(:query_with, config)
@@ -316,6 +401,13 @@ defmodule LiveAdmin.Resource do
     end
   end
 
+  @doc """
+  Renders the value of `field` on `record` for display.
+
+  When the resource configures `render_with`, that function receives the
+  `record`, `field`, and current `session` and returns the content to display.
+  Otherwise the raw value is formatted by `render/2` based on its `type`.
+  """
   def render(record, field, type, resource, config, session) do
     resource
     |> LiveAdmin.fetch_config(:render_with, config)
@@ -326,6 +418,13 @@ defmodule LiveAdmin.Resource do
     end
   end
 
+  @doc """
+  Formats a raw `value` for display according to its Ecto `type`.
+
+  Handles the common built-in types (dates and times via `Calendar.strftime/2`,
+  maps and embeds via `inspect/2`, arrays element-wise) and falls back to an
+  HTML-safe rendering for everything else. `nil` renders as an empty string.
+  """
   def render(nil, _), do: ""
   def render(val, {_, {Ecto.Embedded, _}}), do: inspect(val, pretty: true)
   def render(val, :map), do: inspect(val, pretty: true)
