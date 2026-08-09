@@ -1,4 +1,16 @@
 defmodule LiveAdmin.Session.Agent do
+  @moduledoc """
+  Default `LiveAdmin.Session.Store` implementation backed by an in-memory `Agent`.
+
+  Sessions are held in process state keyed by id, so they are fast but ephemeral:
+  restarting the server clears the store. When a socket reconnects to a session
+  that no longer exists, `load!/1` raises `InvalidSessionId`; the session is then
+  regenerated automatically on reload, so the error is safe to ignore.
+
+  To persist sessions across restarts, implement your own
+  `LiveAdmin.Session.Store` and set it via the `:session_store` config.
+  """
+
   defmodule InvalidSessionId do
     defexception [:message]
 
