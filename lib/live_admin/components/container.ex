@@ -263,14 +263,21 @@ defmodule LiveAdmin.Components.Container do
     params =
       {defaults, types}
       |> Ecto.Changeset.cast(params, Map.keys(types))
-      |> Ecto.Changeset.apply_action!(:update)
+      |> Ecto.Changeset.apply_changes()
 
     assign(socket, params)
   end
 
   defp redirect_with_params(socket, params) do
-    if Enum.all?(["per", "page", "sort-attr", "sort-dir"], &Map.has_key?(params, &1)) &&
-         Map.get(params, "prefix") == socket.assigns.prefix do
+    canonical = %{
+      "page" => to_string(socket.assigns.page),
+      "per" => to_string(socket.assigns.per),
+      "sort-attr" => to_string(socket.assigns.sort_attr),
+      "sort-dir" => to_string(socket.assigns.sort_dir),
+      "prefix" => socket.assigns.prefix
+    }
+
+    if Enum.all?(canonical, fn {key, val} -> Map.get(params, key) == val end) do
       socket
     else
       push_navigate(socket,

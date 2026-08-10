@@ -100,6 +100,23 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
+  describe "list resource with invalid page param" do
+    setup %{conn: conn} do
+      Repo.insert!(%User{})
+
+      {:error, {:live_redirect, %{to: redirect_to}}} =
+        live(conn, "/user?prefix=public&per=10&page=abc&sort-attr=id&sort-dir=asc")
+
+      %{redirect_to: redirect_to}
+    end
+
+    test "redirects to url with the invalid param replaced by the default", %{
+      redirect_to: redirect_to
+    } do
+      assert redirect_to =~ ~r/page=1(?![0-9])/
+    end
+  end
+
   describe "list resource with search param not matching any records" do
     setup %{conn: conn} do
       Repo.insert!(%User{name: "Tom"})
