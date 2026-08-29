@@ -134,7 +134,7 @@ defmodule LiveAdmin.Components.Container.Index do
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.35-4.35" />
               </svg>
-              <form phx-change={JS.push("search", target: @myself, page_loading: true)}>
+              <form id="index-search-form" phx-change={JS.push("search", target: @myself, page_loading: true)}>
                 <input
                   type="text"
                   placeholder={"#{trans("Search")}..."}
@@ -155,7 +155,12 @@ defmodule LiveAdmin.Components.Container.Index do
                     <thead>
                       <tr>
                         <th>
-                          <form phx-change="toggle_select" phx-debounce={500} phx-target={@myself}>
+                          <form
+                            id="index-select-all-form"
+                            phx-change="toggle_select"
+                            phx-debounce={500}
+                            phx-target={@myself}
+                          >
                             <input
                               type="checkbox"
                               class="row-checkbox"
@@ -195,7 +200,12 @@ defmodule LiveAdmin.Components.Container.Index do
                         <%= for record <- elem(@records.result, 0), record_id = Map.fetch!(record, LiveAdmin.primary_key!(@resource)) do %>
                           <tr>
                             <td>
-                              <form phx-change="toggle_select" phx-debounce={500} phx-target={@myself}>
+                              <form
+                                id={"index-select-#{record_id}"}
+                                phx-change="toggle_select"
+                                phx-debounce={500}
+                                phx-target={@myself}
+                              >
                                 <input
                                   type="checkbox"
                                   class="row-checkbox"

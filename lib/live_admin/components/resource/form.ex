@@ -56,6 +56,7 @@ defmodule LiveAdmin.Components.Container.Form do
           <div class="edit-view">
             <.form
               :let={f}
+              id="resource-form"
               for={@changeset}
               as={:params}
               phx-change="validate"
