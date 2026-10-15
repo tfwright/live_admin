@@ -262,6 +262,28 @@ defmodule LiveAdmin.Components.ContainerTest do
     end
   end
 
+  describe "edit resource after adding singular embed with only array fields" do
+    setup %{conn: conn} do
+      user = Repo.insert!(%User{})
+
+      {:ok, view, _} = live(conn, "/user/edit/#{user.id}")
+
+      view
+      |> element("form")
+      |> render_change(%{"params" => %{"private_data_sort" => "0"}})
+
+      view
+      |> element("form")
+      |> render_change(%{"params" => %{"name" => "test"}})
+
+      %{view: view}
+    end
+
+    test "keeps embed form field", %{view: view} do
+      assert has_element?(view, "#params_private_data_0_aliases_array_input")
+    end
+  end
+
   describe "edit resource with plural embed with multiple entries" do
     setup %{conn: conn} do
       post = Repo.insert!(%Post{title: "test", previous_versions: [%Version{}, %Version{}]})

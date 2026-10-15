@@ -37,6 +37,7 @@ defmodule LiveAdminTest.User do
     field(:encrypted_password, :string)
 
     embeds_one(:settings, LiveAdminTest.Settings)
+    embeds_one(:private_data, LiveAdminTest.PrivateData)
   end
 
   def user_task(_, _), do: {:ok, "worked"}
@@ -93,6 +94,15 @@ defmodule LiveAdminTest.Settings do
   embedded_schema do
     field(:some_option, :string)
     field(:metadata, :map)
+  end
+end
+
+defmodule LiveAdminTest.PrivateData do
+  use Ecto.Schema
+
+  @primary_key false
+  embedded_schema do
+    field(:aliases, {:array, :string})
   end
 end
 

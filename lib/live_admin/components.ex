@@ -88,7 +88,7 @@ defmodule LiveAdmin.Components do
           <h2 class="embed-section-title">{@field |> humanize() |> trans()}</h2>
         </div>
         <%= if @value do %>
-          <.inputs_for :let={embed_form} field={@form[@field]} skip_hidden={true}>
+          <.inputs_for :let={embed_form} field={@form[@field]}>
             <%= if sortable?(@value) do %>
               <div class="drop-zone" data-idx={embed_form.index}>{trans("Move here")}</div>
             <% end %>
