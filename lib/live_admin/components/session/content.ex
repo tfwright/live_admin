@@ -21,6 +21,7 @@ defmodule LiveAdmin.Components.Session.Content do
           <div class="edit-view">
             <.form
               :let={f}
+              id="session-form"
               for={@changeset}
               as={:session}
               phx-submit={:save}
